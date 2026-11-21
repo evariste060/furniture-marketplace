@@ -98,6 +98,7 @@ from app.models.commerce import (
 from app.models.content import QuoteRequest
 from app.models.engagement import ProductReview
 from app.models.identity import User
+from app.models.marketplace import StoreStatusHistory
 from app.models.services import ServiceRequest
 from app.models.support import SupportMessage
 from app.schemas.notifications import NotificationItem
@@ -114,9 +115,18 @@ CustomerOrderEvent = Literal[
     "received", "payment_succeeded", "confirmed", "dispatched", "delivered", "cancelled"
 ]
 EmailEvent = Literal[
-    "welcome", "quote_received", "review_thanks", "support_reply", "service_received"
+    "welcome",
+    "quote_received",
+    "review_thanks",
+    "support_reply",
+    "service_received",
+    "store_application_received",
+    "store_approved",
+    "store_rejected",
+    "store_suspended",
+    "store_reinstated",
 ]
-SubjectType = Literal["order", "user", "quote", "review", "support", "service"]
+SubjectType = Literal["order", "user", "quote", "review", "support", "service", "store_status"]
 CUSTOMER_ORDER_EVENTS = ("received", "payment_succeeded", *ORDER_STATUS_EVENTS)
 EMAIL_SUBJECTS: dict[str, SubjectType] = {
     "welcome": "user",
@@ -124,6 +134,14 @@ EMAIL_SUBJECTS: dict[str, SubjectType] = {
     "review_thanks": "review",
     "support_reply": "support",  # subject: the staff reply (one email per reply)
     "service_received": "service",  # subject: the service request (ADR-013)
+    # ADR-014: the subject is the store_status_history row of that submission or decision, so
+    # each decision is its own message (a second rejection is not a duplicate) and the message
+    # is rendered from what was decided, never from the store's later state.
+    "store_application_received": "store_status",
+    "store_approved": "store_status",
+    "store_rejected": "store_status",
+    "store_suspended": "store_status",
+    "store_reinstated": "store_status",
 }
 SessionFactory = Callable[[], Session]
 
@@ -441,6 +459,15 @@ def _render(db: Session, row: NotificationLog) -> tpl.Rendered | None:
         return tpl.service_received(
             request.reference, request.full_name, request.service.name_en, link
         )
+    if row.subject_type == "store_status":
+        entry = db.get(StoreStatusHistory, row.subject_id)
+        if entry is None or row.event not in tpl.STORE_STATUS_COPY:
+            return None
+        owner = entry.store.owner
+        name = (owner.full_name or "").strip() or "there"
+        link = _link("View your seller account", "/account")
+        # The history row is append-only: its store name and reason are those of the event.
+        return tpl.store_status(row.event, name, entry.store_name, entry.reason, link)
     if row.subject_type == "review":
         found = db.execute(
             select(ProductReview.author_name, Product.name, Product.slug)

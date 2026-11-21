@@ -82,6 +82,8 @@ def test_matrix_matches_approved_policy():
             "quotes:manage",
             "reports:read",
             "reviews:moderate",
+            "sellers:manage",
+            "sellers:read",
             "services:manage",
             "services:read",
             "settings:manage",

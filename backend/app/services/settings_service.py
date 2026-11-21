@@ -4,7 +4,10 @@ Only keys registered in SETTINGS can be read or written through the API, so noth
 in the table is ever exposed. Module 12 registers delivery.free_delivery_threshold; module 16
 the seller details printed on invoices (seller.legal_name, seller.tin, seller.address); module 19
 the store contact (store.name, contact.*) and the announcement bar (announcement.*); the social
-media links (social.*, owner 2026-11-18) follow, "" meaning no link. Only the
+media links (social.*, owner 2026-11-18) follow, "" meaning no link. ADR-014 phase 1 adds
+marketplace.default_commission_bps (whole basis points; unset means 1000, 10%). Note: the
+seller.* invoice keys describe the platform as invoice issuer (ADR-014 decision 12), not a
+marketplace seller. Only the
 keys in PUBLIC_KEYS are served without signing in (GET /settings); everything else is staff only.
 The announcement bar can be switched on only while both its messages are set.
 
@@ -42,6 +45,7 @@ from app.schemas.settings import (
     ANNOUNCEMENT_MAX,
     ANNOUNCEMENT_TEXT_EN,
     ANNOUNCEMENT_TEXT_RW,
+    COMMISSION_BPS_MAX,
     CONTACT_ADDRESS,
     CONTACT_ADDRESS_MAX,
     CONTACT_EMAIL,
@@ -49,9 +53,11 @@ from app.schemas.settings import (
     CONTACT_HOURS_MAX,
     CONTACT_PHONE,
     CONTACT_WHATSAPP,
+    DEFAULT_COMMISSION_BPS,
     FREE_DELIVERY_THRESHOLD,
     INTERNATIONAL_PHONE_PATTERN,
     LEGAL_NAME_MAX,
+    MARKETPLACE_DEFAULT_COMMISSION,
     SELLER_ADDRESS,
     SELLER_LEGAL_NAME,
     SELLER_TIN,
@@ -120,6 +126,11 @@ def _is_flag(value: Any) -> bool:
     return isinstance(value, bool)
 
 
+def _is_bps(value: Any) -> bool:
+    """Whole basis points 0-10000; never a float or a bool."""
+    return type(value) is int and 0 <= value <= COMMISSION_BPS_MAX
+
+
 def _social(hosts: tuple[str, ...]) -> Callable[[Any], bool]:
     def valid(value: Any) -> bool:
         return isinstance(value, str) and social_url_problem(value, hosts) is None
@@ -146,6 +157,7 @@ SETTINGS: dict[str, SettingRule] = {
     ANNOUNCEMENT_ENABLED: SettingRule(valid=_is_flag),
     ANNOUNCEMENT_TEXT_EN: SettingRule(valid=_text(3, ANNOUNCEMENT_MAX)),
     ANNOUNCEMENT_TEXT_RW: SettingRule(valid=_text(3, ANNOUNCEMENT_MAX)),
+    MARKETPLACE_DEFAULT_COMMISSION: SettingRule(valid=_is_bps),
     **{
         SOCIAL_KEYS[name]: SettingRule(valid=_social(hosts))
         for name, hosts in SOCIAL_NETWORKS.items()
@@ -188,6 +200,13 @@ def get_value(db: Session, key: str) -> Any:
 def free_delivery_threshold(db: Session) -> int | None:
     value = get_value(db, FREE_DELIVERY_THRESHOLD)
     return int(value) if value is not None else None
+
+
+def default_commission_bps(db: Session) -> int:
+    """The platform commission in basis points: the stored setting, or DEFAULT_COMMISSION_BPS
+    (10%) while it is unset or invalid (an invalid row is logged by get_value). ADR-014."""
+    value = get_value(db, MARKETPLACE_DEFAULT_COMMISSION)
+    return int(value) if value is not None else DEFAULT_COMMISSION_BPS
 
 
 def seller_details(db: Session) -> dict[str, str] | None:

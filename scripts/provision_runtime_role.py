@@ -33,7 +33,10 @@ UPDATE; never deleted). Policy pages (module 19) are written by staff and read b
 and business quote requests are sent by visitors and followed up by staff (pages, quote_requests:
 SELECT, INSERT, UPDATE; never deleted). Support conversations are started by visitors and
 customers and answered by staff (support_threads: SELECT, INSERT, UPDATE; support_messages:
-SELECT, INSERT, as messages are never edited; neither is deleted). Tables without a built feature
+SELECT, INSERT, as messages are never edited; neither is deleted). Marketplace stores (ADR-014)
+are created by applicants and updated by them and by administrators (stores: SELECT, INSERT,
+UPDATE; never deleted); their status history is append-only (store_status_history: SELECT,
+INSERT). Tables without a built feature
 get no privileges; extend TABLE_GRANTS in the same change that needs a privilege.
 It is not a superuser, cannot create roles/databases, and owns no table, so it cannot drop or
 disable the append-only audit trigger. Secrets are never printed.
@@ -176,6 +179,11 @@ TABLE_GRANTS: dict[str, tuple[str, ...]] = {
     "service_categories": ("SELECT", "INSERT", "UPDATE", "DELETE"),
     "service_items": ("SELECT", "INSERT", "UPDATE", "DELETE"),
     "service_requests": ("SELECT", "INSERT", "UPDATE"),
+    # Marketplace stores (ADR-014 phase 1, 2026-11-21): applicants create their store (INSERT),
+    # edit and resubmit it, administrators decide on it (UPDATE). A store is never deleted.
+    # Its status history is append-only: rows are added and read, never edited or deleted.
+    "stores": ("SELECT", "INSERT", "UPDATE"),
+    "store_status_history": ("SELECT", "INSERT"),
 }
 
 

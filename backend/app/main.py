@@ -150,6 +150,18 @@ tags_metadata = [
         "cash-on-delivery orders only, in Africa/Kigali days (weeks from Monday).",
     },
     {
+        "name": "Seller",
+        "description": "Marketplace sellers (ADR-014): a signed-in customer with a verified "
+        "email applies to sell and follows the application; an approved seller reads and edits "
+        "their own store. The store is always the caller's own, resolved on every request.",
+    },
+    {
+        "name": "Staff Sellers",
+        "description": "Seller applications and stores for administrators (sellers:read, "
+        "sellers:manage): review, approve, reject, suspend and reinstate, and the commission "
+        "override (ADR-014).",
+    },
+    {
         "name": "Support",
         "description": "Customer support conversations: sending a message (guests and "
         "customers), reading and replying by private link or from My messages, and the "

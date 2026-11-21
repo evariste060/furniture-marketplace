@@ -43,7 +43,8 @@ class MediaObject(Entity):
         CheckConstraint("kind IN ('original', 'public_source', 'incoming')", name="valid_kind"),
         CheckConstraint("state IN ('pending', 'active', 'deleting')", name="valid_state"),
         CheckConstraint(
-            "owner_type IN ('products', 'categories', 'brands', 'banners', 'jobs', 'services')",
+            "owner_type IN ('products', 'categories', 'brands', 'banners', 'jobs', 'services', "
+            "'stores')",
             name="valid_owner_type",
         ),
         CheckConstraint("sha256 ~ '^[0-9a-f]{64}$'", name="sha256_hex"),

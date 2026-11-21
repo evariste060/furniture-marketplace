@@ -399,6 +399,58 @@ def service_received(reference: str, full_name: str, service: str, link: Link | 
     )
 
 
+# Seller applications and decisions (ADR-014 phase 1). {store} is the store's name and {reason}
+# the administrator's reason, both as they were when the event was recorded.
+STORE_STATUS_COPY: dict[str, tuple[str, str, str]] = {
+    "store_application_received": (
+        "We received your seller application for {store}",
+        "Seller application received",
+        "Hi {name}, thank you for applying to sell on {brand} as {store}. Our team will review "
+        "your application and email you when it has been decided.",
+    ),
+    "store_approved": (
+        "Your store {store} is approved",
+        "Your store is approved",
+        "Hi {name}, good news: your seller application for {store} has been approved. You can "
+        "now set up your store and start listing your products.",
+    ),
+    "store_rejected": (
+        "Your seller application for {store} was not approved",
+        "Seller application not approved",
+        "Hi {name}, we could not approve your seller application for {store}. You can update "
+        "your application and send it again.",
+    ),
+    "store_suspended": (
+        "Your store {store} has been suspended",
+        "Your store is suspended",
+        "Hi {name}, your store {store} has been suspended. While it is suspended your store "
+        "and its products are not shown to customers and you cannot manage them.",
+    ),
+    "store_reinstated": (
+        "Your store {store} is active again",
+        "Your store is active again",
+        "Hi {name}, your store {store} has been reinstated. Customers can see it again and you "
+        "can manage it as before.",
+    ),
+}
+
+
+def store_status(
+    event: str, name: str, store: str, reason: str | None, link: Link | None
+) -> Rendered:
+    subject, title, first = STORE_STATUS_COPY[event]
+    paragraphs = [first.format(name=name, store=store, brand=BRAND)]
+    if reason and event in ("store_rejected", "store_suspended"):
+        paragraphs.append(f"Reason: {reason}")
+    return _message(
+        subject.format(store=store),
+        title,
+        paragraphs,
+        link,
+        f"{BRAND}: {title.lower()} ({store}).",
+    )
+
+
 def review_thanks(name: str, product: str, link: Link | None) -> Rendered:
     return _message(
         "Thank you for your review",

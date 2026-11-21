@@ -32,6 +32,12 @@ from the Contact page, for administrator and sales. content:manage also covers t
 
 notifications:manage (module 17: the notification log and retry) is administrator only, as
 listed in the final matrix (docs/IMPLEMENTATION_PLAN.md, §3); finance does not receive it.
+
+sellers:read and sellers:manage (ADR-014 phase 1, approved by the project owner on 2026-11-21):
+seller applications, stores and their owners' contact details. Administrator only in V1; no
+other staff role receives them. Sellers are store owners, not staff: they hold no permission
+here, and their access is scoped to their own approved store (app.core.dependencies
+require_approved_seller).
 """
 
 from enum import StrEnum
@@ -92,6 +98,9 @@ class Permission(StrEnum):
     # Technical services (ADR-013, 2026-11-17): the service pages and their requests.
     SERVICES_READ = "services:read"  # staff service list and service requests
     SERVICES_MANAGE = "services:manage"  # edit services, follow up requests
+    # Marketplace sellers (ADR-014 phase 1, 2026-11-21): administrator only in V1.
+    SELLERS_READ = "sellers:read"  # seller applications, stores and owner contact details
+    SELLERS_MANAGE = "sellers:manage"  # approve, reject, suspend, reinstate; commission override
 
 
 StaffRoleName = Literal["administrator", "sales", "operations", "management", "finance"]

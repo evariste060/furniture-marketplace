@@ -385,6 +385,14 @@ class InvoiceCounter(Base):
     last_number: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
+# Seller application events (ADR-014 phase 1); the subject is a store_status_history row.
+STORE_STATUS_EVENTS = (
+    "store_application_received",
+    "store_approved",
+    "store_rejected",
+    "store_suspended",
+    "store_reinstated",
+)
 # Module 17 (§7 Q22): order notifications.
 # Order status messages to the customer (module 17).
 ORDER_STATUS_EVENTS = ("confirmed", "dispatched", "delivered", "cancelled")
@@ -400,8 +408,10 @@ NOTIFICATION_EVENTS = (
     "review_thanks",
     "support_reply",
     "service_received",  # a service request with an email (ADR-013)
+    # Seller applications and decisions (ADR-014 phase 1), to the owner's verified email.
+    *STORE_STATUS_EVENTS,
 )
-NOTIFICATION_SUBJECTS = ("order", "user", "quote", "review", "support", "service")
+NOTIFICATION_SUBJECTS = ("order", "user", "quote", "review", "support", "service", "store_status")
 MAX_NOTIFICATION_ATTEMPTS = 3
 EMAIL_PATTERN = r"^[^@[:space:]]+@[^@[:space:]]+$"
 
@@ -466,7 +476,7 @@ class NotificationLog(Entity):
     subject_type: Mapped[str] = mapped_column(String(16), nullable=False)
     subject_id: Mapped[UUID] = mapped_column(nullable=False)
     dedupe_key: Mapped[str] = mapped_column(String(400), nullable=False)
-    event: Mapped[str] = mapped_column(String(24), nullable=False)
+    event: Mapped[str] = mapped_column(String(32), nullable=False)
     channel: Mapped[str] = mapped_column(String(8), nullable=False)
     recipient: Mapped[str] = mapped_column(String(320), nullable=False)
     status: Mapped[str] = mapped_column(

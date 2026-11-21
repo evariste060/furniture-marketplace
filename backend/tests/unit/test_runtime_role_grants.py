@@ -185,3 +185,9 @@ def test_google_sign_in_tables_have_exactly_the_privileges_the_service_uses():
 def test_email_verification_tokens_are_issued_and_updated_but_never_deleted():
     # Issued at registration and resend; consumed or revoked in place.
     assert sorted(GRANTS["email_verification_tokens"]) == ["INSERT", "SELECT", "UPDATE"]
+
+
+def test_stores_are_never_deleted_and_their_history_is_append_only():
+    # ADR-014 phase 1: applicants insert and edit their store, administrators decide on it.
+    assert sorted(GRANTS["stores"]) == ["INSERT", "SELECT", "UPDATE"]
+    assert sorted(GRANTS["store_status_history"]) == ["INSERT", "SELECT"]

@@ -78,6 +78,8 @@ Permissions are added only when the feature that uses them is built (ADR-006). A
 | `notifications:manage` | notification log and retry | ✓ | — | — | — | — | 17 |
 | `reviews:moderate` | approve or reject customer reviews | ✓ | ✓ | — | — | — | 20 part 2 (SC-01, 2026-10-27) |
 | `quotes:manage` | business quote requests: list and status | ✓ | ✓ | — | — | — | 19 (owner decision 2026-10-29) |
+| `sellers:read` | seller applications, stores and owner contact details | ✓ | — | — | — | — | ADR-014 phase 1 (owner decision 2026-11-21) |
+| `sellers:manage` | approve, reject, suspend, reinstate stores; commission override | ✓ | — | — | — | — | ADR-014 phase 1 (owner decision 2026-11-21) |
 
 ## 4. Before module 5 (in this order)
 

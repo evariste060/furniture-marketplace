@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import Depends, Request
@@ -11,8 +12,10 @@ from app.core.roles import effective_roles, has_permission
 from app.core.security import hash_session_token
 from app.db.session import get_db
 from app.models.identity import User
+from app.models.marketplace import Store
 from app.models.session import UserSession
 from app.repositories.session_repository import SessionRepository
+from app.repositories.store_repository import StoreRepository
 from app.services.audit_service import AuditService
 
 security_scheme = HTTPBearer(
@@ -100,3 +103,45 @@ def require_permission(required_permission: str) -> Callable:
     # Read by tests that enumerate every permission-protected route.
     permission_checker.required_permission = required_permission  # type: ignore[attr-defined]
     return permission_checker
+
+
+@dataclass(frozen=True)
+class SellerContext:
+    """The signed-in seller and their own approved store (ADR-014)."""
+
+    user: User
+    store: Store
+
+
+SELLER_NOT_APPROVED = "Seller access requires an approved store."
+
+
+def require_approved_seller(
+    request: Request,
+    ctx: Annotated[RequestContext, Depends(get_request_context)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+) -> SellerContext:
+    """The single authorization mechanism for seller features (ADR-014 decision 4).
+
+    The caller's store is read from the database on every request, never from the request or the
+    session, so a suspension applies to the very next call made with an existing session. No
+    store, or a store that is pending, rejected or suspended, is 403 seller_not_approved
+    (audited as auth.access_denied). Staff never own stores. Seller routes take no store id: what
+    a seller may touch is always their own store.
+    """
+    store = None if current_user.is_staff else StoreRepository.get_by_owner(db, current_user.id)
+    if store is None or store.status != "approved":
+        _deny(
+            db,
+            ctx,
+            request,
+            current_user,
+            {"required": "approved_seller", "store_status": store.status if store else None},
+        )
+        raise Forbidden(SELLER_NOT_APPROVED, code="seller_not_approved")
+    return SellerContext(user=current_user, store=store)
+
+
+# Read by tests that enumerate every seller-scoped route.
+require_approved_seller.seller_scoped = True  # type: ignore[attr-defined]

@@ -42,6 +42,12 @@ SOCIAL_NETWORKS: dict[str, tuple[str, ...]] = {
 }
 SOCIAL_KEYS = {name: f"social.{name}" for name in SOCIAL_NETWORKS}
 SOCIAL_URL_MAX = 300
+# Marketplace (ADR-014 phase 1): the commission on a seller's sales, in basis points (1000 =
+# 10.00 %), whole numbers only (no floating point). Unset means the 10 % default
+# (DEFAULT_COMMISSION_BPS); a store's own override wins over it.
+MARKETPLACE_DEFAULT_COMMISSION = "marketplace.default_commission_bps"
+DEFAULT_COMMISSION_BPS = 1000
+COMMISSION_BPS_MAX = 10_000
 
 # Seller details (module 16). Only shape is checked: no TIN format is assumed (Finance, PR-14).
 LEGAL_NAME_MAX = 200
@@ -243,6 +249,16 @@ class SettingsUpdateRequest(BaseModel):
         max_length=SOCIAL_URL_MAX,
         description="The store's LinkedIn page link (public): a full https:// link on "
         "linkedin.com. An empty string removes it from the store.",
+    )
+
+    marketplace_default_commission_bps: int | None = Field(
+        default=None,
+        alias="marketplace.default_commission_bps",
+        strict=True,
+        ge=0,
+        le=COMMISSION_BPS_MAX,
+        description="The platform commission on sellers' sales in basis points, 0-10000 "
+        "(1000 = 10%). Unset means 1000. A store's own override, when set, wins over it.",
     )
 
     @field_validator("contact_email")

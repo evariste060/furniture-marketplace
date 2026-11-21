@@ -36,8 +36,9 @@ SETTINGS = "/api/v1/staff/settings"
 CART = "/api/v1/cart"
 THRESHOLD = "delivery.free_delivery_threshold"
 REGISTERED = sorted(  # module 16 added the seller details, module 19 the store contact,
-    # the owner the social links (2026-11-18)
+    # the owner the social links (2026-11-18), ADR-014 phase 1 the default commission
     [
+        "marketplace.default_commission_bps",
         "social.facebook",
         "social.instagram",
         "social.x",

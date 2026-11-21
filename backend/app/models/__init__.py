@@ -25,6 +25,7 @@ from app.models.engagement import ProductReview, ReviewToken, WishlistItem
 from app.models.identity import Address, OAuthIdentity, StaffRoleAssignment, User
 from app.models.inventory import InventoryBalance, StockMovement, StockReservation
 from app.models.jobs import Job, JobItem
+from app.models.marketplace import Store, StoreStatusHistory
 from app.models.media import MediaObject
 from app.models.operations import (
     AuditRecord,
@@ -53,6 +54,8 @@ __all__ = [
     "ServiceCategory",
     "ServiceItem",
     "ServiceRequest",
+    "Store",
+    "StoreStatusHistory",
     "Brand",
     "Cart",
     "CartItem",

@@ -38,13 +38,25 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 
 | Phase | Scope | Status |
 | --- | --- | --- |
-| 0 | Baseline commit `03bb5cc`; this ADR, SC-04, AGENTS.md and README updates | Done (2026-11-21); awaiting owner review |
-| 1 | `stores`, seller application and admin review APIs, `require_approved_seller`, `sellers:*` permissions, runtime-role grants | Not started |
+| 0 | Baseline commit `03bb5cc`; this ADR, SC-04, AGENTS.md and README updates | Done (2026-11-21); approved |
+| 1 | `stores`, seller application and admin review APIs, `require_approved_seller`, `sellers:*` permissions, runtime-role grants | Implemented (2026-11-21); see "Phase 1 as built" |
 | 2 | `products.store_id`, store-scoped seller product, image and inventory APIs, approved-store catalogue filter, public store endpoints, cross-store isolation tests | Not started |
 | 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Not started |
 | 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Not started |
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Not started |
 | 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
+
+## Phase 1 as built (2026-11-21)
+
+Owner decisions for phase 1 (2026-11-21): a verified account email is required to apply; only administrators hold `sellers:read` and `sellers:manage`; store names are unique regardless of letter case; the default commission is 1,000 basis points.
+
+- **Migration `f4c8a2e6b9d3`** (after `e5a1c7d9b3f2`): `stores` and `store_status_history`; `media_objects.owner_type` also allows `stores`; `notification_logs` allows the five store events about a `store_status` subject, and `notification_logs.event` is widened from 24 to 32 characters (`store_application_received` has 26). It inserts no rows (no migration does; `test_migrations_have_no_sample_data.py`). The downgrade refuses while stores, store notifications or store media exist.
+- **`stores`**: `owner_user_id` unique (`uq_stores_owner_user_id`, one store per user for life), slug unique and lower-case hyphenated, `uq_stores_name_lower` on `lower(name)`, canonical phone and lower-case email checks, `status_reason` present exactly while rejected or suspended, `reviewed_at` set once decided, `approved_at` set at the first approval and kept, commission 0–10,000 or NULL, logo and cover media pairs (uploads arrive in phase 2).
+- **`store_status_history`** is append-only (the runtime role has SELECT and INSERT only): one row per submission, resubmission and decision, with the status, reason, store name at the time and actor. Each row is the subject of that event's email, so the outbox's `subject:id:event` deduplication never drops a second rejection, and a retry renders the decision it was recorded for, not the store's later name or reason.
+- **Emails** go to the owner's verified account email, never the store's contact email (which nobody verified). They are in English, like the other transactional emails, and still carry the platform brand constant until phase 6.
+- **Commission**: `app.services.store_service.effective_commission_bps` is the only place the rate is worked out (override, else `settings_service.default_commission_bps`: the setting, or 1,000 while unset or invalid). Strict integers end to end; a float, string or boolean is 422.
+- **`require_approved_seller`** (`app/core/dependencies.py`) returns `SellerContext(user, store)`. It is marked so `tests/integration/test_seller_route_guards.py` can enumerate every `/seller/*` route: any route other than the three application routes without it fails the test, and no seller route may name a store in its path.
+- Slugs follow the name until the first approval and are fixed afterwards. A slug collision between two concurrent applications is 409 `store_slug_conflict` (retry).
 
 ## Consequences
 

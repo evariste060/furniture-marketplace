@@ -750,6 +750,16 @@ EXPECTED_OPERATIONS = {
     ("get", "/api/v1/inventory"),
     ("get", "/api/v1/inventory/{sku}"),
     ("post", "/api/v1/inventory/{sku}/adjustments"),
+    # Marketplace sellers (ADR-014 phase 1): applications, the seller's store, staff review.
+    ("post", "/api/v1/seller/application"),
+    ("get", "/api/v1/seller/application"),
+    ("put", "/api/v1/seller/application"),
+    ("get", "/api/v1/seller/store"),
+    ("patch", "/api/v1/seller/store"),
+    ("get", "/api/v1/staff/sellers"),
+    ("get", "/api/v1/staff/sellers/{store_id}"),
+    ("patch", "/api/v1/staff/sellers/{store_id}/status"),
+    ("patch", "/api/v1/staff/sellers/{store_id}/commission"),
 }
 PUBLIC = {
     ("get", "/"),

@@ -33,6 +33,8 @@ from app.api.v1.endpoints.promotions import router as staff_promotions_router
 from app.api.v1.endpoints.quotes import public_router as quotes_router
 from app.api.v1.endpoints.quotes import staff_router as staff_quotes_router
 from app.api.v1.endpoints.reports import router as staff_reports_router
+from app.api.v1.endpoints.sellers import seller_router
+from app.api.v1.endpoints.sellers import staff_router as staff_sellers_router
 from app.api.v1.endpoints.services import public_router as services_router
 from app.api.v1.endpoints.services import staff_router as staff_services_router
 from app.api.v1.endpoints.settings import public_router as settings_router
@@ -90,3 +92,5 @@ router.include_router(staff_orders_router)
 router.include_router(inventory_router)
 router.include_router(staff_notifications_router)  # /staff/notifications (module 17)
 router.include_router(staff_reports_router)  # /staff/reports (module 18)
+router.include_router(seller_router)  # /seller (ADR-014: applications, own store)
+router.include_router(staff_sellers_router)  # /staff/sellers (ADR-014, sellers:read/manage)
