@@ -1,6 +1,9 @@
-# Rwanda Electronics E-Commerce MVP
-A mobile-first single-store development foundation. Currency: RWF. Planned languages: English and Kinyarwanda; translations and default language await approval.
-This repository is intentionally isolated at `tsonGroup/rwanda-electronics-ecommerce` to preserve the existing workspace starter. The original three documents remain in `../docs`; see docs/requirements/README.md. Customer authentication, accounts, addresses, staff accounts and staff authorization are implemented; payments and checkout are not.
+# FurnitureHub — multi-vendor furniture marketplace
+FurnitureHub (provisional name) is being built from a working single-store electronics platform, cloned from `tsonGroup/rwanda-electronics-ecommerce`. Currency: RWF. Languages: English and Kinyarwanda.
+
+**Transformation in progress (SC-04, ADR-014).** The marketplace has customers, sellers (who apply, are approved and run their own store, products, stock and orders) and platform administrators. The work is done in approved phases; see the phase table in [ADR-014](docs/architecture/ADR-014-multi-vendor-marketplace.md). Commit `03bb5cc` is the unmodified electronics baseline. **Until those phases are done, the code still behaves as the single-vendor electronics store this README describes:** seller features, stores and the furniture catalogue do not exist yet.
+
+The original requirement documents (electronics) and every approved scope change are listed in docs/requirements/README.md.
 
 Quick links: [First-time setup](#first-time-setup) · [After pulling changes](#after-pulling-changes) · [Start the project](#start-the-project) · [Checks](#checks)
 

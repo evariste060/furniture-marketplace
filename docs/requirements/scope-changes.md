@@ -4,6 +4,34 @@ The original requirement documents stay unchanged (see `original-checksums.txt`)
 to the MVP scope approved by the project owner after they were written is recorded here, newest
 first. Where this file and an original document disagree, this file wins.
 
+## SC-04: multi-vendor furniture marketplace (2026-11-21)
+
+Approved by the project owner on 2026-11-21. Trello card: none (no furniture board exists).
+Baseline before the change: commit `03bb5cc`.
+
+The original documents describe a single electronics store. The owner changed both the business
+model and the domain: the platform becomes a **multi-vendor furniture marketplace**, provisionally
+named **FurnitureHub**, where sellers apply, are approved by a platform administrator, and run
+their own store, products, stock and orders. Existing features are reused, not rebuilt.
+
+- **Sellers.** A customer applies with their shop details; administrators approve, reject,
+  suspend or reinstate. Only approved sellers reach seller features, checked by the backend on
+  every request. Sellers are store owners, not staff, and see only their own store's data.
+- **Products** belong to one store. Staff moderate the catalogue (review, hide, archive); they do
+  not create products for sellers in V1.
+- **Orders.** One customer order and one payment per checkout, split into one group per seller
+  (ADR-014 option A). Sellers fulfil their own group; payment and whole-order cancellation stay
+  with the platform. A commission is recorded per group.
+- **Furniture domain.** Furniture categories and attributes; technical services become furniture
+  services (assembly, installation); quote requests serve bulk furniture purchasing for offices,
+  hotels, schools and other organizations; the development catalogue is reseeded with furniture
+  from several demo stores.
+- **Not in V1:** seller payouts, partial seller cancellations or refunds, per-seller delivery
+  fees (the platform fee by district stays), per-seller invoicing. The platform issues invoices
+  for the class project; this is configurable and not a verified legal or tax decision.
+
+Full specification and phases: `docs/architecture/ADR-014-multi-vendor-marketplace.md`.
+
 ## SC-03: social media links in the footer (2026-11-18)
 
 Approved by the project owner on 2026-11-18. Trello card: none.
