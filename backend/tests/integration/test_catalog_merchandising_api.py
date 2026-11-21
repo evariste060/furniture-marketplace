@@ -23,6 +23,7 @@ from app.repositories.audit_repository import AuditRepository
 from app.services import media_cleanup
 from tests.support.catalog import force_status
 from tests.support.commerce import new_order
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -291,8 +292,8 @@ def test_anonymous_image_changes_are_unauthorized(client, category, storage):
 
 # ---- B2 and B4: featured products, created_at -----------------------------------------------
 def make_product(client, headers, category_id: str, name: str, **extra) -> dict:
-    res = client.post(
-        f"{STAFF}/products",
+    res = post_product(
+        client,
         json={"name": name, "category_id": category_id, **extra},
         headers=headers,
     )
@@ -334,7 +335,9 @@ def test_featured_flag_is_staff_editable_audited_and_filters_the_catalogue(
         for r in audits(db, "catalog.product_update")
         if "is_featured" in r.change_summary["changes"]
     ]
-    assert changes == [{"is_featured": {"from": False, "to": True}}]
+    # Two staff updates: featuring is the administrator's, so the seller-created "Galaxy A55" was
+    # featured by an update too (ADR-014 phase 2), then "Spark 20" here.
+    assert changes == [{"is_featured": {"from": False, "to": True}}] * 2
     null = client.patch(f"{STAFF}/products/{plain['id']}", json={"is_featured": None}, headers=h)
     assert null.status_code == 422
 

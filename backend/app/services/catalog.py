@@ -163,6 +163,7 @@ def product_to_data(product: Product, available: dict[UUID, int]) -> dict[str, A
         "warranty_text": product.warranty_text,
         "category": product.category,
         "brand": product.brand,
+        "store": product.store,
         "images": [
             product_image_data(storage, image, product) for image in _ordered(product.images)
         ],

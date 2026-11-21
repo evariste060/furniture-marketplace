@@ -89,6 +89,15 @@ def product_filters(
             "many stars; products without reviews are left out",
         ),
     ] = None,
+    store: Annotated[
+        str | None,
+        Query(
+            min_length=1,
+            max_length=120,
+            description="Store slug: only that approved store's products (ADR-014). A store that "
+            "is not approved, or does not exist, matches nothing",
+        ),
+    ] = None,
 ) -> ProductFilters:
     """The product list's filters, shared with /facets."""
     if min_price is not None and max_price is not None and min_price > max_price:
@@ -109,6 +118,7 @@ def product_filters(
         featured=featured,
         on_sale=on_sale,
         min_rating=min_rating,
+        store_slug=store,
     )
 
 

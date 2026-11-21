@@ -26,6 +26,7 @@ from app.models.common import MAX_MONEY_RWF, Entity
 
 if TYPE_CHECKING:
     from app.models.inventory import InventoryBalance
+    from app.models.marketplace import Store
     from app.models.media import MediaObject
 
 
@@ -114,6 +115,8 @@ class Product(Entity):
         Index("ix_products_status_brand", "status", "brand_id"),
         Index("ix_products_search_vector", "search_vector", postgresql_using="gin"),
         Index("ix_products_featured", "status", postgresql_where=text("is_featured")),
+        # ADR-014 phase 2: every product belongs to one store; seller lists filter by store.
+        Index("ix_products_store_status", "store_id", "status"),
         # Module 20 (SC-01, 2026-10-27): totals of approved reviews, kept by the review service.
         CheckConstraint(
             "rating_1_count >= 0 AND rating_2_count >= 0 AND rating_3_count >= 0 "
@@ -148,6 +151,11 @@ class Product(Entity):
         ForeignKey("categories.id", ondelete="RESTRICT"), nullable=False
     )
     brand_id: Mapped[UUID | None] = mapped_column(ForeignKey("brands.id", ondelete="RESTRICT"))
+    # ADR-014 phase 2 (decision 5): the store that owns the product. Set from the seller's own
+    # store when the product is created and never taken from a request body.
+    store_id: Mapped[UUID] = mapped_column(
+        ForeignKey("stores.id", ondelete="RESTRICT"), nullable=False
+    )
     # B2 (approved 2026-10-25): staff-picked products for the storefront's Featured section.
     is_featured: Mapped[bool] = mapped_column(nullable=False, default=False, server_default="false")
     # Module 20 (SC-01, approved 2026-10-27): approved reviews only. rating_average has one
@@ -179,6 +187,7 @@ class Product(Entity):
 
     category: Mapped[Category] = relationship(back_populates="products", foreign_keys=[category_id])
     brand: Mapped[Brand | None] = relationship(back_populates="products")
+    store: Mapped[Store] = relationship()
     variants: Mapped[list[ProductVariant]] = relationship(
         back_populates="product", cascade="save-update, merge"
     )

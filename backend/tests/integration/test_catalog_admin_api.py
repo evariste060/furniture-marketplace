@@ -17,6 +17,7 @@ from app.models import Brand, Category, Product
 from app.models.operations import AuditRecord
 from app.repositories.audit_repository import AuditRepository
 from app.services import catalog_admin
+from tests.support.sellers import new_store
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -41,6 +42,7 @@ def create_brand(client, headers, name, **fields):
 def add_product(db: Session, category_id, brand_id=None, status="active") -> Product:
     tag = uuid.uuid4().hex[:10]
     product = Product(
+        store=new_store(),
         name=f"Product {tag}",
         slug=f"product-{tag}",
         category_id=uuid.UUID(str(category_id)),

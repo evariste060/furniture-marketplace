@@ -2,6 +2,9 @@
 
 Proves the module's grants (INSERT and UPDATE on products and product_variants, no DELETE) and
 that the product advisory lock serialises slug and SKU allocation across API processes.
+
+SC-05 / ADR-014 phase 2: products are created by an approved seller (POST /seller/products);
+administrators moderate them through the staff routes used below.
 """
 
 import secrets
@@ -13,10 +16,21 @@ from tests.postgres.conftest import Stack
 from tests.postgres.test_pg_http import HTTP, one
 from tests.postgres.test_pg_images import add_photo
 from tests.postgres.test_pg_inventory import together
+from tests.postgres.test_pg_sellers import approved_seller_headers
 
 
 def staff(stack: Stack, i: int, admin: dict, method: str, path: str, body: dict | None = None):
     return HTTP.request(method, f"{stack.servers[i % 2]}/staff/{path}", json=body, headers=admin)
+
+
+def seller_create(stack: Stack, i: int, seller: dict, body: dict):
+    """Create a product in the seller's store on API process i % 2."""
+    return HTTP.post(f"{stack.servers[i % 2]}/seller/products", json=body, headers=seller)
+
+
+@pytest.fixture
+def seller(stack: Stack, admin: dict, unique: str, phone_factory) -> dict:
+    return approved_seller_headers(stack, admin, unique, phone_factory())
 
 
 @pytest.fixture
@@ -26,10 +40,10 @@ def category_id(stack: Stack, admin: dict) -> str:
     return res.json()["id"]
 
 
-def test_concurrent_product_creates_get_distinct_slugs(stack: Stack, admin: dict, category_id):
+def test_concurrent_product_creates_get_distinct_slugs(stack: Stack, seller: dict, category_id):
     name = f"Race Phone {secrets.token_hex(4)}"
     body = {"name": name, "category_id": category_id}
-    results = together(6, lambda i: staff(stack, i, admin, "POST", "products", body))
+    results = together(6, lambda i: seller_create(stack, i, seller, body))
     assert [r.status_code for r in results] == [201] * 6, [r.text for r in results]
     base = name.lower().replace(" ", "-")
     assert sorted(r.json()["slug"] for r in results) == sorted(
@@ -38,15 +52,10 @@ def test_concurrent_product_creates_get_distinct_slugs(stack: Stack, admin: dict
 
 
 def test_concurrent_variants_with_one_sku_create_exactly_one(
-    stack: Stack, admin: dict, category_id
+    stack: Stack, admin: dict, seller: dict, category_id
 ):
-    product = staff(
-        stack,
-        0,
-        admin,
-        "POST",
-        "products",
-        {"name": f"SKU {secrets.token_hex(4)}", "category_id": category_id},
+    product = seller_create(
+        stack, 0, seller, {"name": f"SKU {secrets.token_hex(4)}", "category_id": category_id}
     ).json()
     sku = f"RACE-{secrets.token_hex(4)}"
     body = {"sku": sku, "name": "Std", "price": 100}
@@ -60,11 +69,11 @@ def test_concurrent_variants_with_one_sku_create_exactly_one(
 
 
 def test_runtime_role_manages_products_and_public_shows_only_a_stock_band(
-    stack: Stack, admin: dict, category_id
+    stack: Stack, admin: dict, seller: dict, category_id
 ):
     tag = secrets.token_hex(4)
-    product = staff(
-        stack, 1, admin, "POST", "products", {"name": f"Runtime {tag}", "category_id": category_id}
+    product = seller_create(
+        stack, 1, seller, {"name": f"Runtime {tag}", "category_id": category_id}
     ).json()
     variant = staff(
         stack,

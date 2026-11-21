@@ -30,6 +30,7 @@ override, else the platform setting (default 1000 = 10%). Whole basis points onl
 
 import uuid
 from collections.abc import Mapping
+from typing import Literal, cast
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
@@ -40,14 +41,17 @@ from app.core.request_context import RequestContext
 from app.core.slugs import first_free_slug, slugify
 from app.db.transaction import atomic
 from app.integrations.media import MediaStorage, get_media_storage
+from app.models import Product
 from app.models.common import utc_now
 from app.models.identity import User
 from app.models.marketplace import STORE_SLUG_MAX_LENGTH, Store, StoreStatusHistory
 from app.models.media import MediaObject
+from app.repositories.catalog import public_product_ids
 from app.repositories.store_repository import StoreRepository
 from app.schemas.images import PublicImage
 from app.schemas.pagination import page_offset
 from app.schemas.stores import (
+    PublicStoreResponse,
     SellerStoreResponse,
     StaffPerson,
     StaffStoreDetail,
@@ -59,7 +63,14 @@ from app.schemas.stores import (
     StoreStatusRequest,
 )
 from app.services.audit_service import AuditService
-from app.services.media_registry import public_image
+from app.services.image_processing import ProcessedImage
+from app.services.media_registry import (
+    activate,
+    discard_staged,
+    public_image,
+    retire,
+    stage_image,
+)
 from app.services.notification_service import EmailEvent, record_email_event
 from app.services.settings_service import default_commission_bps
 
@@ -97,6 +108,9 @@ class InvalidStoreTransition(Conflict):
             code="invalid_store_transition",
             details={"current_status": current, "requested_status": requested},
         )
+
+
+StoreImageField = Literal["logo", "cover"]
 
 
 def allowed_transition(current: str, requested: str) -> bool:
@@ -302,6 +316,109 @@ class StoreService:
         db.refresh(store)
         return store
 
+    @staticmethod
+    def set_image(
+        db: Session,
+        storage: MediaStorage,
+        user: User,
+        store_id: uuid.UUID,
+        field: StoreImageField,
+        processed: ProcessedImage,
+        upload_bytes: int,
+        ctx: RequestContext,
+    ) -> Store:
+        """Upload or replace the seller's own logo or cover (ADR-014 phase 2), as category images
+        do: stage the files (TX-A), then point the store at them and retire the replaced ones
+        (TX-B; the cleanup worker deletes the files). Audited as store.logo_upload or
+        store.cover_upload."""
+        with atomic(db):  # refused before anything is stored
+            _own_approved(db, user, store_id)
+        staged = stage_image(db, storage, "stores", store_id, processed)
+        try:
+            with atomic(db):
+                store = _own_approved(db, user, store_id)
+                previous = getattr(store, f"{field}_media")
+                replaced = (
+                    getattr(store, f"{field}_media_id"),
+                    getattr(store, f"{field}_original_media_id"),
+                )
+                setattr(store, f"{field}_media_id", staged.public_id)
+                setattr(store, f"{field}_original_media_id", staged.original_id)
+                activate(db, staged)
+                retire(db, replaced)
+                db.flush()
+                _audit(
+                    db,
+                    f"store.{field}_upload",
+                    store,
+                    user,
+                    ctx,
+                    {
+                        "image_ref": staged.key,
+                        "sha256": staged.sha256,
+                        "replaced_image_ref": previous.storage_key if previous else None,
+                        "width": staged.width,
+                        "height": staged.height,
+                        "content_type": staged.content_type,
+                        "upload_bytes": upload_bytes,
+                    },
+                )
+        except BaseException:
+            discard_staged(db, storage, staged)
+            raise
+        db.refresh(store)
+        return store
+
+    @staticmethod
+    def remove_image(
+        db: Session, user: User, store_id: uuid.UUID, field: StoreImageField, ctx: RequestContext
+    ) -> Store:
+        """Clear the seller's own logo or cover and retire its files. Nothing to remove: no
+        write, no audit. Audited as store.logo_delete or store.cover_delete."""
+        with atomic(db):
+            store = _own_approved(db, user, store_id)
+            previous = getattr(store, f"{field}_media")
+            if previous is None:
+                return store
+            retired = (
+                getattr(store, f"{field}_media_id"),
+                getattr(store, f"{field}_original_media_id"),
+            )
+            setattr(store, f"{field}_media_id", None)
+            setattr(store, f"{field}_original_media_id", None)
+            db.flush()
+            retire(db, retired)
+            _audit(
+                db, f"store.{field}_delete", store, user, ctx, {"image_ref": previous.storage_key}
+            )
+        db.refresh(store)
+        return store
+
+    # ---- the public storefront (ADR-014 decision 7) ---------------------------------------
+    @staticmethod
+    def public_page(db: Session, page: int, size: int) -> tuple[list[tuple[Store, int]], int]:
+        """Approved stores by name, each with the number of its public products."""
+        total = db.scalar(select(func.count(Store.id)).where(Store.status == "approved")) or 0
+        stores = list(
+            db.scalars(
+                select(Store)
+                .where(Store.status == "approved")
+                .order_by(func.lower(Store.name), Store.id)
+                .offset(page_offset(page, size))
+                .limit(size)
+            )
+        )
+        counts = public_product_counts(db, [store.id for store in stores])
+        return [(store, counts.get(store.id, 0)) for store in stores], total
+
+    @staticmethod
+    def public_get(db: Session, slug: str) -> tuple[Store, int]:
+        """An approved store by slug. Any other store, or none, is the same 404."""
+        store = db.scalar(select(Store).where(Store.slug == slug, Store.status == "approved"))
+        if store is None:
+            raise NotFound(STORE_NOT_FOUND, code="store_not_found")
+        return store, public_product_counts(db, [store.id]).get(store.id, 0)
+
     # ---- administrators --------------------------------------------------------------------
     @staticmethod
     def staff_page(
@@ -392,6 +509,47 @@ class StoreService:
                 )
         db.refresh(store)
         return store
+
+
+def _own_approved(db: Session, user: User, store_id: uuid.UUID) -> Store:
+    """The caller's own store, locked, checked approved again under the lock."""
+    store = StoreRepository.get(db, store_id, for_update=True)
+    if store is None or store.owner_user_id != user.id:
+        raise NotFound(STORE_NOT_FOUND, code="store_not_found")
+    if store.status != "approved":
+        raise Forbidden(NOT_APPROVED, code="seller_not_approved")
+    return store
+
+
+def public_product_counts(db: Session, store_ids: list[uuid.UUID]) -> dict[uuid.UUID, int]:
+    """The number of public products of each store, by the public catalogue rule. One grouped
+    query (not a correlated subquery: the rule joins stores itself, and correlating that join
+    with an outer store row would drop it)."""
+    if not store_ids:
+        return {}
+    public = (
+        public_product_ids()
+        .add_columns(Product.store_id)
+        .where(Product.store_id.in_(store_ids))
+        .subquery()
+    )
+    rows = db.execute(select(public.c.store_id, func.count()).group_by(public.c.store_id)).all()
+    return {cast(uuid.UUID, store_id): cast(int, count) for store_id, count in rows}
+
+
+def public_store_response(store: Store, product_count: int) -> PublicStoreResponse:
+    storage = get_media_storage()
+    return PublicStoreResponse(
+        id=store.id,
+        name=store.name,
+        slug=store.slug,
+        description=store.description,
+        district=store.district,
+        logo=_image(storage, store.logo_media, store.name),
+        cover=_image(storage, store.cover_media, store.name),
+        product_count=product_count,
+        approved_at=store.approved_at,
+    )
 
 
 # ---- responses -----------------------------------------------------------------------------

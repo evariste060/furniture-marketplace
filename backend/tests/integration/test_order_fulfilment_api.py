@@ -26,6 +26,7 @@ from app.models.identity import User
 from app.repositories.audit_repository import AuditRepository
 from app.services.inventory import commit_order_reservations, create_order_with_reservations
 from app.services.order_service import OrderService
+from tests.support.sellers import new_store
 
 
 @pytest.fixture
@@ -38,6 +39,7 @@ def _new_reserved_order(session_factory, customer_id: UUID | None = None) -> UUI
         category = Category(name="Phones", slug=f"phones-{uuid4().hex}")
         brand = Brand(name="Example", slug=f"example-{uuid4().hex}")
         product = Product(
+            store=new_store(),
             name="Example phone",
             slug=f"example-phone-{uuid4().hex}",
             category=category,

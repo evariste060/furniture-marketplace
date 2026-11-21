@@ -54,6 +54,7 @@ from app.models import (
     StockReservation,
 )
 from app.models.identity import User
+from app.models.marketplace import Store
 from app.repositories.category_tree import category_visible
 from app.services.audit_service import AuditService
 from app.services.notification_service import record_order_event
@@ -287,8 +288,9 @@ def _line_details(rows: list[StockReservation]) -> dict[str, Any]:
 def sellable_variants(session: Session, variant_ids: set[UUID]) -> dict[UUID, bool]:
     """Sellability of each existing SKU (unknown IDs are absent from the result).
 
-    Sellable means: the variant is active, its product is `active`, its category is visible
-    (active, and so is its main category), and its brand (if any) is active. The cart
+    Sellable means: the variant is active, its product is `active`, its store is approved
+    (ADR-014 phase 2), its category is visible (active, and so is its main category), and its
+    brand (if any) is active. The cart
     (module 11) flags lines with this; check_sellable raises with it.
     """
     if not variant_ids:
@@ -297,23 +299,21 @@ def sellable_variants(session: Session, variant_ids: set[UUID]) -> dict[UUID, bo
         select(
             ProductVariant.id,
             ProductVariant.is_active,
-            Product.status,
+            and_(Product.status == "active", Store.status == "approved"),
             and_(Category.is_active, category_visible(Product.category_id)),
             Brand.is_active,
         )
         .join(Product, Product.id == ProductVariant.product_id)
+        .join(Store, Store.id == Product.store_id)
         .join(Category, Category.id == Product.category_id)
         .outerjoin(Brand, Brand.id == Product.brand_id)
         .where(ProductVariant.id.in_(variant_ids))
     ).all()
     return {
         variant_id: bool(
-            variant_active
-            and product_status == "active"
-            and category_active
-            and brand_active is not False
+            variant_active and product_listed and category_active and brand_active is not False
         )
-        for variant_id, variant_active, product_status, category_active, brand_active in rows
+        for variant_id, variant_active, product_listed, category_active, brand_active in rows
     }
 
 

@@ -13,6 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.models import Brand, Category, InventoryBalance, Product, ProductVariant
+from tests.support.sellers import new_store
 
 URL = "/api/v1/catalog/products"
 T0 = datetime(2026, 10, 1, tzinfo=UTC)
@@ -32,6 +33,7 @@ def add_product(
     stock: int = 0,
 ) -> Product:
     product = Product(
+        store=new_store(),
         name=name,
         slug=f"p-{uuid4().hex}",
         model=model,

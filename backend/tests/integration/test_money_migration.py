@@ -13,6 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from alembic import command
 from app.core.config import get_settings
 from app.models.common import MAX_MONEY_RWF
+from tests.support.sellers import sql_store
 
 ALEMBIC_INI = Path(__file__).resolve().parents[2] / "alembic.ini"
 BEFORE = "e1b7f3c9a5d2"
@@ -37,12 +38,16 @@ def _seed_variant(engine: Engine, price: str, compare_at: str | None = None) -> 
             text("INSERT INTO categories (id, name, slug) VALUES (:id, 'Phones', :slug)"),
             {"id": ids[0], "slug": f"phones-{ids[0]}"},
         )
+        store = sql_store(conn)  # a store owns it once products.store_id exists (ADR-014)
         conn.execute(
             text(
-                "INSERT INTO products (id, name, slug, category_id) "
-                "VALUES (:id, 'Phone', :slug, :category)"
+                "INSERT INTO products (id, name, slug, category_id"
+                + (", store_id" if store else "")
+                + ") VALUES (:id, 'Phone', :slug, :category"
+                + (", :store" if store else "")
+                + ")"
             ),
-            {"id": ids[1], "slug": f"phone-{ids[1]}", "category": ids[0]},
+            {"id": ids[1], "slug": f"phone-{ids[1]}", "category": ids[0], "store": store},
         )
         conn.execute(
             text(
@@ -99,7 +104,8 @@ def test_whole_amounts_survive_upgrade_and_downgrade(pg_engine: Engine):
     assert _column_type(pg_engine, "product_variants", "price") == "numeric"
     assert [str(v) for v in _variant_amounts(pg_engine, variant)] == ["125000.00", "150000.00"]
 
-    _migrate(pg_engine, "upgrade", "head")
+    # Up to the revision before b2d4f6a8c0e1, which refuses while products exist (ADR-014 phase 2).
+    _migrate(pg_engine, "upgrade", "a9d3f5b7c1e2")
     assert _variant_amounts(pg_engine, variant) == (125000, 150000)
 
 

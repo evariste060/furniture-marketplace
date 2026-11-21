@@ -10,7 +10,6 @@ import {
   FileUp,
   MessageSquare,
   Package,
-  Plus,
   Scale,
   ShoppingCart,
   Tag,
@@ -706,7 +705,6 @@ function LowStockCard({ rows }: { rows?: LowRow[] }) {
 }
 
 const ACTIONS: { key: string; href: string; Icon: LucideIcon; tone: string; perm: Permission }[] = [
-  { key: "addProduct", href: "/admin/products/new", Icon: Plus, tone: "bg-light text-pri-h", perm: "catalog:manage" },
   { key: "orders", href: "/admin/orders", Icon: ShoppingCart, tone: "bg-pur-bg text-pur", perm: "orders:read" },
   { key: "stock", href: "/admin/inventory", Icon: Boxes, tone: "bg-ok-bg text-ok-tx", perm: "inventory:adjust" },
   { key: "promotion", href: "/admin/promotions?new=1", Icon: Tag, tone: "bg-warn-bg text-warn-tx", perm: "promotions:manage" },

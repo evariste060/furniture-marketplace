@@ -18,6 +18,7 @@ from app.repositories.audit_repository import AuditRepository
 from app.services import inventory as inv
 from tests.support.catalog import force_status
 from tests.support.commerce import new_order, soon
+from tests.support.sellers import default_seller, post_product
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -51,7 +52,7 @@ def catalogue(client: TestClient, admin_auth: dict) -> dict:
 
 def create_product(client, catalogue, name="Galaxy S24", **fields):
     body = {"name": name, "category_id": catalogue["category_id"], **fields}
-    res = client.post(f"{STAFF}/products", json=body, headers=catalogue["headers"])
+    res = post_product(client, json=body, headers=catalogue["headers"])
     assert res.status_code == 201, res.text
     return res.json()
 
@@ -97,7 +98,7 @@ def quantity_keys(value, path="") -> list[str]:
 
 
 # ---- products: create, slugs, references -------------------------------------------------
-def test_product_is_created_as_draft_with_a_generated_slug(client, catalogue, db, admin_auth):
+def test_product_is_created_as_draft_with_a_generated_slug(client, catalogue, db):
     product = create_product(
         client,
         catalogue,
@@ -111,8 +112,10 @@ def test_product_is_created_as_draft_with_a_generated_slug(client, catalogue, db
     assert product["brand_id"] == catalogue["brand_id"] and product["variants"] == []
     assert product["specifications"] == {"screen": "6.2 in", "ram_gb": 8}
     (record,) = audits(db, "catalog.product_create", product["id"])
-    assert record.actor_user_id == admin_auth["user"].id
+    seller = default_seller(client, catalogue["headers"])  # sellers create (ADR-014 phase 2)
+    assert str(record.actor_user_id) == seller["user"]["id"]
     assert record.change_summary["slug"] == "galaxy-s24"
+    assert record.change_summary["store_id"] == seller["store_id"]
     assert "galaxy-s24" not in public_slugs(client)  # drafts are not public
 
 
@@ -121,14 +124,14 @@ def test_product_slugs_get_numeric_suffixes_and_explicit_slugs_must_be_free(clie
     assert create_product(client, catalogue, "galaxy  s24!")["slug"] == "galaxy-s24-2"
     assert create_product(client, catalogue, "Écran Pro")["slug"] == "ecran-pro"
     assert create_product(client, catalogue, "Custom", slug="my-phone")["slug"] == "my-phone"
-    taken = client.post(
-        f"{STAFF}/products",
+    taken = post_product(
+        client,
         json={"name": "X", "slug": "galaxy-s24", "category_id": catalogue["category_id"]},
         headers=catalogue["headers"],
     )
     assert taken.status_code == 409 and error_code(taken) == "slug_taken"
-    nameless = client.post(
-        f"{STAFF}/products",
+    nameless = post_product(
+        client,
         json={"name": "!!!", "category_id": catalogue["category_id"]},
         headers=catalogue["headers"],
     )
@@ -152,8 +155,8 @@ def test_rename_keeps_the_slug_and_slugs_can_be_edited(client, catalogue):
 
 def test_category_and_brand_must_exist_and_brand_can_be_cleared(client, catalogue):
     h = catalogue["headers"]
-    missing_category = client.post(
-        f"{STAFF}/products", json={"name": "X", "category_id": str(uuid.uuid4())}, headers=h
+    missing_category = post_product(
+        client, json={"name": "X", "category_id": str(uuid.uuid4())}, headers=h
     )
     assert missing_category.status_code == 422
     assert missing_category.json()["error"]["details"][0]["loc"] == ["body", "category_id"]
@@ -489,6 +492,22 @@ def test_other_roles_are_forbidden_and_nothing_changes(client, catalogue, db, wh
     stored = db.get(ProductVariant, uuid.UUID(variant["id"]))
     assert stored is not None and (stored.price, stored.is_active) == (1000, True)
     assert db.get(Product, uuid.UUID(product["id"])).status == "draft"
+
+
+def test_administrators_cannot_create_products(client, catalogue, db):
+    # SC-05: moderation only. A valid body is refused with an explanation; nothing is stored or
+    # audited, and the administrator can still edit the seller's products (tests above).
+    res = client.post(
+        f"{STAFF}/products",
+        json={"name": "Staff Sofa", "category_id": catalogue["category_id"]},
+        headers=catalogue["headers"],
+    )
+    assert res.status_code == 409 and error_code(res) == "staff_product_creation_disabled"
+    assert "sellers add their own products" in res.json()["error"]["message"]
+    assert db.scalar(select(func.count(Product.id))) == 0
+    assert not db.scalars(
+        select(AuditRecord).where(AuditRecord.action == "catalog.product_create")
+    ).all()
 
 
 def test_anonymous_requests_are_unauthorized(client):

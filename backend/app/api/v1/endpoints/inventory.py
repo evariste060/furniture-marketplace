@@ -30,9 +30,11 @@ from app.schemas.inventory import (
     StockAdjustmentResponse,
 )
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, Page
+from app.services.catalog_scope import CatalogScope
 from app.services.inventory_admin import InventoryAdminService
 
 router = APIRouter(prefix="/inventory", tags=["Inventory"])
+PLATFORM = CatalogScope.platform()  # staff see every store's stock (ADR-014 phase 2)
 
 GUARDED: ResponseMap = {**UNAUTHORIZED_401, **FORBIDDEN_403}
 SKU_404: ResponseMap = {404: {**ERR, "description": "No SKU with this code"}}
@@ -83,7 +85,7 @@ def list_inventory(
         if not q:
             raise field_error(("query", "q"), "q must contain non-whitespace characters")
     items, total = InventoryAdminService.list_stock(
-        db, low_stock=low_stock, q=q, page=page, size=size
+        db, low_stock=low_stock, q=q, page=page, size=size, scope=PLATFORM
     )
     return Page[InventoryListItem](items=items, total=total, page=page, size=size)
 
@@ -100,7 +102,7 @@ def list_inventory(
     responses={**GUARDED, **SKU_404, **VALIDATION_422},
 )
 def get_inventory(sku: Sku, current_user: Reader, db: Db) -> InventoryResponse:
-    return InventoryAdminService.get(db, sku)
+    return InventoryAdminService.get(db, sku, scope=PLATFORM)
 
 
 @router.post(
@@ -143,7 +145,9 @@ def adjust_inventory(
         ),
     ],
 ) -> StockAdjustmentResponse:
-    result = InventoryAdminService.adjust(db, current_user, sku, req, idempotency_key, ctx)
+    result = InventoryAdminService.adjust(
+        db, current_user, sku, req, idempotency_key, ctx, scope=PLATFORM
+    )
     if result.replayed:
         response.status_code = status.HTTP_200_OK
     return result

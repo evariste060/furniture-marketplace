@@ -1,13 +1,7 @@
-import { AdminPage } from "@/features/admin/guard";
-import { ProductEditorView } from "@/features/admin/product-editor";
-import { adminMetadata } from "@/features/admin/titles";
+import { redirect } from "next/navigation";
 
-export const generateMetadata = adminMetadata("newProduct");
-
+/** SC-05: administrators moderate products but do not create them; sellers add products to
+ * their own store. The old address goes to the product list. */
 export default function NewProductPage() {
-  return (
-    <AdminPage area="products">
-      <ProductEditorView />
-    </AdminPage>
-  );
+  redirect("/admin/products");
 }

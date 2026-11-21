@@ -33,6 +33,7 @@ from app.api.v1.endpoints.promotions import router as staff_promotions_router
 from app.api.v1.endpoints.quotes import public_router as quotes_router
 from app.api.v1.endpoints.quotes import staff_router as staff_quotes_router
 from app.api.v1.endpoints.reports import router as staff_reports_router
+from app.api.v1.endpoints.seller_catalog import router as seller_catalog_router
 from app.api.v1.endpoints.sellers import seller_router
 from app.api.v1.endpoints.sellers import staff_router as staff_sellers_router
 from app.api.v1.endpoints.services import public_router as services_router
@@ -40,6 +41,7 @@ from app.api.v1.endpoints.services import staff_router as staff_services_router
 from app.api.v1.endpoints.settings import public_router as settings_router
 from app.api.v1.endpoints.settings import router as staff_settings_router
 from app.api.v1.endpoints.staff import router as staff_router
+from app.api.v1.endpoints.stores import router as stores_router
 from app.api.v1.endpoints.support import customer_router as support_customer_router
 from app.api.v1.endpoints.support import public_router as support_router
 from app.api.v1.endpoints.support import staff_router as staff_support_router
@@ -94,3 +96,6 @@ router.include_router(staff_notifications_router)  # /staff/notifications (modul
 router.include_router(staff_reports_router)  # /staff/reports (module 18)
 router.include_router(seller_router)  # /seller (ADR-014: applications, own store)
 router.include_router(staff_sellers_router)  # /staff/sellers (ADR-014, sellers:read/manage)
+# /seller/products, /seller/images, /seller/inventory, /seller/store/logo|cover (ADR-014 phase 2)
+router.include_router(seller_catalog_router)
+router.include_router(stores_router)  # /stores: approved stores (ADR-014 phase 2)

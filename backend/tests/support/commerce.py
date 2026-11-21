@@ -22,12 +22,14 @@ from app.models import (
 )
 from app.models.operations import AuditRecord
 from app.services import inventory
+from tests.support.sellers import new_store
 
 
 def seed_sku(session: Session, *, on_hand: int | None = 1, **variant_overrides) -> ProductVariant:
     """One sellable test SKU; on_hand=None creates no inventory record."""
     tag = uuid4().hex[:12]
     product = Product(
+        store=new_store(),
         name=f"Test phone {tag}",
         slug=f"test-phone-{tag}",
         category=Category(name=f"Test category {tag}", slug=f"test-cat-{tag}"),

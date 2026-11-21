@@ -121,6 +121,24 @@ class SeedPage:
 
 
 @dataclass(frozen=True)
+class SeedStore:
+    """A demo seller store (ADR-014 phase 2): its owner is a verified customer account at the
+    seed domain, and an administrator approves the application."""
+
+    key: str  # local part of the owner's e-mail address
+    owner_name: str
+    phone: str
+    name: str
+    description: str
+    district: str
+    sector: str
+
+    @property
+    def email(self) -> str:
+        return f"{self.key}@{EMAIL_DOMAIN}"
+
+
+@dataclass(frozen=True)
 class Catalogue:
     categories: tuple[SeedCategory, ...]
     brands: tuple[SeedBrand, ...]
@@ -133,6 +151,8 @@ class Catalogue:
     notes: tuple[str, ...] = field(default=())
     pages: tuple[SeedPage, ...] = field(default=())
     contact: tuple[tuple[str, str], ...] = field(default=())  # (setting key, value)
+    # ADR-014 phase 2: the seed products are shared out over these stores, in order.
+    stores: tuple[SeedStore, ...] = field(default=())
 
 
 # Header.dc.html nav: Phones, Laptops, TVs & Audio, Home Appliances, Accessories, then "Brands"
@@ -1259,6 +1279,36 @@ CONTACT = (
     ("contact.hours", "Mon – Sat: 8:00 AM – 6:00 PM"),
 )
 
+STORES = (
+    SeedStore(
+        "seller.kigali-oak",
+        "Claudine Mukamana",
+        "+250780000201",
+        "Kigali Oak Works",
+        "Development seed store: solid wood furniture made in Kigali.",
+        "Gasabo",
+        "Kimironko",
+    ),
+    SeedStore(
+        "seller.nyamirambo-living",
+        "Eric Nshimiyimana",
+        "+250780000202",
+        "Nyamirambo Living",
+        "Development seed store: sofas, chairs and living-room pieces.",
+        "Nyarugenge",
+        "Nyamirambo",
+    ),
+    SeedStore(
+        "seller.kicukiro-office",
+        "Grace Uwimana",
+        "+250780000203",
+        "Kicukiro Office Supply",
+        "Development seed store: desks, office chairs and storage.",
+        "Kicukiro",
+        "Niboye",
+    ),
+)
+
 CATALOGUE = Catalogue(
     CATEGORIES,
     BRANDS,
@@ -1270,4 +1320,5 @@ CATALOGUE = Catalogue(
     REVIEWS,
     pages=PAGES,
     contact=CONTACT,
+    stores=STORES,
 )

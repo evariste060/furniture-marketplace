@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.models import ProductImage
 from tests.support.media import image_row
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 
@@ -21,8 +22,8 @@ def category(client: TestClient, admin_auth: dict) -> dict:
 
 
 def product(client, headers, category_id: str, name: str, sku: str | None = None, **extra):
-    res = client.post(
-        f"{STAFF}/products",
+    res = post_product(
+        client,
         json={"name": name, "category_id": category_id, **extra},
         headers=headers,
     )

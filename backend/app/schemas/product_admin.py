@@ -16,7 +16,7 @@ from pydantic import (
 
 from app.core.slugs import SLUG_PATTERN
 from app.models.common import MAX_MONEY_RWF
-from app.schemas.catalog import CatalogReference
+from app.schemas.catalog import CatalogReference, StoreReference
 from app.schemas.image_admin import ImageResponse
 from app.schemas.images import PublicImage
 
@@ -133,6 +133,44 @@ class ProductUpdateRequest(BaseModel):
         return self
 
 
+class SellerProductCreateRequest(BaseModel):
+    """A seller's new product (ADR-014 phase 2). The store is always the seller's own, taken
+    from the session; store_id, is_featured and other merchandising fields are refused (422)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: ProductName
+    slug: ProductSlug | None = Field(default=None, description=SLUG_DESCRIPTION)
+    category_id: uuid.UUID
+    brand_id: uuid.UUID | None = None
+    model: ModelName | None = None
+    description: LongText | None = None
+    specifications: dict[str, Any] = Field(default_factory=dict)
+    warranty_text: LongText | None = None
+    status: ProductStatus = "draft"
+
+
+class SellerProductUpdateRequest(BaseModel):
+    """A seller's partial update of their own product: the staff fields without is_featured."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: ProductName | None = None
+    slug: ProductSlug | None = None
+    category_id: uuid.UUID | None = None
+    brand_id: uuid.UUID | None = None
+    model: ModelName | None = None
+    description: LongText | None = None
+    specifications: dict[str, Any] | None = None
+    warranty_text: LongText | None = None
+    status: ProductStatus | None = None
+
+    @model_validator(mode="after")
+    def check_fields(self) -> "SellerProductUpdateRequest":
+        _check_update(self, ("name", "slug", "category_id", "specifications", "status"))
+        return self
+
+
 class VariantCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -201,6 +239,7 @@ class ProductResponse(BaseModel):
     warranty_text: str | None
     status: ProductStatus
     is_featured: bool
+    store_id: uuid.UUID = Field(description="The store that owns the product (ADR-014)")
     variants: list[VariantResponse]
     created_at: datetime
     updated_at: datetime
@@ -216,6 +255,7 @@ class StaffProductListItem(BaseModel):
     is_featured: bool
     category: CatalogReference
     brand: CatalogReference | None
+    store: StoreReference = Field(description="The store that owns the product (ADR-014)")
     variant_count: int = Field(ge=0, description="Variants, active or not")
     image_count: int = Field(ge=0, description="Product images (variant images not counted)")
     image: PublicImage | None = Field(description="The first product image, if any")

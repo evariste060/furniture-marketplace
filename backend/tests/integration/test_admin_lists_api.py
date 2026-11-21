@@ -14,6 +14,7 @@ from tests.integration.test_checkout_api import (  # noqa: F401 (delivery is a f
     delivery,
     guest_cart,
 )
+from tests.support.sellers import new_store
 
 ORDERS = "/api/v1/staff/orders"
 STAFF = "/api/v1/staff"
@@ -92,6 +93,7 @@ def test_staff_lists_include_hidden_categories_and_brands_with_counts(
     for i, status in enumerate(["active", "draft"]):
         db.add(
             Product(
+                store=new_store(),
                 name=f"Phone {i}",
                 slug=f"phone-{i}",
                 category=child,
@@ -125,11 +127,25 @@ def test_product_rows_have_price_sku_and_stock_and_filter_low_stock(
 ):
     category = Category(name="Phones", slug="phones")
     db.add(category)
-    low = Product(name="Low", slug="low", category=category, specifications={}, status="active")
-    plenty = Product(
-        name="Plenty", slug="plenty", category=category, specifications={}, status="active"
+    low = Product(
+        store=new_store(),
+        name="Low",
+        slug="low",
+        category=category,
+        specifications={},
+        status="active",
     )
-    bare = Product(name="Bare", slug="bare", category=category, specifications={})
+    plenty = Product(
+        store=new_store(),
+        name="Plenty",
+        slug="plenty",
+        category=category,
+        specifications={},
+        status="active",
+    )
+    bare = Product(
+        store=new_store(), name="Bare", slug="bare", category=category, specifications={}
+    )
     db.add_all([low, plenty, bare])
     db.flush()
 

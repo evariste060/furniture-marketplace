@@ -197,7 +197,6 @@
     "noLowStock": "Nothing is low on stock.",
     "quickActions": "Quick Actions",
     "actions": {
-      "addProduct": "Add product",
       "import": "Import catalogue",
       "orders": "View orders",
       "stock": "Manage stock",
@@ -340,7 +339,6 @@
   "products": {
     "title": "Products",
     "import": "Import",
-    "add": "Add product",
     "viewsLabel": "Product views",
     "views": {
       "all": "All products",
@@ -845,12 +843,12 @@
   },
   "import": {
     "title": "Catalogue import",
-    "description": "Add or update many products at once from a CSV or Excel file.",
+    "description": "Update many existing products at once from a CSV or Excel file. Sellers add new products to their own store.",
     "steps": {
       "template": "Download the template",
       "templateBody": "Columns for product, brand, category, variant, price, stock and specs.",
       "upload": "Upload your file",
-      "uploadBody": "CSV or XLSX up to 10 MB. Existing SKUs are updated, new SKUs are created.",
+      "uploadBody": "CSV or XLSX up to 10 MB. Existing SKUs are updated and new SKUs are added to existing products; rows for unknown products are refused.",
       "check": "Check the report",
       "checkBody": "Rows with errors are skipped; the rest are imported. Download the report to fix them."
     },

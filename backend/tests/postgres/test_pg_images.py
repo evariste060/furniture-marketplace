@@ -17,6 +17,7 @@ from PIL import Image
 from tests.postgres.conftest import Stack
 from tests.postgres.test_pg_http import HTTP, one
 from tests.postgres.test_pg_inventory import together
+from tests.postgres.test_pg_sellers import approved_seller_headers
 
 
 def jpeg() -> bytes:
@@ -26,15 +27,16 @@ def jpeg() -> bytes:
 
 
 @pytest.fixture
-def product_id(stack: Stack, admin: dict) -> str:
+def product_id(stack: Stack, admin: dict, unique: str, phone_factory) -> str:
     base = stack.servers[0]
+    seller = approved_seller_headers(stack, admin, unique, phone_factory())
     category = HTTP.post(
         f"{base}/staff/categories", json={"name": f"PG Img {secrets.token_hex(4)}"}, headers=admin
     ).json()
-    product = HTTP.post(
-        f"{base}/staff/products",
+    product = HTTP.post(  # sellers create products; staff moderate them (SC-05)
+        f"{base}/seller/products",
         json={"name": f"PG Img {secrets.token_hex(4)}", "category_id": category["id"]},
-        headers=admin,
+        headers=seller,
     )
     assert product.status_code == 201, product.text
     return product.json()["id"]

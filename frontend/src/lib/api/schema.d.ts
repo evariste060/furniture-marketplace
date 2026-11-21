@@ -624,13 +624,13 @@ export interface paths {
         };
         /**
          * Every category, hidden ones included
-         * @description Requires 'catalog:read' (administrator, sales, operations, management). Every category, active or not, with its image and the number of products directly in it (any status). Ordered by sort_order, then name; build the tree from parent_id. The public tree (GET /catalog/categories) shows active ones only.
+         * @description Requires 'catalog:read' (administrator). Every category, active or not, with its image and the number of products directly in it (any status). Ordered by sort_order, then name; build the tree from parent_id. The public tree (GET /catalog/categories) shows active ones only.
          */
         get: operations["list_categories_api_v1_staff_categories_get"];
         put?: never;
         /**
          * Create a category
-         * @description Requires 'catalog:manage' (administrator, sales). The slug is generated from the name unless one is sent. parent_id must be an existing main category: the tree has two levels, main category and subcategory (422 otherwise). Audited as 'catalog.category_create'.
+         * @description Requires 'catalog:manage' (administrator). The slug is generated from the name unless one is sent. parent_id must be an existing main category: the tree has two levels, main category and subcategory (422 otherwise). Audited as 'catalog.category_create'.
          */
         post: operations["create_category_api_v1_staff_categories_post"];
         delete?: never;
@@ -649,7 +649,7 @@ export interface paths {
         get?: never;
         /**
          * Set the brands a main category's menu lists
-         * @description Requires 'catalog:manage' (administrator, sales). Replaces the ordered list of brands the storefront's "All Categories" menu shows for this main category (an empty list clears it; the menu then lists the brands of its products). Every brand must exist, and a brand not already listed must be active (422). A subcategory has no list (422). Returns the list. Audited as 'catalog.category_menu_brands' with the old and new lists; a request that changes nothing is not audited.
+         * @description Requires 'catalog:manage' (administrator). Replaces the ordered list of brands the storefront's "All Categories" menu shows for this main category (an empty list clears it; the menu then lists the brands of its products). Every brand must exist, and a brand not already listed must be active (422). A subcategory has no list (422). Returns the list. Audited as 'catalog.category_menu_brands' with the old and new lists; a request that changes nothing is not audited.
          */
         put: operations["set_category_menu_brands_api_v1_staff_categories__category_id__menu_brands_put"];
         post?: never;
@@ -668,13 +668,13 @@ export interface paths {
         };
         /**
          * Every brand, hidden ones included
-         * @description Requires 'catalog:read' (administrator, sales, operations, management). Every brand, active or not, with its logo and number of products (any status), by name. The public list (GET /catalog/brands) shows active ones only.
+         * @description Requires 'catalog:read' (administrator). Every brand, active or not, with its logo and number of products (any status), by name. The public list (GET /catalog/brands) shows active ones only.
          */
         get: operations["list_brands_api_v1_staff_brands_get"];
         put?: never;
         /**
          * Create a brand
-         * @description Requires 'catalog:manage' (administrator, sales). The slug is generated from the name unless one is sent. Audited as 'catalog.brand_create'.
+         * @description Requires 'catalog:manage' (administrator). The slug is generated from the name unless one is sent. Audited as 'catalog.brand_create'.
          */
         post: operations["create_brand_api_v1_staff_brands_post"];
         delete?: never;
@@ -695,14 +695,14 @@ export interface paths {
         post?: never;
         /**
          * Delete an unused category
-         * @description Requires 'catalog:manage' (administrator, sales). Only a category with no products and no subcategories can be deleted; otherwise 409 (deactivate it with is_active=false). Its image files are then retired (the worker deletes them). Audited as 'catalog.category_delete'.
+         * @description Requires 'catalog:manage' (administrator). Only a category with no products and no subcategories can be deleted; otherwise 409 (deactivate it with is_active=false). Its image files are then retired (the worker deletes them). Audited as 'catalog.category_delete'.
          */
         delete: operations["delete_category_api_v1_staff_categories__category_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update a category
-         * @description Requires 'catalog:manage' (administrator, sales). Partial update of name, slug, parent_id (null = top level; a parent must be a main category, and a category with subcategories cannot get one: 422), sort_order, description (null clears it), is_active (false deactivates it and hides its subcategories from the public tree) and spotlight_product_id (a product in this category or a subcategory, 422 otherwise; null clears it). A rename keeps the slug. Audited as 'catalog.category_update' with the old and new values; a request that changes nothing is not audited.
+         * @description Requires 'catalog:manage' (administrator). Partial update of name, slug, parent_id (null = top level; a parent must be a main category, and a category with subcategories cannot get one: 422), sort_order, description (null clears it), is_active (false deactivates it and hides its subcategories from the public tree) and spotlight_product_id (a product in this category or a subcategory, 422 otherwise; null clears it). A rename keeps the slug. Audited as 'catalog.category_update' with the old and new values; a request that changes nothing is not audited.
          */
         patch: operations["update_category_api_v1_staff_categories__category_id__patch"];
         trace?: never;
@@ -717,7 +717,7 @@ export interface paths {
         get?: never;
         /**
          * Reorder the categories under one parent
-         * @description Requires 'catalog:manage' (administrator, sales). Sets sort_order to 1, 2, 3, ... for the categories directly under parent_id (null: the main categories), in the order of category_ids, which must list every one of them, hidden ones included, exactly once (409 otherwise). Audited once as 'catalog.category_reorder' with the positions that changed; an order that changes nothing is not audited.
+         * @description Requires 'catalog:manage' (administrator). Sets sort_order to 1, 2, 3, ... for the categories directly under parent_id (null: the main categories), in the order of category_ids, which must list every one of them, hidden ones included, exactly once (409 otherwise). Audited once as 'catalog.category_reorder' with the positions that changed; an order that changes nothing is not audited.
          */
         put: operations["reorder_categories_api_v1_staff_categories_order_put"];
         post?: never;
@@ -738,12 +738,12 @@ export interface paths {
         put?: never;
         /**
          * Upload or replace a category image
-         * @description Requires 'catalog:manage' (administrator, sales). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. Replaces the current one, whose files the worker deletes once the replacement is committed. Audited as 'catalog.category_image_upload'.
+         * @description Requires 'catalog:manage' (administrator). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. Replaces the current one, whose files the worker deletes once the replacement is committed. Audited as 'catalog.category_image_upload'.
          */
         post: operations["upload_category_image_api_v1_staff_categories__category_id__image_post"];
         /**
          * Remove a category image
-         * @description Requires 'catalog:manage' (administrator, sales). Clears the image and retires its files (the worker deletes them). A category without an image is returned unchanged and not audited. Audited as 'catalog.category_image_delete'.
+         * @description Requires 'catalog:manage' (administrator). Clears the image and retires its files (the worker deletes them). A category without an image is returned unchanged and not audited. Audited as 'catalog.category_image_delete'.
          */
         delete: operations["delete_category_image_api_v1_staff_categories__category_id__image_delete"];
         options?: never;
@@ -763,14 +763,14 @@ export interface paths {
         post?: never;
         /**
          * Delete an unused brand
-         * @description Requires 'catalog:manage' (administrator, sales). Only a brand with no products can be deleted; otherwise 409 (deactivate it with is_active=false). Its logo files are then retired (the worker deletes them). Audited as 'catalog.brand_delete'.
+         * @description Requires 'catalog:manage' (administrator). Only a brand with no products can be deleted; otherwise 409 (deactivate it with is_active=false). Its logo files are then retired (the worker deletes them). Audited as 'catalog.brand_delete'.
          */
         delete: operations["delete_brand_api_v1_staff_brands__brand_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update a brand
-         * @description Requires 'catalog:manage' (administrator, sales). Partial update of name, slug and is_active (false deactivates it and hides its products). A rename keeps the slug. Audited as 'catalog.brand_update' with the old and new values; a request that changes nothing is not audited.
+         * @description Requires 'catalog:manage' (administrator). Partial update of name, slug and is_active (false deactivates it and hides its products). A rename keeps the slug. Audited as 'catalog.brand_update' with the old and new values; a request that changes nothing is not audited.
          */
         patch: operations["update_brand_api_v1_staff_brands__brand_id__patch"];
         trace?: never;
@@ -786,12 +786,12 @@ export interface paths {
         put?: never;
         /**
          * Upload or replace a brand logo
-         * @description Requires 'catalog:manage' (administrator, sales). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. Replaces the current one, whose files the worker deletes once the replacement is committed. Audited as 'catalog.brand_logo_upload'.
+         * @description Requires 'catalog:manage' (administrator). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. Replaces the current one, whose files the worker deletes once the replacement is committed. Audited as 'catalog.brand_logo_upload'.
          */
         post: operations["upload_brand_logo_api_v1_staff_brands__brand_id__logo_post"];
         /**
          * Remove a brand logo
-         * @description Requires 'catalog:manage' (administrator, sales). Clears the logo and retires its files (the worker deletes them). A brand without a logo is returned unchanged and not audited. Audited as 'catalog.brand_logo_delete'.
+         * @description Requires 'catalog:manage' (administrator). Clears the logo and retires its files (the worker deletes them). A brand without a logo is returned unchanged and not audited. Audited as 'catalog.brand_logo_delete'.
          */
         delete: operations["delete_brand_logo_api_v1_staff_brands__brand_id__logo_delete"];
         options?: never;
@@ -808,13 +808,13 @@ export interface paths {
         };
         /**
          * Staff product list, drafts included
-         * @description Requires 'catalog:read' (administrator, sales, operations, management). Every product whatever its status, most recently updated first. Filters: `status`; `has_images` (product images only, variant images not counted), e.g. `status=active&has_images=false` for active products without a photo or `status=draft&has_images=true` for drafts ready to activate; `category_id`, `brand_id`, `featured`; `low_stock=true` for products with an active variant at or below its low-stock threshold; `q` matches a case-insensitive substring of the name, slug, model or any variant SKU. Each row has the lowest active price, the first active SKU and the units available across active variants.
+         * @description Requires 'catalog:read' (administrator). Every product whatever its status, most recently updated first. Filters: `status`; `has_images` (product images only, variant images not counted), e.g. `status=active&has_images=false` for active products without a photo or `status=draft&has_images=true` for drafts ready to activate; `category_id`, `brand_id`, `featured`; `low_stock=true` for products with an active variant at or below its low-stock threshold; `q` matches a case-insensitive substring of the name, slug, model or any variant SKU. Each row has the lowest active price, the first active SKU and the units available across active variants. `store_id` lists one store's products; each row names its store (ADR-014).
          */
         get: operations["list_products_api_v1_staff_products_get"];
         put?: never;
         /**
-         * Create a product
-         * @description Requires 'catalog:manage' (administrator, sales). status defaults to draft (not public); a new product cannot be created active, because it has no images yet (409 product_has_no_images). The slug is generated from the name unless one is sent. category_id and brand_id must exist. Audited as 'catalog.product_create'.
+         * Create a product (disabled for staff: 409)
+         * @description Requires 'catalog:manage' (administrator). Always 409 staff_product_creation_disabled (SC-05, ADR-014): every product belongs to a seller's store and sellers create their own products (POST /seller/products). Administrators view, edit, hide and archive products of every store through the other routes. Nothing is created or audited.
          */
         post: operations["create_product_api_v1_staff_products_post"];
         delete?: never;
@@ -832,7 +832,7 @@ export interface paths {
         };
         /**
          * Staff product detail, drafts included
-         * @description Requires 'catalog:read' (administrator, sales, operations, management). The product whatever its status, every variant, and every image (variant images included) in display order.
+         * @description Requires 'catalog:read' (administrator). The product whatever its status, every variant, and every image (variant images included) in display order.
          */
         get: operations["get_product_api_v1_staff_products__product_id__get"];
         put?: never;
@@ -842,7 +842,7 @@ export interface paths {
         head?: never;
         /**
          * Update a product
-         * @description Requires 'catalog:manage' (administrator, sales). Partial update of the product fields and status (draft, active, hidden, archived). Activating needs at least one product image (409 product_has_no_images). Only active products in an active category, with an active brand or none, are public. A rename keeps the slug. Audited as 'catalog.product_update' with the old and new values; a request that changes nothing is not audited.
+         * @description Requires 'catalog:manage' (administrator). Partial update of the product fields and status (draft, active, hidden, archived). Activating needs at least one product image (409 product_has_no_images). Only active products in an active category, with an active brand or none, are public. A rename keeps the slug. Audited as 'catalog.product_update' with the old and new values; a request that changes nothing is not audited.
          */
         patch: operations["update_product_api_v1_staff_products__product_id__patch"];
         trace?: never;
@@ -858,7 +858,7 @@ export interface paths {
         put?: never;
         /**
          * Bulk upload product images (processed in the background)
-         * @description Requires 'catalog:manage' (administrator, sales). Up to 20 files and 100 MB per request (send more as further batches). Name each file `<product-slug>.jpg` for position 1 or `<product-slug>__<n>.jpg` for position n (1–99); jpg, jpeg, png or webp, matched case-insensitively. The staff product list and detail show the expected names. A file over 5 MB, or more than 20 files, rejects the whole request before anything is stored (413, 422); 507 when the upload area or disk is full. Names that match no product (`unknown_slug`), are malformed (`invalid_filename`) or name the same position twice in one request (`duplicate_position`, neither applied) fail at once. The rest are stored and processed by the worker (python -m app.worker): each file replaces the image at its position (or adds one there), or is `unchanged` when it is the same file. Poll GET /staff/jobs/{id}. Audited per image as 'catalog.image_bulk_add' or 'catalog.image_bulk_replace' and per job as 'catalog.image_bulk_complete'.
+         * @description Requires 'catalog:manage' (administrator). Up to 20 files and 100 MB per request (send more as further batches). Name each file `<product-slug>.jpg` for position 1 or `<product-slug>__<n>.jpg` for position n (1–99); jpg, jpeg, png or webp, matched case-insensitively. The staff product list and detail show the expected names. A file over 5 MB, or more than 20 files, rejects the whole request before anything is stored (413, 422); 507 when the upload area or disk is full. Names that match no product (`unknown_slug`), are malformed (`invalid_filename`) or name the same position twice in one request (`duplicate_position`, neither applied) fail at once. The rest are stored and processed by the worker (python -m app.worker): each file replaces the image at its position (or adds one there), or is `unchanged` when it is the same file. Poll GET /staff/jobs/{id}. Audited per image as 'catalog.image_bulk_add' or 'catalog.image_bulk_replace' and per job as 'catalog.image_bulk_complete'.
          */
         post: operations["bulk_upload_images_api_v1_staff_products_bulk_images_post"];
         delete?: never;
@@ -878,7 +878,7 @@ export interface paths {
         put?: never;
         /**
          * Activate several products at once
-         * @description Requires 'catalog:manage' (administrator, sales). Up to 200 product IDs. Each product goes through the publication guard: `activated`, `skipped_no_images` (no product image yet), `already_active` or `not_found`. One 'catalog.product_update' audit record per activated product.
+         * @description Requires 'catalog:manage' (administrator). Up to 200 product IDs. Each product goes through the publication guard: `activated`, `skipped_no_images` (no product image yet), `already_active` or `not_found`. One 'catalog.product_update' audit record per activated product.
          */
         post: operations["bulk_activate_products_api_v1_staff_products_bulk_activate_post"];
         delete?: never;
@@ -898,7 +898,7 @@ export interface paths {
         put?: never;
         /**
          * Add a variant (SKU) to a product
-         * @description Requires 'catalog:manage' (administrator, sales). price and compare_at_price are whole RWF (compare_at_price is display only). Stock is managed through the inventory endpoints. Audited as 'catalog.variant_create'.
+         * @description Requires 'catalog:manage' (administrator). price and compare_at_price are whole RWF (compare_at_price is display only). Stock is managed through the inventory endpoints. Audited as 'catalog.variant_create'.
          */
         post: operations["create_variant_api_v1_staff_products__product_id__variants_post"];
         delete?: never;
@@ -919,14 +919,14 @@ export interface paths {
         post?: never;
         /**
          * Deactivate a variant
-         * @description Requires 'catalog:manage' (administrator, sales). The variant is not removed: stock and orders reference it. It is set to is_active=false and hidden from the public catalogue. Repeating it is a no-op. Audited as 'catalog.variant_deactivate'.
+         * @description Requires 'catalog:manage' (administrator). The variant is not removed: stock and orders reference it. It is set to is_active=false and hidden from the public catalogue. Repeating it is a no-op. Audited as 'catalog.variant_deactivate'.
          */
         delete: operations["delete_variant_api_v1_staff_products__product_id__variants__variant_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update a variant
-         * @description Requires 'catalog:manage' (administrator, sales). Partial update; is_active=true reactivates a deactivated variant. Audited as 'catalog.variant_update' with the old and new values, including price.
+         * @description Requires 'catalog:manage' (administrator). Partial update; is_active=true reactivates a deactivated variant. Audited as 'catalog.variant_update' with the old and new values, including price.
          */
         patch: operations["update_variant_api_v1_staff_products__product_id__variants__variant_id__patch"];
         trace?: never;
@@ -942,7 +942,7 @@ export interface paths {
         put?: never;
         /**
          * Upload a product image
-         * @description Requires 'catalog:manage' (administrator, sales). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB) and optional `variant_id` and `alt_text`. The file is identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. It is appended after the product's other images. Audited as 'catalog.image_upload'.
+         * @description Requires 'catalog:manage' (administrator). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB) and optional `variant_id` and `alt_text`. The file is identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. It is appended after the product's other images. Audited as 'catalog.image_upload'.
          */
         post: operations["upload_image_api_v1_staff_products__product_id__images_post"];
         delete?: never;
@@ -961,7 +961,7 @@ export interface paths {
         get?: never;
         /**
          * Reorder a product's images
-         * @description Requires 'catalog:manage' (administrator, sales). `image_ids` lists every product-level image of the product (not variant images) exactly once, in the new display order. They get positions 1..n (sort_order 0..n-1) in one transaction, so the bulk upload file names follow the new order. Returns those images in that order. Audited as 'catalog.image_reorder'; the order they already have is not audited.
+         * @description Requires 'catalog:manage' (administrator). `image_ids` lists every product-level image of the product (not variant images) exactly once, in the new display order. They get positions 1..n (sort_order 0..n-1) in one transaction, so the bulk upload file names follow the new order. Returns those images in that order. Audited as 'catalog.image_reorder'; the order they already have is not audited.
          */
         put: operations["reorder_images_api_v1_staff_products__product_id__images_order_put"];
         post?: never;
@@ -983,14 +983,14 @@ export interface paths {
         post?: never;
         /**
          * Delete an image
-         * @description Requires 'catalog:manage' (administrator, sales). Removes the image from the catalogue and retires its stored files (public source and private original) in the same transaction; the cleanup worker deletes them afterwards. Audited as 'catalog.image_delete'.
+         * @description Requires 'catalog:manage' (administrator). Removes the image from the catalogue and retires its stored files (public source and private original) in the same transaction; the cleanup worker deletes them afterwards. Audited as 'catalog.image_delete'.
          */
         delete: operations["delete_image_api_v1_staff_images__image_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update an image's order, alt text or variant
-         * @description Requires 'catalog:manage' (administrator, sales). Partial update of sort_order (>= 0), alt_text (null clears it) and variant_id (a variant of the same product; null makes it a product-level image). Audited as 'catalog.image_update'; a request that changes nothing is not audited.
+         * @description Requires 'catalog:manage' (administrator). Partial update of sort_order (>= 0), alt_text (null clears it) and variant_id (a variant of the same product; null makes it a product-level image). Audited as 'catalog.image_update'; a request that changes nothing is not audited.
          */
         patch: operations["update_image_api_v1_staff_images__image_id__patch"];
         trace?: never;
@@ -1004,7 +1004,7 @@ export interface paths {
         };
         /**
          * Download the catalogue import template
-         * @description Requires 'catalog:manage' (administrator, sales). The header row of the import file (and, for xlsx, an Instructions sheet describing every column). It contains no data rows, so importing it unchanged changes nothing.
+         * @description Requires 'catalog:manage' (administrator). The header row of the import file (and, for xlsx, an Instructions sheet describing every column). It contains no data rows, so importing it unchanged changes nothing.
          */
         get: operations["download_template_api_v1_staff_imports_template_get"];
         put?: never;
@@ -1026,7 +1026,7 @@ export interface paths {
         put?: never;
         /**
          * Import products and variants from a CSV or XLSX file
-         * @description Requires 'catalog:manage' (administrator, sales). multipart/form-data with `file` (.csv in UTF-8 or .xlsx, at most 10 MB and 5000 data rows). The file is processed within the request. Every row is checked first; valid rows are then applied in one transaction (SKU matching: existing SKUs are updated, new ones created) and invalid rows are reported by row number and column. 201 returns the job: 'completed' (valid rows applied) or 'failed' (the file was unusable; nothing changed). See docs/api/catalogue-import.md.
+         * @description Requires 'catalog:manage' (administrator). multipart/form-data with `file` (.csv in UTF-8 or .xlsx, at most 10 MB and 5000 data rows). The file is processed within the request. Every row is checked first; valid rows are then applied in one transaction (SKU matching: existing SKUs are updated, new ones created) and invalid rows are reported by row number and column. 201 returns the job: 'completed' (valid rows applied) or 'failed' (the file was unusable; nothing changed). See docs/api/catalogue-import.md.
          */
         post: operations["upload_import_api_v1_staff_imports_post"];
         delete?: never;
@@ -1044,7 +1044,7 @@ export interface paths {
         };
         /**
          * Read an import job
-         * @description Requires 'catalog:manage' (administrator, sales). Status, row counts and row errors of one import.
+         * @description Requires 'catalog:manage' (administrator). Status, row counts and row errors of one import.
          */
         get: operations["get_import_api_v1_staff_imports__job_id__get"];
         put?: never;
@@ -1064,7 +1064,7 @@ export interface paths {
         };
         /**
          * Stored files the cleanup worker could not delete
-         * @description Requires 'catalog:manage' (administrator, sales). Files retired by the API whose deletion failed at least once, most attempts first, with the last error. The worker retries them with backoff (at most hourly); an empty list means nothing is stuck.
+         * @description Requires 'catalog:manage' (administrator). Files retired by the API whose deletion failed at least once, most attempts first, with the last error. The worker retries them with backoff (at most hourly); an empty list means nothing is stuck.
          */
         get: operations["list_cleanup_problems_api_v1_staff_media_cleanup_problems_get"];
         put?: never;
@@ -1084,7 +1084,7 @@ export interface paths {
         };
         /**
          * A job's progress and every item's outcome
-         * @description Requires 'catalog:manage' (administrator, sales). Poll it after starting a job: `state` is finished when no item is queued or processing.
+         * @description Requires 'catalog:manage' (administrator). Poll it after starting a job: `state` is finished when no item is queued or processing.
          */
         get: operations["get_job_api_v1_staff_jobs__job_id__get"];
         put?: never;
@@ -1106,7 +1106,7 @@ export interface paths {
         put?: never;
         /**
          * Requeue a job's failed items
-         * @description Requires 'catalog:manage' (administrator, sales). Failed items go back to the queue with their attempts reset; done items are never redone. Audited as 'job.retry_failed'.
+         * @description Requires 'catalog:manage' (administrator). Failed items go back to the queue with their attempts reset; done items are never redone. Audited as 'job.retry_failed'.
          */
         post: operations["retry_failed_api_v1_staff_jobs__job_id__retry_failed_post"];
         delete?: never;
@@ -1144,13 +1144,13 @@ export interface paths {
         };
         /**
          * Every banner, scheduled and inactive included
-         * @description Requires 'content:manage' (administrator, management). By position. `shown_now` tells which are live.
+         * @description Requires 'content:manage' (administrator). By position. `shown_now` tells which are live.
          */
         get: operations["list_staff_banners_api_v1_staff_banners_get"];
         put?: never;
         /**
          * Create a banner (inactive)
-         * @description Requires 'content:manage' (administrator, management). Created inactive; upload its image, then PATCH is_active: true. Audited as 'content.banner_create' with its values.
+         * @description Requires 'content:manage' (administrator). Created inactive; upload its image, then PATCH is_active: true. Audited as 'content.banner_create' with its values.
          */
         post: operations["create_banner_api_v1_staff_banners_post"];
         delete?: never;
@@ -1171,14 +1171,14 @@ export interface paths {
         post?: never;
         /**
          * Delete a banner
-         * @description Requires 'content:manage' (administrator, management). Its image files are retired (the worker deletes them). Audited as 'content.banner_delete' with its values.
+         * @description Requires 'content:manage' (administrator). Its image files are retired (the worker deletes them). Audited as 'content.banner_delete' with its values.
          */
         delete: operations["delete_banner_api_v1_staff_banners__banner_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update or activate a banner
-         * @description Requires 'content:manage' (administrator, management). Partial update; nullable fields accept null to clear them. Activation needs an image. Audited as 'content.banner_update' with old and new values.
+         * @description Requires 'content:manage' (administrator). Partial update; nullable fields accept null to clear them. Activation needs an image. Audited as 'content.banner_update' with old and new values.
          */
         patch: operations["update_banner_api_v1_staff_banners__banner_id__patch"];
         trace?: never;
@@ -1194,12 +1194,12 @@ export interface paths {
         put?: never;
         /**
          * Upload or replace a banner image
-         * @description Requires 'content:manage' (administrator, management). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), same rules as product images. Audited as 'content.banner_image_upload'.
+         * @description Requires 'content:manage' (administrator). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), same rules as product images. Audited as 'content.banner_image_upload'.
          */
         post: operations["upload_banner_image_api_v1_staff_banners__banner_id__image_post"];
         /**
          * Remove a banner image
-         * @description Requires 'content:manage' (administrator, management). Only for an inactive banner (409 banner_needs_image otherwise). Audited as 'content.banner_image_delete'.
+         * @description Requires 'content:manage' (administrator). Only for an inactive banner (409 banner_needs_image otherwise). Audited as 'content.banner_image_delete'.
          */
         delete: operations["delete_banner_image_api_v1_staff_banners__banner_id__image_delete"];
         options?: never;
@@ -1524,7 +1524,7 @@ export interface paths {
         };
         /**
          * All delivery zones with fee history
-         * @description Requires 'delivery:read' (administrator, operations, management). Includes inactive zones.
+         * @description Requires 'delivery:read' (administrator). Includes inactive zones.
          */
         get: operations["staff_zones_api_v1_staff_delivery_zones_get"];
         put?: never;
@@ -1568,7 +1568,7 @@ export interface paths {
         };
         /**
          * Read settings
-         * @description Requires 'settings:read' (administrator, management). Every setting this API manages; a setting never set has value null.
+         * @description Requires 'settings:read' (administrator). Every setting this API manages; a setting never set has value null.
          */
         get: operations["read_settings_api_v1_staff_settings_get"];
         put?: never;
@@ -1632,7 +1632,7 @@ export interface paths {
         };
         /**
          * List policy pages
-         * @description Requires 'content:manage' (administrator, management). Every policy page in menu order with its English and Kinyarwanda versions (null when not written), drafts included.
+         * @description Requires 'content:manage' (administrator). Every policy page in menu order with its English and Kinyarwanda versions (null when not written), drafts included.
          */
         get: operations["list_pages_api_v1_staff_pages_get"];
         put?: never;
@@ -1653,7 +1653,7 @@ export interface paths {
         get?: never;
         /**
          * Write one language version of a page
-         * @description Requires 'content:manage' (administrator, management). Creates or replaces the `lang` version: title (plain text, at most 120), body (Markdown, at most 50,000 characters) and whether it is published. Returns the page with both versions. Audited as 'content.page_update' (title, publication and body length before and after); a write that changes nothing is not audited.
+         * @description Requires 'content:manage' (administrator). Creates or replaces the `lang` version: title (plain text, at most 120), body (Markdown, at most 50,000 characters) and whether it is published. Returns the page with both versions. Audited as 'content.page_update' (title, publication and body length before and after); a write that changes nothing is not audited.
          */
         put: operations["write_page_api_v1_staff_pages__slug__put"];
         post?: never;
@@ -1692,7 +1692,7 @@ export interface paths {
         };
         /**
          * List quote requests
-         * @description Requires 'quotes:manage' (administrator, sales). Newest first; `status` filters.
+         * @description Requires 'quotes:manage' (administrator). Newest first; `status` filters.
          */
         get: operations["list_quote_requests_api_v1_staff_quote_requests_get"];
         put?: never;
@@ -1718,7 +1718,7 @@ export interface paths {
         head?: never;
         /**
          * Change a quote request's status
-         * @description Requires 'quotes:manage' (administrator, sales). new, contacted or closed; moving out of new records who handled it and when. Audited as 'quote.status_change'; setting the current status changes nothing and is not audited.
+         * @description Requires 'quotes:manage' (administrator). new, contacted or closed; moving out of new records who handled it and when. Audited as 'quote.status_change'; setting the current status changes nothing and is not audited.
          */
         patch: operations["change_quote_status_api_v1_staff_quote_requests__quote_id__patch"];
         trace?: never;
@@ -1792,13 +1792,13 @@ export interface paths {
         };
         /**
          * List services (staff)
-         * @description Requires 'services:read' (administrator, sales, management). Every service, hidden ones included, in order, with its items.
+         * @description Requires 'services:read' (administrator). Every service, hidden ones included, in order, with its items.
          */
         get: operations["staff_list_services_api_v1_staff_services_get"];
         put?: never;
         /**
          * Create a service
-         * @description Requires 'services:manage' (administrator, sales). Added last. The slug is generated from the English name when omitted; a taken slug is 409 slug_taken. Audited as 'services.service_create'.
+         * @description Requires 'services:manage' (administrator). Added last. The slug is generated from the English name when omitted; a taken slug is 409 slug_taken. Audited as 'services.service_create'.
          */
         post: operations["create_service_api_v1_staff_services_post"];
         delete?: never;
@@ -1817,7 +1817,7 @@ export interface paths {
         get?: never;
         /**
          * Reorder the services
-         * @description Requires 'services:manage' (administrator, sales). Every service exactly once, in the new order (409 service_order_mismatch otherwise). Audited as 'services.service_reorder' when the order changes.
+         * @description Requires 'services:manage' (administrator). Every service exactly once, in the new order (409 service_order_mismatch otherwise). Audited as 'services.service_reorder' when the order changes.
          */
         put: operations["reorder_services_api_v1_staff_services_order_put"];
         post?: never;
@@ -1839,14 +1839,14 @@ export interface paths {
         post?: never;
         /**
          * Delete a service without requests
-         * @description Requires 'services:manage' (administrator, sales). A service with requests cannot be deleted (409 service_has_requests); hide it instead. Its items go with it and its image files are retired. Audited as 'services.service_delete'.
+         * @description Requires 'services:manage' (administrator). A service with requests cannot be deleted (409 service_has_requests); hide it instead. Its items go with it and its image files are retired. Audited as 'services.service_delete'.
          */
         delete: operations["delete_service_api_v1_staff_services__service_id__delete"];
         options?: never;
         head?: never;
         /**
          * Edit a service
-         * @description Requires 'services:manage' (administrator, sales). Only the fields sent change; is_active=false hides it from the store. Audited as 'services.service_update' when something changes.
+         * @description Requires 'services:manage' (administrator). Only the fields sent change; is_active=false hides it from the store. Audited as 'services.service_update' when something changes.
          */
         patch: operations["update_service_api_v1_staff_services__service_id__patch"];
         trace?: never;
@@ -1862,12 +1862,12 @@ export interface paths {
         put?: never;
         /**
          * Upload or replace a service image
-         * @description Requires 'services:manage' (administrator, sales). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), processed as category images. Audited as 'services.service_image_upload'.
+         * @description Requires 'services:manage' (administrator). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), processed as category images. Audited as 'services.service_image_upload'.
          */
         post: operations["upload_service_image_api_v1_staff_services__service_id__image_post"];
         /**
          * Remove a service image
-         * @description Requires 'services:manage' (administrator, sales). Clears the image and retires its files. Without an image, nothing changes. Audited as 'services.service_image_delete'.
+         * @description Requires 'services:manage' (administrator). Clears the image and retires its files. Without an image, nothing changes. Audited as 'services.service_image_delete'.
          */
         delete: operations["delete_service_image_api_v1_staff_services__service_id__image_delete"];
         options?: never;
@@ -1886,7 +1886,7 @@ export interface paths {
         put?: never;
         /**
          * Add an item to a service
-         * @description Requires 'services:manage' (administrator, sales). Added last; at most 30 per service. Audited as 'services.item_create'.
+         * @description Requires 'services:manage' (administrator). Added last; at most 30 per service. Audited as 'services.item_create'.
          */
         post: operations["add_service_item_api_v1_staff_services__service_id__items_post"];
         delete?: never;
@@ -1905,7 +1905,7 @@ export interface paths {
         get?: never;
         /**
          * Reorder a service's items
-         * @description Requires 'services:manage' (administrator, sales). Every item of the service exactly once (409 service_item_order_mismatch otherwise). Audited as 'services.item_reorder'.
+         * @description Requires 'services:manage' (administrator). Every item of the service exactly once (409 service_item_order_mismatch otherwise). Audited as 'services.item_reorder'.
          */
         put: operations["reorder_service_items_api_v1_staff_services__service_id__items_order_put"];
         post?: never;
@@ -1927,14 +1927,14 @@ export interface paths {
         post?: never;
         /**
          * Delete a service item
-         * @description Requires 'services:manage' (administrator, sales). Audited as 'services.item_delete'.
+         * @description Requires 'services:manage' (administrator). Audited as 'services.item_delete'.
          */
         delete: operations["delete_service_item_api_v1_staff_services__service_id__items__item_id__delete"];
         options?: never;
         head?: never;
         /**
          * Edit a service item
-         * @description Requires 'services:manage' (administrator, sales). Audited as 'services.item_update' when something changes.
+         * @description Requires 'services:manage' (administrator). Audited as 'services.item_update' when something changes.
          */
         patch: operations["update_service_item_api_v1_staff_services__service_id__items__item_id__patch"];
         trace?: never;
@@ -1948,7 +1948,7 @@ export interface paths {
         };
         /**
          * List service requests
-         * @description Requires 'services:read' (administrator, sales, management). Newest first. Filters: status, service (id), assignee and the Kigali dates the requests were sent (from/to, inclusive).
+         * @description Requires 'services:read' (administrator). Newest first. Filters: status, service (id), assignee and the Kigali dates the requests were sent (from/to, inclusive).
          */
         get: operations["list_service_requests_api_v1_staff_service_requests_get"];
         put?: never;
@@ -1968,7 +1968,7 @@ export interface paths {
         };
         /**
          * Staff who can be assigned service requests
-         * @description Requires 'services:read' (administrator, sales, management). Active staff with 'services:manage', by name.
+         * @description Requires 'services:read' (administrator). Active staff with 'services:manage', by name.
          */
         get: operations["list_service_assignees_api_v1_staff_service_requests_assignees_get"];
         put?: never;
@@ -1988,7 +1988,7 @@ export interface paths {
         };
         /**
          * Get a service request
-         * @description Requires 'services:read' (administrator, sales, management).
+         * @description Requires 'services:read' (administrator).
          */
         get: operations["get_service_request_api_v1_staff_service_requests__request_id__get"];
         put?: never;
@@ -1998,7 +1998,7 @@ export interface paths {
         head?: never;
         /**
          * Follow up a service request
-         * @description Requires 'services:manage' (administrator, sales). Only the fields sent change: status, assigned_to_user_id (an active staff member with 'services:manage'; null unassigns) and internal_notes (null or blank clears them). Audited as 'services.request_update' when something changes; the notes' text is not copied into the audit trail.
+         * @description Requires 'services:manage' (administrator). Only the fields sent change: status, assigned_to_user_id (an active staff member with 'services:manage'; null unassigns) and internal_notes (null or blank clears them). Audited as 'services.request_update' when something changes; the notes' text is not copied into the audit trail.
          */
         patch: operations["update_service_request_api_v1_staff_service_requests__request_id__patch"];
         trace?: never;
@@ -2132,7 +2132,7 @@ export interface paths {
         };
         /**
          * List support conversations
-         * @description Requires 'support:read' (administrator, sales, management). Most recent activity first. `status` filters; `q` searches reference, name, subject, email, phone and order number.
+         * @description Requires 'support:read' (administrator). Most recent activity first. `status` filters; `q` searches reference, name, subject, email, phone and order number.
          */
         get: operations["list_support_threads_api_v1_staff_support_threads_get"];
         put?: never;
@@ -2152,7 +2152,7 @@ export interface paths {
         };
         /**
          * Read a support conversation
-         * @description Requires 'support:read' (administrator, sales, management).
+         * @description Requires 'support:read' (administrator).
          */
         get: operations["get_support_thread_api_v1_staff_support_threads__thread_id__get"];
         put?: never;
@@ -2162,7 +2162,7 @@ export interface paths {
         head?: never;
         /**
          * Change a support conversation's status
-         * @description Requires 'support:reply' (administrator, sales). open, answered or closed. Audited as 'support.status_change'; setting the current status changes nothing and is not audited.
+         * @description Requires 'support:reply' (administrator). open, answered or closed. Audited as 'support.status_change'; setting the current status changes nothing and is not audited.
          */
         patch: operations["change_support_status_api_v1_staff_support_threads__thread_id__patch"];
         trace?: never;
@@ -2178,7 +2178,7 @@ export interface paths {
         put?: never;
         /**
          * Reply to a support conversation
-         * @description Requires 'support:reply' (administrator, sales). Sets the status to answered and emails the reply to the sender's address when they gave one. Audited as 'support.reply'.
+         * @description Requires 'support:reply' (administrator). Sets the status to answered and emails the reply to the sender's address when they gave one. Audited as 'support.reply'.
          */
         post: operations["reply_to_support_thread_api_v1_staff_support_threads__thread_id__messages_post"];
         delete?: never;
@@ -2196,7 +2196,7 @@ export interface paths {
         };
         /**
          * List promotions
-         * @description Requires 'promotions:read' (administrator, sales, management). Newest first.
+         * @description Requires 'promotions:read' (administrator). Newest first.
          */
         get: operations["list_promotions_api_v1_staff_promotions_get"];
         put?: never;
@@ -2220,7 +2220,7 @@ export interface paths {
         };
         /**
          * View a promotion
-         * @description Requires 'promotions:read' (administrator, sales, management).
+         * @description Requires 'promotions:read' (administrator).
          */
         get: operations["get_promotion_api_v1_staff_promotions__promotion_id__get"];
         put?: never;
@@ -2428,7 +2428,7 @@ export interface paths {
         };
         /**
          * List reviews
-         * @description Requires 'reviews:moderate' (administrator, sales). Newest first; `status` filters (e.g. pending for the moderation queue).
+         * @description Requires 'reviews:moderate' (administrator). Newest first; `status` filters (e.g. pending for the moderation queue).
          */
         get: operations["list_reviews_api_v1_staff_reviews_get"];
         put?: never;
@@ -2568,7 +2568,7 @@ export interface paths {
         };
         /**
          * Payment attempts (reconciliation list)
-         * @description Requires 'payments:read' (administrator, management, finance). Read-only; newest first. `amount_total` sums `amount` over every attempt matching the filters, not just this page.
+         * @description Requires 'payments:read' (administrator). Read-only; newest first. `amount_total` sums `amount` over every attempt matching the filters, not just this page.
          */
         get: operations["list_payments_api_v1_staff_payments_get"];
         put?: never;
@@ -2648,7 +2648,7 @@ export interface paths {
         };
         /**
          * Staff an order can be assigned to
-         * @description Requires 'orders:fulfil' (administrator, operations). Every active staff account (name and role only), by name: the choices for PATCH /staff/orders/{id}/assignment.
+         * @description Requires 'orders:fulfil' (administrator). Every active staff account (name and role only), by name: the choices for PATCH /staff/orders/{id}/assignment.
          */
         get: operations["list_assignees_api_v1_staff_orders_assignees_get"];
         put?: never;
@@ -2694,7 +2694,7 @@ export interface paths {
         head?: never;
         /**
          * Advance an order status
-         * @description Requires 'orders:fulfil' (administrator, operations). A valid transition, status history row and audit event commit atomically; the optional `reason` is kept in both. Dispatch consumes committed inventory; cancellation (allowed only before dispatch) releases active holds and the promotion use and cancels an unpaid payment. Confirming a cash-on-delivery order commits its stock (§7 Q13); delivering it marks the payment succeeded (Q14). Committed stock is never released by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409. A move to confirmed, dispatched, delivered or cancelled records the customer's SMS or email notification with the change and sends it after the response (module 17); a notification failure never fails the change.
+         * @description Requires 'orders:fulfil' (administrator). A valid transition, status history row and audit event commit atomically; the optional `reason` is kept in both. Dispatch consumes committed inventory; cancellation (allowed only before dispatch) releases active holds and the promotion use and cancels an unpaid payment. Confirming a cash-on-delivery order commits its stock (§7 Q13); delivering it marks the payment succeeded (Q14). Committed stock is never released by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409. A move to confirmed, dispatched, delivered or cancelled records the customer's SMS or email notification with the change and sends it after the response (module 17); a notification failure never fails the change.
          */
         patch: operations["change_order_status_api_v1_staff_orders__order_id__status_patch"];
         trace?: never;
@@ -2714,7 +2714,7 @@ export interface paths {
         head?: never;
         /**
          * Assign fulfilment responsibility for an order
-         * @description Requires 'orders:fulfil' (administrator, operations). The target must be an active staff account with one of the repository's assigned staff roles. The assignment and audit event commit atomically.
+         * @description Requires 'orders:fulfil' (administrator). The target must be an active staff account with one of the repository's assigned staff roles. The assignment and audit event commit atomically.
          */
         patch: operations["assign_order_fulfilment_api_v1_staff_orders__order_id__assignment_patch"];
         trace?: never;
@@ -2772,7 +2772,7 @@ export interface paths {
         };
         /**
          * Stock list, with the low-stock filter
-         * @description Requires 'inventory:read' (administrator, sales, operations, management). One row per SKU, active or not, ordered by SKU, with the same figures as GET /inventory/{sku}. `low_stock=true` lists SKUs whose available quantity is at or below their low_stock_threshold (threshold above 0): this is the low-stock alert. `low_stock=false` lists the others; omit it for all. `q` matches a case-insensitive substring of the SKU, variant name or product name.
+         * @description Requires 'inventory:read' (administrator). One row per SKU, active or not, ordered by SKU, with the same figures as GET /inventory/{sku}. `low_stock=true` lists SKUs whose available quantity is at or below their low_stock_threshold (threshold above 0): this is the low-stock alert. `low_stock=false` lists the others; omit it for all. `q` matches a case-insensitive substring of the SKU, variant name or product name.
          */
         get: operations["list_inventory_api_v1_inventory_get"];
         put?: never;
@@ -2792,7 +2792,7 @@ export interface paths {
         };
         /**
          * Stock figures for a SKU
-         * @description Returns physical, unavailable, reserved (active), committed and available quantities read from PostgreSQL. A SKU without an inventory record reports zeros. Requires 'inventory:read' (administrator, sales, operations, management).
+         * @description Returns physical, unavailable, reserved (active), committed and available quantities read from PostgreSQL. A SKU without an inventory record reports zeros. Requires 'inventory:read' (administrator).
          */
         get: operations["get_inventory_api_v1_inventory__sku__get"];
         put?: never;
@@ -2814,7 +2814,7 @@ export interface paths {
         put?: never;
         /**
          * Record a physical stock change
-         * @description Applies a receipt, adjustment or inspected return to physical on_hand and appends a stock-ledger movement, in one transaction with an 'inventory.adjust' audit record. Requires 'inventory:adjust' (administrator, sales, operations).
+         * @description Applies a receipt, adjustment or inspected return to physical on_hand and appends a stock-ledger movement, in one transaction with an 'inventory.adjust' audit record. Requires 'inventory:adjust' (administrator).
          *
          *     **Idempotency:** the `Idempotency-Key` header is required (8-100 characters: letters, digits, `_ . : -`). Repeating a request with the same key returns the original movement with HTTP 200 and `replayed: true`, without changing stock again. Reusing a key for a different change returns 409. Keys are scoped to the calling staff member.
          *
@@ -2876,7 +2876,7 @@ export interface paths {
         };
         /**
          * Sales by day or week
-         * @description Requires 'reports:read' (administrator, management, finance). Counts only paid orders and delivered cash-on-delivery orders (orders with a succeeded payment; UAT scenario 7), each once, dated by its first payment success. `from` and `to` are inclusive Africa/Kigali dates (YYYY-MM-DD), at most 366 days apart; weeks start on Monday (§7 Q25). Amounts are whole RWF. Every day or week of the range is listed, with zeros where nothing sold; the first and last week are cut at the range. `totals` is the sum of the periods.
+         * @description Requires 'reports:read' (administrator). Counts only paid orders and delivered cash-on-delivery orders (orders with a succeeded payment; UAT scenario 7), each once, dated by its first payment success. `from` and `to` are inclusive Africa/Kigali dates (YYYY-MM-DD), at most 366 days apart; weeks start on Monday (§7 Q25). Amounts are whole RWF. Every day or week of the range is listed, with zeros where nothing sold; the first and last week are cut at the range. `totals` is the sum of the periods.
          */
         get: operations["sales_report_api_v1_staff_reports_sales_get"];
         put?: never;
@@ -2896,7 +2896,7 @@ export interface paths {
         };
         /**
          * Top products by units sold
-         * @description Requires 'reports:read' (administrator, management, finance). The products in the sales of the range (same rule: Counts only paid orders and delivered cash-on-delivery orders (orders with a succeeded payment; UAT scenario 7), each once, dated by its first payment success. `from` and `to` are inclusive Africa/Kigali dates (YYYY-MM-DD), at most 366 days apart; weeks start on Monday (§7 Q25). Amounts are whole RWF.) ranked by units sold, then revenue (line totals after discounts), then product name. A product deleted since keeps its lines under the name it was sold with.
+         * @description Requires 'reports:read' (administrator). The products in the sales of the range (same rule: Counts only paid orders and delivered cash-on-delivery orders (orders with a succeeded payment; UAT scenario 7), each once, dated by its first payment success. `from` and `to` are inclusive Africa/Kigali dates (YYYY-MM-DD), at most 366 days apart; weeks start on Monday (§7 Q25). Amounts are whole RWF.) ranked by units sold, then revenue (line totals after discounts), then product name. A product deleted since keeps its lines under the name it was sold with.
          */
         get: operations["top_products_report_api_v1_staff_reports_top_products_get"];
         put?: never;
@@ -2916,7 +2916,7 @@ export interface paths {
         };
         /**
          * Stock report
-         * @description Requires 'reports:read' (administrator, management, finance). One row per SKU, active or not, ordered by SKU, with the figures of GET /api/v1/inventory (available = on hand - unavailable - reserved - committed, never below 0). Paginated; `totals` covers every SKU.
+         * @description Requires 'reports:read' (administrator). One row per SKU, active or not, ordered by SKU, with the figures of GET /api/v1/inventory (available = on hand - unavailable - reserved - committed, never below 0). Paginated; `totals` covers every SKU.
          */
         get: operations["stock_report_api_v1_staff_reports_stock_get"];
         put?: never;
@@ -2936,7 +2936,7 @@ export interface paths {
         };
         /**
          * Export a report to Excel (XLSX)
-         * @description Requires 'reports:read' (administrator, management, finance). `report_type` is `sales`, `top-products` or `stock`; the query parameters are those of the JSON report (`from`, `to` and `group_by` for sales; `from`, `to` and `limit` for top products; none for stock, which exports every SKU). The rows and totals are those of the JSON report with the same parameters.
+         * @description Requires 'reports:read' (administrator). `report_type` is `sales`, `top-products` or `stock`; the query parameters are those of the JSON report (`from`, `to` and `group_by` for sales; `from`, `to` and `limit` for top products; none for stock, which exports every SKU). The rows and totals are those of the JSON report with the same parameters.
          */
         get: operations["export_report_api_v1_staff_reports__report_type__export_get"];
         put?: never;
@@ -3077,6 +3077,310 @@ export interface paths {
          * @description Requires 'sellers:manage' (administrator). Whole basis points 0-10000 (1000 = 10%), or null to inherit the platform default (setting marketplace.default_commission_bps). Audited as 'store.commission_change'; setting the current value changes nothing.
          */
         patch: operations["change_seller_commission_api_v1_staff_sellers__store_id__commission_patch"];
+        trace?: never;
+    };
+    "/api/v1/seller/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My products, drafts included
+         * @description Approved sellers only; your own store's products. Every status, most recently updated first, with the filters of the staff list: `status`, `has_images`, `category_id`, `brand_id`, `low_stock` and `q` (name, slug, model or SKU).
+         */
+        get: operations["list_my_products_api_v1_seller_products_get"];
+        put?: never;
+        /**
+         * Add a product to my store
+         * @description Approved sellers only; your own store's products. The product belongs to your store; store_id and is_featured are refused (422). status defaults to draft; a new product cannot be created active, because it has no images yet (409 product_has_no_images). The slug is generated from the name unless one is sent; slugs and SKUs are unique across the marketplace. category_id and brand_id must exist and be visible. Audited as 'catalog.product_create'.
+         */
+        post: operations["create_my_product_api_v1_seller_products_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of my products
+         * @description Approved sellers only; your own store's products. Every variant and image.
+         */
+        get: operations["read_my_product_api_v1_seller_products__product_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update one of my products
+         * @description Approved sellers only; your own store's products. Partial update with the staff rules (activating needs a product image, 409 product_has_no_images); store_id and is_featured are refused (422). Audited as 'catalog.product_update'.
+         */
+        patch: operations["update_my_product_api_v1_seller_products__product_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/seller/products/{product_id}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a variant (SKU) to one of my products
+         * @description Approved sellers only; your own store's products. Whole RWF prices. Stock is managed through /seller/inventory. Audited as 'catalog.variant_create'.
+         */
+        post: operations["create_my_variant_api_v1_seller_products__product_id__variants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/products/{product_id}/variants/{variant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Deactivate a variant of one of my products
+         * @description Approved sellers only; your own store's products. The variant is kept (stock and orders reference it) and hidden. Audited as 'catalog.variant_deactivate'.
+         */
+        delete: operations["deactivate_my_variant_api_v1_seller_products__product_id__variants__variant_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a variant of one of my products
+         * @description Approved sellers only; your own store's products. Audited as 'catalog.variant_update', price changes included.
+         */
+        patch: operations["update_my_variant_api_v1_seller_products__product_id__variants__variant_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/seller/products/{product_id}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload an image of one of my products
+         * @description Approved sellers only; your own store's products. multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB) and optional `variant_id` and `alt_text`, processed as staff uploads are. Audited as 'catalog.image_upload'.
+         */
+        post: operations["upload_my_image_api_v1_seller_products__product_id__images_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/products/{product_id}/images/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Reorder the images of one of my products
+         * @description Approved sellers only; your own store's products. List every product image exactly once. Audited as 'catalog.image_reorder'.
+         */
+        put: operations["reorder_my_images_api_v1_seller_products__product_id__images_order_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/images/{image_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete an image of one of my products
+         * @description Approved sellers only; your own store's products. An active product keeps its last product image (409 last_product_image). Audited as 'catalog.image_delete'.
+         */
+        delete: operations["delete_my_image_api_v1_seller_images__image_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update an image of one of my products
+         * @description Approved sellers only; your own store's products. alt_text, sort_order or variant_id. Audited as 'catalog.image_update'.
+         */
+        patch: operations["update_my_image_api_v1_seller_images__image_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/seller/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My stock list, with the low-stock filter
+         * @description Approved sellers only; your own store's products. One row per SKU of your store, ordered by SKU, with the staff figures. `low_stock` and `q` work as in GET /inventory.
+         */
+        get: operations["list_my_inventory_api_v1_seller_inventory_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/inventory/{sku}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock figures for one of my SKUs
+         * @description Approved sellers only; your own store's products. Another store's SKU is 404 like an unknown one.
+         */
+        get: operations["read_my_inventory_api_v1_seller_inventory__sku__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/inventory/{sku}/adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a physical stock change for one of my SKUs
+         * @description Approved sellers only; your own store's products. A receipt, adjustment or inspected return, with the rules, idempotency (`Idempotency-Key`, scoped to you) and audit of POST /inventory/{sku}/adjustments. Reservations and order commitments stay with the platform.
+         */
+        post: operations["adjust_my_inventory_api_v1_seller_inventory__sku__adjustments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/store/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload or replace my store's logo
+         * @description Approved sellers only. multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB). The replaced files are retired. Audited as 'store.logo_upload'.
+         */
+        post: operations["upload_store_logo_api_v1_seller_store_logo_post"];
+        /**
+         * Remove my store's logo
+         * @description Approved sellers only. No logo: unchanged, not audited. Audited as 'store.logo_delete'.
+         */
+        delete: operations["delete_store_logo_api_v1_seller_store_logo_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/store/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload or replace my store's cover image
+         * @description Approved sellers only. multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB). The replaced files are retired. Audited as 'store.cover_upload'.
+         */
+        post: operations["upload_store_cover_api_v1_seller_store_cover_post"];
+        /**
+         * Remove my store's cover image
+         * @description Approved sellers only. No cover: unchanged, not audited. Audited as 'store.cover_delete'.
+         */
+        delete: operations["delete_store_cover_api_v1_seller_store_cover_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Approved stores
+         * @description Approved stores by name, each with the number of its public products.
+         */
+        get: operations["list_stores_api_v1_stores_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/stores/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One approved store
+         * @description Any store that is not approved, or does not exist, is 404 store_not_found.
+         */
+        get: operations["read_store_api_v1_stores__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -3436,8 +3740,42 @@ export interface components {
              */
             file: string;
         };
+        /** Body_upload_my_image_api_v1_seller_products__product_id__images_post */
+        Body_upload_my_image_api_v1_seller_products__product_id__images_post: {
+            /**
+             * File
+             * @description JPEG, PNG or WebP, at most 5 MB
+             */
+            file: string;
+            /**
+             * Variant Id
+             * @description A variant of the same product; omit for a product-level image
+             */
+            variant_id?: string | null;
+            /**
+             * Alt Text
+             * @description 1-300 characters
+             */
+            alt_text?: string | null;
+        };
         /** Body_upload_service_image_api_v1_staff_services__service_id__image_post */
         Body_upload_service_image_api_v1_staff_services__service_id__image_post: {
+            /**
+             * File
+             * @description JPEG, PNG or WebP, at most 5 MB
+             */
+            file: string;
+        };
+        /** Body_upload_store_cover_api_v1_seller_store_cover_post */
+        Body_upload_store_cover_api_v1_seller_store_cover_post: {
+            /**
+             * File
+             * @description JPEG, PNG or WebP, at most 5 MB
+             */
+            file: string;
+        };
+        /** Body_upload_store_logo_api_v1_seller_store_logo_post */
+        Body_upload_store_logo_api_v1_seller_store_logo_post: {
             /**
              * File
              * @description JPEG, PNG or WebP, at most 5 MB
@@ -3907,6 +4245,8 @@ export interface components {
             warranty_text: string | null;
             category: components["schemas"]["CatalogReference"];
             brand: components["schemas"]["CatalogReference"] | null;
+            /** @description Sold by: the approved store that sells it */
+            store: components["schemas"]["StoreReference"];
             /** Images */
             images: components["schemas"]["PublicImage"][];
             /** Variants */
@@ -3950,6 +4290,8 @@ export interface components {
             warranty_text: string | null;
             category: components["schemas"]["CatalogReference"];
             brand: components["schemas"]["CatalogReference"] | null;
+            /** @description Sold by: the approved store that sells it */
+            store: components["schemas"]["StoreReference"];
             /** Images */
             images: components["schemas"]["PublicImage"][];
             /** Variants */
@@ -5707,6 +6049,26 @@ export interface components {
              */
             size: number;
         };
+        /** Page[PublicStoreResponse] */
+        Page_PublicStoreResponse_: {
+            /** Items */
+            items: components["schemas"]["PublicStoreResponse"][];
+            /**
+             * Total
+             * @description Number of items matching the filters
+             */
+            total: number;
+            /**
+             * Page
+             * @description Page number, starting at 1
+             */
+            page: number;
+            /**
+             * Size
+             * @description Requested page size
+             */
+            size: number;
+        };
         /** Page[StaffBannerResponse] */
         Page_StaffBannerResponse_: {
             /** Items */
@@ -6136,6 +6498,12 @@ export interface components {
             status: "draft" | "active" | "hidden" | "archived";
             /** Is Featured */
             is_featured: boolean;
+            /**
+             * Store Id
+             * Format: uuid
+             * @description The store that owns the product (ADR-014)
+             */
+            store_id: string;
             /** Variants */
             variants: components["schemas"]["VariantResponse"][];
             /**
@@ -6627,6 +6995,38 @@ export interface components {
             /** @description The store's social media links, each null while unset */
             social: components["schemas"]["SocialLinks"];
         };
+        /**
+         * PublicStoreResponse
+         * @description An approved store on the public storefront (ADR-014 decision 7). Never carries the
+         *     contact details, street address, owner, status history or commission.
+         */
+        PublicStoreResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description: string | null;
+            /** District */
+            district: string;
+            logo: components["schemas"]["PublicImage"] | null;
+            cover: components["schemas"]["PublicImage"] | null;
+            /**
+             * Product Count
+             * @description Public products of this store
+             */
+            product_count: number;
+            /**
+             * Approved At
+             * @description When the store was first approved
+             */
+            approved_at: string | null;
+        };
         /** QuoteLine */
         QuoteLine: {
             /**
@@ -7017,6 +7417,69 @@ export interface components {
              */
             periods: components["schemas"]["SalesPeriod"][];
             totals: components["schemas"]["SalesFigures"];
+        };
+        /**
+         * SellerProductCreateRequest
+         * @description A seller's new product (ADR-014 phase 2). The store is always the seller's own, taken
+         *     from the session; store_id, is_featured and other merchandising fields are refused (422).
+         */
+        SellerProductCreateRequest: {
+            /** Name */
+            name: string;
+            /**
+             * Slug
+             * @description Omit to generate one from the name (a taken slug gets -2, -3, ...). A slug given explicitly must be unused, otherwise 409.
+             */
+            slug?: string | null;
+            /**
+             * Category Id
+             * Format: uuid
+             */
+            category_id: string;
+            /** Brand Id */
+            brand_id?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Specifications */
+            specifications?: {
+                [key: string]: unknown;
+            };
+            /** Warranty Text */
+            warranty_text?: string | null;
+            /**
+             * Status
+             * @default draft
+             * @enum {string}
+             */
+            status: "draft" | "active" | "hidden" | "archived";
+        };
+        /**
+         * SellerProductUpdateRequest
+         * @description A seller's partial update of their own product: the staff fields without is_featured.
+         */
+        SellerProductUpdateRequest: {
+            /** Name */
+            name?: string | null;
+            /** Slug */
+            slug?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /** Brand Id */
+            brand_id?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Specifications */
+            specifications?: {
+                [key: string]: unknown;
+            } | null;
+            /** Warranty Text */
+            warranty_text?: string | null;
+            /** Status */
+            status?: ("draft" | "active" | "hidden" | "archived") | null;
         };
         /**
          * SellerStoreResponse
@@ -8022,6 +8485,12 @@ export interface components {
             status: "draft" | "active" | "hidden" | "archived";
             /** Is Featured */
             is_featured: boolean;
+            /**
+             * Store Id
+             * Format: uuid
+             * @description The store that owns the product (ADR-014)
+             */
+            store_id: string;
             /** Variants */
             variants: components["schemas"]["VariantResponse"][];
             /**
@@ -8070,6 +8539,8 @@ export interface components {
             is_featured: boolean;
             category: components["schemas"]["CatalogReference"];
             brand: components["schemas"]["CatalogReference"] | null;
+            /** @description The store that owns the product (ADR-014) */
+            store: components["schemas"]["StoreReference"];
             /**
              * Variant Count
              * @description Variants, active or not
@@ -8795,6 +9266,21 @@ export interface components {
             sector?: string | null;
             /** Street Address */
             street_address?: string | null;
+        };
+        /**
+         * StoreReference
+         * @description A store's public identity: the "Sold by" summary (ADR-014 phase 2).
+         */
+        StoreReference: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
         };
         /**
          * StoreStatusRequest
@@ -11992,6 +12478,7 @@ export interface operations {
                 featured?: boolean | null;
                 q?: string | null;
                 low_stock?: boolean | null;
+                store_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -12077,7 +12564,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description slug_taken: the slug is used by another product */
+            /** @description staff_product_creation_disabled: administrators moderate products but do not create them; sellers add products to their own store (SC-05) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -13693,6 +14180,8 @@ export interface operations {
                 on_sale?: boolean | null;
                 /** @description Only products whose average approved-review rating is at least this many stars; products without reviews are left out */
                 min_rating?: number | null;
+                /** @description Store slug: only that approved store's products (ADR-014). A store that is not approved, or does not exist, matches nothing */
+                store?: string | null;
             };
             header?: never;
             path?: never;
@@ -13739,6 +14228,8 @@ export interface operations {
                 on_sale?: boolean | null;
                 /** @description Only products whose average approved-review rating is at least this many stars; products without reviews are left out */
                 min_rating?: number | null;
+                /** @description Store slug: only that approved store's products (ADR-014). A store that is not approved, or does not exist, matches nothing */
+                store?: string | null;
             };
             header?: never;
             path?: never;
@@ -19752,6 +20243,1207 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_my_products_api_v1_seller_products_get: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1 */
+                page?: number;
+                /** @description Items per page (1-100) */
+                size?: number;
+                status?: ("draft" | "active" | "hidden" | "archived") | null;
+                has_images?: boolean | null;
+                category_id?: string | null;
+                brand_id?: string | null;
+                q?: string | null;
+                low_stock?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_StaffProductListItem_"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_my_product_api_v1_seller_products_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SellerProductCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description slug_taken: the slug is used by another product */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_my_product_api_v1_seller_products__product_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffProductDetail"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description product_not_found: no such product in your store */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_my_product_api_v1_seller_products__product_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SellerProductUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description product_not_found: no such product in your store */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description slug_taken: the slug is used by another product */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_my_variant_api_v1_seller_products__product_id__variants_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VariantCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VariantResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description product_not_found: no such product in your store */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description sku_taken: the SKU is used by another variant */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deactivate_my_variant_api_v1_seller_products__product_id__variants__variant_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No product with this ID, or no such variant on it */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_my_variant_api_v1_seller_products__product_id__variants__variant_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VariantUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VariantResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No product with this ID, or no such variant on it */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description sku_taken: the SKU is used by another variant */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    upload_my_image_api_v1_seller_products__product_id__images_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_my_image_api_v1_seller_products__product_id__images_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No product with this ID */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description sort_order_full: the product's highest sort_order is already the maximum */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description file_too_large: the upload is larger than 5 MB. Checked while the body is received, before authentication, so it can also answer an unauthenticated request */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Invalid request, a file that is not a valid JPEG/PNG/WebP image, or a variant_id that does not belong to the product */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reorder_my_images_api_v1_seller_products__product_id__images_order_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImageOrderRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponse"][];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No product with this ID */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description sort_order_full: the product's highest sort_order is already the maximum */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_my_image_api_v1_seller_images__image_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No image with this ID */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description last_product_image */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_my_image_api_v1_seller_images__image_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImageUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No image with this ID */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description sort_order_full: the product's highest sort_order is already the maximum */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_my_inventory_api_v1_seller_inventory_get: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1 */
+                page?: number;
+                /** @description Items per page (1-100) */
+                size?: number;
+                low_stock?: boolean | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_InventoryListItem_"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_my_inventory_api_v1_seller_inventory__sku__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Exact SKU code */
+                sku: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No SKU with this code */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    adjust_my_inventory_api_v1_seller_inventory__sku__adjustments_post: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Unique key per intended change; reuse it only to retry that change */
+                "Idempotency-Key": string;
+            };
+            path: {
+                /** @description Exact SKU code */
+                sku: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockAdjustmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Replay of an applied key */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockAdjustmentResponse"];
+                };
+            };
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockAdjustmentResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No SKU with this code */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Insufficient stock (the change would go below reserved, committed or unavailable units), or the Idempotency-Key was already used for a different change */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    upload_store_logo_api_v1_seller_store_logo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_store_logo_api_v1_seller_store_logo_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description file_too_large: the upload is larger than 5 MB. Checked while the body is received, before authentication, so it can also answer an unauthenticated request */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Invalid request, a file that is not a valid JPEG/PNG/WebP image, or a variant_id that does not belong to the product */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_store_logo_api_v1_seller_store_logo_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    upload_store_cover_api_v1_seller_store_cover_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_store_cover_api_v1_seller_store_cover_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description file_too_large: the upload is larger than 5 MB. Checked while the body is received, before authentication, so it can also answer an unauthenticated request */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Invalid request, a file that is not a valid JPEG/PNG/WebP image, or a variant_id that does not belong to the product */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_store_cover_api_v1_seller_store_cover_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_stores_api_v1_stores_get: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1 */
+                page?: number;
+                /** @description Items per page (1-100) */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_PublicStoreResponse_"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_store_api_v1_stores__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicStoreResponse"];
                 };
             };
             /** @description store_not_found */

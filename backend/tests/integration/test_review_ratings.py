@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.models import Product, ProductReview, ReviewToken
 from tests.support.catalog import force_status
 from tests.support.commerce import new_order, seed_sku
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -37,9 +38,7 @@ def category(client: TestClient, admin_auth: dict) -> dict:
 
 def make_product(client: TestClient, admin_auth: dict, category: dict, name: str) -> dict:
     h = admin_auth["headers"]
-    res = client.post(
-        f"{STAFF}/products", json={"name": name, "category_id": category["id"]}, headers=h
-    )
+    res = post_product(client, json={"name": name, "category_id": category["id"]}, headers=h)
     assert res.status_code == 201, res.text
     product = res.json()
     variant = client.post(

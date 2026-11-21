@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.models import InventoryBalance, Product
 from tests.support.catalog import force_status
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -50,9 +51,13 @@ def catalogue(client: TestClient, db: Session, admin_auth: dict) -> dict[str, st
     )
     ids = {}
     for name, category, brand, variants, rating in rows:
-        product = post(
-            "/products", {"name": name, "category_id": category["id"], "brand_id": brand["id"]}
+        made = post_product(  # a seller's product (ADR-014 phase 2; staff do not create)
+            client,
+            json={"name": name, "category_id": category["id"], "brand_id": brand["id"]},
+            headers=h,
         )
+        assert made.status_code == 201, made.text
+        product = made.json()
         for price, stock in variants:
             variant = post(
                 f"/products/{product['id']}/variants",

@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1402 strings.
+1400 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -165,7 +165,6 @@ updates `messages/admin.rw.json`.
 | `dashboard.sku` | SKU: {sku} | SKU: {sku} | |
 | `dashboard.noLowStock` | Nothing is low on stock. | Nta gicuruzwa kiri gushira. | |
 | `dashboard.quickActions` | Quick Actions | Ibikorwa byihuse | |
-| `dashboard.actions.addProduct` | Add product | Ongeramo igicuruzwa | |
 | `dashboard.actions.import` | Import catalogue | Injiza ibicuruzwa | |
 | `dashboard.actions.orders` | View orders | Reba amatumiza | |
 | `dashboard.actions.stock` | Manage stock | Genzura ububiko | |
@@ -287,7 +286,6 @@ updates `messages/admin.rw.json`.
 | `payments.needsCheck` | Needs reconciliation | Bikeneye guhuzwa | |
 | `products.title` | Products | Ibicuruzwa | |
 | `products.import` | Import | Injiza | |
-| `products.add` | Add product | Ongeramo igicuruzwa | |
 | `products.viewsLabel` | Product views | Uko ibicuruzwa byerekanwa | |
 | `products.views.all` | All products | Ibicuruzwa byose | |
 | `products.views.missingImages` | Missing images | Nta mafoto | |
@@ -718,11 +716,11 @@ updates `messages/admin.rw.json`.
 | `catalogue.inItsMenuShort` | (in its store menu) | (kiri muri menu yacyo) | |
 | `catalogue.otherBrandsJoin` | Other brands (they join {name}) | Ibindi birango (byinjira muri {name}) | |
 | `import.title` | Catalogue import | Kwinjiza ibicuruzwa | |
-| `import.description` | Add or update many products at once from a CSV or Excel file. | Ongeramo cyangwa uvugurure ibicuruzwa byinshi icyarimwe uhereye kuri dosiye ya CSV cyangwa Excel. | |
+| `import.description` | Update many existing products at once from a CSV or Excel file. Sellers add new products to their own store. | Vugurura ibicuruzwa byinshi bisanzweho icyarimwe uhereye kuri dosiye ya CSV cyangwa Excel. Abacuruzi ni bo bongeramo ibicuruzwa bishya mu iduka ryabo. | |
 | `import.steps.template` | Download the template | Kuramo icyitegererezo | |
 | `import.steps.templateBody` | Columns for product, brand, category, variant, price, stock and specs. | Inkingi z'igicuruzwa, ikirango, icyiciro, ubwoko, igiciro, ububiko n'ibiranga. | |
 | `import.steps.upload` | Upload your file | Ohereza dosiye yawe | |
-| `import.steps.uploadBody` | CSV or XLSX up to 10 MB. Existing SKUs are updated, new SKUs are created. | CSV cyangwa XLSX itarenze MB 10. SKU zisanzwe zivugururwa, inshya zigakorwa. | |
+| `import.steps.uploadBody` | CSV or XLSX up to 10 MB. Existing SKUs are updated and new SKUs are added to existing products; rows for unknown products are refused. | CSV cyangwa XLSX itarenze MB 10. SKU zisanzwe zivugururwa, inshya zigashyirwa ku bicuruzwa bisanzweho; imirongo y'ibicuruzwa bitazwi ntiyemerwa. | |
 | `import.steps.check` | Check the report | Reba raporo | |
 | `import.steps.checkBody` | Rows with errors are skipped; the rest are imported. Download the report to fix them. | Imirongo ifite amakosa irasimbukwa; indi ikinjizwa. Kuramo raporo kugira ngo uyakosore. | |
 | `import.templateXlsx` | Template (.xlsx) | Icyitegererezo (.xlsx) | |

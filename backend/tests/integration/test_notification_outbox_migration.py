@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from tests.integration.test_payment_migration import _alembic
 from tests.support.commerce import new_order, seed_sku
+from tests.support.sellers import forget_stores
 
 BEFORE = "b2f6d8e4a1c9"
 OUTBOX = "c7e2a9f4d1b6"
@@ -40,6 +41,10 @@ def _old_row(engine: Engine, order_id: uuid.UUID, event: str) -> None:
 
 def test_existing_order_messages_keep_their_identity(pg_engine: Engine):
     order_id = _order(pg_engine)
+    # The order's product belongs to a store (ADR-014 phase 2); phase 1 refuses to downgrade
+    # while stores exist, so leave phase 2, then remove this test's store.
+    _alembic(pg_engine, "downgrade", "a9d3f5b7c1e2")
+    forget_stores(pg_engine)
     _alembic(pg_engine, "downgrade", BEFORE)
     _old_row(pg_engine, order_id, "confirmed")
     _alembic(pg_engine, "upgrade", OUTBOX)

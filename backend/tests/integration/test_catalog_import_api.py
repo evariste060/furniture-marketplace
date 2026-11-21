@@ -21,6 +21,7 @@ from app.services import catalog_import
 from app.services.catalog_import import UNEXPECTED_FAILURE
 from app.services.import_files import XLSX_CONTENT_TYPE, template_headers
 from tests.support.catalog import force_status
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 IMPORTS = f"{STAFF}/imports"
@@ -107,8 +108,8 @@ def catalog(client: TestClient, admin_auth: dict) -> dict:
         headers=h,
     )
     assert {phones.status_code, hidden.status_code, samsung.status_code} == {201}
-    existing = client.post(
-        f"{STAFF}/products",
+    existing = post_product(
+        client,
         json={
             "name": "Galaxy S24",
             "slug": "galaxy-s24",
@@ -130,8 +131,8 @@ def catalog(client: TestClient, admin_auth: dict) -> dict:
         headers=h,
     )
     assert created.status_code == 201, created.text
-    other = client.post(
-        f"{STAFF}/products",
+    other = post_product(
+        client,
         json={"name": "Pixel 9", "slug": "pixel-9", "category_id": phones.json()["id"]},
         headers=h,
     ).json()
@@ -140,6 +141,26 @@ def catalog(client: TestClient, admin_auth: dict) -> dict:
         json={"sku": "PX9-128", "name": "128 GB", "price": 900},
         headers=h,
     )
+    # SC-05: imports update existing products only, so the products the tests import into
+    # exist first, added by a seller (drafts without variants).
+    for slug, name in (
+        ("galaxy-a54", "Galaxy A54"),
+        ("dup", "Dup"),
+        ("stocked", "Stocked"),
+        ("xlsx-phone", "XLSX phone"),
+        ("round-trip", "Round trip"),
+        ("errors", "Errors"),
+        ("audited", "Audited"),
+        ("np", "NP"),
+        ("tx-one", "Tx one"),
+        ("tx-two", "Tx two"),
+    ):
+        made = post_product(
+            client,
+            json={"name": name, "slug": slug, "category_id": phones.json()["id"]},
+            headers=h,
+        )
+        assert made.status_code == 201, made.text
     return {
         "headers": h,
         "product_id": existing["id"],
@@ -179,7 +200,12 @@ def test_valid_rows_are_imported_and_invalid_rows_reported_by_row_and_column(cli
         2,
         3,
     )
-    assert by_row(job) == {4: {"category_slug"}, 5: {"price"}, 6: {"brand_slug"}}
+    # Rows 4 and 6 also name products that do not exist (SC-05); row 5 fails its cells first.
+    assert by_row(job) == {
+        4: {"category_slug", "product_slug"},
+        5: {"price"},
+        6: {"brand_slug", "product_slug"},
+    }
     assert job["errors_truncated"] is False and job["file_format"] == "csv"
     assert job["filename"] == "catalogue.csv" and job["finished_at"] is not None
 
@@ -310,9 +336,9 @@ def test_hidden_categories_and_brands_are_refused_for_new_assignments(client, db
     job = post(client, h, data).json()
     assert job["imported_rows"] == 0
     assert by_row(job) == {
-        2: {"category_slug"},
-        3: {"category_slug"},
-        4: {"brand_slug"},
+        2: {"category_slug", "product_slug"},
+        3: {"category_slug", "product_slug"},
+        4: {"brand_slug", "product_slug"},
         5: {"category_slug"},
     }
     assert product(db, "old-phone") is None and product(db, "retired-phone") is None
@@ -360,6 +386,24 @@ def test_opening_stock_records_a_receipt_for_new_skus_only(client, db, catalog):
     movement = db.scalars(select(StockMovement).where(StockMovement.variant_id == created.id)).one()
     assert (movement.reason, movement.quantity_delta) == ("receipt", 7)
     assert movement.source_key.endswith(f"import:{job['id']}:NEW-STOCK")
+
+
+def test_rows_for_unknown_products_are_refused_and_create_nothing(client, db, catalog):
+    # SC-05 (moderation only): administrators never create products, not even by import. A row
+    # naming no existing product is refused on product_slug; the other rows still apply.
+    data = csv_file(
+        [
+            ["NEW-1", "brand-new-sofa", "Brand new sofa", "phones", "", "Std", "10", "", "", ""],
+            ["GS24-512", "galaxy-s24", "Galaxy S24", "phones", "", "512 GB", "1500", "", "", ""],
+        ]
+    )
+    job = post(client, catalog["headers"], data).json()
+    assert (job["status"], job["imported_rows"]) == ("completed", 1)
+    assert by_row(job) == {2: {"product_slug"}}
+    assert "sellers add them to their own store" in job["errors"][0]["message"]
+    assert product(db, "brand-new-sofa") is None and variant(db, "NEW-1") is None
+    added = variant(db, "GS24-512")  # a new SKU on an existing product is an update
+    assert added is not None and str(added.product_id) == catalog["product_id"]
 
 
 # ---- XLSX, formulas, injection ---------------------------------------------------------------
@@ -590,7 +634,7 @@ def test_an_unexpected_failure_rolls_back_every_change_and_fails_the_job(
     with pytest.raises(RuntimeError):
         post(client, catalog["headers"], data)
     db.expire_all()
-    assert product(db, "tx-one") is None and variant(db, "T-1") is None
+    assert variant(db, "T-1") is None  # the first row's new SKU was rolled back too
     assert variant(db, "GS24-128").price == 1000
     job = db.scalars(select(ImportJob)).one()
     assert job.status == "failed" and job.finished_at is not None
@@ -604,8 +648,8 @@ def test_an_unexpected_failure_answers_500_without_internal_detail(catalog, monk
     def boom(*args, **kwargs):
         raise RuntimeError("secret internal detail")
 
-    monkeypatch.setattr(catalog_import, "apply_product_create", boom)
-    data = csv_file([["T-9", "tx-nine", "Tx", "phones", "", "Std", "1", "", "", ""]])
+    monkeypatch.setattr(catalog_import, "apply_variant_create", boom)
+    data = csv_file([["T-9", "galaxy-s24", "Galaxy S24", "phones", "", "Std", "1", "", "", ""]])
     with TestClient(app, raise_server_exceptions=False) as plain:
         res = post(plain, catalog["headers"], data)
     assert res.status_code == 500 and code(res) == "internal_error"

@@ -201,6 +201,21 @@ class SellerStoreResponse(BaseModel):
     )
 
 
+class PublicStoreResponse(BaseModel):
+    """An approved store on the public storefront (ADR-014 decision 7). Never carries the
+    contact details, street address, owner, status history or commission."""
+
+    id: uuid.UUID
+    name: str
+    slug: str
+    description: str | None
+    district: str
+    logo: PublicImage | None
+    cover: PublicImage | None
+    product_count: int = Field(ge=0, description="Public products of this store")
+    approved_at: datetime | None = Field(description="When the store was first approved")
+
+
 class StaffPerson(BaseModel):
     id: uuid.UUID
     full_name: str | None

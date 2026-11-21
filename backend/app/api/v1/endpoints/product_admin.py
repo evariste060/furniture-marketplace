@@ -4,6 +4,10 @@ Changes require 'catalog:manage' (administrator). The list and detail require
 'catalog:read' (administrator) and show drafts too. Rules and
 concurrency are in app.services.product_admin. The public, read-only views are
 GET /catalog/products and GET /catalog/products/{slug}.
+
+Stores (ADR-014 phase 2; SC-05): staff act on every store (CatalogScope.platform()) and moderate
+products (view, edit, hide, archive); they do not create them, so POST /staff/products answers
+409 staff_product_creation_disabled. Sellers manage their own products under /seller/products.
 """
 
 import uuid
@@ -29,7 +33,7 @@ from app.db.session import get_db
 from app.integrations.media import MediaStorage, get_media_storage
 from app.models import Product
 from app.models.identity import User
-from app.schemas.catalog import CatalogReference
+from app.schemas.catalog import CatalogReference, StoreReference
 from app.schemas.images import PublicImage
 from app.schemas.jobs import JobResponse
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, Page
@@ -54,6 +58,7 @@ from app.services.bulk_images import (
     start_bulk_upload,
 )
 from app.services.catalog import product_image_data
+from app.services.catalog_scope import CatalogScope
 from app.services.product_admin import (
     ProductAdminService,
     ProductStock,
@@ -87,6 +92,14 @@ Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 
 PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
+PLATFORM = CatalogScope.platform()
+STAFF_CREATE_409: ResponseMap = {
+    409: {
+        **ERR,
+        "description": "staff_product_creation_disabled: administrators moderate products but do "
+        "not create them; sellers add products to their own store (SC-05)",
+    }
+}
 
 
 def _stock_fields(stock: ProductStock | None) -> dict[str, Any]:
@@ -100,7 +113,7 @@ def _stock_fields(stock: ProductStock | None) -> dict[str, Any]:
     }
 
 
-def _product_response(product: Product) -> ProductResponse:
+def product_response(product: Product) -> ProductResponse:
     return ProductResponse.model_validate(
         {
             **{f: getattr(product, f) for f in ProductResponse.model_fields if f != "variants"},
@@ -121,7 +134,8 @@ def _product_response(product: Product) -> ProductResponse:
         "to activate; `category_id`, `brand_id`, `featured`; `low_stock=true` for products with "
         "an active variant at or below its low-stock threshold; `q` matches a case-insensitive "
         "substring of the name, slug, model or any variant SKU. Each row has the lowest active "
-        "price, the first active SKU and the units available across active variants."
+        "price, the first active SKU and the units available across active variants. "
+        "`store_id` lists one store's products; each row names its store (ADR-014)."
     ),
     responses={**GUARDED, **VALIDATION_422},
 )
@@ -138,6 +152,7 @@ def list_products(
     featured: Annotated[bool | None, Query()] = None,
     q: Annotated[str | None, Query(min_length=1, max_length=160)] = None,
     low_stock: Annotated[bool | None, Query()] = None,
+    store_id: Annotated[uuid.UUID | None, Query()] = None,
 ) -> Page[StaffProductListItem]:
     if q is not None:
         q = q.strip()
@@ -153,10 +168,21 @@ def list_products(
         q=q,
         page=page,
         size=size,
+        scope=PLATFORM,
         low_stock=low_stock,
+        store_id=store_id,
     )
+    return Page[StaffProductListItem](
+        items=product_list_items(db, storage, rows), total=total, page=page, size=size
+    )
+
+
+def product_list_items(
+    db: Session, storage: MediaStorage, rows: list[tuple[Product, int, int]]
+) -> list[StaffProductListItem]:
+    """The rows of the staff product list, also used by the seller's own list (ADR-014)."""
     stock = product_stock(db, [product.id for product, _, _ in rows])
-    items = [
+    return [
         StaffProductListItem(
             id=product.id,
             name=product.name,
@@ -165,6 +191,7 @@ def list_products(
             is_featured=product.is_featured,
             category=CatalogReference.model_validate(product.category),
             brand=CatalogReference.model_validate(product.brand) if product.brand else None,
+            store=StoreReference.model_validate(product.store),
             variant_count=variants,
             image_count=images,
             image=(
@@ -179,7 +206,6 @@ def list_products(
         )
         for product, variants, images in rows
     ]
-    return Page[StaffProductListItem](items=items, total=total, page=page, size=size)
 
 
 @router.get(
@@ -196,11 +222,15 @@ def list_products(
 def get_product(
     product_id: uuid.UUID, current_user: CatalogReader, db: Db, storage: Storage
 ) -> StaffProductDetail:
-    product = get_staff_product(db, product_id)
+    return product_detail(get_staff_product(db, product_id, PLATFORM), storage)
+
+
+def product_detail(product: Product, storage: MediaStorage) -> StaffProductDetail:
+    """The staff product detail, also used by the seller's own detail (ADR-014)."""
     images = sorted(product.images, key=lambda image: (image.sort_order, str(image.id)))
     return StaffProductDetail.model_validate(
         {
-            **_product_response(product).model_dump(),
+            **product_response(product).model_dump(),
             "images": [image_response(image, storage) for image in images],
             "photo_file_names": [
                 PhotoFileName(
@@ -273,7 +303,7 @@ def bulk_upload_images(
 def bulk_activate_products(
     req: BulkActivateRequest, current_user: CatalogManager, db: Db, ctx: Ctx
 ) -> BulkActivateResponse:
-    outcomes = bulk_activate(db, current_user, req.product_ids, ctx)
+    outcomes = bulk_activate(db, current_user, req.product_ids, ctx, scope=PLATFORM)
     counts = {name: 0 for name in ("activated", "skipped_no_images", "already_active", "not_found")}
     for _, outcome in outcomes:
         counts[outcome] += 1
@@ -290,19 +320,20 @@ def bulk_activate_products(
     "/products",
     response_model=ProductResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a product",
+    summary="Create a product (disabled for staff: 409)",
     description=(
-        f"{PERMISSION_NOTE} status defaults to draft (not public); a new product cannot be "
-        "created active, because it has no images yet (409 product_has_no_images). The slug is "
-        "generated from the name unless one is sent. category_id and brand_id must exist. "
-        "Audited as 'catalog.product_create'."
+        f"{PERMISSION_NOTE} Always 409 staff_product_creation_disabled (SC-05, ADR-014): every "
+        "product belongs to a seller's store and sellers create their own products "
+        "(POST /seller/products). Administrators view, edit, hide and archive products of every "
+        "store through the other routes. Nothing is created or audited."
     ),
-    responses={**GUARDED, **SLUG_409, **VALIDATION_422},
+    responses={**GUARDED, **STAFF_CREATE_409, **VALIDATION_422},
 )
 def create_product(
     req: ProductCreateRequest, current_user: CatalogManager, db: Db, ctx: Ctx
 ) -> ProductResponse:
-    return _product_response(ProductAdminService.create_product(db, current_user, req, ctx))
+    product = ProductAdminService.create_product(db, current_user, req, ctx, scope=PLATFORM)
+    return product_response(product)  # pragma: no cover - the platform scope always raises
 
 
 @router.patch(
@@ -326,8 +357,10 @@ def update_product(
     db: Db,
     ctx: Ctx,
 ) -> ProductResponse:
-    product = ProductAdminService.update_product(db, current_user, product_id, req, ctx)
-    return _product_response(product)
+    product = ProductAdminService.update_product(
+        db, current_user, product_id, req, ctx, scope=PLATFORM
+    )
+    return product_response(product)
 
 
 @router.post(
@@ -349,7 +382,9 @@ def create_variant(
     db: Db,
     ctx: Ctx,
 ) -> VariantResponse:
-    variant = ProductAdminService.create_variant(db, current_user, product_id, req, ctx)
+    variant = ProductAdminService.create_variant(
+        db, current_user, product_id, req, ctx, scope=PLATFORM
+    )
     return VariantResponse.model_validate(variant)
 
 
@@ -371,7 +406,9 @@ def update_variant(
     db: Db,
     ctx: Ctx,
 ) -> VariantResponse:
-    variant = ProductAdminService.update_variant(db, current_user, product_id, variant_id, req, ctx)
+    variant = ProductAdminService.update_variant(
+        db, current_user, product_id, variant_id, req, ctx, scope=PLATFORM
+    )
     return VariantResponse.model_validate(variant)
 
 
@@ -390,5 +427,7 @@ def update_variant(
 def delete_variant(
     product_id: uuid.UUID, variant_id: uuid.UUID, current_user: CatalogManager, db: Db, ctx: Ctx
 ):
-    ProductAdminService.deactivate_variant(db, current_user, product_id, variant_id, ctx)
+    ProductAdminService.deactivate_variant(
+        db, current_user, product_id, variant_id, ctx, scope=PLATFORM
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

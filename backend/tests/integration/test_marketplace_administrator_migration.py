@@ -56,7 +56,6 @@ def _revision(engine: Engine) -> str:
 
 
 def test_only_the_administrator_role_is_accepted_at_head(pg_engine: Engine):
-    assert _revision(pg_engine) == SC05
     _staff(pg_engine, "administrator")
     for role in ("sales", "operations", "management", "finance", "customer"):
         with pytest.raises(IntegrityError, match="ck_staff_role_assignments_valid_role"):
@@ -104,5 +103,5 @@ def test_the_downgrade_restores_the_five_roles_without_changing_rows(pg_engine: 
         _staff(pg_engine, "customer")
     with pg_engine.begin() as conn:
         conn.execute(text("DELETE FROM staff_role_assignments WHERE role <> 'administrator'"))
-    _alembic(pg_engine, "upgrade", SC05)
+    _alembic(pg_engine, "upgrade", "head")  # through SC05 and the later revisions (no products)
     _alembic(pg_engine, "check")  # the models match the migrated schema

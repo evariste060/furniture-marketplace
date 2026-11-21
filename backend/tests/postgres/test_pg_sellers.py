@@ -27,6 +27,19 @@ def _apply(stack: Stack, base: str, unique: str, phone: str, name: str) -> tuple
     return seller, res.json()["id"]
 
 
+def approved_seller_headers(stack: Stack, admin: dict, unique: str, phone: str) -> dict:
+    """The headers of a seller whose store an administrator approved (ADR-014 phase 2: products
+    are created by sellers, never by staff)."""
+    seller, store_id = _apply(stack, stack.servers[0], unique, phone, "maker")
+    res = HTTP.patch(
+        f"{stack.servers[0]}/staff/sellers/{store_id}/status",
+        json={"status": "approved"},
+        headers=admin,
+    )
+    assert res.status_code == 200, res.text
+    return seller["headers"]
+
+
 def test_concurrent_decisions_across_processes_have_one_winner(
     stack: Stack, admin: dict, unique: str, phone_factory
 ):

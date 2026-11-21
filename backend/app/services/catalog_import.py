@@ -21,8 +21,11 @@ Order of work for one upload:
 
 Rules:
 - Matching is by SKU, ignoring case (2026-10-26): an existing SKU is updated (its stored
-  spelling is kept), a new SKU is created. A new product_slug
-  creates the product; an existing one is updated. A SKU cannot move to another product.
+  spelling is kept), a new SKU is created on its existing product. A SKU cannot move to another
+  product.
+- Moderation only (SC-05, ADR-014 phase 2): the import updates existing products of any store
+  and never creates one. A row whose product_slug matches no product is refused (product_slug):
+  sellers add new products to their own store.
 - A blank cell keeps the existing value (or the default for something new); values cannot be
   cleared by import. attr:<key> and spec:<key> values are merged into the existing attributes
   and specifications.
@@ -69,7 +72,6 @@ from app.schemas.catalog_import import (
     ImportRow,
 )
 from app.schemas.product_admin import (
-    ProductCreateRequest,
     ProductUpdateRequest,
     VariantCreateRequest,
     VariantUpdateRequest,
@@ -90,7 +92,6 @@ from app.services.product_admin import (
     BRAND_HIDDEN,
     CATEGORY_HIDDEN,
     PRODUCT_CHANGE_LOCK_KEY,
-    apply_product_create,
     apply_product_update,
     apply_variant_create,
     apply_variant_update,
@@ -441,6 +442,8 @@ def check_database_rows(
             current is None or current.brand_id != lookups.brands[v.brand_slug]
         ):
             row_errors.append(RowError(row.number, "brand_slug", BRAND_HIDDEN))
+        if current is None:
+            row_errors.append(RowError(row.number, "product_slug", NEW_PRODUCT_REFUSED))
         existing_owner = lookups.sku_owners.get(v.sku.lower())
         if existing_owner is not None and existing_owner != v.product_slug:
             row_errors.append(
@@ -475,6 +478,10 @@ def check_database_rows(
     return valid, errors, lookups
 
 
+NEW_PRODUCT_REFUSED = (
+    "No product has this slug. Imports update existing products only: administrators do not "
+    "create products, sellers add them to their own store."
+)
 NO_IMAGES_WARNING = (
     "The product has no images, so it was saved as {kept} instead of active. Upload images "
     "(bulk upload), then activate it."
@@ -509,32 +516,20 @@ def _apply_product(
         value = _group_value(group, source)
         if value is not None:
             fields[target] = value
-    product = lookups.products.get(slug)
+    product = lookups.products[slug]  # check_database_rows refused rows of unknown products
     # Publication guard (2026-10-26): a row asking for 'active' cannot activate a product without
-    # images; it is applied with the status kept (a new product: draft) and a warning.
-    if fields.get("status") == "active" and (
-        product is None
-        or (product.status != "active" and not has_publishable_image(db, product.id))
+    # images; it is applied with the status kept and a warning.
+    if (
+        fields.get("status") == "active"
+        and product.status != "active"
+        and not has_publishable_image(db, product.id)
     ):
-        kept = "a draft" if product is None else f"{product.status}"
-        if product is None:
-            fields["status"] = "draft"
-        else:
-            del fields["status"]
+        del fields["status"]
         warnings.append(
-            RowError(group[0].number, "product_status", NO_IMAGES_WARNING.format(kept=kept))
+            RowError(
+                group[0].number, "product_status", NO_IMAGES_WARNING.format(kept=product.status)
+            )
         )
-    if product is None:
-        product = apply_product_create(
-            db,
-            actor,
-            ProductCreateRequest.model_validate(
-                {**fields, "slug": slug, "specifications": specifications}
-            ),
-            ctx,
-        )
-        lookups.products[slug] = product
-        return product
     if specifications:
         fields["specifications"] = {**product.specifications, **specifications}
     apply_product_update(db, actor, product, ProductUpdateRequest.model_validate(fields), ctx)

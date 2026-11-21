@@ -22,6 +22,13 @@ statuses. Product photos come from backend/seed/photos/<slug>.<ext> (position 1)
 sent through the bulk image upload in batches of at most 20 files and processed by the worker,
 then the products are activated with the bulk-activate rule (at least one image).
 
+Stores (ADR-014 phase 2): every product belongs to a store. The seed creates the demo
+seller stores of scripts/seed_catalogue_data.py (each owner a verified seed customer who
+applies through the store service; the seed administrator approves), and shares the seed
+products out over them in order. Each product, its variants and opening stock are created by
+its store's owner through the seller scope; the administrator only moderates (featured picks,
+activation). Cleanup removes the seed stores and their history with the seed people.
+
 Idempotent: the seed keys are in scripts/seed_catalogue_data.py. A rerun creates only what is
 missing and reports created/updated/skipped/failed per kind. It never resets the stock or the
 prices of existing variants, never touches orders of other customers and never changes the
@@ -120,7 +127,9 @@ from app.models import (  # noqa: E402
     User,
     WishlistItem,
 )
+from app.models.marketplace import Store, StoreStatusHistory  # noqa: E402
 from app.repositories.staff_repository import StaffRepository  # noqa: E402
+from app.repositories.store_repository import StoreRepository  # noqa: E402
 from app.repositories.user_repository import UserRepository  # noqa: E402
 from app.schemas.address import AddressCreateRequest  # noqa: E402
 from app.schemas.auth import RegisterRequest  # noqa: E402
@@ -129,14 +138,20 @@ from app.schemas.catalog_admin import BrandCreateRequest, CategoryCreateRequest 
 from app.schemas.checkout import CheckoutRequest  # noqa: E402
 from app.schemas.inventory import StockAdjustmentRequest  # noqa: E402
 from app.schemas.pages import PageUpdateRequest  # noqa: E402
-from app.schemas.product_admin import ProductCreateRequest, VariantCreateRequest  # noqa: E402
+from app.schemas.product_admin import (  # noqa: E402
+    ProductCreateRequest,
+    ProductUpdateRequest,
+    VariantCreateRequest,
+)
 from app.schemas.staff import StaffCreateRequest  # noqa: E402
+from app.schemas.stores import StoreApplicationRequest, StoreStatusRequest  # noqa: E402
 from app.services import bulk_images  # noqa: E402
 from app.services.address_service import AddressService  # noqa: E402
 from app.services.audit_service import AuditService  # noqa: E402
 from app.services.banners import BannerService  # noqa: E402
 from app.services.cart_service import CartOwner, CartService  # noqa: E402
 from app.services.catalog_admin import CatalogAdminService  # noqa: E402
+from app.services.catalog_scope import CatalogScope  # noqa: E402
 from app.services.checkout_service import CheckoutService  # noqa: E402
 from app.services.image_admin import processed_upload  # noqa: E402
 from app.services.image_processing import ProcessedImage  # noqa: E402
@@ -149,6 +164,7 @@ from app.services.review_service import ReviewService  # noqa: E402
 from app.services.review_service import author_name as review_author  # noqa: E402
 from app.services.settings_service import SettingsService  # noqa: E402
 from app.services.staff_service import StaffService  # noqa: E402
+from app.services.store_service import StoreService  # noqa: E402
 
 PHOTOS = BACKEND / "seed" / "photos"
 PHOTO_EXTENSIONS = (".jpg", ".jpeg", ".png", ".webp")
@@ -545,6 +561,61 @@ def is_seed_product(db: Session, product_id: uuid.UUID) -> bool:
     )
 
 
+PLATFORM = CatalogScope.platform()
+
+
+def seed_stores(db: Session, admin: User, data: Catalogue, report: Report) -> list[Store]:
+    """The demo seller stores, approved (ADR-014 phase 2). Existing ones are kept as they are."""
+    stores: list[Store] = []
+    for spec in data.stores:
+        owner = _user_by_email(db, spec.email)
+        try:
+            if owner is None:
+                with atomic(db):
+                    owner = UserRepository.create_customer(
+                        db,
+                        full_name=spec.owner_name,
+                        password_hash=hash_password(
+                            _new_password("SEED_CUSTOMER_PASSWORD", report, spec.email)
+                        ),
+                        email=spec.email,
+                        phone=spec.phone,
+                        email_verified_at=datetime.now(UTC),
+                    )
+            store = StoreRepository.get_by_owner(db, owner.id)
+            if store is None:
+                store = StoreService.apply(
+                    db,
+                    owner,
+                    StoreApplicationRequest(
+                        name=spec.name,
+                        description=spec.description,
+                        contact_email=spec.email,
+                        contact_phone=spec.phone,
+                        district=spec.district,
+                        sector=spec.sector,
+                    ),
+                    CTX,
+                )
+                report.add("stores", "created")
+            else:
+                report.add("stores", "skipped")
+            if store.status == "pending":
+                store = StoreService.change_status(
+                    db, admin, store.id, StoreStatusRequest(status="approved"), CTX
+                )
+                report.add("store approvals", "updated")
+        except (AppError, IntegrityError) as exc:
+            db.rollback()
+            report.add("stores", "failed", f"{spec.name}: {getattr(exc, 'message', 'conflict')}")
+            continue
+        if store.status == "approved":
+            stores.append(store)
+        else:
+            report.add("stores", "failed", f"{spec.name}: the store is {store.status}")
+    return stores
+
+
 def seed_products(
     db: Session,
     admin: User,
@@ -552,18 +623,23 @@ def seed_products(
     categories: dict[str, Category],
     brands: dict[str, Brand],
     report: Report,
+    stores: list[Store],
 ) -> dict[str, Product]:
     products: dict[str, Product] = {}
-    for spec in data.products:
+    if not stores:
+        report.add("products", "failed", "no approved seed store to own the products")
+        return products
+    for index, spec in enumerate(data.products):
         product = db.scalar(select(Product).where(Product.slug == spec.slug))
         if product is not None and not is_seed_product(db, product.id):
             report.add("products", "failed", f"{spec.slug}: the slug belongs to a non-seed product")
             continue
         try:
             if product is None:
+                store = stores[index % len(stores)]
                 product = ProductAdminService.create_product(
                     db,
-                    admin,
+                    store.owner,
                     ProductCreateRequest(
                         name=spec.name,
                         slug=spec.slug,
@@ -573,10 +649,19 @@ def seed_products(
                         description=spec.description,
                         specifications=dict(spec.specifications),
                         warranty_text=spec.warranty,
-                        is_featured=spec.featured,
                     ),
                     CTX,
+                    scope=CatalogScope.store(store.id),
                 )
+                if spec.featured:  # merchandising is the administrator's (ADR-014 decision 5)
+                    product = ProductAdminService.update_product(
+                        db,
+                        admin,
+                        product.id,
+                        ProductUpdateRequest(is_featured=True),
+                        CTX,
+                        scope=PLATFORM,
+                    )
                 report.add("products", "created")
             else:
                 report.add("products", "skipped")
@@ -596,10 +681,14 @@ def seed_products(
                 else:
                     report.add("variants", "skipped")  # never repriced or restocked
                 continue
+            owner = db.get(Store, product.store_id)
+            assert owner is not None
+            seller = owner.owner
+            scope = CatalogScope.store(owner.id)
             try:
                 ProductAdminService.create_variant(
                     db,
-                    admin,
+                    seller,
                     product.id,
                     VariantCreateRequest(
                         sku=variant_spec.sku,
@@ -610,13 +699,14 @@ def seed_products(
                         low_stock_threshold=LOW_STOCK_THRESHOLD,
                     ),
                     CTX,
+                    scope=scope,
                 )
                 report.add("variants", "created")
                 quantity = OPENING_STOCK[variant_spec.stock]
                 if quantity:
                     InventoryAdminService.adjust(
                         db,
-                        admin,
+                        seller,
                         variant_spec.sku,
                         StockAdjustmentRequest(
                             reason="receipt",
@@ -625,6 +715,7 @@ def seed_products(
                         ),
                         f"seed-receipt-{variant_spec.sku}",
                         CTX,
+                        scope=scope,
                     )
                     report.add("stock", "created")
             except AppError as exc:
@@ -716,7 +807,7 @@ def seed_images(
         )
     ]
     if drafts:
-        for product_id, outcome in bulk_activate(db, admin, drafts, CTX):
+        for product_id, outcome in bulk_activate(db, admin, drafts, CTX, scope=PLATFORM):
             if outcome == "activated":
                 report.add("activation", "updated")
             else:
@@ -932,7 +1023,8 @@ def seed(
     admin = seed_staff(db, data, report)
     customers = seed_customers(db, data, report)
     categories, brands = seed_taxonomy(db, storage, admin, data, report)
-    products = seed_products(db, admin, data, categories, brands, report)
+    stores = seed_stores(db, admin, data, report)
+    products = seed_products(db, admin, data, categories, brands, report, stores)
     seed_images(db, storage, admin, data, products, categories, report, run_jobs)
     seed_banners(db, storage, admin, data, report)
     seed_content(db, admin, data, report)
@@ -1065,6 +1157,29 @@ def cleanup(db: Session, data: Catalogue = CATALOGUE) -> dict[str, int]:
         retire(db, [m for row in images for m in row[1:]])
         run("variants", delete(ProductVariant).where(ProductVariant.id.in_(variant_ids)))
         run("products", delete(Product).where(Product.id.in_(product_ids)))
+
+        # Seed stores (ADR-014 phase 2), once no product of theirs is left.
+        store_ids = _ids(db, select(Store.id).where(Store.owner_user_id.in_(people)))
+        left = db.scalar(select(func.count(Product.id)).where(Product.store_id.in_(store_ids)))
+        if left:
+            raise CleanupRefused(
+                f"Refused: the seed stores own {left} products that are not seed products. "
+                "Nothing was removed."
+            )
+        media = db.execute(
+            select(
+                Store.logo_media_id,
+                Store.logo_original_media_id,
+                Store.cover_media_id,
+                Store.cover_original_media_id,
+            ).where(Store.id.in_(store_ids))
+        ).all()
+        run(
+            "store history",
+            delete(StoreStatusHistory).where(StoreStatusHistory.store_id.in_(store_ids)),
+        )
+        run("stores", delete(Store).where(Store.id.in_(store_ids)))
+        retire(db, [m for row in media for m in row if m is not None])
 
         # Banners.
         titles = [b.title_en for b in data.banners]

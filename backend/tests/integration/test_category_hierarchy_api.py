@@ -17,6 +17,7 @@ from app.models import Category, InventoryBalance
 from app.models.operations import AuditRecord
 from app.services import inventory
 from tests.support.catalog import force_status
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -39,7 +40,7 @@ def brand(client, h, name, **fields) -> dict:
 
 def product(client, h, name, category_id, brand_id=None, publish=True) -> dict:
     body = {"name": name, "category_id": category_id, "brand_id": brand_id}
-    res = client.post(f"{STAFF}/products", json=body, headers=h)
+    res = post_product(client, json=body, headers=h)
     assert res.status_code == 201, res.text
     if publish:
         force_status(res.json()["id"])  # active without images (the guard has its own tests)
@@ -249,12 +250,10 @@ def test_new_products_cannot_go_into_hidden_categories_or_hidden_brands(client, 
     h = tree["h"]
     hidden = category(client, h, "Feature Phones", parent_id=tree["phones"]["id"], is_active=False)
     off = brand(client, h, "Retired", is_active=False)
-    res = client.post(
-        f"{STAFF}/products", json={"name": "Nokia 105", "category_id": hidden["id"]}, headers=h
-    )
+    res = post_product(client, json={"name": "Nokia 105", "category_id": hidden["id"]}, headers=h)
     assert "hidden" in field_message(res, "category_id")
-    res = client.post(
-        f"{STAFF}/products",
+    res = post_product(
+        client,
         json={"name": "Old phone", "category_id": tree["smart"]["id"], "brand_id": off["id"]},
         headers=h,
     )
@@ -263,8 +262,8 @@ def test_new_products_cannot_go_into_hidden_categories_or_hidden_brands(client, 
     # A visible subcategory of a hidden main category is hidden too.
     path = f"{STAFF}/categories/{tree['phones']['id']}"
     assert client.patch(path, json={"is_active": False}, headers=h).status_code == 200
-    res = client.post(
-        f"{STAFF}/products", json={"name": "Pixel 9", "category_id": tree["smart"]["id"]}, headers=h
+    res = post_product(
+        client, json={"name": "Pixel 9", "category_id": tree["smart"]["id"]}, headers=h
     )
     assert "hidden" in field_message(res, "category_id")
 

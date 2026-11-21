@@ -23,6 +23,11 @@ Rules:
 
 The staff product list and detail ('catalog:read', 2026-10-26) show every product whatever its
 status, so staff can find drafts; the public catalogue shows active products only.
+Stores (ADR-014 phase 2): every product belongs to one store. Every function reachable by a
+seller takes a CatalogScope (app.services.catalog_scope), with no default: a seller's scope is
+their own store, and another store's product is 404 product_not_found. Sellers create products
+in their own store; platform staff moderate (view, edit, hide, archive) products of every store
+but do not create them (SC-05: 409 staff_product_creation_disabled).
 
 Concurrency: every product or variant change takes one transaction-scoped advisory lock, so slug
 and SKU allocation cannot race, and the row being changed is locked FOR UPDATE. The unique
@@ -55,6 +60,7 @@ from app.schemas.product_admin import (
     VariantUpdateRequest,
 )
 from app.services.catalog_admin import _audit, _changes, _lock
+from app.services.catalog_scope import CatalogScope
 from app.services.inventory import stock_figures
 
 # pg_advisory_xact_lock(bigint) keys: ...001 staff, ...002 categories, ...003 brands.
@@ -74,6 +80,11 @@ NO_IMAGES = (
 )
 LAST_IMAGE = "Upload a replacement or deactivate the product first."
 NO_SLUG_FROM_NAME = "The name has no letters or digits to build a slug from; send a slug."
+STAFF_CREATE_DISABLED = (
+    "Marketplace administrators do not create products: every product belongs to a seller's "
+    "store, and sellers add their own products. Administrators can view, edit, hide and archive "
+    "products of every store."
+)
 # Long or structured fields: the audit records that they changed, not their full values.
 SUMMARISED_FIELDS = frozenset({"description", "specifications", "warranty_text", "attributes"})
 
@@ -127,8 +138,10 @@ def _check_references(
             raise field_error(("body", "brand_id"), BRAND_HIDDEN)
 
 
-def _locked_product(db: Session, product_id: uuid.UUID) -> Product:
-    product = db.scalar(select(Product).where(Product.id == product_id).with_for_update())
+def _locked_product(db: Session, product_id: uuid.UUID, scope: CatalogScope) -> Product:
+    product = db.scalar(
+        select(Product).where(Product.id == product_id, scope.products()).with_for_update()
+    )
     if product is None:
         raise NotFound(PRODUCT_NOT_FOUND, code="product_not_found")
     return product
@@ -195,7 +208,12 @@ def ensure_publishable(
 # Each function expects PRODUCT_CHANGE_LOCK_KEY to be held and commits nothing; the caller owns
 # the transaction. They apply the same rules and audit records as the routes.
 def apply_product_create(
-    db: Session, actor: User, req: ProductCreateRequest, ctx: RequestContext
+    db: Session,
+    actor: User,
+    req: ProductCreateRequest,
+    ctx: RequestContext,
+    *,
+    store_id: uuid.UUID,
 ) -> Product:
     _check_references(db, req.category_id, req.brand_id)
     if req.status == "active":
@@ -211,6 +229,7 @@ def apply_product_create(
         warranty_text=req.warranty_text,
         status=req.status,
         is_featured=req.is_featured,
+        store_id=store_id,
     )
     db.add(product)
     db.flush()
@@ -228,6 +247,7 @@ def apply_product_create(
             "is_featured": product.is_featured,
             "category_id": product.category_id,
             "brand_id": product.brand_id,
+            "store_id": product.store_id,
         },
     )
     return product
@@ -335,12 +355,20 @@ class ProductAdminService:
     # ---- products -----------------------------------------------------------------------------
     @staticmethod
     def create_product(
-        db: Session, actor: User, req: ProductCreateRequest, ctx: RequestContext
+        db: Session,
+        actor: User,
+        req: ProductCreateRequest,
+        ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> Product:
+        """A product in the scope's store. Platform staff have no store: 409 (SC-05)."""
+        if scope.store_id is None:
+            raise Conflict(STAFF_CREATE_DISABLED, code="staff_product_creation_disabled")
         try:
             with atomic(db):
                 _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-                product = apply_product_create(db, actor, req, ctx)
+                product = apply_product_create(db, actor, req, ctx, store_id=scope.store_id)
         except IntegrityError as exc:
             conflict = _unique_conflict(exc)
             if conflict is None:
@@ -355,11 +383,13 @@ class ProductAdminService:
         product_id: uuid.UUID,
         req: ProductUpdateRequest,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> Product:
         try:
             with atomic(db):
                 _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-                product = _locked_product(db, product_id)
+                product = _locked_product(db, product_id, scope)
                 apply_product_update(db, actor, product, req, ctx)
         except IntegrityError as exc:
             conflict = _unique_conflict(exc)
@@ -376,11 +406,13 @@ class ProductAdminService:
         product_id: uuid.UUID,
         req: VariantCreateRequest,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> ProductVariant:
         try:
             with atomic(db):
                 _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-                product = _locked_product(db, product_id)
+                product = _locked_product(db, product_id, scope)
                 variant = apply_variant_create(db, actor, product, req, ctx)
         except IntegrityError as exc:
             conflict = _unique_conflict(exc)
@@ -397,11 +429,13 @@ class ProductAdminService:
         variant_id: uuid.UUID,
         req: VariantUpdateRequest,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> ProductVariant:
         try:
             with atomic(db):
                 _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-                _locked_product(db, product_id)
+                _locked_product(db, product_id, scope)
                 variant = _locked_variant(db, product_id, variant_id)
                 apply_variant_update(db, actor, variant, req, ctx)
         except IntegrityError as exc:
@@ -418,11 +452,13 @@ class ProductAdminService:
         product_id: uuid.UUID,
         variant_id: uuid.UUID,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> None:
         """DELETE semantics: the variant is kept and deactivated. Repeating it is a no-op."""
         with atomic(db):
             _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-            _locked_product(db, product_id)
+            _locked_product(db, product_id, scope)
             variant = _locked_variant(db, product_id, variant_id)
             if not variant.is_active:
                 return
@@ -468,11 +504,16 @@ def list_staff_products(
     q: str | None,
     page: int,
     size: int,
+    scope: CatalogScope,
     low_stock: bool | None = None,
+    store_id: uuid.UUID | None = None,
 ) -> tuple[list[tuple[Product, int, int]], int]:
     """(product, variant count, product image count) rows, most recently updated first.
-    low_stock: true keeps products with an active low-stock variant, false the others."""
-    conditions: list[Any] = []
+    low_stock: true keeps products with an active low-stock variant, false the others.
+    store_id narrows a platform list to one store; a seller's scope is always their own."""
+    conditions: list[Any] = [scope.products()]
+    if store_id is not None:
+        conditions.append(Product.store_id == store_id)
     if low_stock is not None:
         figures, columns = stock_figures()
         low = (
@@ -525,6 +566,7 @@ def list_staff_products(
         .options(
             joinedload(Product.category),
             joinedload(Product.brand),
+            joinedload(Product.store),
             selectinload(Product.images.and_(ProductImage.variant_id.is_(None))),
         )
         .order_by(Product.updated_at.desc(), Product.id.asc())
@@ -566,10 +608,10 @@ def product_stock(db: Session, product_ids: list[uuid.UUID]) -> dict[uuid.UUID, 
     }
 
 
-def get_staff_product(db: Session, product_id: uuid.UUID) -> Product:
+def get_staff_product(db: Session, product_id: uuid.UUID, scope: CatalogScope) -> Product:
     product = db.scalar(
         select(Product)
-        .where(Product.id == product_id)
+        .where(Product.id == product_id, scope.products())
         .options(selectinload(Product.variants), selectinload(Product.images))
     )
     if product is None:
@@ -579,7 +621,12 @@ def get_staff_product(db: Session, product_id: uuid.UUID) -> Product:
 
 # ---- bulk activate (2026-10-26) ----------------------------------------------------------------
 def bulk_activate(
-    db: Session, actor: User, product_ids: list[uuid.UUID], ctx: RequestContext
+    db: Session,
+    actor: User,
+    product_ids: list[uuid.UUID],
+    ctx: RequestContext,
+    *,
+    scope: CatalogScope,
 ) -> list[tuple[uuid.UUID, str]]:
     """Activate each product that passes the publication guard; one audit per activation.
     Outcomes: activated, skipped_no_images, already_active, not_found."""
@@ -589,7 +636,9 @@ def bulk_activate(
         products = {
             product.id: product
             for product in db.scalars(
-                select(Product).where(Product.id.in_(product_ids)).with_for_update()
+                select(Product)
+                .where(Product.id.in_(product_ids), scope.products())
+                .with_for_update()
             )
         }
         for product_id in product_ids:

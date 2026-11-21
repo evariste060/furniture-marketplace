@@ -17,6 +17,16 @@ class CatalogReference(BaseModel):
     slug: str
 
 
+class StoreReference(BaseModel):
+    """A store's public identity: the "Sold by" summary (ADR-014 phase 2)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    name: str
+    slug: str
+
+
 class CatalogCategory(CatalogReference):
     sort_order: int
     parent_id: UUID | None
@@ -90,6 +100,7 @@ class CatalogProduct(BaseModel):
     warranty_text: str | None
     category: CatalogReference
     brand: CatalogReference | None
+    store: StoreReference = Field(description="Sold by: the approved store that sells it")
     images: list[PublicImage]
     variants: list[CatalogVariant]
     rating: CatalogRating

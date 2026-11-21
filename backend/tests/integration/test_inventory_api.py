@@ -182,8 +182,15 @@ def test_reservation_finalization_is_not_exposed_over_http():
         "/api/v1/inventory",  # module 10 stock list, read-only
         "/api/v1/inventory/{sku}",
         "/api/v1/inventory/{sku}/adjustments",
+        # ADR-014 phase 2: the seller's own stock, the same read and adjust, nothing more.
+        "/api/v1/seller/inventory",
+        "/api/v1/seller/inventory/{sku}",
+        "/api/v1/seller/inventory/{sku}/adjustments",
     }
     assert not [p for p in paths if "reservation" in p]
+    assert set(paths["/api/v1/seller/inventory"]) == {"get"}
+    assert set(paths["/api/v1/seller/inventory/{sku}"]) == {"get"}
+    assert set(paths["/api/v1/seller/inventory/{sku}/adjustments"]) == {"post"}
     assert set(paths["/api/v1/inventory"]) == {"get"}
     assert set(paths["/api/v1/inventory/{sku}"]) == {"get"}
     assert set(paths["/api/v1/inventory/{sku}/adjustments"]) == {"post"}

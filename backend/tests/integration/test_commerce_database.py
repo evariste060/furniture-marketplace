@@ -43,6 +43,7 @@ from app.services.inventory import (
     release_order_reservations,
 )
 from tests.support.media import image_row
+from tests.support.sellers import new_store
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
 
@@ -128,6 +129,7 @@ def _seed_sku(session: Session, *, on_hand: int = 1) -> ProductVariant:
     category = Category(name="Phones", slug=f"phones-{uuid4().hex}")
     brand = Brand(name="Example", slug=f"example-{uuid4().hex}")
     product = Product(
+        store=new_store(),
         name="Example phone",
         slug=f"example-phone-{uuid4().hex}",
         category=category,
@@ -417,6 +419,7 @@ def test_public_catalog_filters_visibility_and_lists_active_categories_brands(
         brand = Brand(name="Example", slug=f"example-{uuid4().hex}")
         inactive_brand = Brand(name="Private", slug=f"private-{uuid4().hex}", is_active=False)
         visible = Product(
+            store=new_store(),
             name="Visible phone",
             slug=f"visible-{uuid4().hex}",
             status="active",
@@ -425,6 +428,7 @@ def test_public_catalog_filters_visibility_and_lists_active_categories_brands(
         )
         hidden_products = [
             Product(
+                store=new_store(),
                 name=f"{status} phone",
                 slug=f"{status}-{uuid4().hex}",
                 status=status,
@@ -434,12 +438,14 @@ def test_public_catalog_filters_visibility_and_lists_active_categories_brands(
             for status in ("draft", "hidden", "archived")
         ]
         hidden_category_product = Product(
+            store=new_store(),
             name="Inactive category phone",
             slug=f"inactive-category-{uuid4().hex}",
             status="active",
             category=inactive_category,
         )
         hidden_brand_product = Product(
+            store=new_store(),
             name="Inactive brand phone",
             slug=f"inactive-brand-{uuid4().hex}",
             status="active",
@@ -477,6 +483,7 @@ def test_public_product_details_include_prices_specs_ordered_images_and_inventor
         category = Category(name="Phones", slug=f"phones-{uuid4().hex}")
         brand = Brand(name="Example", slug=f"brand-{uuid4().hex}")
         product = Product(
+            store=new_store(),
             name="Example phone",
             slug=f"example-{uuid4().hex}",
             status="active",
@@ -569,6 +576,7 @@ def test_catalog_reports_zero_stock_without_balance_and_filters_price_stock_and_
             ("Beta phone", 200, False),
         ):
             product = Product(
+                store=new_store(),
                 name=name,
                 slug=f"{name.split()[0].lower()}-{uuid4().hex}",
                 status="active",
@@ -646,6 +654,7 @@ def test_catalog_search_fields_punctuation_and_combined_filters(session_factory,
         google = Brand(name="Google", slug=f"google-{uuid4().hex}")
         other_brand = Brand(name="Other", slug=f"other-{uuid4().hex}")
         target = Product(
+            store=new_store(),
             name="Pixel 100% phone",
             slug=f"pixel-{uuid4().hex}",
             model="GX-10",
@@ -659,6 +668,7 @@ def test_catalog_search_fields_punctuation_and_combined_filters(session_factory,
         target_variant.inventory = InventoryBalance(on_hand=3, unavailable_quantity=0)
         decoys = [
             Product(
+                store=new_store(),
                 name="Other phone",
                 slug=f"other-phone-{uuid4().hex}",
                 model="GX-11",
@@ -667,6 +677,7 @@ def test_catalog_search_fields_punctuation_and_combined_filters(session_factory,
                 brand=other_brand,
             ),
             Product(
+                store=new_store(),
                 name="Pixel laptop",
                 slug=f"pixel-laptop-{uuid4().hex}",
                 model="GX-10",
@@ -723,6 +734,7 @@ def test_catalog_name_sort_directions_have_stable_pagination(session_factory, ap
         category = Category(name="Sort test", slug=f"sort-{uuid4().hex}")
         products = [
             Product(
+                store=new_store(),
                 name=name,
                 slug=f"{name.lower()}-{uuid4().hex}",
                 status="active",

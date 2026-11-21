@@ -12,9 +12,10 @@ Local layout under MEDIA_ROOT:
             itself serves it at /media in development).
 
 Keys are generated here, never taken from a client:
-- images: "<owner>/<owner id>/<32 hex>-<12 hex>.<ext>", owner products, categories, brands or
-  banners; the 12 hex characters are the start of the SHA-256 of the original upload. A new
-  image always gets a new key, so a URL never changes content and needs no cache purge.
+- images: "<owner>/<owner id>/<32 hex>-<12 hex>.<ext>", owner products, categories, brands,
+  banners, services or stores (ADR-014 phase 2 logo and cover); the 12 hex characters are the
+  start of the SHA-256 of the original upload. A new image always gets a new key, so a URL never
+  changes content and needs no cache purge.
 - incoming bulk uploads (private only): "incoming/<job id>/<item id>".
 Every path is checked against these patterns and confined to its folder, so a stored key can
 never reach outside it. Writes go to a temporary file in the same folder and are renamed into
@@ -37,11 +38,12 @@ from starlette.staticfiles import StaticFiles
 from app.core.config import get_settings
 
 Visibility = Literal["public", "private"]
-Owner = Literal["products", "categories", "brands", "banners", "services"]
+Owner = Literal["products", "categories", "brands", "banners", "services", "stores"]
 
 UUID_TEXT = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 KEY_PATTERN = re.compile(
-    rf"^(?:products|categories|brands|banners|services)/{UUID_TEXT}/[0-9a-f]{{32}}-[0-9a-f]{{12}}"
+    rf"^(?:products|categories|brands|banners|services|stores)/{UUID_TEXT}/"
+    rf"[0-9a-f]{{32}}-[0-9a-f]{{12}}"
     r"\.(?:jpg|png|webp)$"
 )
 INCOMING_KEY_PATTERN = re.compile(rf"^incoming/{UUID_TEXT}/{UUID_TEXT}$")

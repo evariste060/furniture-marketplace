@@ -197,7 +197,6 @@
     "noLowStock": "Nta gicuruzwa kiri gushira.",
     "quickActions": "Ibikorwa byihuse",
     "actions": {
-      "addProduct": "Ongeramo igicuruzwa",
       "import": "Injiza ibicuruzwa",
       "orders": "Reba amatumiza",
       "stock": "Genzura ububiko",
@@ -340,7 +339,6 @@
   "products": {
     "title": "Ibicuruzwa",
     "import": "Injiza",
-    "add": "Ongeramo igicuruzwa",
     "viewsLabel": "Uko ibicuruzwa byerekanwa",
     "views": {
       "all": "Ibicuruzwa byose",
@@ -845,12 +843,12 @@
   },
   "import": {
     "title": "Kwinjiza ibicuruzwa",
-    "description": "Ongeramo cyangwa uvugurure ibicuruzwa byinshi icyarimwe uhereye kuri dosiye ya CSV cyangwa Excel.",
+    "description": "Vugurura ibicuruzwa byinshi bisanzweho icyarimwe uhereye kuri dosiye ya CSV cyangwa Excel. Abacuruzi ni bo bongeramo ibicuruzwa bishya mu iduka ryabo.",
     "steps": {
       "template": "Kuramo icyitegererezo",
       "templateBody": "Inkingi z'igicuruzwa, ikirango, icyiciro, ubwoko, igiciro, ububiko n'ibiranga.",
       "upload": "Ohereza dosiye yawe",
-      "uploadBody": "CSV cyangwa XLSX itarenze MB 10. SKU zisanzwe zivugururwa, inshya zigakorwa.",
+      "uploadBody": "CSV cyangwa XLSX itarenze MB 10. SKU zisanzwe zivugururwa, inshya zigashyirwa ku bicuruzwa bisanzweho; imirongo y'ibicuruzwa bitazwi ntiyemerwa.",
       "check": "Reba raporo",
       "checkBody": "Imirongo ifite amakosa irasimbukwa; indi ikinjizwa. Kuramo raporo kugira ngo uyakosore."
     },

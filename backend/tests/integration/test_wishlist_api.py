@@ -15,6 +15,7 @@ from app.models import Category, Product, WishlistItem
 from app.models.engagement import WISHLIST_LIMIT
 from app.services.wishlist_service import WishlistService
 from tests.support.catalog import force_status
+from tests.support.sellers import new_store, post_product
 
 STAFF = "/api/v1/staff"
 WISH = "/api/v1/customers/me/wishlist"
@@ -33,9 +34,7 @@ def category(client: TestClient, admin_auth: dict) -> dict:
 
 def product(client: TestClient, admin_auth: dict, category: dict, name: str) -> str:
     h = admin_auth["headers"]
-    res = client.post(
-        f"{STAFF}/products", json={"name": name, "category_id": category["id"]}, headers=h
-    )
+    res = post_product(client, json={"name": name, "category_id": category["id"]}, headers=h)
     assert res.status_code == 201, res.text
     product_id = res.json()["id"]
     variant = client.post(
@@ -103,8 +102,8 @@ def test_each_customer_has_their_own_wishlist(
 
 
 def test_only_products_on_sale_can_be_saved(client, admin_auth, category, customer_auth):
-    draft = client.post(
-        f"{STAFF}/products",
+    draft = post_product(
+        client,
         json={"name": "Draft phone", "category_id": category["id"]},
         headers=admin_auth["headers"],
     ).json()["id"]
@@ -151,6 +150,9 @@ def test_products_no_longer_sold_stay_listed_until_removed(
 def _fill(db: Session, user_id: uuid.UUID, category_id: uuid.UUID, n: int) -> list[uuid.UUID]:
     """n active products saved by the customer, inserted directly (fast)."""
     product_ids = [uuid.uuid4() for _ in range(n)]
+    store = new_store()  # every product belongs to an approved store (ADR-014 phase 2)
+    db.add(store)
+    db.flush()
     db.execute(
         insert(Product),
         [
@@ -161,6 +163,7 @@ def _fill(db: Session, user_id: uuid.UUID, category_id: uuid.UUID, n: int) -> li
                 "category_id": category_id,
                 "status": "active",
                 "specifications": {},
+                "store_id": store.id,
             }
             for i, pid in enumerate(product_ids)
         ],

@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckSquare, ExternalLink, ImageOff, Layers, PackageSearch, Pencil, Plus, Rocket, Upload, X, type LucideIcon } from "lucide-react";
+import { CheckSquare, ExternalLink, ImageOff, Layers, PackageSearch, Pencil, Rocket, Upload, X, type LucideIcon } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
@@ -106,14 +106,12 @@ export function ProductsView() {
         description={t("products.description")}
         actions={
           manage && (
+            // Administrators moderate products but do not create them (SC-05): sellers add products
+            // to their own store, so there is no New product action here.
             <>
               <NextLink href="/admin/import" className={buttonClasses({ variant: "neutral", size: "sm", className: "gap-2" })}>
                 <Upload size={16} aria-hidden="true" />
                 {t("products.import")}
-              </NextLink>
-              <NextLink href="/admin/products/new" className={buttonClasses({ size: "sm", className: "gap-2" })}>
-                <Plus size={16} aria-hidden="true" />
-                {t("products.add")}
               </NextLink>
             </>
           )

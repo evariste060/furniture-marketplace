@@ -39,6 +39,7 @@ from app.models import (
 )
 from app.models.content import PAGE_SLUGS
 from app.services import bulk_images, dev_data_guard, jobs
+from tests.support.sellers import post_product
 
 SCRIPTS = Path(__file__).resolve().parents[3] / "scripts"
 sys.path.insert(0, str(SCRIPTS))
@@ -105,6 +106,8 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     got = outcomes(report)
     assert got["staff"] == {"created": 1}  # SC-05: the Marketplace Administrator only
     assert got["customers"] == {"created": 5}
+    assert got["stores"] == {"created": len(data.stores)}
+    assert got["store approvals"] == {"updated": len(data.stores)}
     assert got["categories"] == {"created": 5, "updated": 5}  # created, then the image
     assert got["brands"] == {"created": 12, "updated": 12}
     assert got["products"] == {"created": len(data.products)}
@@ -191,7 +194,9 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     assert count(db, ProductReview) == 0
     assert count(db, WishlistItem) == 0
     assert removed["orders"] == 15 and removed["products"] == len(data.products)
-    assert removed["people"] == 6 and removed["banners"] == 3  # SC-05: 1 administrator, 5 customers
+    # SC-05: 1 administrator and 5 customers; ADR-014 phase 2: the 3 store owners and stores.
+    assert removed["people"] == 9 and removed["banners"] == 3
+    assert removed["stores"] == 3 and removed["store history"] == 6
     for model in (Order, Product, ProductVariant, StockReservation, Banner):
         assert count(db, model) == 0, model
     assert count(db, User, User.email.endswith("@seed.3sixty.local")) == 0
@@ -220,6 +225,7 @@ def _small(products=1):
         data.staff[:1],
         (),
         (),
+        stores=data.stores[:1],  # ADR-014 phase 2: the products need a store
     )
 
 
@@ -307,8 +313,8 @@ def test_a_slug_held_by_a_non_seed_product_is_reported_not_changed(
     category = db.scalar(select(Category))
     assert category is not None
     spec = small.products[0]
-    res = client.post(
-        "/api/v1/staff/products",
+    res = post_product(  # a real seller's product (SC-05: staff do not create products)
+        client,
         json={"name": "Real product", "slug": spec.slug, "category_id": str(category.id)},
         headers=admin_auth["headers"],
     )

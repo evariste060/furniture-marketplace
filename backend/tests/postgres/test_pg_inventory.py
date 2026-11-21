@@ -34,19 +34,36 @@ def owner_sessions(stack: Stack):
     engine.dispose()
 
 
+def seed_store(conn, tag: str) -> uuid.UUID:
+    """A disposable approved store with its owner (ADR-014 phase 2: every product has one)."""
+    owner, store = uuid.uuid4(), uuid.uuid4()
+    conn.execute(
+        "INSERT INTO users (id, email, full_name) VALUES (%s, %s, 'PG store owner')",
+        (owner, f"pg.store.{tag}@pg.test"),
+    )
+    conn.execute(
+        "INSERT INTO stores (id, owner_user_id, name, slug, contact_email, contact_phone, "
+        "district, status, submitted_at, reviewed_at, approved_at) VALUES (%s, %s, %s, %s, "
+        "'shop@pg.test', '+250788000001', 'Gasabo', 'approved', now(), now(), now())",
+        (store, owner, f"PG store {tag}", f"pg-store-{tag}"),
+    )
+    return store
+
+
 def seed_sku(stack: Stack, on_hand: int) -> tuple[uuid.UUID, str, str]:
     """A sellable disposable SKU; returns (variant_id, sku, product_slug)."""
     tag = secrets.token_hex(5)
     ids = [uuid.uuid4() for _ in range(4)]
     with stack.owner() as conn:
+        store = seed_store(conn, tag)
         conn.execute(
             "INSERT INTO categories (id, name, slug) VALUES (%s, %s, %s)",
             (ids[0], f"PG category {tag}", f"pg-cat-{tag}"),
         )
         conn.execute(
-            "INSERT INTO products (id, name, slug, category_id, status, specifications) "
-            "VALUES (%s, %s, %s, %s, 'active', '{}')",
-            (ids[1], f"PG product {tag}", f"pg-product-{tag}", ids[0]),
+            "INSERT INTO products (id, name, slug, category_id, status, specifications, store_id) "
+            "VALUES (%s, %s, %s, %s, 'active', '{}', %s)",
+            (ids[1], f"PG product {tag}", f"pg-product-{tag}", ids[0], store),
         )
         conn.execute(
             "INSERT INTO product_variants (id, product_id, sku, name, price) "

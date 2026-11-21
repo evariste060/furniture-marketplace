@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.models import AuditRecord, Product
 from app.services import product_admin
 from tests.support.media import image_row
+from tests.support.sellers import new_store, post_product
 
 STAFF = "/api/v1/staff"
 
@@ -28,9 +29,7 @@ def category(client: TestClient, admin_auth: dict) -> dict:
 
 
 def draft(client, headers, category_id: str, name: str, sku: str | None = None) -> dict:
-    res = client.post(
-        f"{STAFF}/products", json={"name": name, "category_id": category_id}, headers=headers
-    )
+    res = post_product(client, json={"name": name, "category_id": category_id}, headers=headers)
     assert res.status_code == 201, res.text
     product = res.json()
     if sku:
@@ -64,8 +63,8 @@ def status_of(db: Session, product_id: str) -> str:
 
 # ---- the guard on every path ---------------------------------------------------------------
 def test_a_new_product_cannot_be_created_active(client, admin_auth, category):
-    res = client.post(
-        f"{STAFF}/products",
+    res = post_product(
+        client,
         json={"name": "Spark", "category_id": category["id"], "status": "active"},
         headers=admin_auth["headers"],
     )
@@ -117,7 +116,9 @@ def test_the_last_product_image_of_an_active_product_cannot_be_removed(
 def test_products_already_active_without_images_are_not_deactivated(
     client, db, admin_auth, category
 ):
-    legacy = Product(name="Legacy", slug="legacy", category_id=uuid.UUID(category["id"]))
+    legacy = Product(
+        store=new_store(), name="Legacy", slug="legacy", category_id=uuid.UUID(category["id"])
+    )
     legacy.status = "active"
     db.add(legacy)
     db.commit()
@@ -147,8 +148,8 @@ def test_every_activation_and_image_removal_path_uses_the_single_guard(
     ):
         monkeypatch.setattr(f"{module}.ensure_publishable", spy)
     h = admin_auth["headers"]
-    client.post(
-        f"{STAFF}/products",
+    post_product(
+        client,
         json={"name": "New", "category_id": category["id"], "status": "active"},
         headers=h,
     )
@@ -235,6 +236,13 @@ def test_an_import_row_asking_for_active_without_images_saves_a_draft_with_a_war
     client, db, admin_auth, category
 ):
     h = admin_auth["headers"]
+    # SC-05: imports update existing products only; a seller added this one as a draft.
+    made = post_product(
+        client,
+        json={"name": "Imported Phone", "slug": "imported-phone", "category_id": category["id"]},
+        headers=h,
+    )
+    assert made.status_code == 201, made.text
     rows = (
         "sku,product_slug,product_name,category_slug,variant_name,price,product_status\n"
         "IMP-1,imported-phone,Imported Phone,phones,Std,1000,active\n"
@@ -251,7 +259,8 @@ def test_an_import_row_asking_for_active_without_images_saves_a_draft_with_a_war
         {
             "row": 2,
             "field": "product_status",
-            "message": "The product has no images, so it was saved as a draft instead of "
+            # The existing-product wording (SC-05: imports no longer create products).
+            "message": "The product has no images, so it was saved as draft instead of "
             "active. Upload images (bulk upload), then activate it.",
         }
     ]

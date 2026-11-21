@@ -35,6 +35,7 @@ from app.schemas.images import PublicImage
 from app.services import media_cleanup
 from app.services.image_processing import MAX_UPLOAD_BYTES
 from tests.support.catalog import force_status
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
@@ -102,8 +103,8 @@ def stored_files(storage: LocalMediaStorage) -> list[str]:
 def product(client: TestClient, admin_auth: dict) -> dict:
     h = admin_auth["headers"]
     category = client.post(f"{STAFF}/categories", json={"name": "Phones"}, headers=h).json()
-    created = client.post(
-        f"{STAFF}/products",
+    created = post_product(
+        client,
         json={"name": "Galaxy S24", "category_id": category["id"]},
         headers=h,
     ).json()  # a draft: deleting its images is not restricted by the publication guard
@@ -112,8 +113,8 @@ def product(client: TestClient, admin_auth: dict) -> dict:
         json={"sku": "GS24-BLK", "name": "Black", "price": 1000},
         headers=h,
     ).json()
-    other = client.post(
-        f"{STAFF}/products", json={"name": "Other", "category_id": category["id"]}, headers=h
+    other = post_product(
+        client, json={"name": "Other", "category_id": category["id"]}, headers=h
     ).json()
     other_variant = client.post(
         f"{STAFF}/products/{other['id']}/variants",

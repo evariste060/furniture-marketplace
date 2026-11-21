@@ -755,6 +755,27 @@ EXPECTED_OPERATIONS = {
     ("put", "/api/v1/seller/application"),
     ("get", "/api/v1/seller/store"),
     ("patch", "/api/v1/seller/store"),
+    # ADR-014 phase 2: the seller's own catalogue and the public stores
+    ("get", "/api/v1/seller/products"),
+    ("post", "/api/v1/seller/products"),
+    ("get", "/api/v1/seller/products/{product_id}"),
+    ("patch", "/api/v1/seller/products/{product_id}"),
+    ("post", "/api/v1/seller/products/{product_id}/variants"),
+    ("patch", "/api/v1/seller/products/{product_id}/variants/{variant_id}"),
+    ("delete", "/api/v1/seller/products/{product_id}/variants/{variant_id}"),
+    ("post", "/api/v1/seller/products/{product_id}/images"),
+    ("put", "/api/v1/seller/products/{product_id}/images/order"),
+    ("patch", "/api/v1/seller/images/{image_id}"),
+    ("delete", "/api/v1/seller/images/{image_id}"),
+    ("get", "/api/v1/seller/inventory"),
+    ("get", "/api/v1/seller/inventory/{sku}"),
+    ("post", "/api/v1/seller/inventory/{sku}/adjustments"),
+    ("post", "/api/v1/seller/store/logo"),
+    ("delete", "/api/v1/seller/store/logo"),
+    ("post", "/api/v1/seller/store/cover"),
+    ("delete", "/api/v1/seller/store/cover"),
+    ("get", "/api/v1/stores"),
+    ("get", "/api/v1/stores/{slug}"),
     ("get", "/api/v1/staff/sellers"),
     ("get", "/api/v1/staff/sellers/{store_id}"),
     ("patch", "/api/v1/staff/sellers/{store_id}/status"),
@@ -762,6 +783,8 @@ EXPECTED_OPERATIONS = {
 }
 PUBLIC = {
     ("get", "/"),
+    ("get", "/api/v1/stores"),  # approved stores (ADR-014 phase 2)
+    ("get", "/api/v1/stores/{slug}"),
     ("get", "/api/v1/health"),
     ("get", "/api/v1/banners"),  # storefront banners (2026-10-26)
     ("post", "/api/v1/auth/register"),

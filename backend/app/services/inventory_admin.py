@@ -1,6 +1,10 @@
 """Staff inventory operations behind the HTTP API ('inventory:read' and 'inventory:adjust', both
 held by the Marketplace Administrator, SC-05).
 
+Stores (ADR-014 phase 2): every function takes a CatalogScope. A seller reads and adjusts only
+the SKUs of their own store; another store's SKU is 404 sku_not_found, like an unknown one.
+Sellable also needs the product's store to be approved: a suspended store's SKUs cannot be sold.
+
 Maps inventory rule errors to HTTP responses and commits each request's change together with its
 audit record. The stock rules themselves live in app.services.inventory.
 """
@@ -14,6 +18,7 @@ from app.core.errors import Conflict, NotFound
 from app.core.request_context import RequestContext
 from app.models import Brand, Category, Product, ProductVariant
 from app.models.identity import User
+from app.models.marketplace import Store
 from app.repositories.category_tree import category_visible
 from app.schemas.inventory import (
     InventoryListItem,
@@ -24,23 +29,29 @@ from app.schemas.inventory import (
 )
 from app.schemas.pagination import page_offset
 from app.services import inventory
+from app.services.catalog_scope import CatalogScope
 
 SKU_NOT_FOUND = "No SKU with this code."
 
 
-def _variant_by_sku(db: Session, sku: str) -> ProductVariant:
-    variant = db.scalar(select(ProductVariant).where(func.lower(ProductVariant.sku) == sku.lower()))
+def _variant_by_sku(db: Session, sku: str, scope: CatalogScope) -> ProductVariant:
+    variant = db.scalar(
+        select(ProductVariant)
+        .join(Product, Product.id == ProductVariant.product_id)
+        .where(func.lower(ProductVariant.sku) == sku.lower(), scope.products())
+    )
     if variant is None:
         raise NotFound(SKU_NOT_FOUND, code="sku_not_found")
     return variant
 
 
 def _sellable():
-    """Variant active, product active, category visible (it and its main category active) and
-    brand active (or none)."""
+    """Variant active, product active, its store approved, category visible (it and its main
+    category active) and brand active (or none)."""
     return and_(
         ProductVariant.is_active.is_(True),
         Product.status == "active",
+        Store.status == "approved",
         Category.is_active.is_(True),
         category_visible(Product.category_id),
         or_(Product.brand_id.is_(None), Brand.is_active.is_(True)),
@@ -63,6 +74,7 @@ def stock_list_query(variant_ids: list[uuid.UUID] | None = None):
             _sellable().label("is_sellable"),
         )
         .join(Product, Product.id == ProductVariant.product_id)
+        .join(Store, Store.id == Product.store_id)
         .join(Category, Category.id == Product.category_id)
         .outerjoin(Brand, Brand.id == Product.brand_id)
     )
@@ -81,17 +93,24 @@ def _like(text: str) -> str:
 
 class InventoryAdminService:
     @staticmethod
-    def get(db: Session, sku: str) -> InventoryResponse:
-        return _inventory_response(db, _variant_by_sku(db, sku))
+    def get(db: Session, sku: str, *, scope: CatalogScope) -> InventoryResponse:
+        return _inventory_response(db, _variant_by_sku(db, sku, scope))
 
     @staticmethod
     def list_stock(
-        db: Session, *, low_stock: bool | None, q: str | None, page: int, size: int
+        db: Session,
+        *,
+        low_stock: bool | None,
+        q: str | None,
+        page: int,
+        size: int,
+        scope: CatalogScope,
     ) -> tuple[list[InventoryListItem], int]:
         """Every SKU (active or not), ordered by SKU. low_stock: true keeps low-stock SKUs,
         false the others, omitted all. q: case-insensitive substring of the SKU, variant name
         or product name. Two queries per page, whatever its size."""
         query, columns = stock_list_query()
+        query = query.where(scope.products())
         if low_stock is not None:
             query = query.where(columns.is_low_stock if low_stock else ~columns.is_low_stock)
         if q:
@@ -117,8 +136,10 @@ class InventoryAdminService:
         req: StockAdjustmentRequest,
         idempotency_key: str,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> StockAdjustmentResponse:
-        variant = _variant_by_sku(db, sku)
+        variant = _variant_by_sku(db, sku, scope)
         try:
             result = inventory.adjust_stock(
                 db,

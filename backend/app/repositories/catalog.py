@@ -21,6 +21,7 @@ from app.models import (
     ProductVariant,
     StockReservation,
 )
+from app.models.marketplace import Store
 from app.repositories.category_tree import category_roots, category_visible, subtree_ids_by_slug
 from app.schemas.pagination import page_offset
 from app.services.inventory import stock_figures
@@ -132,6 +133,7 @@ def _public_product_options():
     return (
         joinedload(Product.category),
         joinedload(Product.brand),
+        joinedload(Product.store),
         selectinload(Product.images.and_(ProductImage.variant_id.is_(None))),
         selectinload(Product.variants.and_(ProductVariant.is_active.is_(True))).selectinload(
             ProductVariant.images
@@ -140,18 +142,28 @@ def _public_product_options():
 
 
 def _base_public_products():
+    """The single public-visibility rule: an active product of an approved store (ADR-014
+    phase 2; suspending a store hides its products), in a visible category, with an active brand
+    or none."""
     return (
         select(Product)
         .join(Product.category)
+        .join(Store, Store.id == Product.store_id)
         .outerjoin(Product.brand)
         .where(
             Product.status == "active",
+            Store.status == "approved",
             Category.is_active.is_(True),
             # Hidden parent, hidden subtree: the same rule as the public category tree.
             category_visible(Product.category_id),
             or_(Product.brand_id.is_(None), Brand.is_active.is_(True)),
         )
     )
+
+
+def public_product_ids():
+    """The ids of every public product (the same rule as the listing)."""
+    return _base_public_products().with_only_columns(Product.id)
 
 
 def _available_variant_exists(variant_id):
@@ -221,10 +233,13 @@ class ProductFilters:
     featured: bool | None = None
     on_sale: bool | None = None
     min_rating: int | None = None
+    store_slug: str | None = None  # ADR-014 phase 2: one approved store's products
 
 
 def _filtered_products(f: ProductFilters):
     query = _base_public_products()
+    if f.store_slug:
+        query = query.where(Store.slug == f.store_slug)
     if f.min_rating is not None:
         query = query.where(Product.rating_average >= f.min_rating)
     if f.featured is not None:

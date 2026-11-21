@@ -33,9 +33,11 @@ from app.schemas.image_admin import (
     ImageResponse,
     ImageUpdateRequest,
 )
+from app.services.catalog_scope import CatalogScope
 from app.services.image_admin import ImageAdminService, read_upload
 
 router = APIRouter(prefix="/staff", tags=["Staff Catalogue"])
+PLATFORM = CatalogScope.platform()  # staff act on every store (ADR-014 phase 2)
 
 
 def _examples(**cases: tuple[str, str, Any]) -> dict[str, Any]:
@@ -217,7 +219,7 @@ def upload_image(
 ) -> ImageResponse:
     raw = read_upload(file.file)
     image = ImageAdminService.upload(
-        db, storage, current_user, product_id, raw, variant_id, alt_text, ctx
+        db, storage, current_user, product_id, raw, variant_id, alt_text, ctx, scope=PLATFORM
     )
     return image_response(image, storage)
 
@@ -257,7 +259,7 @@ def reorder_images(
     storage: Storage,
     ctx: Ctx,
 ) -> list[ImageResponse]:
-    images = ImageAdminService.reorder(db, current_user, product_id, req, ctx)
+    images = ImageAdminService.reorder(db, current_user, product_id, req, ctx, scope=PLATFORM)
     return [image_response(image, storage) for image in images]
 
 
@@ -280,7 +282,7 @@ def update_image(
     storage: Storage,
     ctx: Ctx,
 ) -> ImageResponse:
-    image = ImageAdminService.update(db, current_user, image_id, req, ctx)
+    image = ImageAdminService.update(db, current_user, image_id, req, ctx, scope=PLATFORM)
     return image_response(image, storage)
 
 
@@ -297,5 +299,5 @@ def update_image(
     responses={**GUARDED, **IMAGE_404, **DELETE_422},
 )
 def delete_image(image_id: uuid.UUID, current_user: CatalogManager, db: Db, ctx: Ctx):
-    ImageAdminService.delete(db, current_user, image_id, ctx)
+    ImageAdminService.delete(db, current_user, image_id, ctx, scope=PLATFORM)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

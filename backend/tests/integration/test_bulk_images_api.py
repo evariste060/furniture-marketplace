@@ -21,6 +21,7 @@ from app.models import AuditRecord, MediaObject, ProductImage
 from app.services import bulk_images, jobs, media_cleanup
 from app.services.bulk_images import Placement, parse_file_name
 from app.services.image_processing import MAX_UPLOAD_BYTES
+from tests.support.sellers import post_product
 
 STAFF = "/api/v1/staff"
 BULK = f"{STAFF}/products/bulk-images"
@@ -48,9 +49,7 @@ def products(client: TestClient, admin_auth: dict) -> dict[str, dict]:
     category = client.post(f"{STAFF}/categories", json={"name": "Phones"}, headers=h).json()
     made = {}
     for name in ("Samsung Galaxy A55", "Tecno Spark 20"):
-        res = client.post(
-            f"{STAFF}/products", json={"name": name, "category_id": category["id"]}, headers=h
-        )
+        res = post_product(client, json={"name": name, "category_id": category["id"]}, headers=h)
         assert res.status_code == 201, res.text
         made[res.json()["slug"]] = res.json()
     return made

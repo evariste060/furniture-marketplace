@@ -12,6 +12,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import IntegrityError
 
 from tests.integration.test_image_media_migration import _alembic
+from tests.support.sellers import forget_stores, sql_store
 
 BEFORE = "b8d3f5a1c2e7"
 REGISTRY = "c4e8f2a6b9d1"
@@ -32,12 +33,22 @@ def _product(conn) -> tuple[str, str, str]:
         text("INSERT INTO brands (id, name, slug) VALUES (:id, 'Tecno', :slug)"),
         {"id": brand, "slug": f"tecno-{brand}"},
     )
+    store = sql_store(conn)  # a store owns it once products.store_id exists (ADR-014 phase 2)
     conn.execute(
         text(
-            "INSERT INTO products (id, name, slug, category_id, brand_id) "
-            "VALUES (:id, 'Phone', :slug, :category, :brand)"
+            "INSERT INTO products (id, name, slug, category_id, brand_id"
+            + (", store_id" if store else "")
+            + ") VALUES (:id, 'Phone', :slug, :category, :brand"
+            + (", :store" if store else "")
+            + ")"
         ),
-        {"id": product, "slug": f"phone-{product}", "category": category, "brand": brand},
+        {
+            "id": product,
+            "slug": f"phone-{product}",
+            "category": category,
+            "brand": brand,
+            "store": store,
+        },
     )
     return category, brand, product
 
@@ -191,6 +202,10 @@ def test_the_downgrade_moves_the_links_back_to_keys_and_dimensions(pg_engine: En
             ),
             {"m": logo, "o": logo_original, "id": brand},
         )
+    # The product belongs to a store (ADR-014 phase 2); phase 1 refuses to downgrade while
+    # stores exist, so leave phase 2, then remove this test's store.
+    _alembic(pg_engine, "downgrade", "a9d3f5b7c1e2")
+    forget_stores(pg_engine)
     _alembic(pg_engine, "downgrade", BEFORE)
     assert "media_objects" not in inspect(pg_engine).get_table_names()
     with pg_engine.connect() as conn:

@@ -52,6 +52,7 @@ from app.schemas.catalog_admin import (  # noqa: E402
 )
 from app.schemas.product_admin import ProductUpdateRequest  # noqa: E402
 from app.services.catalog_admin import CatalogAdminService  # noqa: E402
+from app.services.catalog_scope import CatalogScope  # noqa: E402
 from app.services.product_admin import ProductAdminService  # noqa: E402
 
 CTX = RequestContext(ip_address=None, user_agent="apply_category_taxonomy")
@@ -416,7 +417,12 @@ def apply_taxonomy(db: Session, admin: User, plan: Plan) -> None:
         if plan.apply:
             assert target is not None
             ProductAdminService.update_product(
-                db, admin, product.id, ProductUpdateRequest(category_id=target.id), CTX
+                db,
+                admin,
+                product.id,
+                ProductUpdateRequest(category_id=target.id),
+                CTX,
+                scope=CatalogScope.platform(),  # the administrator moderates every store
             )
         plan.did("products", "moved", f"{product_slug}: {from_slug} -> {to_slug}")
 

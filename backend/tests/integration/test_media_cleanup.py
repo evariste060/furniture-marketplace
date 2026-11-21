@@ -16,6 +16,7 @@ from app.models import Category, MediaObject, Product
 from app.services import media_cleanup
 from app.services.media_cleanup import PENDING_TTL, backoff
 from tests.support.media import image_row, media_pair
+from tests.support.sellers import new_store
 
 NOW = datetime.now(UTC)
 
@@ -125,7 +126,9 @@ def test_retired_files_are_deleted_then_their_rows_and_a_missing_file_is_fine(st
 def test_a_retired_object_still_in_use_keeps_its_file_and_records_the_error(storage, db):
     category_row = category(db)
     image = image_row(None, 0)
-    product = Product(name="Phone", slug=f"phone-{uuid.uuid4().hex[:8]}", category=category_row)
+    product = Product(
+        store=new_store(), name="Phone", slug=f"phone-{uuid.uuid4().hex[:8]}", category=category_row
+    )
     image.product = product
     db.add(image)
     db.commit()

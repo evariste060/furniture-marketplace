@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.models import Brand, Category, MediaObject, Product, ProductImage
 from tests.integration.test_image_media_migration import _alembic
 from tests.support.media import image_row, media_pair
+from tests.support.sellers import new_store
 
 SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "reset_dev_images.py"
 _spec = importlib.util.spec_from_file_location("reset_dev_images", SCRIPT)
@@ -75,7 +76,7 @@ def test_other_hosts_are_not_local(host):
 def test_it_deletes_image_rows_and_links_only(db: Session, pg_engine: Engine):
     category = Category(name="Phones", slug="phones")
     brand = Brand(name="Tecno", slug="tecno")
-    product = Product(name="Spark", slug="spark", category=category, brand=brand)
+    product = Product(store=new_store(), name="Spark", slug="spark", category=category, brand=brand)
     image = image_row(None, 0)
     image.product = product
     logo, logo_original = media_pair("brands/logo.png", "brands", uuid.uuid4())

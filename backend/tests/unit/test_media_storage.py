@@ -57,6 +57,12 @@ def test_keys_follow_owner_id_uuid_hash_and_are_new_every_time():
     assert key(content=b"other").rsplit("-", 1)[1] != first.rsplit("-", 1)[1]
 
 
+def test_every_image_owner_has_managed_keys_and_others_do_not():
+    for owner in ("products", "categories", "brands", "banners", "services", "stores"):
+        assert KEY_PATTERN.fullmatch(key(owner=owner)), owner  # stores: ADR-014 phase 2
+    assert not KEY_PATTERN.fullmatch(key().replace("products/", "sellers/", 1))
+
+
 @pytest.mark.parametrize("owner", ["products", "categories", "brands", "banners"])
 def test_every_owner_has_its_own_prefix(owner):
     assert key("png", owner).startswith(f"{owner}/{OWNER}/")

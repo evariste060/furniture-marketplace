@@ -156,6 +156,17 @@ tags_metadata = [
         "their own store. The store is always the caller's own, resolved on every request.",
     },
     {
+        "name": "Seller Catalogue",
+        "description": "An approved seller's own products, variants, images and stock, and the "
+        "store's logo and cover (ADR-014 phase 2). Another store's resources answer 404; store_id "
+        "and is_featured are never accepted.",
+    },
+    {
+        "name": "Stores",
+        "description": "Approved stores on the public storefront, with their public product "
+        "counts (ADR-014 phase 2). Contact details, owner and commission are never shown.",
+    },
+    {
         "name": "Staff Sellers",
         "description": "Seller applications and stores for administrators (sellers:read, "
         "sellers:manage): review, approve, reject, suspend and reinstate, and the commission "
@@ -215,10 +226,11 @@ app = FastAPI(
 # Added before CORS so that CORS wraps it and a 413 still carries the CORS headers.
 app.add_middleware(
     UploadSizeLimitMiddleware,
-    # Product images, category images and brand logos (module 7; B1, ADR-009).
+    # Product images, category images and brand logos (module 7; B1, ADR-009), and the seller's
+    # product images, store logo and cover (ADR-014 phase 2).
     path_pattern=(
-        r"/api/v1/staff/(?:products/[^/]+/images|categories/[^/]+/image|brands/[^/]+/logo"
-        r"|banners/[^/]+/image)/?"
+        r"/api/v1/(?:staff/(?:products/[^/]+/images|categories/[^/]+/image|brands/[^/]+/logo"
+        r"|banners/[^/]+/image)|seller/(?:products/[^/]+/images|store/(?:logo|cover)))/?"
     ),
     max_body=MAX_UPLOAD_BYTES + UPLOAD_FORM_OVERHEAD_BYTES,
 )

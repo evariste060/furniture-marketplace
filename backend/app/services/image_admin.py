@@ -47,6 +47,7 @@ from app.models import Product, ProductImage, ProductVariant
 from app.models.identity import User
 from app.schemas.image_admin import SORT_ORDER_MAX, ImageOrderRequest, ImageUpdateRequest
 from app.services.catalog_admin import _audit, _changes, _lock
+from app.services.catalog_scope import CatalogScope
 from app.services.image_processing import (
     MAX_UPLOAD_BYTES,
     InvalidImage,
@@ -73,8 +74,12 @@ def _check_variant(db: Session, product_id: uuid.UUID, variant_id: uuid.UUID) ->
         raise field_error(("body", "variant_id"), VARIANT_MISMATCH)
 
 
-def _check_product(db: Session, product_id: uuid.UUID, variant_id: uuid.UUID | None) -> Product:
-    product = db.scalar(select(Product).where(Product.id == product_id).with_for_update())
+def _check_product(
+    db: Session, product_id: uuid.UUID, variant_id: uuid.UUID | None, scope: CatalogScope
+) -> Product:
+    product = db.scalar(
+        select(Product).where(Product.id == product_id, scope.products()).with_for_update()
+    )
     if product is None:
         raise NotFound(PRODUCT_NOT_FOUND, code="product_not_found")
     if variant_id is not None:
@@ -89,8 +94,15 @@ def _guard_removal(db: Session, image: ProductImage) -> None:
         ensure_publishable(db, image.product_id, excluding_image_id=image.id)
 
 
-def _locked_image(db: Session, image_id: uuid.UUID) -> ProductImage:
-    image = db.scalar(select(ProductImage).where(ProductImage.id == image_id).with_for_update())
+def _locked_image(db: Session, image_id: uuid.UUID, scope: CatalogScope) -> ProductImage:
+    """The image, if its product is in the scope; another store's image is 404 like a missing
+    one (ADR-014 phase 2)."""
+    image = db.scalar(
+        select(ProductImage)
+        .join(Product, Product.id == ProductImage.product_id)
+        .where(ProductImage.id == image_id, scope.products())
+        .with_for_update(of=ProductImage)
+    )
     if image is None:
         raise NotFound(IMAGE_NOT_FOUND, code="image_not_found")
     return image
@@ -123,15 +135,17 @@ class ImageAdminService:
         variant_id: uuid.UUID | None,
         alt_text: str | None,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> ProductImage:
         processed = processed_upload(raw)
         with atomic(db):  # 404 and variant checks before anything is stored
-            _check_product(db, product_id, variant_id)
+            _check_product(db, product_id, variant_id, scope)
         staged = stage_image(db, storage, "products", product_id, processed)
         try:
             with atomic(db):
                 _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-                product = _check_product(db, product_id, variant_id)
+                product = _check_product(db, product_id, variant_id, scope)
                 highest = db.scalar(
                     select(func.max(ProductImage.sort_order)).where(
                         ProductImage.product_id == product.id
@@ -183,12 +197,14 @@ class ImageAdminService:
         image_id: uuid.UUID,
         req: ImageUpdateRequest,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> ProductImage:
         fields = req.model_fields_set
         try:
             with atomic(db):
                 _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-                image = _locked_image(db, image_id)
+                image = _locked_image(db, image_id, scope)
                 if "variant_id" in fields and req.variant_id is not None:
                     _check_variant(db, image.product_id, req.variant_id)
                     if image.variant_id is None:  # it stops being a product image
@@ -218,10 +234,12 @@ class ImageAdminService:
         actor: User,
         image_id: uuid.UUID,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> None:
         with atomic(db):
             _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-            image = _locked_image(db, image_id)
+            image = _locked_image(db, image_id, scope)
             if image.variant_id is None:
                 _guard_removal(db, image)
             media = (image.public_media_id, image.original_media_id)
@@ -237,11 +255,13 @@ class ImageAdminService:
         product_id: uuid.UUID,
         req: ImageOrderRequest,
         ctx: RequestContext,
+        *,
+        scope: CatalogScope,
     ) -> list[ProductImage]:
         """Put the product's product-level images in the requested order (positions 0..n-1)."""
         with atomic(db):
             _lock(db, PRODUCT_CHANGE_LOCK_KEY)
-            _check_product(db, product_id, None)
+            _check_product(db, product_id, None, scope)
             images = list(
                 db.scalars(
                     select(ProductImage)

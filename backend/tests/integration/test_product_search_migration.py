@@ -93,7 +93,8 @@ def test_upgrade_backfills_existing_products_and_downgrade_removes_everything(
             ).scalar_one()
             == "Spark 20"
         )
-    _alembic(pg_engine, "upgrade", "head")
+    # Up to the revision before b2d4f6a8c0e1, which refuses while products exist (ADR-014 phase 2).
+    _alembic(pg_engine, "upgrade", "a9d3f5b7c1e2")
 
 
 def test_models_match_the_migrated_schema(pg_engine: Engine):
