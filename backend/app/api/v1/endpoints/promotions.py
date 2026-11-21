@@ -1,7 +1,7 @@
 """Staff promotions (module 13; RE-026 B3, B6; TC-06). Rules are in
 app.services.promotion_service. Customers apply codes through POST /cart/apply-code.
 
-GET routes need 'promotions:read' (administrator, management); POST and PATCH need
+GET routes need 'promotions:read' (administrator); POST and PATCH need
 'promotions:manage' (administrator only).
 """
 
@@ -54,7 +54,7 @@ TIME_NOTE = (
     "",
     response_model=Page[PromotionResponse],
     summary="List promotions",
-    description="Requires 'promotions:read' (administrator, sales, management). Newest first.",
+    description="Requires 'promotions:read' (administrator). Newest first.",
     responses={**GUARDED, **VALIDATION_422},
 )
 def list_promotions(
@@ -73,7 +73,7 @@ def list_promotions(
     "/{promotion_id}",
     response_model=PromotionResponse,
     summary="View a promotion",
-    description="Requires 'promotions:read' (administrator, sales, management).",
+    description="Requires 'promotions:read' (administrator).",
     responses={**GUARDED, **NOT_FOUND, **VALIDATION_422},
 )
 def get_promotion(promotion_id: uuid.UUID, _: Reader, db: Db) -> PromotionResponse:

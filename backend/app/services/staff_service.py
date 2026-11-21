@@ -6,7 +6,8 @@ Rules:
   disabled administrator cannot complete a change.
 - Every change commits atomically with its audit record (app.db.transaction.atomic).
 - At least one active administrator must always remain.
-- A role change or deactivation revokes all of the user's sessions.
+- Deactivation revokes all of the user's sessions. Every staff account is a Marketplace
+  Administrator (SC-05), so there is no role change.
 - Customers are never converted to staff here: non-staff IDs are reported as not found.
 """
 
@@ -210,32 +211,6 @@ class StaffService:
                 )
         except IntegrityError:
             raise _conflict("phone") from None
-        return target
-
-    @staticmethod
-    def change_role(
-        db: Session, actor: User, staff_id: uuid.UUID, role: str, ctx: RequestContext
-    ) -> User:
-        with atomic(db):
-            target = StaffService._begin_change(db, actor, staff_id)
-            assert target is not None
-            old_role = staff_role(target)
-            if old_role == role:
-                return target  # no change: nothing to audit, sessions kept
-            if old_role == Role.ADMINISTRATOR.value and target.is_active:
-                StaffService._ensure_other_active_admin(db, target)
-            StaffRepository.set_role(db, target, role)
-            revoked = SessionRepository.revoke_all_user_sessions(db, target.id)
-            AuditService.log_event(
-                db=db,
-                action="staff.role_change",
-                status="success",
-                actor=actor,
-                entity_type="user",
-                entity_id=target.id,
-                context=ctx,
-                details={"old_role": old_role, "new_role": role, "sessions_revoked": revoked},
-            )
         return target
 
     @staticmethod

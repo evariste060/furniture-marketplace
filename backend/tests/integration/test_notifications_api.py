@@ -154,12 +154,10 @@ def load_script():
 
 
 # ---- events, after commit only -------------------------------------------------------------
-def test_each_order_event_sends_one_sms_after_the_change(
-    client, db, admin_auth, operations_auth, shop, notify
-):
+def test_each_order_event_sends_one_sms_after_the_change(client, db, admin_auth, shop, notify):
     order, _ = placed(client, db, admin_auth, with_code=False)
     assert logs(db) == []  # placed() set the checkout message aside
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     for status in ("confirmed", "processing", "dispatched", "delivered"):
         assert move(client, order["id"], status, h).status_code == 200, status
     everything = logs(db, order["id"])
@@ -181,9 +179,9 @@ def test_each_order_event_sends_one_sms_after_the_change(
     assert all(m.channel == "sms" and m.recipient == PHONE for m in notify.messages)
 
 
-def test_a_cancellation_is_notified(client, db, admin_auth, operations_auth, shop, notify):
+def test_a_cancellation_is_notified(client, db, admin_auth, shop, notify):
     order, _ = placed(client, db, admin_auth, with_code=False)
-    assert move(client, order["id"], "cancelled", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "cancelled", admin_auth["headers"]).status_code == 200
     [row] = logs(db, order["id"])
     assert (row.event, row.status) == ("cancelled", "sent")
     assert (
@@ -193,7 +191,7 @@ def test_a_cancellation_is_notified(client, db, admin_auth, operations_auth, sho
 
 
 def test_the_provider_runs_only_after_the_order_change_committed(
-    client, db, admin_auth, operations_auth, shop, notify, factory
+    client, db, admin_auth, shop, notify, factory
 ):
     order, _ = placed(client, db, admin_auth, with_code=False)
     seen: list[tuple[str, int]] = []
@@ -212,15 +210,15 @@ def test_the_provider_runs_only_after_the_order_change_committed(
             return super().send(message)
 
     app.dependency_overrides[get_notification_provider] = lambda: Observing()
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     assert seen == [("confirmed", 1)]
 
 
 def test_a_rolled_back_order_change_records_and_sends_nothing(
-    client, db, admin_auth, operations_auth, shop, notify, monkeypatch
+    client, db, admin_auth, shop, notify, monkeypatch
 ):
     order, _ = placed(client, db, admin_auth, with_code=False)
-    invalid = move(client, order["id"], "delivered", operations_auth["headers"])
+    invalid = move(client, order["id"], "delivered", admin_auth["headers"])
     assert invalid.status_code == 409 and code(invalid) == "invalid_transition"
 
     # A failure after the notification was recorded (the status-change audit insert) rolls the
@@ -235,7 +233,7 @@ def test_a_rolled_back_order_change_records_and_sends_nothing(
         return real(*args, **kwargs)
 
     monkeypatch.setattr(order_service.AuditService, "log_event", staticmethod(failing))
-    actor = db.get(User, operations_auth["user"].id)
+    actor = db.get(User, admin_auth["user"].id)
     assert actor is not None
     with pytest.raises(RuntimeError):
         OrderService.change_status(
@@ -249,11 +247,11 @@ def test_a_rolled_back_order_change_records_and_sends_nothing(
 
 
 def test_nothing_is_recorded_while_notifications_are_off(
-    client, db, admin_auth, operations_auth, shop, notify, monkeypatch
+    client, db, admin_auth, shop, notify, monkeypatch
 ):
     monkeypatch.setattr(get_settings(), "notification_provider", "none")
     order, _ = placed(client, db, admin_auth, with_code=False)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     assert logs(db) == [] and notify.messages == []
 
 
@@ -285,14 +283,14 @@ def test_the_expiry_jobs_cancellation_is_recorded_and_sent_by_the_retry_job(
 
 # ---- provider failures never fail the order ------------------------------------------------
 def test_status_changes_succeed_when_the_provider_raises_or_times_out(
-    client, db, admin_auth, operations_auth, shop, notify, caplog
+    client, db, admin_auth, shop, notify, caplog
 ):
     notify.outcomes = [
         RuntimeError(f"gateway said token=sk_live_123 for {PHONE}"),
         DeliveryTimeout(),
     ]
     order, _ = placed(client, db, admin_auth, with_code=False)
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     with caplog.at_level(logging.INFO):
         for status in ("confirmed", "processing", "dispatched"):
             assert move(client, order["id"], status, h).status_code == 200, status
@@ -319,11 +317,11 @@ def test_checkout_succeeds_with_a_failing_provider(client, db, shop, notify):
 
 
 def test_failures_are_retried_at_most_three_times_with_backoff(
-    client, db, admin_auth, operations_auth, shop, notify, factory
+    client, db, admin_auth, shop, notify, factory
 ):
     notify.outcomes = [DeliveryError("gateway_unavailable")] * 3
     order, _ = placed(client, db, admin_auth, with_code=False)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db)
     assert (row.status, row.attempts, row.last_error) == ("failed", 1, "gateway_unavailable")
     assert deliver(factory, notify).claimed == 0  # not due for 5 minutes
@@ -342,12 +340,10 @@ def test_failures_are_retried_at_most_three_times_with_backoff(
     assert {m.idempotency_key for m in notify.messages} == {f"notification:{row.id}"}
 
 
-def test_a_permanent_provider_error_ends_the_retries(
-    client, db, admin_auth, operations_auth, shop, notify
-):
+def test_a_permanent_provider_error_ends_the_retries(client, db, admin_auth, shop, notify):
     notify.outcomes = [DeliveryError("recipient_rejected", retryable=False)]
     order, _ = placed(client, db, admin_auth, with_code=False)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db)
     assert (row.status, row.attempts, row.next_attempt_at) == ("failed", 1, None)
     assert row.last_error == "recipient_rejected"
@@ -707,9 +703,7 @@ def test_sms_goes_to_the_orders_phone_otherwise_email():
     assert recipient_for(order) is None
 
 
-def test_an_order_without_a_usable_phone_is_emailed(
-    client, db, admin_auth, operations_auth, shop, notify
-):
+def test_an_order_without_a_usable_phone_is_emailed(client, db, admin_auth, shop, notify):
     order, _ = placed(client, db, admin_auth, with_code=False)
     db.execute(
         text(
@@ -719,7 +713,7 @@ def test_an_order_without_a_usable_phone_is_emailed(
         {"id": uuid.UUID(order["id"])},
     )
     db.commit()
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db)
     assert (row.channel, row.recipient, row.status) == ("email", "aline@example.rw", "sent")
     assert notify.messages[0].subject == f"Order {order['order_number']} confirmed"
@@ -756,12 +750,10 @@ def test_the_database_refuses_invalid_records(client, db, admin_auth, shop, fiel
 
 
 # ---- staff endpoints -------------------------------------------------------------------------
-def test_the_log_is_paginated_filtered_and_masked(
-    client, db, admin_auth, operations_auth, shop, notify
-):
+def test_the_log_is_paginated_filtered_and_masked(client, db, admin_auth, shop, notify):
     notify.outcomes = [None, RuntimeError("down")]
     order, _ = placed(client, db, admin_auth, with_code=False)
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     for status in ("confirmed", "processing", "dispatched"):
         assert move(client, order["id"], status, h).status_code == 200
     res = client.get(NOTIFICATIONS, params={"size": 1}, headers=admin_auth["headers"])
@@ -827,7 +819,7 @@ def test_invalid_list_queries_are_422(client, admin_auth, params):
 
 @pytest.mark.parametrize(
     "who",
-    ["sales_auth", "operations_auth", "management_auth", "finance_auth", "customer_auth"],
+    ["customer_auth"],
 )
 def test_only_notifications_manage_reads_or_retries(client, db, request, who):
     # Final staff matrix (2026-10-26): finance reads orders and payments but holds no
@@ -844,12 +836,10 @@ def test_anonymous_callers_are_401(client):
     assert client.post(f"{NOTIFICATIONS}/{uuid.uuid4()}/retry").status_code == 401
 
 
-def test_retry_sends_a_failed_notification_now_and_is_audited(
-    client, db, admin_auth, operations_auth, shop, notify
-):
+def test_retry_sends_a_failed_notification_now_and_is_audited(client, db, admin_auth, shop, notify):
     notify.outcomes = [DeliveryTimeout()]
     order, _ = placed(client, db, admin_auth, with_code=False)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db)
     assert row.status == "failed"
     res = client.post(f"{NOTIFICATIONS}/{row.id}/retry", headers=admin_auth["headers"])
@@ -865,12 +855,10 @@ def test_retry_sends_a_failed_notification_now_and_is_audited(
     assert summary["notification_status"] == "failed" and PHONE not in str(summary)
 
 
-def test_retry_without_a_provider_leaves_the_notification_due(
-    client, db, admin_auth, operations_auth, shop, notify
-):
+def test_retry_without_a_provider_leaves_the_notification_due(client, db, admin_auth, shop, notify):
     notify.outcomes = [DeliveryTimeout()]
     order, _ = placed(client, db, admin_auth, with_code=False)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db)
     app.dependency_overrides[get_notification_provider] = lambda: None
     res = client.post(f"{NOTIFICATIONS}/{row.id}/retry", headers=admin_auth["headers"])
@@ -917,13 +905,13 @@ def test_retry_of_a_missing_or_malformed_id(client, admin_auth):
 
 
 def test_a_failed_notification_insert_never_fails_the_order_change(
-    client, db, admin_auth, operations_auth, shop, notify, monkeypatch, caplog
+    client, db, admin_auth, shop, notify, monkeypatch, caplog
 ):
     # A recipient the database refuses for its channel: the insert fails inside its savepoint.
     monkeypatch.setattr(notification_service, "recipient_for", lambda order: ("sms", "a@b.rw"))
     order, _ = placed(client, db, admin_auth, with_code=False)
     with caplog.at_level(logging.ERROR, logger="app.notifications"):
-        res = move(client, order["id"], "confirmed", operations_auth["headers"])
+        res = move(client, order["id"], "confirmed", admin_auth["headers"])
     assert res.status_code == 200, res.text
     db.expire_all()
     assert db.get(Order, uuid.UUID(order["id"])).status == "confirmed"

@@ -12,8 +12,8 @@ keyed pseudonym of the account, phone or email, never the value) and per client 
 (SUPPORT_MESSAGE_* settings); beyond it the request answers 429, and an unreachable limit store
 refuses (503).
 
-Staff with 'support:read' (administrator, sales, management) read the conversations; those with
-'support:reply' (administrator, sales) reply and close them. A staff reply sets the status to
+Staff with 'support:read' (administrator) read the conversations; those with
+'support:reply' (administrator) reply and close them. A staff reply sets the status to
 'answered' and is emailed to the sender's address (outbox event 'support_reply'), a customer
 reply sets it to 'open', and closing sets 'closed'. Replies and status changes are audited as
 'support.reply' and 'support.status_change'; message text is never put in the audit trail.

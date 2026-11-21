@@ -53,31 +53,34 @@ def test_order_rows_name_the_customer_and_search_by_phone_or_number(client, db, 
 
 
 @pytest.mark.usefixtures("delivery")
-def test_assignees_list_active_staff_for_fulfilment_roles_only(
-    client, db, admin_auth, operations_auth, sales_auth
+def test_assignees_list_active_administrators(
+    client, db, admin_auth, second_admin_auth, customer_auth
 ):
-    res = client.get(f"{ORDERS}/assignees", headers=operations_auth["headers"])
+    res = client.get(f"{ORDERS}/assignees", headers=admin_auth["headers"])
     assert res.status_code == 200, res.text
-    roles = {item["role"] for item in res.json()["items"]}
-    assert {"administrator", "operations", "sales"} <= roles
-    assert client.get(f"{ORDERS}/assignees", headers=sales_auth["headers"]).status_code == 403
+    assert {item["role"] for item in res.json()["items"]} == {"administrator"}
+    assert {item["id"] for item in res.json()["items"]} >= {
+        str(admin_auth["user"].id),
+        str(second_admin_auth["user"].id),
+    }
+    assert client.get(f"{ORDERS}/assignees", headers=customer_auth["headers"]).status_code == 403
 
     order = place(client, db, "0788111222", "Aline Uwase")
-    target = str(operations_auth["user"].id)
+    target = str(second_admin_auth["user"].id)
     assigned = client.patch(
         f"{ORDERS}/{order['id']}/assignment",
         json={"staff_user_id": target},
         headers=admin_auth["headers"],
     )
     assert assigned.status_code == 200, assigned.text
-    detail = client.get(f"{ORDERS}/{order['id']}", headers=sales_auth["headers"]).json()
+    detail = client.get(f"{ORDERS}/{order['id']}", headers=admin_auth["headers"]).json()
     assert detail["fulfilment_assignee_user_id"] == target
-    assert detail["fulfilment_assignee_name"] == "Test operations"
+    assert detail["fulfilment_assignee_name"] == "Test administrator"
 
 
 # ---- categories and brands ---------------------------------------------------------------------
 def test_staff_lists_include_hidden_categories_and_brands_with_counts(
-    client, db: Session, operations_auth, customer_auth
+    client, db: Session, admin_auth, customer_auth
 ):
     shown = Category(name="Phones", slug="phones", sort_order=1)
     hidden = Category(name="Gaming", slug="gaming", sort_order=2, is_active=False)
@@ -98,7 +101,7 @@ def test_staff_lists_include_hidden_categories_and_brands_with_counts(
             )
         )
     db.commit()
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
 
     categories = client.get(f"{STAFF}/categories", headers=h).json()["items"]
     by_slug = {c["slug"]: c for c in categories}
@@ -118,7 +121,7 @@ def test_staff_lists_include_hidden_categories_and_brands_with_counts(
 
 # ---- products ----------------------------------------------------------------------------------
 def test_product_rows_have_price_sku_and_stock_and_filter_low_stock(
-    client, db: Session, operations_auth
+    client, db: Session, admin_auth
 ):
     category = Category(name="Phones", slug="phones")
     db.add(category)
@@ -149,7 +152,7 @@ def test_product_rows_have_price_sku_and_stock_and_filter_low_stock(
     variant(plenty, "PLENTY-1", 5000, 40)
     db.commit()
 
-    res = client.get(f"{STAFF}/products", headers=operations_auth["headers"])
+    res = client.get(f"{STAFF}/products", headers=admin_auth["headers"])
     assert res.status_code == 200, res.text
     rows = {r["slug"]: r for r in res.json()["items"]}
     assert (rows["low"]["sku"], rows["low"]["price"]) == ("LOW-A", 900)
@@ -162,7 +165,7 @@ def test_product_rows_have_price_sku_and_stock_and_filter_low_stock(
     )
 
     def slugs(**params) -> set[str]:
-        page = client.get(f"{STAFF}/products", params=params, headers=operations_auth["headers"])
+        page = client.get(f"{STAFF}/products", params=params, headers=admin_auth["headers"])
         return {r["slug"] for r in page.json()["items"]}
 
     assert slugs(low_stock="true") == {"low"}

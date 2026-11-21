@@ -630,19 +630,9 @@ def test_the_job_is_audited_and_timestamps_are_ordered(client, db, catalog, admi
 
 
 # ---- authorization and job access -----------------------------------------------------------
-def test_sales_staff_import_and_read_any_import_job(client, catalog, sales_auth):
-    data = csv_file([["SA-1", "sales-phone", "Sales phone", "phones", "", "Std", "1", "", "", ""]])
-    mine = post(client, sales_auth["headers"], data)
-    assert mine.status_code == 201
-    admins = post(client, catalog["headers"], data).json()
-    assert client.get(f"{IMPORTS}/{admins['id']}", headers=sales_auth["headers"]).status_code == 200
-    template = client.get(
-        f"{IMPORTS}/template", params={"format": "csv"}, headers=sales_auth["headers"]
-    )
-    assert template.status_code == 200
 
 
-@pytest.mark.parametrize("who", ["operations_auth", "management_auth", "customer_auth"])
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_other_roles_cannot_upload_read_jobs_or_download_templates(
     client, db, catalog, who, request
 ):

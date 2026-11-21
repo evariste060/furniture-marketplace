@@ -91,13 +91,11 @@ def run_retry_job(factory_, server: FakeSmtp):
     return deliver(factory_, server.provider)  # type: ignore[attr-defined]
 
 
-def test_each_order_event_emails_the_customer_once(
-    client, db, admin_auth, operations_auth, shop, smtp
-):
+def test_each_order_event_emails_the_customer_once(client, db, admin_auth, shop, smtp):
     order = order_for(client, db)
     assert smtp.messages == []  # the checkout email was set aside
     for status in ("confirmed", "processing", "dispatched", "delivered"):
-        res = move(client, order["id"], status, operations_auth["headers"])
+        res = move(client, order["id"], status, admin_auth["headers"])
         assert res.status_code == 200, res.text
     number = order["order_number"]
     subjects = [mail.email["Subject"] for mail in smtp.messages]
@@ -118,11 +116,11 @@ def test_each_order_event_emails_the_customer_once(
 
 
 def test_an_order_without_an_email_gets_no_message_and_still_moves(
-    client, db, operations_auth, shop, smtp, caplog
+    client, db, admin_auth, shop, smtp, caplog
 ):
     order = order_for(client, db, email=None)
     with caplog.at_level(logging.WARNING, logger="app.notifications"):
-        res = move(client, order["id"], "confirmed", operations_auth["headers"])
+        res = move(client, order["id"], "confirmed", admin_auth["headers"])
     assert res.status_code == 200, res.text
     assert status_of(db, order) == "confirmed"
     assert logs(db, order["id"]) == [] and smtp.messages == []
@@ -130,11 +128,11 @@ def test_an_order_without_an_email_gets_no_message_and_still_moves(
 
 
 def test_a_server_that_is_down_never_fails_the_order_and_the_retry_job_sends_it_once(
-    client, db, operations_auth, shop, smtp, factory
+    client, db, admin_auth, shop, smtp, factory
 ):
     order = order_for(client, db)
     smtp.script("MAIL", DROP)
-    res = move(client, order["id"], "confirmed", operations_auth["headers"])
+    res = move(client, order["id"], "confirmed", admin_auth["headers"])
     assert res.status_code == 200, res.text
     assert status_of(db, order) == "confirmed"
     [row] = logs(db, order["id"])
@@ -152,7 +150,7 @@ def test_a_server_that_is_down_never_fails_the_order_and_the_retry_job_sends_it_
 
 
 def test_the_temporary_gmail_route_keeps_the_same_delivery_and_retry_behaviour(
-    client, db, operations_auth, shop, smtp, factory, monkeypatch
+    client, db, admin_auth, shop, smtp, factory, monkeypatch
 ):
     live = get_settings()
     monkeypatch.setattr(live, "app_env", "production")
@@ -161,7 +159,7 @@ def test_the_temporary_gmail_route_keeps_the_same_delivery_and_retry_behaviour(
 
     order = order_for(client, db)
     smtp.script("MAIL", DROP)
-    res = move(client, order["id"], "confirmed", operations_auth["headers"])
+    res = move(client, order["id"], "confirmed", admin_auth["headers"])
     assert res.status_code == 200, res.text  # the failed delivery does not fail the order
     [row] = logs(db, order["id"])
     assert (row.status, row.attempts, row.last_error) == ("failed", 1, "connection_lost")
@@ -174,11 +172,11 @@ def test_the_temporary_gmail_route_keeps_the_same_delivery_and_retry_behaviour(
 
 
 def test_a_refused_recipient_ends_the_retries_and_leaves_the_order_alone(
-    client, db, operations_auth, shop, smtp, factory
+    client, db, admin_auth, shop, smtp, factory
 ):
     order = order_for(client, db)
     smtp.script("RCPT", "550 5.1.1 aline@example.rw does not exist")
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     assert status_of(db, order) == "confirmed"
     [row] = logs(db, order["id"])
     assert (row.status, row.attempts, row.last_error) == ("failed", 1, "recipient_refused")
@@ -189,11 +187,11 @@ def test_a_refused_recipient_ends_the_retries_and_leaves_the_order_alone(
 
 
 def test_a_temporary_refusal_is_retried_until_the_attempts_run_out(
-    client, db, operations_auth, shop, smtp, factory
+    client, db, admin_auth, shop, smtp, factory
 ):
     order = order_for(client, db)
     smtp.script("RCPT", "451 busy", "451 busy", "451 busy")
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db, order["id"])
     for _ in range(2):
         make_due(db, row.id)
@@ -206,11 +204,11 @@ def test_a_temporary_refusal_is_retried_until_the_attempts_run_out(
 
 
 def test_a_lost_answer_is_labelled_unknown_and_its_retry_keeps_the_message_id(
-    client, db, operations_auth, shop, smtp, factory
+    client, db, admin_auth, shop, smtp, factory
 ):
     order = order_for(client, db)
     smtp.script("DATA_END", TAKE_AND_DROP)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db, order["id"])
     assert (row.status, row.last_error) == ("failed", "connection_lost")
     make_due(db, row.id)
@@ -219,19 +217,19 @@ def test_a_lost_answer_is_labelled_unknown_and_its_retry_keeps_the_message_id(
     assert first.email["Message-ID"] == second.email["Message-ID"]
 
 
-def test_repeating_an_event_sends_one_email(client, db, operations_auth, shop, smtp):
+def test_repeating_an_event_sends_one_email(client, db, admin_auth, shop, smtp):
     order = order_for(client, db)
-    headers = operations_auth["headers"]
+    headers = admin_auth["headers"]
     assert move(client, order["id"], "confirmed", headers).status_code == 200
     assert move(client, order["id"], "confirmed", headers).status_code in (200, 409)
     assert len(smtp.messages) == 1 and len(logs(db, order["id"])) == 1
 
 
 def test_a_staff_retry_cannot_send_a_delivered_notification_again(
-    client, db, admin_auth, operations_auth, shop, smtp
+    client, db, admin_auth, shop, smtp
 ):
     order = order_for(client, db)
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db, order["id"])
     res = client.post(f"{NOTIFICATIONS}/{row.id}/retry", headers=admin_auth["headers"])
     assert res.status_code == 409 and res.json()["error"]["code"] == "notification_already_sent"
@@ -239,12 +237,12 @@ def test_a_staff_retry_cannot_send_a_delivered_notification_again(
 
 
 def test_an_old_sms_row_is_closed_rather_than_retried_for_ever(
-    client, db, operations_auth, shop, smtp, factory, monkeypatch
+    client, db, admin_auth, shop, smtp, factory, monkeypatch
 ):
     # Recorded under another provider, then sent after the switch to smtp.
     order = order_for(client, db)
     monkeypatch.setattr(get_settings(), "notification_provider", "mock")
-    assert move(client, order["id"], "confirmed", operations_auth["headers"]).status_code == 200
+    assert move(client, order["id"], "confirmed", admin_auth["headers"]).status_code == 200
     [row] = logs(db, order["id"])
     assert row.channel == "sms"
     make_due(db, row.id)

@@ -378,20 +378,7 @@ def admin_auth(client: TestClient, db: Session) -> dict:
 
 
 @pytest.fixture
-def sales_auth(client: TestClient, db: Session) -> dict:
-    return make_staff(db, "sales", "sales@example.com", "+250788000002")
-
-
-@pytest.fixture
-def operations_auth(client: TestClient, db: Session) -> dict:
-    return make_staff(db, "operations", "ops@example.com", "+250788000003")
-
-
-@pytest.fixture
-def management_auth(client: TestClient, db: Session) -> dict:
-    return make_staff(db, "management", "mgmt@example.com", "+250788000004")
-
-
-@pytest.fixture
-def finance_auth(client: TestClient, db: Session) -> dict:
-    return make_staff(db, "finance", "finance@example.com", "+250788000005")
+def second_admin_auth(client: TestClient, db: Session) -> dict:
+    """Another Marketplace Administrator, the only staff role (SC-05): for tests that need two
+    distinct staff members, such as an order assignee."""
+    return make_staff(db, "administrator", "admin.two@example.com", "+250788000002")

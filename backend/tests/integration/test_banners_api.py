@@ -256,10 +256,6 @@ def test_changes_are_audited_with_before_and_after_values(client, db, admin_auth
     ("who", "expected"),
     [
         ("admin_auth", 200),
-        ("management_auth", 200),
-        ("sales_auth", 403),
-        ("operations_auth", 403),
-        ("finance_auth", 403),
         ("customer_auth", 403),
         (None, 401),
     ],

@@ -1,6 +1,6 @@
 """Staff catalogue import (module 8; TC-15).
 
-Every route requires 'catalog:manage' (administrator and sales). Reading, checking and applying
+Every route requires 'catalog:manage' (administrator). Reading, checking and applying
 rows is in app.services.catalog_import; file formats and templates in app.services.import_files.
 Any catalogue manager may read any import job: jobs hold only counts and row/column errors, no
 personal data, and the catalogue is shared by all catalogue staff.
@@ -36,7 +36,7 @@ CatalogManager = Annotated[User, Depends(require_permission(Permission.CATALOG_M
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 
-PERMISSION_NOTE = "Requires 'catalog:manage' (administrator, sales)."
+PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
 EXTENSIONS = {".csv": "csv", ".xlsx": "xlsx"}
 FILENAME_MAX_LENGTH = 255
 FILE_TOO_LARGE = "The file is larger than 10 MB."

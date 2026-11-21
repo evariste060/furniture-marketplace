@@ -121,15 +121,15 @@ def test_a_customer_follows_the_conversation(client, db, customer_auth, second_c
     )
 
 
-def test_a_staff_message_from_the_contact_page_is_a_guest_message(client, db, sales_auth):
-    reference = send(client, headers=sales_auth["headers"]).json()["reference"]
+def test_a_staff_message_from_the_contact_page_is_a_guest_message(client, db, admin_auth):
+    reference = send(client, headers=admin_auth["headers"]).json()["reference"]
     thread = db.scalar(select(SupportThread).where(SupportThread.reference == reference))
     assert thread.customer_user_id is None
-    assert client.get(MINE, headers=sales_auth["headers"]).status_code == 403
+    assert client.get(MINE, headers=admin_auth["headers"]).status_code == 403
 
 
-def test_staff_reply_and_close(client, db, sales_auth, customer_auth):
-    h = sales_auth["headers"]
+def test_staff_reply_and_close(client, db, admin_auth, customer_auth):
+    h = admin_auth["headers"]
     first = send(client).json()["reference"]
     second = send(client, headers=customer_auth["headers"], phone="0788555111").json()["reference"]
     page = client.get(STAFF, headers=h).json()
@@ -142,7 +142,7 @@ def test_staff_reply_and_close(client, db, sales_auth, customer_auth):
     body = res.json()
     assert body["status"] == "answered"
     assert [m["author"] for m in body["messages"]] == ["customer", "staff"]
-    assert body["messages"][1]["staff_name"] == sales_auth["user"].full_name
+    assert body["messages"][1]["staff_name"] == admin_auth["user"].full_name
     assert client.get(STAFF, headers=h).json()["items"][0]["reference"] == first
 
     assert client.get(f"{STAFF}?status=open", headers=h).json()["total"] == 1
@@ -162,22 +162,22 @@ def test_staff_reply_and_close(client, db, sales_auth, customer_auth):
     assert missing.status_code == 404
 
 
-def test_a_customer_reply_reopens_the_conversation(client, sales_auth, customer_auth):
+def test_a_customer_reply_reopens_the_conversation(client, admin_auth, customer_auth):
     mine = customer_auth["headers"]
     reference = send(client, headers=mine).json()["reference"]
-    thread_id = client.get(STAFF, headers=sales_auth["headers"]).json()["items"][0]["id"]
-    client.patch(f"{STAFF}/{thread_id}", json={"status": "closed"}, headers=sales_auth["headers"])
+    thread_id = client.get(STAFF, headers=admin_auth["headers"]).json()["items"][0]["id"]
+    client.patch(f"{STAFF}/{thread_id}", json={"status": "closed"}, headers=admin_auth["headers"])
     res = client.post(f"{MINE}/{reference}/messages", json={"body": "One more thing"}, headers=mine)
     assert res.json()["status"] == "open"
 
 
-def test_a_staff_reply_is_emailed(client, db, sales_auth, emails):  # noqa: F811
+def test_a_staff_reply_is_emailed(client, db, admin_auth, emails):  # noqa: F811
     reference = send(client).json()["reference"]
-    thread_id = client.get(STAFF, headers=sales_auth["headers"]).json()["items"][0]["id"]
+    thread_id = client.get(STAFF, headers=admin_auth["headers"]).json()["items"][0]["id"]
     res = client.post(
         f"{STAFF}/{thread_id}/messages",
         json={"body": "It leaves today.\n\nIt arrives tomorrow."},
-        headers=sales_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 201, res.text
     [row] = rows(db, "support_reply")
@@ -190,25 +190,22 @@ def test_a_staff_reply_is_emailed(client, db, sales_auth, emails):  # noqa: F811
     assert f"/rw/support/{reference}/{key}" in mail.html  # a guest: the private link
 
 
-def test_a_reply_to_a_phone_only_sender_sends_no_email(client, db, sales_auth, emails):  # noqa: F811
+def test_a_reply_to_a_phone_only_sender_sends_no_email(client, db, admin_auth, emails):  # noqa: F811
     send(client, email=None)
-    thread_id = client.get(STAFF, headers=sales_auth["headers"]).json()["items"][0]["id"]
+    thread_id = client.get(STAFF, headers=admin_auth["headers"]).json()["items"][0]["id"]
     client.post(
-        f"{STAFF}/{thread_id}/messages", json={"body": "Called you"}, headers=sales_auth["headers"]
+        f"{STAFF}/{thread_id}/messages", json={"body": "Called you"}, headers=admin_auth["headers"]
     )
     assert rows(db, "support_reply") == [] and emails.messages == []
 
 
-def test_support_permissions(
-    client, admin_auth, management_auth, operations_auth, finance_auth, customer_auth
-):
+def test_support_permissions(client, admin_auth, customer_auth):
     send(client)
     assert client.get(STAFF, headers=admin_auth["headers"]).status_code == 200
     thread_id = client.get(STAFF, headers=admin_auth["headers"]).json()["items"][0]["id"]
-    # Management reads but cannot reply or close.
-    assert client.get(STAFF, headers=management_auth["headers"]).status_code == 200
-    assert client.get(f"{STAFF}/{thread_id}", headers=management_auth["headers"]).status_code == 200
-    for auth in (management_auth, operations_auth, finance_auth, customer_auth):
+    # SC-05: only the administrator reads, replies and closes; a customer cannot.
+    assert client.get(f"{STAFF}/{thread_id}", headers=admin_auth["headers"]).status_code == 200
+    for auth in (customer_auth,):
         h = auth["headers"]
         assert (
             client.post(f"{STAFF}/{thread_id}/messages", json={"body": "Hi"}, headers=h).status_code
@@ -218,13 +215,13 @@ def test_support_permissions(
             client.patch(f"{STAFF}/{thread_id}", json={"status": "closed"}, headers=h).status_code
             == 403
         )
-    for auth in (operations_auth, finance_auth, customer_auth):
+    for auth in (customer_auth,):
         assert client.get(STAFF, headers=auth["headers"]).status_code == 403
     assert client.get(STAFF).status_code == 401
     assert client.get(MINE).status_code == 401
 
 
-def test_a_guest_follows_the_conversation_by_its_private_link(client, db, sales_auth):
+def test_a_guest_follows_the_conversation_by_its_private_link(client, db, admin_auth):
     sent = send(client).json()
     reference, key = sent["reference"], sent["access_key"]
     link = f"{SEND}/{reference}/{key}"
@@ -232,7 +229,7 @@ def test_a_guest_follows_the_conversation_by_its_private_link(client, db, sales_
     assert thread.status_code == 200, thread.text
     assert (thread.json()["topic"], thread.json()["status"]) == ("order", "open")
 
-    h = sales_auth["headers"]
+    h = admin_auth["headers"]
     thread_id = client.get(STAFF, headers=h).json()["items"][0]["id"]
     client.post(f"{STAFF}/{thread_id}/messages", json={"body": "Tomorrow."}, headers=h)
     seen = client.get(link).json()

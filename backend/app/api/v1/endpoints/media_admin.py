@@ -25,7 +25,7 @@ router = APIRouter(prefix="/staff/media", tags=["Staff Catalogue"])
     response_model=Page[MediaCleanupProblem],
     summary="Stored files the cleanup worker could not delete",
     description=(
-        "Requires 'catalog:manage' (administrator, sales). Files retired by the API whose "
+        "Requires 'catalog:manage' (administrator). Files retired by the API whose "
         "deletion failed at least once, most attempts first, with the last error. The worker "
         "retries them with backoff (at most hourly); an empty list means nothing is stuck."
     ),

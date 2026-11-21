@@ -49,6 +49,8 @@ For each step: models + Alembic migration (upgrade, downgrade to the previous re
 
 ## 3. Target permission matrix
 
+**SC-05 (approved by the project owner on 2026-11-21; `docs/requirements/scope-changes.md`): the Marketplace Administrator is the only staff role.** It holds every permission below. The Sales, Operations, Management and Finance columns record the single-business shop's matrix before SC-05 and grant nothing any more: those roles were removed, and `staff_role_assignments.role` accepts only `administrator` (migration `a9d3f5b7c1e2`). Each staff route still requires its own permission, so the matrix stays the place to add a role through a later scope change.
+
 Permissions are added only when the feature that uses them is built (ADR-006). Administrator keeps every permission. "—" means no access. The roles and permissions are defined in code only (`backend/app/core/roles.py`); the database holds just the role names (a check constraint), so a matrix change needs no migration.
 
 **Final staff matrix (approved by the project owner on 2026-10-26, checkpoint 1b).** It replaces the four-role table of 2026-10-23: finance became a fifth role on 2026-10-25, and on 2026-10-26 `catalog:read` and `content:manage` were added, operations gained `inventory:adjust` and `delivery:read`, management gained `catalog:read`, `inventory:read`, `orders:read`, `reports:read` and `content:manage`, and sales gained `promotions:read`. Finance changes nothing.

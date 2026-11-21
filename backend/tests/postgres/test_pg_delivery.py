@@ -16,7 +16,6 @@ import pytest
 from tests.postgres.conftest import BACKEND, HMAC_KEY, REPO, Stack
 from tests.postgres.test_pg_http import HTTP, one, register
 from tests.postgres.test_pg_inventory import seed_sku, together
-from tests.postgres.test_pg_staff import STAFF_PASSWORD, create_staff
 
 ZONES = "/staff/delivery/zones"
 THRESHOLD = "delivery.free_delivery_threshold"
@@ -139,25 +138,6 @@ def test_concurrent_threshold_changes_are_all_audited_in_order(clean: Stack, adm
         current = by_from[current]
         chain.append(current)
     assert sorted(chain) == sorted(values) and chain[-1] == final
-
-
-def test_management_can_view_but_not_change_over_http(clean: Stack, admin: dict, unique: str):
-    staff = create_staff(clean, admin, unique, "management", "mgmt-delivery")
-    res = HTTP.post(
-        f"{clean.servers[0]}/auth/login",
-        json={"identifier": staff["email"], "password": STAFF_PASSWORD},
-    )
-    assert res.status_code == 200, res.text
-    h = {"Authorization": f"Bearer {res.json()['session_token']}"}
-    base = clean.servers[1]
-    assert HTTP.get(f"{base}{ZONES}", headers=h).status_code == 200
-    assert HTTP.get(f"{base}/staff/settings", headers=h).status_code == 200
-    body = {"code": "gasabo", "name": "Gasabo", "district": "Gasabo", "fee": 1}
-    assert HTTP.post(f"{base}{ZONES}", json=body, headers=h).status_code == 403
-    assert HTTP.patch(f"{base}/staff/settings", json={THRESHOLD: 1}, headers=h).status_code == 403
-    customer = register(clean, clean.servers[0], f"delivery.{unique}@pg.test")
-    assert HTTP.get(f"{base}{ZONES}", headers=customer["headers"]).status_code == 403
-    assert HTTP.get(f"{base}{ZONES}").status_code == 401
 
 
 def test_cart_quote_on_the_runtime_role(clean: Stack, unique: str):

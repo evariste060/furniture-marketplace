@@ -44,7 +44,7 @@ Ctx = Annotated[RequestContext, Depends(get_request_context)]
     response_model=JobResponse,
     summary="A job's progress and every item's outcome",
     description=(
-        "Requires 'catalog:manage' (administrator, sales). Poll it after starting a job: "
+        "Requires 'catalog:manage' (administrator). Poll it after starting a job: "
         "`state` is finished when no item is queued or processing."
     ),
     responses={**GUARDED, **JOB_404, **VALIDATION_422},
@@ -58,7 +58,7 @@ def get_job(job_id: uuid.UUID, current_user: CatalogManager, db: Db) -> JobRespo
     response_model=JobResponse,
     summary="Requeue a job's failed items",
     description=(
-        "Requires 'catalog:manage' (administrator, sales). Failed items go back to the queue "
+        "Requires 'catalog:manage' (administrator). Failed items go back to the queue "
         "with their attempts reset; done items are never redone. Audited as "
         "'job.retry_failed'."
     ),

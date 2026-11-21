@@ -2,7 +2,7 @@
 
 GET /banners is public: the banners shown now, by position (the storefront shows the first one;
 with none it shows its default hero), cached for 60 seconds. The staff routes need
-'content:manage' (administrator, management). Rules are in app.services.banners.
+'content:manage' (administrator). Rules are in app.services.banners.
 """
 
 import uuid
@@ -58,7 +58,7 @@ ContentManager = Annotated[User, Depends(require_permission(Permission.CONTENT_M
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 Storage = Annotated[MediaStorage, Depends(get_media_storage)]
-PERMISSION_NOTE = "Requires 'content:manage' (administrator, management)."
+PERMISSION_NOTE = "Requires 'content:manage' (administrator)."
 
 
 def _image(storage: MediaStorage, banner: Banner) -> PublicImage | None:

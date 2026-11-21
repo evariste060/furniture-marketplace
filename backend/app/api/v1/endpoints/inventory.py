@@ -1,8 +1,8 @@
 """Staff inventory endpoints (ADR-002 stock lifecycle, approved 2026-10-22).
 
-- inventory:read (administrator, sales, operations): the stock list with its low-stock filter
+- inventory:read (administrator): the stock list with its low-stock filter
   (module 10) and stock figures for one SKU; both use one calculation
-- inventory:adjust (administrator, sales): receipts, adjustments and inspected returns
+- inventory:adjust (administrator): receipts, adjustments and inspected returns
 
 Reservation commit, release and expiry are internal operations for the future checkout and
 payment services and the expiry job (scripts/expire_reservations.py). They are deliberately not
@@ -56,7 +56,7 @@ Sku = Annotated[str, Path(min_length=1, max_length=80, description="Exact SKU co
     response_model=Page[InventoryListItem],
     summary="Stock list, with the low-stock filter",
     description=(
-        "Requires 'inventory:read' (administrator, sales, operations, management). One row "
+        "Requires 'inventory:read' (administrator). One row "
         "per SKU, active or not, ordered by SKU, with the same figures as GET /inventory/{sku}. "
         "`low_stock=true` lists SKUs whose available quantity is at or below their "
         "low_stock_threshold (threshold above 0): this is the low-stock alert. "
@@ -95,7 +95,7 @@ def list_inventory(
     description=(
         "Returns physical, unavailable, reserved (active), committed and available quantities "
         "read from PostgreSQL. A SKU without an inventory record reports zeros. "
-        "Requires 'inventory:read' (administrator, sales, operations, management)."
+        "Requires 'inventory:read' (administrator)."
     ),
     responses={**GUARDED, **SKU_404, **VALIDATION_422},
 )
@@ -111,7 +111,7 @@ def get_inventory(sku: Sku, current_user: Reader, db: Db) -> InventoryResponse:
     description=(
         "Applies a receipt, adjustment or inspected return to physical on_hand and appends a "
         "stock-ledger movement, in one transaction with an 'inventory.adjust' audit record. "
-        "Requires 'inventory:adjust' (administrator, sales, operations).\n\n"
+        "Requires 'inventory:adjust' (administrator).\n\n"
         "**Idempotency:** the `Idempotency-Key` header is required (8-100 characters: letters, "
         "digits, `_ . : -`). Repeating a request with the same key returns the original "
         "movement with HTTP 200 and `replayed: true`, without changing stock again. Reusing a "

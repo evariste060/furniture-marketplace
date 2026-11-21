@@ -632,7 +632,6 @@ EXPECTED_OPERATIONS = {
     ("post", "/api/v1/staff"),
     ("get", "/api/v1/staff/{staff_id}"),
     ("patch", "/api/v1/staff/{staff_id}"),
-    ("patch", "/api/v1/staff/{staff_id}/role"),
     ("patch", "/api/v1/staff/{staff_id}/status"),
     ("get", "/api/v1/staff/categories"),
     ("post", "/api/v1/staff/categories"),

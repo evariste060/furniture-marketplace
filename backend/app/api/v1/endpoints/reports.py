@@ -1,6 +1,6 @@
 """Staff reports (module 18; PR-13; UAT scenario 7; plan §5 "18 — reports"; §7 Q25).
 
-Every endpoint requires reports:read (administrator, management, finance; plan §3 final
+Every endpoint requires reports:read (administrator; plan §3 final
 matrix). The XLSX export of a report is built from the same service call as its JSON, with the
 same filters, so the two reconcile.
 """
@@ -43,7 +43,7 @@ XLSX_200: ResponseMap = {
         "description": "The report as an Excel workbook",
     }
 }
-PERMISSION_NOTE = "Requires 'reports:read' (administrator, management, finance)."
+PERMISSION_NOTE = "Requires 'reports:read' (administrator)."
 SALES_RULE = (
     "Counts only paid orders and delivered cash-on-delivery orders (orders with a succeeded "
     "payment; UAT scenario 7), each once, dated by its first payment success. `from` and `to` "

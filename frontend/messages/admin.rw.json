@@ -40,11 +40,7 @@
     "skipToContent": "Jya ku bikubiyemo",
     "close": "Funga",
     "roles": {
-      "administrator": "Umuyobozi mukuru",
-      "sales": "Ugurisha",
-      "operations": "Ibikorwa",
-      "management": "Ubuyobozi",
-      "finance": "Imari"
+      "administrator": "Umuyobozi w'Isoko"
     },
     "language": "Ururimi",
     "languageOf": "Ururimi: {language}",
@@ -1026,8 +1022,6 @@
   "staff": {
     "title": "Abakozi n'inshingano",
     "description": "Abashobora kwinjira mu buyobozi bose, inshingano zabo n'uko konti zabo zikora.",
-    "rolesLabel": "Yungurura ukurikije inshingano",
-    "everyone": "Abakozi bose",
     "statusLabel": "Yungurura ukurikije aho bigeze",
     "statuses": {
       "all": "Bose",
@@ -1059,7 +1053,7 @@
     "contactHelp": "Andika imeri, nimero ya telefoni cyangwa byombi. Kimwe muri byo kirahagije kwinjira.",
     "password": "Ijambobanga rya mbere",
     "passwordHelp": "Nibura inyuguti 8 zirimo inyuguti nkuru n'into n'umubare cyangwa ikimenyetso. Ribahe imbonankubone; bashobora kurihindura muri konti yabo.",
-    "roleSignOut": "Guhindura inshingano bimusohora ku bikoresho byose.",
+    "roleNote": "Konti nshya z'abakozi ni iz'Abayobozi b'Isoko, bafite uburenganzira ku buyobozi bwose.",
     "disableNote": "Kumuhagarika bimusohora kandi bikabuza kwinjira.",
     "selfSignOut": "Iyi ni konti yawe: kubika birakusohora.",
     "errors": {

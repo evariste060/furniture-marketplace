@@ -133,18 +133,12 @@ def test_stock_access_follows_the_role_matrix(
     db: Session,
     customer_auth: dict,
     admin_auth: dict,
-    sales_auth: dict,
-    operations_auth: dict,
-    management_auth: dict,
 ):
-    """TC-16: read for administrator, sales, operations and management; adjust for
-    administrator, sales and operations (final matrix, 2026-10-26)."""
+    """TC-16: the Marketplace Administrator (the only staff role, SC-05) reads and adjusts
+    stock; customers do neither."""
     body = {"reason": "receipt", "quantity_delta": 1}
     expected = {  # role: (auth, read status, adjust status)
         "administrator": (admin_auth, 200, 201),
-        "sales": (sales_auth, 200, 201),
-        "operations": (operations_auth, 200, 201),
-        "management": (management_auth, 200, 403),
         "customer": (customer_auth, 403, 403),
     }
     for role, (who, read_status, adjust_status) in expected.items():
@@ -156,12 +150,12 @@ def test_stock_access_follows_the_role_matrix(
             assert adjust.json()["error"]["code"] == "permission_denied"
     assert client.get(f"{BASE}/{sku.sku}").status_code == 401
     assert post(client, sku.sku, body, {}).status_code == 401
-    assert on_hand(db, sku.id) == 8 and movements(db) == 3  # administrator, sales, operations
+    assert on_hand(db, sku.id) == 6 and movements(db) == 1  # the administrator
     db.expire_all()
     denied = db.scalar(
         select(func.count(AuditRecord.id)).where(AuditRecord.action == "auth.access_denied")
     )
-    assert denied == 3  # management adjust, customer read+adjust
+    assert denied == 2  # customer read and adjust
 
 
 def test_idempotency_keys_are_scoped_to_the_calling_staff_member(

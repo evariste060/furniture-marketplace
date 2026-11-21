@@ -221,7 +221,7 @@ def _staff(review: ProductReview, product: Product, order: Order) -> StaffReview
     "",
     response_model=Page[StaffReview],
     summary="List reviews",
-    description="Requires 'reviews:moderate' (administrator, sales). Newest first; `status` "
+    description="Requires 'reviews:moderate' (administrator). Newest first; `status` "
     "filters (e.g. pending for the moderation queue).",
     responses={**STAFF_ERRORS, **VALIDATION_422},
 )

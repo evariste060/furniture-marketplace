@@ -59,8 +59,6 @@ def test_audit_logs_persisted_for_auth_lifecycle(client: TestClient, admin_auth:
 def test_audit_log_access_control(
     client: TestClient,
     customer_auth: dict,
-    sales_auth: dict,
-    finance_auth: dict,
     admin_auth: dict,
 ):
     # Unauthenticated rejected
@@ -69,11 +67,7 @@ def test_audit_log_access_control(
     # Customer rejected
     assert client.get("/api/v1/audit-logs", headers=customer_auth["headers"]).status_code == 403
 
-    # Sales staff rejected
-    assert client.get("/api/v1/audit-logs", headers=sales_auth["headers"]).status_code == 403
-
-    # Finance (audit:read, 2026-10-25) and admin allowed
-    assert client.get("/api/v1/audit-logs", headers=finance_auth["headers"]).status_code == 200
+    # The Marketplace Administrator (audit:read; the only staff role since SC-05) is allowed
     assert client.get("/api/v1/audit-logs", headers=admin_auth["headers"]).status_code == 200
 
 
@@ -180,9 +174,10 @@ def test_audit_log_date_range_is_validated(client: TestClient, admin_auth: dict)
 
 
 def test_audit_log_date_filter_stays_administrator_only(
-    client: TestClient, sales_auth: dict, management_auth: dict
+    client: TestClient, admin_auth: dict, customer_auth: dict
 ):
     params = {"from": "2026-01-01T00:00:00+00:00"}
-    for who in (sales_auth, management_auth):
-        res = client.get("/api/v1/audit-logs", params=params, headers=who["headers"])
-        assert res.status_code == 403
+    res = client.get("/api/v1/audit-logs", params=params, headers=customer_auth["headers"])
+    assert res.status_code == 403
+    res = client.get("/api/v1/audit-logs", params=params, headers=admin_auth["headers"])
+    assert res.status_code == 200

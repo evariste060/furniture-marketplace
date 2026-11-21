@@ -190,7 +190,7 @@ def list_staff_orders(
     response_model=OrderAssigneesResponse,
     summary="Staff an order can be assigned to",
     description=(
-        "Requires 'orders:fulfil' (administrator, operations). Every active staff account "
+        "Requires 'orders:fulfil' (administrator). Every active staff account "
         "(name and role only), by name: the choices for PATCH /staff/orders/{id}/assignment."
     ),
     responses={**AUTH_ERRORS},
@@ -219,7 +219,7 @@ def get_staff_order(order_id: uuid.UUID, _: OrderReader, db: Db) -> StaffOrderDe
     status_code=status.HTTP_200_OK,
     summary="Advance an order status",
     description=(
-        "Requires 'orders:fulfil' (administrator, operations). A valid transition, status "
+        "Requires 'orders:fulfil' (administrator). A valid transition, status "
         "history row and audit event commit atomically; the optional `reason` is kept in both. "
         "Dispatch consumes committed inventory; cancellation (allowed only before dispatch) "
         "releases active holds and the promotion use and cancels an unpaid payment. Confirming "
@@ -254,7 +254,7 @@ def change_order_status(
     status_code=status.HTTP_200_OK,
     summary="Assign fulfilment responsibility for an order",
     description=(
-        "Requires 'orders:fulfil' (administrator, operations). The target must be an active "
+        "Requires 'orders:fulfil' (administrator). The target must be an active "
         "staff account with one of the repository's assigned staff roles. The assignment and "
         "audit event commit atomically."
     ),

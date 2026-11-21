@@ -1,7 +1,7 @@
 """Delivery zones (module 12; RE-026 B1, B6; TC-17). Rules are in app.services.delivery_service.
 
-Public: GET /delivery/zones. Staff: GET /staff/delivery/zones ('delivery:read': administrator,
-management); POST and PATCH ('delivery:manage': administrator only).
+Public: GET /delivery/zones. Staff: GET /staff/delivery/zones ('delivery:read'); POST and PATCH
+('delivery:manage'). The Marketplace Administrator holds both (SC-05).
 """
 
 import uuid
@@ -65,9 +65,7 @@ def public_zones(db: Db) -> PublicDeliveryZonesResponse:
     "/zones",
     response_model=StaffDeliveryZonesResponse,
     summary="All delivery zones with fee history",
-    description=(
-        "Requires 'delivery:read' (administrator, operations, management). Includes inactive zones."
-    ),
+    description=("Requires 'delivery:read' (administrator). Includes inactive zones."),
     responses=GUARDED,
 )
 def staff_zones(_: DeliveryReader, db: Db) -> StaffDeliveryZonesResponse:

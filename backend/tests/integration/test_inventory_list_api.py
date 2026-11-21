@@ -258,15 +258,10 @@ def test_invalid_parameters_are_422(client, admin_auth, params):
 
 
 # ---- authorization ---------------------------------------------------------------------------
-def test_the_list_follows_the_inventory_read_matrix(
-    client, db, customer_auth, admin_auth, sales_auth, operations_auth, management_auth
-):
+def test_the_list_follows_the_inventory_read_matrix(client, db, customer_auth, admin_auth):
     make(db)
     expected = {
         "administrator": (admin_auth, 200),
-        "sales": (sales_auth, 200),
-        "operations": (operations_auth, 200),
-        "management": (management_auth, 200),  # inventory:read since 2026-10-26
         "customer": (customer_auth, 403),
     }
     for role, (who, status) in expected.items():

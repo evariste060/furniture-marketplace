@@ -10,62 +10,25 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.security import verify_password
 from app.models.identity import StaffRoleAssignment, User
 from app.models.operations import AuditRecord
-from app.models.session import UserSession
 from app.repositories.audit_repository import AuditRepository
 from app.schemas.staff import StaffCreateRequest, StaffRoleName
 from app.services.staff_service import StaffBootstrapError, StaffService
 from tests.conftest import make_staff, verify_email
 from tests.support.credentials import random_password
+from tests.support.sellers import approved_seller
 
 STAFF = "/api/v1/staff"
 LOGIN = "/api/v1/auth/login"
 SECRET_FIELDS = {"password", "password_hash", "token_hash", "session_token"}
-# The final matrix (project owner, 2026-10-26; plan §3).
-SALES_PERMS = [
-    "catalog:manage",
-    "catalog:read",
-    "inventory:adjust",
-    "inventory:read",
-    "orders:read",
-    "promotions:read",
-    "quotes:manage",
-    "reviews:moderate",
-    "services:manage",
-    "services:read",
-    "staff:self_read",
-    "support:read",
-    "support:reply",
-]
-OPERATIONS_PERMS = [
-    "catalog:read",
-    "delivery:read",
-    "inventory:adjust",
-    "inventory:read",
-    "orders:fulfil",
-    "orders:read",
-    "staff:self_read",
-]
-MANAGEMENT_PERMS = [
-    "catalog:read",
-    "content:manage",
-    "delivery:read",
-    "inventory:read",
-    "orders:read",
-    "payments:read",
-    "promotions:read",
-    "reports:read",
-    "services:read",
-    "settings:read",
-    "staff:self_read",
-    "support:read",
-]
-FINANCE_PERMS = ["audit:read", "orders:read", "payments:read", "reports:read", "staff:self_read"]
+# SC-05 (2026-11-21): the Marketplace Administrator is the only staff role and holds every
+# permission.
 ADMIN_PERMS = [
     "audit:read",
     "catalog:manage",
@@ -101,7 +64,9 @@ ADMIN_PERMS = [
 NEW_STAFF_PASSWORD = random_password()  # per test run; never a fixed credential
 
 
-def new_staff(role: StaffRoleName = "sales", n: int = 1, **overrides: object) -> dict[str, object]:
+def new_staff(
+    role: StaffRoleName = "administrator", n: int = 1, **overrides: object
+) -> dict[str, object]:
     body: dict[str, object] = {
         "email": f"new.staff{n}@example.com",
         "phone": f"+25078855500{n}",
@@ -136,7 +101,6 @@ ALL_STAFF_OPS = [
     ("post", "", new_staff()),
     ("get", f"/{uuid.uuid4()}", None),
     ("patch", f"/{uuid.uuid4()}", {"full_name": "X Y"}),
-    ("patch", f"/{uuid.uuid4()}/role", {"role": "sales"}),
     ("patch", f"/{uuid.uuid4()}/status", {"is_active": False}),
 ]
 
@@ -158,20 +122,23 @@ def test_customers_get_403_on_every_staff_api(
     assert denied and denied[-1].change_summary["user_roles"] == ["customer"]
 
 
-@pytest.mark.parametrize(
-    ("fixture", "role", "permissions"),
-    [
-        ("admin_auth", "administrator", ADMIN_PERMS),
-        ("sales_auth", "sales", SALES_PERMS),
-        ("operations_auth", "operations", OPERATIONS_PERMS),
-        ("management_auth", "management", MANAGEMENT_PERMS),
-        ("finance_auth", "finance", FINANCE_PERMS),
-    ],
-)
-def test_every_staff_role_reads_own_identity_and_permissions(
-    client: TestClient, request, fixture, role, permissions
+@pytest.mark.parametrize(("method", "path", "body"), ALL_STAFF_OPS)
+def test_approved_sellers_get_403_on_every_staff_api(
+    client: TestClient, admin_auth: dict, db: Session, method, path, body
 ):
-    auth = request.getfixturevalue(fixture)
+    # Sellers are store owners, not staff (ADR-014): an approved store grants no staff access.
+    seller = approved_seller(
+        client, admin_auth, "seller.staff@example.com", "+250788100070", "Seller Store"
+    )
+    res = client.request(method, STAFF + path, json=body, headers=seller["headers"])
+    assert res.status_code == 403
+    assert audit_rows(db, "auth.access_denied")[-1].change_summary["user_roles"] == ["customer"]
+
+
+def test_the_marketplace_administrator_reads_own_identity_and_permissions(
+    client: TestClient, admin_auth: dict
+):
+    auth, role, permissions = admin_auth, "administrator", ADMIN_PERMS
     me = client.get(f"{STAFF}/me", headers=auth["headers"])
     assert me.status_code == 200
     body = me.json()
@@ -183,61 +150,19 @@ def test_every_staff_role_reads_own_identity_and_permissions(
     assert perms.json() == {"role": role, "permissions": permissions}
 
 
-@pytest.mark.parametrize(
-    "fixture", ["sales_auth", "operations_auth", "management_auth", "finance_auth"]
-)
-def test_restricted_staff_cannot_use_staff_administration_or_audit(
-    client: TestClient, request, admin_auth: dict, fixture
-):
-    h = request.getfixturevalue(fixture)["headers"]
-    target = admin_auth["user"].id
-    assert client.get(STAFF, headers=h).status_code == 403
-    assert client.get(f"{STAFF}/{target}", headers=h).status_code == 403
-    # TC-16: no restricted role can create staff (administrators included) or assign roles.
-    assert client.post(STAFF, json=new_staff("administrator"), headers=h).status_code == 403
-    assert (
-        client.patch(f"{STAFF}/{target}", json={"full_name": "Hijack"}, headers=h).status_code
-        == 403
-    )
-    assert (
-        client.patch(f"{STAFF}/{target}/role", json={"role": "sales"}, headers=h).status_code == 403
-    )
-    assert (
-        client.patch(f"{STAFF}/{target}/status", json={"is_active": False}, headers=h).status_code
-        == 403
-    )
-    # The audit trail is open to administrators and finance (audit:read) only.
-    expected_audit = 200 if fixture == "finance_auth" else 403
-    assert client.get("/api/v1/audit-logs", headers=h).status_code == expected_audit
-
-
-def test_restricted_staff_cannot_escalate_their_own_role(
-    client: TestClient, sales_auth: dict, db: Session
-):
-    me = sales_auth["user"].id
-    res = client.patch(
-        f"{STAFF}/{me}/role", json={"role": "administrator"}, headers=sales_auth["headers"]
-    )
-    assert res.status_code == 403
-    db.expire_all()
-    assert db.scalar(select(StaffRoleAssignment.role).where(StaffRoleAssignment.user_id == me)) == (
-        "sales"
-    )
-
-
 # ---- provisioning ----------------------------------------------------------------------------
 def test_admin_creates_staff_atomically_with_audit(
     client: TestClient, admin_auth: dict, db: Session
 ):
-    res = client.post(STAFF, json=new_staff("operations"), headers=admin_auth["headers"])
+    res = client.post(STAFF, json=new_staff(), headers=admin_auth["headers"])
     assert res.status_code == 201, res.text
     body = res.json()
-    assert body["role"] == "operations" and body["is_active"] is True
+    assert body["role"] == "administrator" and body["is_active"] is True
     assert not SECRET_FIELDS & set(body)
 
     user = staff_user(db, body["id"])
     assert user.is_staff is True
-    assert [a.role for a in user.staff_roles] == ["operations"]
+    assert [a.role for a in user.staff_roles] == ["administrator"]
     assert user.password_hash != NEW_STAFF_PASSWORD
     assert user.password_hash is not None
     assert verify_password(NEW_STAFF_PASSWORD, user.password_hash)
@@ -245,16 +170,19 @@ def test_admin_creates_staff_atomically_with_audit(
     (record,) = audit_rows(db, "staff.create")
     assert record.actor_user_id == admin_auth["user"].id
     assert record.entity_id == body["id"]
-    assert record.change_summary["role"] == "operations"
+    assert record.change_summary["role"] == "administrator"
     assert NEW_STAFF_PASSWORD not in str(record.change_summary)
 
     token = login(client, "new.staff1@example.com", NEW_STAFF_PASSWORD).json()["session_token"]
     me = client.get(f"{STAFF}/me", headers={"Authorization": f"Bearer {token}"})
-    assert me.json()["role"] == "operations"
+    assert me.json()["role"] == "administrator" and me.json()["permissions"] == ADMIN_PERMS
 
 
-def test_admin_can_create_another_administrator(client: TestClient, admin_auth: dict):
-    res = client.post(STAFF, json=new_staff("administrator"), headers=admin_auth["headers"])
+def test_the_role_may_be_omitted_and_is_the_administrator(client: TestClient, admin_auth: dict):
+    body = new_staff()
+    del body["role"]
+    res = client.post(STAFF, json=body, headers=admin_auth["headers"])
+    assert res.status_code == 201 and res.json()["role"] == "administrator"
     assert res.status_code == 201
     token = login(client, "new.staff1@example.com", NEW_STAFF_PASSWORD).json()["session_token"]
     assert client.get(STAFF, headers={"Authorization": f"Bearer {token}"}).status_code == 200
@@ -284,6 +212,10 @@ def test_duplicate_identifiers_conflict_and_customers_are_not_promoted(
         {"password": "weak"},
         {"role": "customer"},
         {"role": "superadmin"},
+        {"role": "sales"},  # the single-business roles are gone (SC-05)
+        {"role": "operations"},
+        {"role": "management"},
+        {"role": "finance"},
         {"role": None},
         {"email": "not-an-email"},
         {"phone": "12345"},
@@ -306,46 +238,38 @@ def test_create_staff_rejects_invalid_or_unexpected_input(
 def test_list_staff_paginates_filters_and_excludes_customers(
     client: TestClient,
     admin_auth: dict,
-    sales_auth: dict,
-    operations_auth: dict,
-    management_auth: dict,
+    second_admin_auth: dict,
     customer_auth: dict,
 ):
     h = admin_auth["headers"]
     everyone = client.get(STAFF, headers=h).json()
-    assert everyone["total"] == 4 and everyone["page"] == 1 and everyone["size"] == 20
-    assert {s["role"] for s in everyone["items"]} == {
-        "administrator",
-        "sales",
-        "operations",
-        "management",
-    }
+    assert everyone["total"] == 2 and everyone["page"] == 1 and everyone["size"] == 20
+    assert {s["role"] for s in everyone["items"]} == {"administrator"}
     assert str(customer_auth["user"]["id"]) not in {s["id"] for s in everyone["items"]}
     for item in everyone["items"]:
         assert not SECRET_FIELDS & set(item)
 
     page = client.get(STAFF, params={"page": 2, "size": 1}, headers=h).json()
-    assert page["total"] == 4 and len(page["items"]) == 1 and page["page"] == 2
+    assert page["total"] == 2 and len(page["items"]) == 1 and page["page"] == 2
     assert page["items"][0]["id"] == everyone["items"][1]["id"]
 
-    sales = client.get(STAFF, params={"role": "sales"}, headers=h).json()
-    assert [s["id"] for s in sales["items"]] == [str(sales_auth["user"].id)]
-    client.patch(
-        f"{STAFF}/{operations_auth['user'].id}/status", json={"is_active": False}, headers=h
-    )
+    admins = client.get(STAFF, params={"role": "administrator"}, headers=h).json()
+    assert admins["total"] == 2
+    second = str(second_admin_auth["user"].id)
+    client.patch(f"{STAFF}/{second}/status", json={"is_active": False}, headers=h)
     inactive = client.get(STAFF, params={"is_active": "false"}, headers=h).json()
-    assert [s["id"] for s in inactive["items"]] == [str(operations_auth["user"].id)]
+    assert [s["id"] for s in inactive["items"]] == [second]
 
-    for bad in ({"size": 0}, {"size": 101}, {"page": 0}, {"role": "customer"}):
+    for bad in ({"size": 0}, {"size": 101}, {"page": 0}, {"role": "customer"}, {"role": "sales"}):
         assert client.get(STAFF, params=bad, headers=h).status_code == 422
 
 
 def test_get_staff_by_id_and_client_errors(
-    client: TestClient, admin_auth: dict, sales_auth: dict, customer_auth: dict
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, customer_auth: dict
 ):
     h = admin_auth["headers"]
-    res = client.get(f"{STAFF}/{sales_auth['user'].id}", headers=h)
-    assert res.status_code == 200 and res.json()["role"] == "sales"
+    res = client.get(f"{STAFF}/{second_admin_auth['user'].id}", headers=h)
+    assert res.status_code == 200 and res.json()["role"] == "administrator"
     assert client.get(f"{STAFF}/{customer_auth['user']['id']}", headers=h).status_code == 404
     assert client.get(f"{STAFF}/{uuid.uuid4()}", headers=h).status_code == 404
     # {staff_id:uuid} path converter (module 5): a non-UUID ID matches no staff route.
@@ -354,16 +278,16 @@ def test_get_staff_by_id_and_client_errors(
 
 # ---- details ---------------------------------------------------------------------------------
 def test_admin_updates_permitted_details_with_audit(
-    client: TestClient, admin_auth: dict, sales_auth: dict, db: Session
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, db: Session
 ):
-    target = sales_auth["user"].id
+    target = second_admin_auth["user"].id
     res = client.patch(
         f"{STAFF}/{target}",
-        json={"full_name": "Renamed Sales", "phone": "0788777666"},
+        json={"full_name": "Renamed Admin", "phone": "0788777666"},
         headers=admin_auth["headers"],
     )
     assert res.status_code == 200
-    assert res.json()["full_name"] == "Renamed Sales" and res.json()["phone"] == "+250788777666"
+    assert res.json()["full_name"] == "Renamed Admin" and res.json()["phone"] == "+250788777666"
     (record,) = audit_rows(db, "staff.update")
     assert record.change_summary["updated_fields"] == ["full_name", "phone"]
 
@@ -382,22 +306,24 @@ def test_admin_updates_permitted_details_with_audit(
     ],
 )
 def test_update_rejects_protected_fields(
-    client: TestClient, admin_auth: dict, sales_auth: dict, db: Session, body
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, db: Session, body
 ):
-    target = sales_auth["user"].id
+    target = second_admin_auth["user"].id
     res = client.patch(f"{STAFF}/{target}", json=body, headers=admin_auth["headers"])
     assert res.status_code == 422
     user = staff_user(db, str(target))
-    assert user.full_name == "Test sales" and [a.role for a in user.staff_roles] == ["sales"]
+    assert user.full_name == "Test administrator"
+    assert [a.role for a in user.staff_roles] == ["administrator"]
 
 
 def test_update_phone_conflict_and_customer_target(
-    client: TestClient, admin_auth: dict, sales_auth: dict, customer_auth: dict
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, customer_auth: dict
 ):
     h = admin_auth["headers"]
     taken = {"phone": customer_auth["user"]["phone"]}
     assert (
-        client.patch(f"{STAFF}/{sales_auth['user'].id}", json=taken, headers=h).status_code == 409
+        client.patch(f"{STAFF}/{second_admin_auth['user'].id}", json=taken, headers=h).status_code
+        == 409
     )
     customer = customer_auth["user"]["id"]
     assert (
@@ -407,91 +333,16 @@ def test_update_phone_conflict_and_customer_target(
 
 
 # ---- roles -----------------------------------------------------------------------------------
-def test_role_change_revokes_sessions_audits_and_applies_new_permissions(
-    client: TestClient, admin_auth: dict, sales_auth: dict, db: Session
-):
-    target = sales_auth["user"].id
-    res = client.patch(
-        f"{STAFF}/{target}/role", json={"role": "operations"}, headers=admin_auth["headers"]
-    )
-    assert res.status_code == 200 and res.json()["role"] == "operations"
-    # The old session no longer works anywhere.
-    assert client.get(f"{STAFF}/me", headers=sales_auth["headers"]).status_code == 401
-    db.expire_all()
-    assert (
-        db.scalar(
-            select(func.count(UserSession.id)).where(
-                UserSession.user_id == target, UserSession.revoked_at.is_(None)
-            )
-        )
-        == 0
-    )
-    (record,) = audit_rows(db, "staff.role_change")
-    assert record.actor_user_id == admin_auth["user"].id
-    assert record.change_summary["old_role"] == "sales"
-    assert record.change_summary["new_role"] == "operations"
-    assert record.change_summary["sessions_revoked"] == 1
-
-    token = login(client, "sales@example.com", sales_auth["password"]).json()["session_token"]
-    me = client.get(f"{STAFF}/me", headers={"Authorization": f"Bearer {token}"}).json()
-    assert me["role"] == "operations" and me["permissions"] == OPERATIONS_PERMS
 
 
-def test_promotion_to_administrator_grants_admin_permissions_after_relogin(
-    client: TestClient, admin_auth: dict, sales_auth: dict
-):
-    target = sales_auth["user"].id
-    client.patch(
-        f"{STAFF}/{target}/role", json={"role": "administrator"}, headers=admin_auth["headers"]
-    )
-    token = login(client, "sales@example.com", sales_auth["password"]).json()["session_token"]
-    assert client.get(STAFF, headers={"Authorization": f"Bearer {token}"}).status_code == 200
-
-
-def test_setting_same_role_is_a_no_op(
-    client: TestClient, admin_auth: dict, sales_auth: dict, db: Session
-):
-    target = sales_auth["user"].id
-    res = client.patch(
-        f"{STAFF}/{target}/role", json={"role": "sales"}, headers=admin_auth["headers"]
-    )
-    assert res.status_code == 200
-    assert client.get(f"{STAFF}/me", headers=sales_auth["headers"]).status_code == 200
-    assert audit_rows(db, "staff.role_change") == []
-
-
-@pytest.mark.parametrize("body", [{"role": "customer"}, {"role": "root"}, {}, {"roles": ["sales"]}])
-def test_role_change_rejects_invalid_roles(
-    client: TestClient, admin_auth: dict, sales_auth: dict, body
-):
-    res = client.patch(
-        f"{STAFF}/{sales_auth['user'].id}/role", json=body, headers=admin_auth["headers"]
-    )
-    assert res.status_code == 422
-
-
-def test_role_change_on_customer_is_not_found_and_does_not_promote(
-    client: TestClient, admin_auth: dict, customer_auth: dict, db: Session
-):
-    customer = customer_auth["user"]["id"]
-    res = client.patch(
-        f"{STAFF}/{customer}/role", json={"role": "administrator"}, headers=admin_auth["headers"]
-    )
-    assert res.status_code == 404
-    user = staff_user(db, customer)
-    assert user.is_staff is False and user.staff_roles == []
-
-
-def test_last_active_administrator_cannot_be_demoted_or_disabled(
+def test_last_active_administrator_cannot_be_disabled(
     client: TestClient, admin_auth: dict, db: Session
 ):
     h, me = admin_auth["headers"], admin_auth["user"].id
-    demote = client.patch(f"{STAFF}/{me}/role", json={"role": "sales"}, headers=h)
-    assert demote.status_code == 409
     disable = client.patch(f"{STAFF}/{me}/status", json={"is_active": False}, headers=h)
     assert disable.status_code == 409
     assert client.get(STAFF, headers=h).status_code == 200  # still an administrator, session kept
-    assert audit_rows(db, "staff.role_change") == [] and audit_rows(db, "staff.status_change") == []
+    assert audit_rows(db, "staff.status_change") == []
 
 
 def test_inactive_administrators_do_not_count_toward_the_last_admin_rule(
@@ -506,33 +357,19 @@ def test_inactive_administrators_do_not_count_toward_the_last_admin_rule(
         == 200
     )
     me = admin_auth["user"].id
-    assert client.patch(f"{STAFF}/{me}/role", json={"role": "sales"}, headers=h).status_code == 409
-
-
-def test_admin_can_step_down_when_another_active_admin_exists(
-    client: TestClient, admin_auth: dict, db: Session
-):
-    other = make_staff(db, "administrator", "admin2@example.com", "+250788000009", "Admin2Sec123!")
-    me = admin_auth["user"].id
-    res = client.patch(
-        f"{STAFF}/{me}/role", json={"role": "management"}, headers=admin_auth["headers"]
-    )
-    assert res.status_code == 200
-    assert (
-        client.get(STAFF, headers=admin_auth["headers"]).status_code == 401
-    )  # own session revoked
-    assert client.get(STAFF, headers=other["headers"]).status_code == 200
+    res = client.patch(f"{STAFF}/{me}/status", json={"is_active": False}, headers=h)
+    assert res.status_code == 409 and res.json()["error"]["code"] == "last_administrator"
 
 
 # ---- status ----------------------------------------------------------------------------------
 def test_disabling_staff_revokes_access_and_blocks_login_until_enabled(
-    client: TestClient, admin_auth: dict, sales_auth: dict, db: Session
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, db: Session
 ):
-    target, h = sales_auth["user"].id, admin_auth["headers"]
+    target, h = second_admin_auth["user"].id, admin_auth["headers"]
     res = client.patch(f"{STAFF}/{target}/status", json={"is_active": False}, headers=h)
     assert res.status_code == 200 and res.json()["is_active"] is False
-    assert client.get(f"{STAFF}/me", headers=sales_auth["headers"]).status_code == 401
-    assert login(client, "sales@example.com", sales_auth["password"]).status_code == 403
+    assert client.get(f"{STAFF}/me", headers=second_admin_auth["headers"]).status_code == 401
+    assert login(client, "admin.two@example.com", second_admin_auth["password"]).status_code == 403
     (record,) = audit_rows(db, "staff.status_change")
     assert record.change_summary["old_is_active"] is True
     assert record.change_summary["new_is_active"] is False
@@ -540,7 +377,7 @@ def test_disabling_staff_revokes_access_and_blocks_login_until_enabled(
 
     enabled = client.patch(f"{STAFF}/{target}/status", json={"is_active": True}, headers=h)
     assert enabled.status_code == 200 and enabled.json()["is_active"] is True
-    assert login(client, "sales@example.com", sales_auth["password"]).status_code == 200
+    assert login(client, "admin.two@example.com", second_admin_auth["password"]).status_code == 200
     assert len(audit_rows(db, "staff.status_change")) == 2
 
 
@@ -558,10 +395,10 @@ def test_disabled_administrator_cannot_manage_staff(
 
 @pytest.mark.parametrize("body", [{}, {"is_active": "maybe"}, {"is_active": None}])
 def test_status_change_rejects_malformed_input(
-    client: TestClient, admin_auth: dict, sales_auth: dict, body
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, body
 ):
     res = client.patch(
-        f"{STAFF}/{sales_auth['user'].id}/status", json=body, headers=admin_auth["headers"]
+        f"{STAFF}/{second_admin_auth['user'].id}/status", json=body, headers=admin_auth["headers"]
     )
     assert res.status_code == 422
 
@@ -575,16 +412,14 @@ def _break_audit(monkeypatch):
 
 
 def test_audit_failure_rolls_back_staff_changes(
-    client: TestClient, admin_auth: dict, sales_auth: dict, db: Session, monkeypatch
+    client: TestClient, admin_auth: dict, second_admin_auth: dict, db: Session, monkeypatch
 ):
-    h, target = admin_auth["headers"], sales_auth["user"].id
+    h, target = admin_auth["headers"], second_admin_auth["user"].id
     _break_audit(monkeypatch)
     with pytest.raises(RuntimeError):
         client.post(STAFF, json=new_staff(), headers=h)
     with pytest.raises(RuntimeError):
         client.patch(f"{STAFF}/{target}", json={"full_name": "Rolled Back"}, headers=h)
-    with pytest.raises(RuntimeError):
-        client.patch(f"{STAFF}/{target}/role", json={"role": "operations"}, headers=h)
     with pytest.raises(RuntimeError):
         client.patch(f"{STAFF}/{target}/status", json={"is_active": False}, headers=h)
     monkeypatch.undo()
@@ -593,9 +428,9 @@ def test_audit_failure_rolls_back_staff_changes(
     assert db.scalar(select(func.count(User.id)).where(User.email == "new.staff1@example.com")) == 0
     user = db.get(User, target)
     assert user is not None
-    assert user.full_name == "Test sales" and user.is_active is True
-    assert [a.role for a in user.staff_roles] == ["sales"]
-    assert client.get(f"{STAFF}/me", headers=sales_auth["headers"]).status_code == 200
+    assert user.full_name == "Test administrator" and user.is_active is True
+    assert [a.role for a in user.staff_roles] == ["administrator"]
+    assert client.get(f"{STAFF}/me", headers=second_admin_auth["headers"]).status_code == 200
 
 
 # ---- registration and profile cannot grant privileges ----------------------------------------
@@ -639,13 +474,14 @@ def test_customer_profile_rejects_privilege_fields(
 
 
 def test_staff_profile_endpoint_cannot_change_role(
-    client: TestClient, sales_auth: dict, db: Session
+    client: TestClient, second_admin_auth: dict, db: Session
 ):
     res = client.patch(
-        "/api/v1/customers/me", json={"role": "administrator"}, headers=sales_auth["headers"]
+        "/api/v1/customers/me", json={"role": "administrator"}, headers=second_admin_auth["headers"]
     )
     assert res.status_code == 422
-    assert [a.role for a in staff_user(db, str(sales_auth["user"].id)).staff_roles] == ["sales"]
+    roles = [a.role for a in staff_user(db, str(second_admin_auth["user"].id)).staff_roles]
+    assert roles == ["administrator"]
 
 
 # ---- first-administrator bootstrap -----------------------------------------------------------
@@ -720,8 +556,8 @@ def test_concurrent_bootstraps_create_exactly_one_administrator(pg_engine):
 def test_bootstrap_refuses_duplicates_and_non_admin_roles(db: Session, customer_auth: dict):
     with pytest.raises(StaffBootstrapError, match="email already exists"):
         StaffService.bootstrap_administrator(db, _bootstrap_req(email="customer.a@example.com"))
-    with pytest.raises(StaffBootstrapError, match="administrator role"):
-        StaffService.bootstrap_administrator(db, _bootstrap_req(role="sales"))
+    with pytest.raises(ValidationError):  # the only staff role is the administrator (SC-05)
+        _bootstrap_req(role="sales")  # type: ignore[arg-type]
     assert db.scalar(select(func.count(User.id)).where(User.is_staff.is_(True))) == 0
 
 
@@ -746,7 +582,7 @@ def test_validation_errors_do_not_echo_passwords(client: TestClient, path, body)
     assert all(set(err) <= {"type", "loc", "msg"} for err in error["details"])
 
 
-# ---- finance changes nothing (final matrix, 2026-10-26) ------------------------------------------
+# ---- every protected route refuses non-staff callers -------------------------------------------
 def _required_permissions(dependant) -> set[str]:
     found: set[str] = set()
     for sub in dependant.dependencies:
@@ -808,9 +644,36 @@ def test_every_permission_protected_mutation_is_enumerated():
     PROTECTED_MUTATIONS,
     ids=[f"{m} {p}" for m, p, _ in PROTECTED_MUTATIONS],
 )
-def test_finance_gets_403_on_every_permission_protected_mutation(
-    client: TestClient, finance_auth: dict, method, path, permissions
+def test_customers_get_403_on_every_permission_protected_mutation(
+    client: TestClient, customer_auth: dict, method, path, permissions
 ):
-    res = client.request(method, _concrete(path), json={}, headers=finance_auth["headers"])
+    res = client.request(method, _concrete(path), json={}, headers=customer_auth["headers"])
     assert res.status_code == 403, res.text
     assert res.json()["error"]["code"] == "permission_denied"
+
+
+def _staff_routes() -> list[tuple[str, str, set[str]]]:
+    from app.main import app
+
+    return [
+        (method, path, _required_permissions(dependant))
+        for path, methods, dependant in _api_routes(app.routes)
+        if path.startswith(("/api/v1/staff", "/api/v1/audit-logs"))
+        for method in sorted(methods - {"HEAD", "OPTIONS"})
+    ]
+
+
+def test_every_staff_route_still_requires_a_permission():
+    # SC-05 keeps one staff role but not one blanket check: each staff route names the
+    # permission it needs, so a role added later gets exactly what it is granted.
+    routes = _staff_routes()
+    assert len(routes) >= 60
+    assert [(m, p) for m, p, permissions in routes if not permissions] == []
+
+
+def test_the_role_change_endpoint_is_gone(client: TestClient, admin_auth: dict):
+    target = admin_auth["user"].id
+    res = client.patch(
+        f"{STAFF}/{target}/role", json={"role": "administrator"}, headers=admin_auth["headers"]
+    )
+    assert res.status_code in (404, 405)

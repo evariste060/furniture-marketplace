@@ -71,7 +71,7 @@ tags_metadata = [
     {
         "name": "Staff Order Fulfilment",
         "description": (
-            "Order status transitions and fulfilment assignment (administrator, operations); "
+            "Order status transitions and fulfilment assignment (administrator); "
             "invoice (orders:read) and delivery-note (orders:fulfil) PDFs, and invoice recovery "
             "for a paid order whose invoice was refused (invoices:recover, administrator only) "
             "(module 16)."
@@ -80,7 +80,7 @@ tags_metadata = [
     {
         "name": "Staff Catalogue",
         "description": "Categories, brands, products, variants, product images and "
-        "catalogue imports (administrator, sales).",
+        "catalogue imports (administrator).",
     },
     {
         "name": "Storefront Content",
@@ -90,13 +90,13 @@ tags_metadata = [
     },
     {
         "name": "Staff Content",
-        "description": "Homepage banners and policy pages (administrator, management; "
-        "content:manage) and business quote requests (administrator, sales; quotes:manage).",
+        "description": "Homepage banners and policy pages (administrator; "
+        "content:manage) and business quote requests (administrator; quotes:manage).",
     },
     {
         "name": "Staff Jobs",
         "description": "Background jobs done by the worker process (bulk image upload): "
-        "progress and retrying failed items (administrator, sales).",
+        "progress and retrying failed items (administrator).",
     },
     {
         "name": "Cart",
@@ -109,13 +109,13 @@ tags_metadata = [
     },
     {
         "name": "Staff Delivery",
-        "description": "Delivery zones and fee history: view (administrator, management), "
+        "description": "Delivery zones and fee history: view (administrator), "
         "change (administrator).",
     },
     {
         "name": "Staff Settings",
         "description": "Settings such as the free-delivery threshold and the seller details "
-        "printed on invoices: view (administrator, management), change (administrator).",
+        "printed on invoices: view (administrator), change (administrator).",
     },
     {
         "name": "Checkout",
@@ -129,12 +129,12 @@ tags_metadata = [
     },
     {
         "name": "Staff Payments",
-        "description": "Payment attempts and provider events: read (administrator, "
-        "management); cash-on-delivery confirmation (administrator).",
+        "description": "Payment attempts and provider events (payments:read) and "
+        "cash-on-delivery confirmation (payments:manage); administrator.",
     },
     {
         "name": "Staff Promotions",
-        "description": "Promotion codes: view (administrator, management), create, edit, "
+        "description": "Promotion codes: view (administrator), create, edit, "
         "activate and disable (administrator).",
     },
     {
@@ -146,7 +146,7 @@ tags_metadata = [
     {
         "name": "Staff Reports",
         "description": "Sales by day or week, top products and stock, with Excel (XLSX) export "
-        "(administrator, management, finance; module 18). Sales count paid orders and delivered "
+        "(administrator; module 18). Sales count paid orders and delivered "
         "cash-on-delivery orders only, in Africa/Kigali days (weeks from Monday).",
     },
     {
@@ -169,8 +169,8 @@ tags_metadata = [
     },
     {
         "name": "Inventory",
-        "description": "Staff stock figures (administrator, sales, operations) and physical "
-        "stock adjustments (administrator, sales). "
+        "description": "Staff stock figures (administrator) and physical "
+        "stock adjustments (administrator). "
         "Reservation commit, release and expiry are internal operations, not HTTP endpoints.",
     },
     {

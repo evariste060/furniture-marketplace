@@ -72,8 +72,8 @@ GUARDED: ResponseMap = {**UNAUTHORIZED_401, **FORBIDDEN_403}
 SERVICE_404: ResponseMap = {404: {**ERR, "description": "service_not_found"}}
 ITEM_404: ResponseMap = {404: {**ERR, "description": "service_not_found, service_item_not_found"}}
 REQUEST_404: ResponseMap = {404: {**ERR, "description": "service_request_not_found"}}
-READ_NOTE = "Requires 'services:read' (administrator, sales, management)."
-MANAGE_NOTE = "Requires 'services:manage' (administrator, sales)."
+READ_NOTE = "Requires 'services:read' (administrator)."
+MANAGE_NOTE = "Requires 'services:manage' (administrator)."
 LocaleQuery = Annotated[Locale, Query(description="Texts in this language (English fallback)")]
 
 

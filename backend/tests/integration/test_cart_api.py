@@ -209,9 +209,9 @@ def test_a_customer_token_ignores_x_cart_token_except_for_merge(client, db, cust
     assert body["owner"] == "customer" and body["lines"] == []
 
 
-def test_staff_accounts_have_no_cart(client, db, sales_auth, admin_auth):
+def test_staff_accounts_have_no_cart(client, db, admin_auth):
     variant = sku(db)
-    for staff in (sales_auth, admin_auth):
+    for staff in (admin_auth,):  # the only staff role since SC-05
         attempts = [
             client.get(CART, headers=staff["headers"]),
             add(client, variant, 1, staff["headers"]),

@@ -52,7 +52,7 @@ def read_public_settings(response: Response, db: Db) -> PublicSettingsResponse:
     response_model=SettingsResponse,
     summary="Read settings",
     description=(
-        "Requires 'settings:read' (administrator, management). Every setting this API manages; "
+        "Requires 'settings:read' (administrator). Every setting this API manages; "
         "a setting never set has value null."
     ),
     responses=GUARDED,

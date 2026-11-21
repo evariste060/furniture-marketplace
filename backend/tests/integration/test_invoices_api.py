@@ -132,12 +132,12 @@ def test_a_cash_on_delivery_order_is_invoiced_on_delivery(
     db,
     delivery,  # noqa: F811
     seller,
-    operations_auth,
+    admin_auth,
 ):
     order = checkout(client, guest_cart(client, db)).json()["order"]
-    deliver(client, order, operations_auth["headers"])
+    deliver(client, order, admin_auth["headers"])
     assert invoices(db) == []  # confirmed and dispatched: not yet paid
-    deliver(client, order, operations_auth["headers"], steps=("delivered",))
+    deliver(client, order, admin_auth["headers"], steps=("delivered",))
     [invoice] = invoices(db)
     assert invoice.snapshot["order"]["payment_method"] == "cash_on_delivery"
     db.expire_all()
@@ -204,12 +204,12 @@ def test_an_invalid_stored_seller_setting_refuses_the_invoice(client, db, delive
     assert refused["reason"] == "seller_details_missing"
 
 
-def test_seller_settings_are_managed_like_other_settings(client, admin_auth, management_auth):
+def test_seller_settings_are_managed_like_other_settings(client, admin_auth, customer_auth):
     bad = client.patch(SETTINGS, json={"seller.tin": "12/34"}, headers=admin_auth["headers"])
     assert bad.status_code == 422
     blank = client.patch(SETTINGS, json={"seller.legal_name": " "}, headers=admin_auth["headers"])
     assert blank.status_code == 422
-    denied = client.patch(SETTINGS, json=SELLER, headers=management_auth["headers"])
+    denied = client.patch(SETTINGS, json=SELLER, headers=customer_auth["headers"])
     assert denied.status_code == 403
     ok = client.patch(SETTINGS, json=SELLER, headers=admin_auth["headers"])
     assert ok.status_code == 200
@@ -283,7 +283,7 @@ def test_an_unpaid_order_has_no_invoice(client, db, delivery, seller, customer_a
     assert res.status_code == 409 and code(res) == "invoice_not_available"
 
 
-@pytest.mark.parametrize("role", ["administrator", "sales", "operations", "management"])
+@pytest.mark.parametrize("role", ["administrator"])  # the only staff role (SC-05)
 def test_staff_invoice_and_delivery_note_permissions(
     client,
     db,
@@ -293,14 +293,7 @@ def test_staff_invoice_and_delivery_note_permissions(
     request,
     customer_auth,
 ):
-    headers = request.getfixturevalue(
-        {
-            "administrator": "admin_auth",
-            "sales": "sales_auth",
-            "operations": "operations_auth",
-            "management": "management_auth",
-        }[role]
-    )["headers"]
+    headers = request.getfixturevalue({"administrator": "admin_auth"}[role])["headers"]
     order = paid_customer_order(client, db, customer_auth["headers"])
     granted = ROLE_PERMISSIONS[role]
     res = client.get(f"{STAFF}/{order['id']}/invoice", headers=headers)
@@ -403,9 +396,9 @@ def test_the_delivery_note_follows_the_fulfilment_workflow_and_shows_no_prices(
     client,
     db,
     delivery,  # noqa: F811
-    operations_auth,
+    admin_auth,
 ):
-    headers = operations_auth["headers"]
+    headers = admin_auth["headers"]
     order = checkout(client, guest_cart(client, db)).json()["order"]
     url = f"{STAFF}/{order['id']}/delivery-note"
     early = client.get(url, headers=headers)  # cash on delivery, not confirmed: stock on hold
@@ -426,9 +419,9 @@ def test_no_delivery_note_for_unpaid_or_cancelled_orders(
     client,
     db,
     delivery,  # noqa: F811
-    operations_auth,
+    admin_auth,
 ):
-    headers = operations_auth["headers"]
+    headers = admin_auth["headers"]
     unpaid = momo_order(client, db)
     res = client.get(f"{STAFF}/{unpaid['id']}/delivery-note", headers=headers)
     assert res.status_code == 409 and code(res) == "delivery_note_unavailable"

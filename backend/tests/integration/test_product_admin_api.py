@@ -286,17 +286,17 @@ def test_variant_create_update_and_unique_sku(client, catalogue, db):
     assert [v["sku"] for v in listed.json()["variants"]] == ["GS24-BLK-128"]
 
 
-def test_price_changes_are_audited_with_old_and_new_values(client, catalogue, db, sales_auth):
+def test_price_changes_are_audited_with_old_and_new_values(client, catalogue, db, admin_auth):
     product = create_product(client, catalogue)
     variant = create_variant(client, catalogue, product["id"], price=1000, compare_at_price=1200)
     res = client.patch(
         f"{STAFF}/products/{product['id']}/variants/{variant['id']}",
         json={"price": 950, "compare_at_price": 1300},
-        headers=sales_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 200 and res.json()["price"] == 950
     (record,) = audits(db, "catalog.variant_update", variant["id"])
-    assert record.actor_user_id == sales_auth["user"].id
+    assert record.actor_user_id == admin_auth["user"].id
     assert record.change_summary["changes"] == {
         "price": {"from": 1000, "to": 950},
         "compare_at_price": {"from": 1200, "to": 1300},
@@ -463,23 +463,9 @@ def test_public_responses_never_contain_exact_quantities(client, catalogue, db):
 
 
 # ---- authorization -------------------------------------------------------------------------
-def test_sales_staff_manage_products(client, catalogue, sales_auth):
-    h = sales_auth["headers"]
-    res = client.post(
-        f"{STAFF}/products",
-        json={"name": "By Sales", "category_id": catalogue["category_id"]},
-        headers=h,
-    )
-    assert res.status_code == 201
-    variant = client.post(
-        f"{STAFF}/products/{res.json()['id']}/variants",
-        json={"sku": "SALES-1", "name": "Std", "price": 10},
-        headers=h,
-    )
-    assert variant.status_code == 201
 
 
-@pytest.mark.parametrize("who", ["operations_auth", "management_auth", "customer_auth"])
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_other_roles_are_forbidden_and_nothing_changes(client, catalogue, db, who, request):
     product = create_product(client, catalogue)
     variant = create_variant(client, catalogue, product["id"], price=1000)

@@ -26,7 +26,6 @@ from app.services.promotion_service import PromotionNotApplicable, redeem
 from tests.postgres.conftest import BACKEND, HMAC_KEY, REPO, Stack
 from tests.postgres.test_pg_http import HTTP, one, register
 from tests.postgres.test_pg_inventory import seed_sku
-from tests.postgres.test_pg_staff import STAFF_PASSWORD, create_staff
 from tests.support.commerce import new_order
 
 PROMOTIONS = "/staff/promotions"
@@ -86,25 +85,6 @@ def test_customers_apply_and_remove_codes_over_http(stack: Stack, admin: dict, u
         assert one(
             conn, "SELECT count(*) FROM discount_redemptions WHERE discount_id = %s", promo["id"]
         ) == (0,)
-
-
-def test_management_can_view_but_not_change_promotions(stack: Stack, admin: dict, unique: str):
-    promo = create_promotion(stack, admin)
-    staff = create_staff(stack, admin, unique, "management", "mgmt-promo")
-    res = HTTP.post(
-        f"{stack.servers[0]}/auth/login",
-        json={"identifier": staff["email"], "password": STAFF_PASSWORD},
-    )
-    h = {"Authorization": f"Bearer {res.json()['session_token']}"}
-    base = stack.servers[1]
-    assert HTTP.get(f"{base}{PROMOTIONS}", headers=h).status_code == 200
-    assert HTTP.get(f"{base}{PROMOTIONS}/{promo['id']}", headers=h).status_code == 200
-    body = {"code": "NOPE", "name": "x", "kind": "percent", "percent_off": 5}
-    assert HTTP.post(f"{base}{PROMOTIONS}", json=body, headers=h).status_code == 403
-    assert (
-        HTTP.patch(f"{base}{PROMOTIONS}/{promo['id']}", json={"name": "y"}, headers=h).status_code
-        == 403
-    )
 
 
 def test_concurrent_redemptions_on_the_runtime_role_take_each_use_once(

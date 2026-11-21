@@ -269,9 +269,7 @@ def test_deleting_a_brand_retires_its_logo_files(client, admin_auth, brand, stor
     assert stored_files(storage) == [] and media_states(db) == []
 
 
-@pytest.mark.parametrize(
-    "who", ["operations_auth", "management_auth", "finance_auth", "customer_auth"]
-)
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_only_catalogue_managers_change_category_images_and_brand_logos(
     client, request, admin_auth, category, brand, storage, who
 ):
@@ -284,11 +282,6 @@ def test_only_catalogue_managers_change_category_images_and_brand_logos(
     ]
     assert [r.status_code for r in attempts] == [403] * 4
     assert stored_files(storage) == []
-
-
-def test_sales_staff_manage_category_images(client, sales_auth, category, storage):
-    res = put_file(client, f"{STAFF}/categories/{category['id']}/image", sales_auth["headers"])
-    assert res.status_code == 200
 
 
 def test_anonymous_image_changes_are_unauthorized(client, category, storage):

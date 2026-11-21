@@ -290,7 +290,7 @@ describe("session", () => {
   });
 
   it("does not treat staff as customers", async () => {
-    const fetcher = vi.fn().mockResolvedValue(json({ full_name: "Sales", is_staff: true, roles: ["sales"] }));
+    const fetcher = vi.fn().mockResolvedValue(json({ full_name: "Admin", is_staff: true, roles: ["administrator"] }));
     const res = await session(request("/api/auth/session", { cookies: `${SESSION_COOKIE}=tok` }), fetcher);
     expect((await res.json()).user).toMatchObject({ is_staff: true, is_customer: false });
   });

@@ -80,12 +80,12 @@ def add_item(client, auth, service_id, title_en, title_rw=None) -> dict:
 
 
 # ---- public ------------------------------------------------------------------------------------
-def test_the_public_list_shows_active_services_in_order_and_language(client, sales_auth):
-    cctv = create(client, sales_auth)
-    add_item(client, sales_auth, cctv["id"], "DVR installation", "Gushyiraho DVR")
-    add_item(client, sales_auth, cctv["id"], "Remote viewing")
-    gate = create(client, sales_auth, name_en="Gate Automation", name_rw=None, icon="gate")
-    create(client, sales_auth, name_en="Hidden service", is_active=False)
+def test_the_public_list_shows_active_services_in_order_and_language(client, admin_auth):
+    cctv = create(client, admin_auth)
+    add_item(client, admin_auth, cctv["id"], "DVR installation", "Gushyiraho DVR")
+    add_item(client, admin_auth, cctv["id"], "Remote viewing")
+    gate = create(client, admin_auth, name_en="Gate Automation", name_rw=None, icon="gate")
+    create(client, admin_auth, name_en="Hidden service", is_active=False)
     assert cctv["slug"] == "cctv-installation" and cctv["sort_order"] < gate["sort_order"]
 
     english = client.get(PUBLIC).json()
@@ -104,8 +104,8 @@ def test_the_public_list_shows_active_services_in_order_and_language(client, sal
 
 
 # ---- requests ----------------------------------------------------------------------------------
-def test_a_request_is_stored_cleaned(client, db, sales_auth):
-    create(client, sales_auth)
+def test_a_request_is_stored_cleaned(client, db, admin_auth):
+    create(client, admin_auth)
     res = client.post(f"{PUBLIC}/cctv-installation/requests", json=REQUEST)
     assert res.status_code == 201, res.text
     reference = res.json()["reference"]
@@ -144,23 +144,23 @@ def test_a_request_is_stored_cleaned(client, db, sales_auth):
         {"preferred_date": (datetime.now(UTC) + timedelta(days=400)).date().isoformat()},
     ],
 )
-def test_requests_are_validated(client, db, sales_auth, change):
-    create(client, sales_auth)
+def test_requests_are_validated(client, db, admin_auth, change):
+    create(client, admin_auth)
     res = client.post(f"{PUBLIC}/cctv-installation/requests", json={**REQUEST, **change})
     assert res.status_code == 422, res.text
     assert db.scalar(select(ServiceRequest.id)) is None
 
 
-def test_a_hidden_or_missing_service_takes_no_requests(client, db, sales_auth):
-    create(client, sales_auth, is_active=False)
+def test_a_hidden_or_missing_service_takes_no_requests(client, db, admin_auth):
+    create(client, admin_auth, is_active=False)
     for slug in ("cctv-installation", "nothing-here"):
         res = client.post(f"{PUBLIC}/{slug}/requests", json=REQUEST)
         assert res.status_code == 404
     assert db.scalar(select(ServiceRequest.id)) is None
 
 
-def test_the_honeypot_looks_successful_but_stores_and_counts_nothing(client, db, sales_auth):
-    create(client, sales_auth)
+def test_the_honeypot_looks_successful_but_stores_and_counts_nothing(client, db, admin_auth):
+    create(client, admin_auth)
     for _ in range(5):  # more than the phone limit: bot attempts are not counted
         res = client.post(
             f"{PUBLIC}/cctv-installation/requests", json={**REQUEST, "website": "spam.example"}
@@ -170,8 +170,8 @@ def test_the_honeypot_looks_successful_but_stores_and_counts_nothing(client, db,
     assert client.post(f"{PUBLIC}/cctv-installation/requests", json=REQUEST).status_code == 201
 
 
-def test_requests_are_rate_limited_per_phone(client, sales_auth):
-    create(client, sales_auth)
+def test_requests_are_rate_limited_per_phone(client, admin_auth):
+    create(client, admin_auth)
     url = f"{PUBLIC}/cctv-installation/requests"
     for _ in range(3):
         assert client.post(url, json=REQUEST).status_code == 201
@@ -182,8 +182,8 @@ def test_requests_are_rate_limited_per_phone(client, sales_auth):
     assert client.post(url, json={**REQUEST, "phone": "0788555111"}).status_code == 201
 
 
-def test_a_request_with_an_email_is_acknowledged(client, db, sales_auth, emails):  # noqa: F811
-    create(client, sales_auth)
+def test_a_request_with_an_email_is_acknowledged(client, db, admin_auth, emails):  # noqa: F811
+    create(client, admin_auth)
     reference = client.post(f"{PUBLIC}/cctv-installation/requests", json=REQUEST).json()[
         "reference"
     ]
@@ -199,21 +199,17 @@ def test_a_request_with_an_email_is_acknowledged(client, db, sales_auth, emails)
 
 
 # ---- staff: services ---------------------------------------------------------------------------
-def test_service_permissions(
-    client, admin_auth, sales_auth, management_auth, operations_auth, finance_auth, customer_auth
-):
-    for auth in (admin_auth, sales_auth, management_auth):
-        assert client.get(STAFF, headers=auth["headers"]).status_code == 200
-        assert client.get(LEADS, headers=auth["headers"]).status_code == 200
-    for auth in (operations_auth, finance_auth, customer_auth):
-        assert client.get(STAFF, headers=auth["headers"]).status_code == 403
-        assert client.get(LEADS, headers=auth["headers"]).status_code == 403
-    for auth in (management_auth, operations_auth, customer_auth):  # read is not manage
-        assert client.post(STAFF, json=SERVICE, headers=auth["headers"]).status_code == 403
-        res = client.patch(
-            f"{LEADS}/{uuid.uuid4()}", json={"status": "contacted"}, headers=auth["headers"]
-        )
-        assert res.status_code == 403
+def test_service_permissions(client, admin_auth, customer_auth):
+    # SC-05: the Marketplace Administrator holds every permission; customers hold none.
+    assert client.get(STAFF, headers=admin_auth["headers"]).status_code == 200
+    assert client.get(LEADS, headers=admin_auth["headers"]).status_code == 200
+    assert client.get(STAFF, headers=customer_auth["headers"]).status_code == 403
+    assert client.get(LEADS, headers=customer_auth["headers"]).status_code == 403
+    assert client.post(STAFF, json=SERVICE, headers=customer_auth["headers"]).status_code == 403
+    res = client.patch(
+        f"{LEADS}/{uuid.uuid4()}", json={"status": "contacted"}, headers=customer_auth["headers"]
+    )
+    assert res.status_code == 403
     assert client.get(STAFF).status_code == 401
     assert client.post(STAFF, json=SERVICE, headers=admin_auth["headers"]).status_code == 201
 
@@ -228,15 +224,15 @@ def test_service_permissions(
         {"price": 1000},
     ],
 )
-def test_service_fields_are_validated(client, sales_auth, change):
-    res = client.post(STAFF, json={**SERVICE, **change}, headers=sales_auth["headers"])
+def test_service_fields_are_validated(client, admin_auth, change):
+    res = client.post(STAFF, json={**SERVICE, **change}, headers=admin_auth["headers"])
     assert res.status_code == 422, res.text
 
 
-def test_editing_a_service_is_audited_once_per_change(client, db, sales_auth):
-    h = sales_auth["headers"]
-    service = create(client, sales_auth)
-    taken = create(client, sales_auth, name_en="Repair")
+def test_editing_a_service_is_audited_once_per_change(client, db, admin_auth):
+    h = admin_auth["headers"]
+    service = create(client, admin_auth)
+    taken = create(client, admin_auth, name_en="Repair")
     assert client.post(STAFF, json={**SERVICE, "slug": "repair"}, headers=h).status_code == 409
     clash = client.patch(f"{STAFF}/{service['id']}", json={"slug": taken["slug"]}, headers=h)
     assert clash.status_code == 409 and clash.json()["error"]["code"] == "slug_taken"
@@ -257,10 +253,10 @@ def test_editing_a_service_is_audited_once_per_change(client, db, sales_auth):
     assert len(audits(db, "services.service_create")) == 2
 
 
-def test_services_and_items_are_reordered(client, db, sales_auth):
-    h = sales_auth["headers"]
-    a = create(client, sales_auth, name_en="Alpha")
-    b = create(client, sales_auth, name_en="Beta")
+def test_services_and_items_are_reordered(client, db, admin_auth):
+    h = admin_auth["headers"]
+    a = create(client, admin_auth, name_en="Alpha")
+    b = create(client, admin_auth, name_en="Beta")
     bad = client.put(f"{STAFF}/order", json={"service_ids": [a["id"]]}, headers=h)
     assert bad.status_code == 409 and bad.json()["error"]["code"] == "service_order_mismatch"
     assert (
@@ -272,8 +268,8 @@ def test_services_and_items_are_reordered(client, db, sales_auth):
     assert [s["slug"] for s in client.get(PUBLIC).json()] == ["beta", "alpha"]
     assert len(audits(db, "services.service_reorder")) == 1
 
-    one = add_item(client, sales_auth, a["id"], "One")
-    two = add_item(client, sales_auth, a["id"], "Two")
+    one = add_item(client, admin_auth, a["id"], "One")
+    two = add_item(client, admin_auth, a["id"], "Two")
     url = f"{STAFF}/{a['id']}/items"
     assert (
         client.put(f"{url}/order", json={"item_ids": [two["id"], one["id"]]}, headers=h).status_code
@@ -297,8 +293,8 @@ def test_services_and_items_are_reordered(client, db, sales_auth):
     assert [len(audits(db, a)) for a in actions] == [2, 1, 1, 1]
 
 
-def test_a_service_has_at_most_thirty_items(client, db, sales_auth):
-    service = create(client, sales_auth)
+def test_a_service_has_at_most_thirty_items(client, db, admin_auth):
+    service = create(client, admin_auth)
     db.add_all(
         ServiceItem(
             service_category_id=uuid.UUID(service["id"]), title_en=f"Item {n}", sort_order=n
@@ -309,16 +305,16 @@ def test_a_service_has_at_most_thirty_items(client, db, sales_auth):
     res = client.post(
         f"{STAFF}/{service['id']}/items",
         json={"title_en": "One more"},
-        headers=sales_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 422
 
 
-def test_a_service_with_requests_cannot_be_deleted(client, db, sales_auth):
-    h = sales_auth["headers"]
-    service = create(client, sales_auth)
-    empty = create(client, sales_auth, name_en="Training")
-    add_item(client, sales_auth, empty["id"], "Basics")
+def test_a_service_with_requests_cannot_be_deleted(client, db, admin_auth):
+    h = admin_auth["headers"]
+    service = create(client, admin_auth)
+    empty = create(client, admin_auth, name_en="Training")
+    add_item(client, admin_auth, empty["id"], "Basics")
     client.post(f"{PUBLIC}/cctv-installation/requests", json=REQUEST)
     listed = {s["slug"]: s["request_count"] for s in client.get(STAFF, headers=h).json()}
     assert listed == {"cctv-installation": 1, "training": 0}
@@ -333,9 +329,9 @@ def test_a_service_with_requests_cannot_be_deleted(client, db, sales_auth):
     assert len(audits(db, "services.service_delete")) == 1
 
 
-def test_a_service_image_is_uploaded_replaced_and_removed(client, db, sales_auth, storage):
-    h = sales_auth["headers"]
-    service = create(client, sales_auth)
+def test_a_service_image_is_uploaded_replaced_and_removed(client, db, admin_auth, storage):
+    h = admin_auth["headers"]
+    service = create(client, admin_auth)
     url = f"{STAFF}/{service['id']}/image"
     first = client.post(url, files={"file": ("a.png", png(), "image/png")}, headers=h)
     assert first.status_code == 200, first.text
@@ -366,10 +362,10 @@ def test_a_service_image_is_uploaded_replaced_and_removed(client, db, sales_auth
 
 
 # ---- staff: requests ---------------------------------------------------------------------------
-def test_staff_follow_up_requests(client, db, sales_auth, admin_auth, management_auth):
-    h = sales_auth["headers"]
-    cctv = create(client, sales_auth)
-    create(client, sales_auth, name_en="Repair", icon="wrench")
+def test_staff_follow_up_requests(client, db, admin_auth, customer_auth):
+    h = admin_auth["headers"]
+    cctv = create(client, admin_auth)
+    create(client, admin_auth, name_en="Repair", icon="wrench")
     first = client.post(f"{PUBLIC}/cctv-installation/requests", json=REQUEST).json()["reference"]
     second = client.post(
         f"{PUBLIC}/repair/requests", json={**REQUEST, "phone": "0788555111"}
@@ -390,14 +386,14 @@ def test_staff_follow_up_requests(client, db, sales_auth, admin_auth, management
     assert lead["service"]["slug"] == "cctv-installation" and lead["assigned_to"] is None
 
     names = {a["name"] for a in client.get(f"{LEADS}/assignees", headers=h).json()}
-    assert names == {"Test sales", "Test administrator"}  # management cannot manage
+    assert names == {"Test administrator"}  # SC-05: the only staff role
 
     url = f"{LEADS}/{lead['id']}"
     res = client.patch(
         url,
         json={
             "status": "contacted",
-            "assigned_to_user_id": str(sales_auth["user"].id),
+            "assigned_to_user_id": str(admin_auth["user"].id),
             "internal_notes": "Called, visit on Friday.",
         },
         headers=h,
@@ -406,15 +402,15 @@ def test_staff_follow_up_requests(client, db, sales_auth, admin_auth, management
     body = res.json()
     assert (body["status"], body["assigned_to"]["name"], body["internal_notes"]) == (
         "contacted",
-        "Test sales",
+        "Test administrator",
         "Called, visit on Friday.",
     )
     assert body["status_changed_at"] is not None
     assert client.get(LEADS, params={"status": "new"}, headers=h).json()["total"] == 1
 
-    refused = client.patch(
-        url, json={"assigned_to_user_id": str(management_auth["user"].id)}, headers=h
-    )
+    # Only an account holding services:manage can be assigned; a customer cannot (SC-05).
+    customer_id = customer_auth["user"]["id"]
+    refused = client.patch(url, json={"assigned_to_user_id": customer_id}, headers=h)
     assert refused.status_code == 422
     assert client.patch(url, json={"status": None}, headers=h).status_code == 422
     back = client.patch(url, json={"status": "new", "assigned_to_user_id": None}, headers=h).json()
@@ -428,19 +424,19 @@ def test_staff_follow_up_requests(client, db, sales_auth, admin_auth, management
     missing = client.get(f"{LEADS}/{uuid.uuid4()}", headers=h)
     assert missing.status_code == 404
     assert missing.json()["error"]["code"] == "service_request_not_found"
-    assert client.get(url, headers=management_auth["headers"]).status_code == 200
+    assert client.get(url, headers=admin_auth["headers"]).status_code == 200
 
 
-def test_an_inactive_staff_member_cannot_be_assigned(client, db, sales_auth):
-    create(client, sales_auth)
+def test_an_inactive_staff_member_cannot_be_assigned(client, db, admin_auth):
+    create(client, admin_auth)
     client.post(f"{PUBLIC}/cctv-installation/requests", json=REQUEST)
-    lead = client.get(LEADS, headers=sales_auth["headers"]).json()["items"][0]
-    other = make_staff(db, "sales", "sales.two@example.com", "+250788000099")
+    lead = client.get(LEADS, headers=admin_auth["headers"]).json()["items"][0]
+    other = make_staff(db, "administrator", "sales.two@example.com", "+250788000099")
     other["user"].is_active = False
     db.commit()
     res = client.patch(
         f"{LEADS}/{lead['id']}",
         json={"assigned_to_user_id": str(other["user"].id)},
-        headers=sales_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 422

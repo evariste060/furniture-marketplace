@@ -2,7 +2,7 @@
 app.services.quotes.
 
 POST /quote-requests is public and rate limited. The staff routes need 'quotes:manage'
-(administrator, sales).
+(administrator).
 """
 
 import uuid
@@ -80,7 +80,7 @@ def send_quote_request(
     "",
     response_model=Page[StaffQuoteRequest],
     summary="List quote requests",
-    description="Requires 'quotes:manage' (administrator, sales). Newest first; `status` filters.",
+    description="Requires 'quotes:manage' (administrator). Newest first; `status` filters.",
     responses={**GUARDED, **VALIDATION_422},
 )
 def list_quote_requests(
@@ -104,7 +104,7 @@ def list_quote_requests(
     response_model=StaffQuoteRequest,
     summary="Change a quote request's status",
     description=(
-        "Requires 'quotes:manage' (administrator, sales). new, contacted or closed; moving out "
+        "Requires 'quotes:manage' (administrator). new, contacted or closed; moving out "
         "of new records who handled it and when. Audited as 'quote.status_change'; setting the "
         "current status changes nothing and is not audited."
     ),

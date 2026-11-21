@@ -2,7 +2,7 @@
 
 GET /pages/{slug}?lang=en|rw is public: one published language version, cached for 60 seconds; a
 missing or unpublished translation is 404, never another language. The staff routes need
-'content:manage' (administrator, management).
+'content:manage' (administrator).
 """
 
 from typing import Annotated
@@ -90,7 +90,7 @@ def read_page(slug: str, response: Response, db: Db, lang: Lang = "en") -> Publi
     response_model=StaffPagesResponse,
     summary="List policy pages",
     description=(
-        "Requires 'content:manage' (administrator, management). Every policy page in menu "
+        "Requires 'content:manage' (administrator). Every policy page in menu "
         "order with its English and Kinyarwanda versions (null when not written), drafts "
         "included."
     ),
@@ -106,7 +106,7 @@ def list_pages(_: ContentManager, db: Db) -> StaffPagesResponse:
     response_model=StaffPage,
     summary="Write one language version of a page",
     description=(
-        "Requires 'content:manage' (administrator, management). Creates or replaces the `lang` "
+        "Requires 'content:manage' (administrator). Creates or replaces the `lang` "
         "version: title (plain text, at most 120), body (Markdown, at most 50,000 characters) "
         "and whether it is published. Returns the page with both versions. Audited as "
         "'content.page_update' (title, publication and body length before and after); a write "

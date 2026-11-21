@@ -1,8 +1,16 @@
 """Code-defined role -> permission mapping over the upstream identity schema.
 
-Staff roles come from staff_role_assignments (administrator, sales, operations, management,
-finance) and only count when users.is_staff is true. Each staff user holds exactly one role
-(unique per user in the database). A user with no effective staff role is a customer.
+SC-05 (approved by the project owner on 2026-11-21): FurniHub is a multi-vendor marketplace, so
+the only staff role is the Marketplace Administrator (stored as 'administrator'). The sales,
+operations, management and finance roles of the original single-business shop are removed; the
+fine-grained permissions below stay, every staff route still requires one, and the administrator
+holds them all. Sellers are store owners, not staff, and hold none (ADR-014).
+
+The staff role comes from staff_role_assignments and only counts when users.is_staff is true.
+Each staff user holds exactly one role (unique per user in the database). A user with no
+effective staff role is a customer.
+
+History of the matrix before SC-05, kept for the record:
 
 Approved minimal matrix (ADR-006, project owner, 2026-10-22): permissions exist only for
 features that are built. Built features add narrowly scoped permissions here; administrator
@@ -49,10 +57,6 @@ from app.models.identity import User
 class Role(StrEnum):
     CUSTOMER = "customer"
     ADMINISTRATOR = "administrator"
-    SALES = "sales"
-    OPERATIONS = "operations"
-    MANAGEMENT = "management"
-    FINANCE = "finance"
 
 
 class Permission(StrEnum):
@@ -80,8 +84,7 @@ class Permission(StrEnum):
     PAYMENTS_MANAGE = "payments:manage"  # any change to payment data (e.g. COD cash collected)
     # Invoices (module 16): issue a paid order's missing invoice (recovery). Administrator only.
     INVOICES_RECOVER = "invoices:recover"
-    # Reports and exports (module 18). Declared with the finance role (approved 2026-10-25) so
-    # the role is complete when the reports endpoints land; nothing requires it yet.
+    # Reports and exports (module 18).
     REPORTS_READ = "reports:read"
     # Storefront content: homepage banners (approved 2026-10-26) and policy pages (module 19).
     CONTENT_MANAGE = "content:manage"
@@ -98,76 +101,20 @@ class Permission(StrEnum):
     # Technical services (ADR-013, 2026-11-17): the service pages and their requests.
     SERVICES_READ = "services:read"  # staff service list and service requests
     SERVICES_MANAGE = "services:manage"  # edit services, follow up requests
-    # Marketplace sellers (ADR-014 phase 1, 2026-11-21): administrator only in V1.
+    # Marketplace sellers (ADR-014 phase 1, 2026-11-21).
     SELLERS_READ = "sellers:read"  # seller applications, stores and owner contact details
     SELLERS_MANAGE = "sellers:manage"  # approve, reject, suspend, reinstate; commission override
 
 
-StaffRoleName = Literal["administrator", "sales", "operations", "management", "finance"]
-STAFF_ROLE_NAMES: tuple[StaffRoleName, ...] = (
-    "administrator",
-    "sales",
-    "operations",
-    "management",
-    "finance",
-)
+# The Marketplace Administrator (SC-05). Adding a role later is a recorded scope change: extend
+# this literal, ROLE_PERMISSIONS, the staff_role_assignments check constraint (with a
+# migration) and the admin frontend's roles.
+StaffRoleName = Literal["administrator"]
+STAFF_ROLE_NAMES: tuple[StaffRoleName, ...] = ("administrator",)
 STAFF_ROLES = frozenset(STAFF_ROLE_NAMES)
 
 ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
     Role.CUSTOMER.value: frozenset(),
-    Role.SALES.value: frozenset(
-        {
-            Permission.STAFF_SELF_READ.value,
-            Permission.INVENTORY_READ.value,
-            Permission.INVENTORY_ADJUST.value,
-            Permission.CATALOG_MANAGE.value,
-            Permission.CATALOG_READ.value,
-            Permission.ORDER_READ.value,
-            Permission.PROMOTIONS_READ.value,
-            Permission.REVIEWS_MODERATE.value,
-            Permission.QUOTES_MANAGE.value,
-            Permission.SUPPORT_READ.value,
-            Permission.SUPPORT_REPLY.value,
-            Permission.SERVICES_READ.value,
-            Permission.SERVICES_MANAGE.value,
-        }
-    ),
-    Role.OPERATIONS.value: frozenset(
-        {
-            Permission.STAFF_SELF_READ.value,
-            Permission.CATALOG_READ.value,
-            Permission.INVENTORY_READ.value,
-            Permission.INVENTORY_ADJUST.value,
-            Permission.ORDER_FULFIL.value,
-            Permission.ORDER_READ.value,
-            Permission.DELIVERY_READ.value,
-        }
-    ),
-    Role.MANAGEMENT.value: frozenset(
-        {
-            Permission.STAFF_SELF_READ.value,
-            Permission.CATALOG_READ.value,
-            Permission.INVENTORY_READ.value,
-            Permission.ORDER_READ.value,
-            Permission.DELIVERY_READ.value,
-            Permission.PROMOTIONS_READ.value,
-            Permission.PAYMENTS_READ.value,
-            Permission.CONTENT_MANAGE.value,
-            Permission.SETTINGS_READ.value,
-            Permission.REPORTS_READ.value,
-            Permission.SUPPORT_READ.value,
-            Permission.SERVICES_READ.value,
-        }
-    ),
-    Role.FINANCE.value: frozenset(
-        {
-            Permission.STAFF_SELF_READ.value,
-            Permission.ORDER_READ.value,
-            Permission.PAYMENTS_READ.value,
-            Permission.REPORTS_READ.value,
-            Permission.AUDIT_READ.value,
-        }
-    ),
     Role.ADMINISTRATOR.value: frozenset(p.value for p in Permission),
 }
 

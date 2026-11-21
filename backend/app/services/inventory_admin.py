@@ -1,5 +1,5 @@
-"""Staff inventory operations behind the HTTP API (approved 2026-10-23: read by administrator,
-sales and operations; adjust by administrator and sales).
+"""Staff inventory operations behind the HTTP API ('inventory:read' and 'inventory:adjust', both
+held by the Marketplace Administrator, SC-05).
 
 Maps inventory rule errors to HTTP responses and commits each request's change together with its
 audit record. The stock rules themselves live in app.services.inventory.

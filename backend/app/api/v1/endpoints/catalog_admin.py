@@ -1,6 +1,6 @@
 """Staff category and brand management (module 5, RE-018).
 
-Every route requires 'catalog:manage' (administrator and sales). Rules and concurrency are in
+Every route requires 'catalog:manage' (administrator). Rules and concurrency are in
 app.services.catalog_admin. The public, read-only views are GET /catalog/categories and
 GET /catalog/brands. Category images and brand logos (B1) are uploaded like product images
 (ADR-009): validated with Pillow, the exact original kept privately, a sanitised public source
@@ -91,7 +91,7 @@ Ctx = Annotated[RequestContext, Depends(get_request_context)]
 Storage = Annotated[MediaStorage, Depends(get_media_storage)]
 ImageFile = Annotated[UploadFile, File(description="JPEG, PNG or WebP, at most 5 MB")]
 
-PERMISSION_NOTE = "Requires 'catalog:manage' (administrator, sales)."
+PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
 UPLOAD_NOTE = (
     "multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB), identified by decoding "
     "it, not by its name or declared type. The exact upload is kept privately; the public source "
@@ -118,7 +118,7 @@ def _product_counts(db: Session, column: Any) -> dict[uuid.UUID, int]:
     return {key: int(count) for key, count in rows if key is not None}
 
 
-READ_NOTE = "Requires 'catalog:read' (administrator, sales, operations, management)."
+READ_NOTE = "Requires 'catalog:read' (administrator)."
 
 
 @router.get(

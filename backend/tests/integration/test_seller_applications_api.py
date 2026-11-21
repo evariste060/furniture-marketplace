@@ -130,8 +130,8 @@ def test_applying_needs_a_session(client: TestClient):
     assert client.put(APPLY, json=application()).status_code == 401
 
 
-def test_staff_cannot_apply(client: TestClient, db: Session, admin_auth: dict, sales_auth: dict):
-    for auth in (admin_auth, sales_auth):
+def test_staff_cannot_apply(client: TestClient, db: Session, admin_auth: dict):
+    for auth in (admin_auth,):  # the only staff role since SC-05
         res = apply(client, auth)
         assert res.status_code == 403 and error_code(res) == "staff_cannot_sell"
     assert db.scalar(select(Store.id)) is None
@@ -629,9 +629,7 @@ def test_a_seller_updates_only_their_own_store(client: TestClient, db: Session, 
 
 
 # ---- administrators only -----------------------------------------------------------------
-@pytest.mark.parametrize(
-    "who", ["sales_auth", "operations_auth", "management_auth", "finance_auth", "customer_auth"]
-)
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_only_administrators_reach_seller_management(
     client: TestClient, admin_auth: dict, request, who: str
 ):
@@ -763,11 +761,11 @@ def test_commission_must_be_whole_basis_points(client: TestClient, admin_auth: d
 
 
 def test_only_settings_managers_change_the_default_commission(
-    client: TestClient, management_auth: dict
+    client: TestClient, customer_auth: dict
 ):
     res = client.patch(
         STAFF_SETTINGS,
         json={"marketplace.default_commission_bps": 900},
-        headers=management_auth["headers"],
+        headers=customer_auth["headers"],  # SC-05: no staff account lacks settings:manage
     )
     assert res.status_code == 403 and error_code(res) == "permission_denied"

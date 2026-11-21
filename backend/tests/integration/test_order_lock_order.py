@@ -96,7 +96,7 @@ def finish(*workers: Worker) -> None:
 @pytest.fixture
 def setup(pg_engine: Engine, db: Session):
     assert pg_engine.url.database == "rwanda_ecommerce_test"
-    staff = make_staff(db, "operations", "ops.lock@example.com", "+250788000777")["user"]
+    staff = make_staff(db, "administrator", "ops.lock@example.com", "+250788000777")["user"]
     discount = Discount(code="LOCKS", name="Locks", kind="fixed", amount_off=100, status="active")
     db.add(discount)
     db.commit()

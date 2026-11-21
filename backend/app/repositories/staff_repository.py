@@ -109,15 +109,6 @@ class StaffRepository:
         return user
 
     @staticmethod
-    def set_role(db: Session, user: User, role: str) -> None:
-        """Stage the user's single role (no commit)."""
-        if user.staff_roles:
-            user.staff_roles[0].role = role
-        else:
-            user.staff_roles.append(StaffRoleAssignment(user_id=user.id, role=role))
-        db.flush()
-
-    @staticmethod
     def set_active(db: Session, user: User, is_active: bool) -> None:
         user.is_active = is_active
         db.flush()

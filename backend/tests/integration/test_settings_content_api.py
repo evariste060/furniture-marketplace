@@ -153,8 +153,8 @@ def test_contact_settings_are_validated(client, admin_auth, body):
     assert res.status_code == 422, res.text
 
 
-def test_only_administrators_change_the_contact(client, management_auth, sales_auth, customer_auth):
-    for auth in (management_auth, sales_auth, customer_auth):
+def test_only_administrators_change_the_contact(client, admin_auth, customer_auth):
+    for auth in (customer_auth,):  # SC-05: the administrator is the only staff role
         res = client.patch(STAFF_SETTINGS, json=CONTACT, headers=auth["headers"])
         assert res.status_code == 403, res.text
     assert client.patch(STAFF_SETTINGS, json=CONTACT).status_code == 401
@@ -209,10 +209,10 @@ def test_social_links_are_validated(client, admin_auth, body):
     assert res.status_code == 422, res.text
 
 
-def test_only_administrators_change_the_social_links(client, management_auth, sales_auth):
-    for auth in (management_auth, sales_auth):
-        res = client.patch(STAFF_SETTINGS, json=SOCIAL, headers=auth["headers"])
-        assert res.status_code == 403, res.text
+def test_only_administrators_change_the_social_links(client, customer_auth):
+    res = client.patch(STAFF_SETTINGS, json=SOCIAL, headers=customer_auth["headers"])
+    assert res.status_code == 403, res.text
+    assert client.patch(STAFF_SETTINGS, json=SOCIAL).status_code == 401
     assert client.get(PUBLIC_SETTINGS).json()["social"]["facebook"] is None
 
 
@@ -243,8 +243,8 @@ def test_a_missing_translation_is_404_not_another_language(client, admin_auth):
     assert client.get(f"{PAGES}/no-such-page?lang=en").status_code == 404
 
 
-def test_unpublished_pages_are_staff_only(client, db, admin_auth, management_auth):
-    h = management_auth["headers"]  # management also manages content
+def test_unpublished_pages_are_staff_only(client, db, admin_auth):
+    h = admin_auth["headers"]  # management also manages content
     draft = {**PAGE, "title": "Ubwishingizi", "is_published": False}
     res = client.put(f"{STAFF_PAGES}/warranty?lang=rw", json=draft, headers=h)
     assert res.status_code == 200, res.text
@@ -255,7 +255,7 @@ def test_unpublished_pages_are_staff_only(client, db, admin_auth, management_aut
     assert warranty["en"] is None
     assert warranty["rw"]["title"] == "Ubwishingizi"
     assert warranty["rw"]["is_published"] is False
-    assert warranty["rw"]["updated_by_user_id"] == str(management_auth["user"].id)
+    assert warranty["rw"]["updated_by_user_id"] == str(admin_auth["user"].id)
 
     published = {**draft, "is_published": True}
     assert client.put(f"{STAFF_PAGES}/warranty?lang=rw", json=published, headers=h).is_success
@@ -305,9 +305,10 @@ def test_page_text_is_cleaned_and_limited(client, admin_auth):
     assert client.put(f"{STAFF_PAGES}/warranty", json=PAGE, headers=h).status_code == 422  # lang
 
 
-def test_page_permissions(client, sales_auth, operations_auth, finance_auth, customer_auth):
+def test_page_permissions(client, admin_auth, customer_auth):
     url = f"{STAFF_PAGES}/warranty?lang=en"
-    for auth in (sales_auth, operations_auth, finance_auth, customer_auth):
+    assert client.get(STAFF_PAGES, headers=admin_auth["headers"]).status_code == 200
+    for auth in (customer_auth,):  # SC-05: the administrator is the only staff role
         assert client.put(url, json=PAGE, headers=auth["headers"]).status_code == 403
         assert client.get(STAFF_PAGES, headers=auth["headers"]).status_code == 403
     assert client.put(url, json=PAGE).status_code == 401
@@ -378,8 +379,8 @@ def test_quote_requests_are_rate_limited_per_phone(client, db):
     assert client.post(QUOTES, json={**QUOTE, "phone": "0788555111"}).status_code == 201
 
 
-def test_staff_follow_up_quote_requests(client, db, sales_auth):
-    h = sales_auth["headers"]
+def test_staff_follow_up_quote_requests(client, db, admin_auth):
+    h = admin_auth["headers"]
     first = client.post(QUOTES, json=QUOTE).json()["reference"]
     second = client.post(QUOTES, json={**QUOTE, "phone": "0788555111"}).json()["reference"]
     page = client.get(STAFF_QUOTES, headers=h).json()
@@ -389,7 +390,7 @@ def test_staff_follow_up_quote_requests(client, db, sales_auth):
 
     res = client.patch(f"{STAFF_QUOTES}/{quote_id}", json={"status": "contacted"}, headers=h)
     assert res.status_code == 200, res.text
-    assert res.json()["handled_by_user_id"] == str(sales_auth["user"].id)
+    assert res.json()["handled_by_user_id"] == str(admin_auth["user"].id)
     assert res.json()["handled_at"] is not None
     assert client.patch(
         f"{STAFF_QUOTES}/{quote_id}", json={"status": "contacted"}, headers=h
@@ -411,11 +412,9 @@ def test_staff_follow_up_quote_requests(client, db, sales_auth):
     assert bad.status_code == 422
 
 
-def test_quote_permissions(
-    client, admin_auth, management_auth, operations_auth, finance_auth, customer_auth
-):
+def test_quote_permissions(client, admin_auth, customer_auth):
     assert client.get(STAFF_QUOTES, headers=admin_auth["headers"]).status_code == 200
-    for auth in (management_auth, operations_auth, finance_auth, customer_auth):
+    for auth in (customer_auth,):  # SC-05: the administrator is the only staff role
         assert client.get(STAFF_QUOTES, headers=auth["headers"]).status_code == 403
         res = client.patch(
             f"{STAFF_QUOTES}/{uuid.uuid4()}", json={"status": "closed"}, headers=auth["headers"]

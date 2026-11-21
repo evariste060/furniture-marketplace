@@ -457,19 +457,9 @@ def test_other_integrity_errors_on_delete_are_not_reported_as_in_use(
 
 
 # ---- authorization ---------------------------------------------------------------------------
-def test_sales_staff_manage_the_catalogue(client: TestClient, sales_auth: dict):
-    h = sales_auth["headers"]
-    category = create_category(client, h, "Accessories")
-    brand = create_brand(client, h, "Anker")
-    assert (
-        client.patch(f"{STAFF}/categories/{category['id']}", json={"name": "A"}, headers=h)
-    ).status_code == 200
-    assert client.patch(f"{STAFF}/brands/{brand['id']}", json={"name": "B"}, headers=h).status_code
-    assert client.delete(f"{STAFF}/categories/{category['id']}", headers=h).status_code == 204
-    assert client.delete(f"{STAFF}/brands/{brand['id']}", headers=h).status_code == 204
 
 
-@pytest.mark.parametrize("who", ["operations_auth", "management_auth", "customer_auth"])
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_other_roles_are_forbidden_and_nothing_changes(
     client: TestClient, db: Session, admin_auth: dict, who: str, request
 ):
@@ -536,7 +526,7 @@ def test_malformed_ids_are_validation_errors(client: TestClient, admin_auth: dic
 
 # ---- {staff_id:uuid} route converter ---------------------------------------------------------
 def test_catalogue_routes_are_not_captured_by_staff_account_routes(
-    client: TestClient, admin_auth: dict, sales_auth: dict
+    client: TestClient, admin_auth: dict
 ):
     h = admin_auth["headers"]
     # Before the converter, these matched GET/PATCH /staff/{staff_id} and failed with 422.
@@ -544,7 +534,7 @@ def test_catalogue_routes_are_not_captured_by_staff_account_routes(
     assert client.get(f"{STAFF}/categories", headers=h).status_code == 200
     assert client.patch(f"{STAFF}/brands", json={"name": "X"}, headers=h).status_code == 405
     # Staff-account URLs are unchanged.
-    staff_id = sales_auth["user"].id
-    assert client.get(f"{STAFF}/{staff_id}", headers=h).json()["role"] == "sales"
+    staff_id = admin_auth["user"].id
+    assert client.get(f"{STAFF}/{staff_id}", headers=h).json()["role"] == "administrator"
     assert client.get(f"{STAFF}/{str(staff_id).upper()}", headers=h).status_code == 200
     assert client.get(f"{STAFF}/not-a-uuid", headers=h).status_code == 404

@@ -32,8 +32,8 @@ describe("access", () => {
     expect(canOpen(["orders:read"], ["orders:read"])).toBe(true);
     expect(canOpen(new Set(["catalog:read"]), ["orders:read"])).toBe(false);
     expect(roleHas("administrator", "audit:read")).toBe(true);
-    expect(roleHas("sales", "audit:read")).toBe(false);
-    expect(rolesFor(["audit:read"])).toEqual(["administrator", "finance"]);
+    // SC-05: the Marketplace Administrator is the only staff role and holds every permission.
+    expect(rolesFor(["audit:read"])).toEqual(["administrator"]);
     expect(rolesFor(["staff:read"])).toEqual(["administrator"]);
   });
 
@@ -251,9 +251,9 @@ describe("staff and audit", () => {
 describe("module 19 content", () => {
   const empty: StoreTexts = { name: "", phone: "", whatsapp: "", email: "", address: "", hours: "", announceEn: "", announceRw: "" };
 
-  it("opens quote requests for administrators and sales only", () => {
+  it("opens quote requests for administrators", () => {
     expect(activeNav("/admin/quotes")).toBe("quotes");
-    expect(rolesFor(["quotes:manage"])).toEqual(["administrator", "sales"]);
+    expect(rolesFor(["quotes:manage"])).toEqual(["administrator"]);
   });
 
   it("sends only the changed store settings, in the backend's form", () => {

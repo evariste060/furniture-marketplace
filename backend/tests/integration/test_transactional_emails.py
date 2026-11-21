@@ -134,10 +134,10 @@ def test_without_a_site_url_emails_carry_no_link(client, db, shop, emails, monke
 
 # ---- status changes and payment -------------------------------------------------------------
 def test_status_changes_and_cash_on_delivery_payment_are_emailed(
-    client, db, shop, emails, operations_auth
+    client, db, shop, emails, admin_auth
 ):
     order, _, _ = guest_order(client, db)
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     for status in ("confirmed", "processing", "dispatched", "delivered"):
         res = client.patch(f"{STAFF}/{order['id']}/status", json={"status": status}, headers=h)
         assert res.status_code == 200, res.text

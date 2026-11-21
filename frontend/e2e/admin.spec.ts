@@ -1,16 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectAccessible, screenshot } from "./helpers";
 
-/** Frontend phase 6: every admin screen opens for an administrator (axe and screenshots), and the
- * sidebar and AccessDenied follow the role. Read-only: nothing is saved, so the dev data stays as
- * it is. Needs staff accounts in the dev database (the development catalogue seed creates one per
- * role) and their password in E2E_STAFF_PASSWORD; the tests are skipped without it. */
+/** Frontend phase 6: every admin screen opens for an administrator (axe and screenshots). SC-05: the
+ * Marketplace Administrator is the only staff role. Read-only: nothing is saved, so the dev data
+ * stays as it is. Needs the seed administrator in the dev database and its password in
+ * E2E_STAFF_PASSWORD; the tests are skipped without it. */
 
 const PASSWORD = process.env.E2E_STAFF_PASSWORD;
 const ACCOUNTS = {
   administrator: process.env.E2E_ADMIN_EMAIL ?? "admin@seed.3sixty.local",
-  sales: process.env.E2E_SALES_EMAIL ?? "sales@seed.3sixty.local",
-  finance: process.env.E2E_FINANCE_EMAIL ?? "finance@seed.3sixty.local",
 } as const;
 
 test.skip(!PASSWORD, "Set E2E_STAFF_PASSWORD to the seed staff password to run the admin tests.");
@@ -107,27 +105,13 @@ test("an administrator opens every admin screen", async ({ page }, testInfo) => 
   });
 });
 
-test("sales sees only its areas and AccessDenied elsewhere", async ({ page }, testInfo) => {
-  await signIn(page, "sales");
-  await open(page, "/admin/reviews", "Reviews");
-  const nav = page.getByRole("navigation", { name: "Admin" });
-  if (testInfo.project.name === "desktop") {
-    await expect(nav.getByRole("link", { name: "Reviews" })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /^Quote requests/ })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Staff & Roles" })).toHaveCount(0);
-    await expect(nav.getByRole("link", { name: "Payments" })).toHaveCount(0);
-  }
-  await page.goto("/admin/staff");
-  await expect(page.getByRole("heading", { name: "You don’t have access to this page" })).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByText("Staff & Roles is only available to Administrator.")).toBeVisible();
-  await expectAccessible(page);
-  await screenshot(page, testInfo, "admin-access-denied");
-});
-
-test("finance reads the audit log but not the catalogue", async ({ page }) => {
-  await signIn(page, "finance");
-  await open(page, "/admin/audit", "Audit log");
-  await expect(page.getByRole("combobox", { name: "Staff member" })).toHaveCount(0);
-  await page.goto("/admin/products");
-  await expect(page.getByRole("heading", { name: "You don’t have access to this page" })).toBeVisible({ timeout: 30_000 });
+test("every staff member is a Marketplace Administrator, with no role filter or picker", async ({ page }) => {
+  await signIn(page, "administrator");
+  await open(page, "/admin/staff", "Staff & roles");
+  await expect(page.getByRole("group", { name: "Filter by role" })).toHaveCount(0);
+  await expect(page.getByText("Marketplace Administrator").first()).toBeVisible();
+  await page.getByRole("button", { name: "Add staff member" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByRole("combobox", { name: "Role" })).toHaveCount(0);
+  await dialog.getByRole("button", { name: "Cancel" }).click();
 });

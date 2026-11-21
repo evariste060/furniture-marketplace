@@ -5,7 +5,6 @@ import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
@@ -302,7 +301,7 @@ def test_review_text_is_plain_text_and_validated(client, db, admin_auth):
 # ---- moderation and totals -------------------------------------------------------------------
 
 
-def test_moderation_recalculates_the_totals_and_is_audited(client, db, admin_auth, sales_auth):
+def test_moderation_recalculates_the_totals_and_is_audited(client, db, admin_auth):
     first = delivered_item(db)
     variant = first.variant
     slug = first.slug
@@ -312,7 +311,7 @@ def test_moderation_recalculates_the_totals_and_is_audited(client, db, admin_aut
     assert public(client, slug)["total"] == 0
 
     for review_id in ids:
-        res = moderate(client, sales_auth, review_id, "approve")
+        res = moderate(client, admin_auth, review_id, "approve")
         assert res.status_code == 200, res.text
         assert res.json()["status"] == "approved" and res.json()["moderated_at"]
     totals = rating(client, slug)
@@ -327,7 +326,7 @@ def test_moderation_recalculates_the_totals_and_is_audited(client, db, admin_aut
     listing = client.get(f"{API}/catalog/products").json()["items"]
     assert next(p for p in listing if p["slug"] == slug)["rating"] == {"average": 3.7, "count": 3}
 
-    again = moderate(client, sales_auth, ids[0], "approve")
+    again = moderate(client, admin_auth, ids[0], "approve")
     assert again.status_code == 409 and code(again) == "review_already_approved"
 
     rejected = moderate(client, admin_auth, ids[2], "reject", reason="Off topic")
@@ -395,12 +394,10 @@ def test_the_public_list_shows_approved_reviews_newest_first(client, db, admin_a
     )
 
 
-@pytest.mark.parametrize("role", ["finance", "operations", "management"])
-def test_only_moderators_see_and_decide_reviews(client, db, request, role, customer_auth):
+def test_only_moderators_see_and_decide_reviews(client, db, customer_auth):
     item = delivered_item(db)
     review_id = review_for(db, client, item, 5)
-    staff = request.getfixturevalue(f"{role}_auth")
-    for auth in (staff, customer_auth):
+    for auth in (customer_auth,):
         assert client.get(STAFF, headers=auth["headers"]).status_code == 403
         assert moderate(client, auth, review_id, "approve").status_code == 403
         assert moderate(client, auth, review_id, "reject").status_code == 403

@@ -91,22 +91,12 @@ def placed_order(db: Session, *, user_id=None, expires_at: datetime | None = Non
 
 
 # ---- staff permissions (B6) ----------------------------------------------------------------
-def test_management_can_view_promotions_but_not_change_them(client, admin_auth, management_auth):
-    promo = create_promotion(client, admin_auth["headers"])
-    h = management_auth["headers"]
-    assert client.get(PROMOTIONS, headers=h).status_code == 200
-    assert client.get(f"{PROMOTIONS}/{promo['id']}", headers=h).status_code == 200
-    body = {"code": "MGMT10", "name": "x", "kind": "percent", "percent_off": 10}
-    assert client.post(PROMOTIONS, json=body, headers=h).status_code == 403
-    res = client.patch(f"{PROMOTIONS}/{promo['id']}", json={"status": "disabled"}, headers=h)
-    assert res.status_code == 403
-    assert client.get(f"{PROMOTIONS}/{promo['id']}", headers=h).json()["status"] == "active"
 
 
 @pytest.mark.parametrize(
     ("who", "read"),
     # Sales views promotions (promotions:read, final matrix 2026-10-26) but cannot change them.
-    [("sales_auth", 200), ("operations_auth", 403), ("customer_auth", 403), (None, 401)],
+    [("customer_auth", 403), (None, 401)],
 )
 def test_other_roles_and_anonymous_callers_are_refused(client, request, admin_auth, who, read):
     promo = create_promotion(client, admin_auth["headers"])
@@ -614,9 +604,7 @@ def test_the_window_boundary_uses_database_time(db, client, admin_auth):
 
 
 # ---- redemption release lifecycle ----------------------------------------------------------
-def test_cancellation_before_dispatch_releases_the_redemption_once(
-    client, db, admin_auth, operations_auth
-):
+def test_cancellation_before_dispatch_releases_the_redemption_once(client, db, admin_auth):
     promo = create_promotion(client, admin_auth["headers"], usage_limit_total=1)
     order_id = placed_order(db)
     redeem(
@@ -631,7 +619,7 @@ def test_cancellation_before_dispatch_releases_the_redemption_once(
     res = client.patch(
         f"{ORDERS}/{order_id}/status",
         json={"status": "cancelled"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 200, res.text
     db.expire_all()
@@ -643,7 +631,7 @@ def test_cancellation_before_dispatch_releases_the_redemption_once(
     assert len(audits(db, "promotion.redemption_release")) == 1
 
 
-def test_a_failed_cancellation_keeps_the_redemption(client, db, admin_auth, operations_auth):
+def test_a_failed_cancellation_keeps_the_redemption(client, db, admin_auth):
     promo = create_promotion(client, admin_auth["headers"])
     order_id = placed_order(db)
     redeem(
@@ -661,7 +649,7 @@ def test_a_failed_cancellation_keeps_the_redemption(client, db, admin_auth, oper
     res = client.patch(
         f"{ORDERS}/{order_id}/status",
         json={"status": "cancelled"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 409  # not before dispatch: nothing is released
     db.expire_all()

@@ -457,20 +457,9 @@ def test_a_failed_delete_audit_keeps_the_row_the_files_and_their_registry_state(
 
 
 # ---- authorization -----------------------------------------------------------------------
-def test_sales_staff_manage_images(client, product, storage, sales_auth):
-    res = client.post(
-        f"{STAFF}/products/{product['id']}/images",
-        files={"file": ("a.jpg", image_bytes(), "image/jpeg")},
-        headers=sales_auth["headers"],
-    )
-    assert res.status_code == 201
-    h = sales_auth["headers"]
-    edited = client.patch(f"{STAFF}/images/{res.json()['id']}", json={"sort_order": 3}, headers=h)
-    assert edited.status_code == 200 and edited.json()["sort_order"] == 3
-    assert client.delete(f"{STAFF}/images/{res.json()['id']}", headers=h).status_code == 204
 
 
-@pytest.mark.parametrize("who", ["operations_auth", "management_auth", "customer_auth"])
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_other_roles_are_forbidden_and_nothing_is_stored(
     client, product, storage, db, who, request
 ):
@@ -680,7 +669,7 @@ def test_openapi_documents_every_image_response_with_valid_examples():
     assert "multipart/form-data" in spec["paths"][UPLOAD_PATH]["post"]["requestBody"]["content"]
 
 
-def test_documented_error_examples_match_real_responses(client, product, storage, operations_auth):
+def test_documented_error_examples_match_real_responses(client, product, storage, customer_auth):
     """Every error the API really returns here is one of the documented examples, verbatim."""
     spec = openapi_spec()
     h = product["headers"]
@@ -695,7 +684,7 @@ def test_documented_error_examples_match_real_responses(client, product, storage
     forbidden = client.post(
         f"{STAFF}/products/{product['id']}/images",
         files={"file": ("a.jpg", image_bytes(), "image/jpeg")},
-        headers=operations_auth["headers"],
+        headers=customer_auth["headers"],  # SC-05: no staff account lacks catalog:manage
     )
     real = {
         ("post", UPLOAD_PATH, "401"): [anonymous],
@@ -775,7 +764,7 @@ def test_reorder_must_list_every_product_image_once(client, product, storage, ca
     assert res.status_code == 422 and error_code(res) == "validation_error"
 
 
-def test_reorder_unknown_product_and_roles(client, product, storage, operations_auth, sales_auth):
+def test_reorder_unknown_product_and_roles(client, product, storage, customer_auth):
     ids = [upload(client, product).json()["id"]]
     unknown = client.put(
         f"{STAFF}/products/{uuid.uuid4()}/images/order",
@@ -784,8 +773,8 @@ def test_reorder_unknown_product_and_roles(client, product, storage, operations_
     )
     assert unknown.status_code == 404 and error_code(unknown) == "product_not_found"
     forbidden = client.put(
-        order_url(product), json={"image_ids": ids}, headers=operations_auth["headers"]
+        order_url(product), json={"image_ids": ids}, headers=customer_auth["headers"]
     )
     assert forbidden.status_code == 403
-    allowed = client.put(order_url(product), json={"image_ids": ids}, headers=sales_auth["headers"])
+    allowed = client.put(order_url(product), json={"image_ids": ids}, headers=product["headers"])
     assert allowed.status_code == 200

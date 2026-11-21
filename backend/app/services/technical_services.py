@@ -10,7 +10,7 @@ number) and per client network (SERVICE_REQUEST_* settings); beyond it the reque
 and an unreachable limit store refuses (503). The request gets a random reference
 (SR-YYMMDD-XXXXXX, Kigali date) and, when an email is given, an acknowledgement email.
 
-Staff with 'services:manage' (administrator, sales) create, edit, hide, reorder and delete
+Staff with 'services:manage' (administrator) create, edit, hide, reorder and delete
 services and their items, and follow requests up (status, assignee, internal notes). A service
 with requests cannot be deleted (409 service_has_requests); hide it instead. Every change is
 audited ('services.*'); a change that changes nothing writes nothing.

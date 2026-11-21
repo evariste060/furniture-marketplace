@@ -926,11 +926,8 @@ BANNERS = (
 )
 
 STAFF = (
+    # The Marketplace Administrator is the only staff role (SC-05, 2026-11-21).
     SeedPerson("admin", "Seed Administrator", role="administrator"),
-    SeedPerson("sales", "Seed Sales", role="sales"),
-    SeedPerson("operations", "Seed Operations", role="operations"),
-    SeedPerson("management", "Seed Management", role="management"),
-    SeedPerson("finance", "Seed Finance", role="finance"),
 )
 
 CUSTOMERS = (

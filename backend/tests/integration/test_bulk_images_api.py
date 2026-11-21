@@ -279,10 +279,8 @@ def test_a_full_upload_area_or_disk_gives_507(
 @pytest.mark.parametrize(
     ("who", "expected"),
     [
-        ("sales_auth", 202),
-        ("operations_auth", 403),
-        ("management_auth", 403),
-        ("finance_auth", 403),
+        ("admin_auth", 202),
+        ("customer_auth", 403),
         (None, 401),
     ],
 )

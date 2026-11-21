@@ -217,7 +217,7 @@ def test_parallel_saves_cannot_pass_the_limit(
     assert count == WISHLIST_LIMIT
 
 
-def test_only_signed_in_customers_have_a_wishlist(client, admin_auth, sales_auth, category):
+def test_only_signed_in_customers_have_a_wishlist(client, admin_auth, category):
     some = product(client, admin_auth, category, "Galaxy A55")
     for method, path in (
         ("get", WISH),
@@ -228,7 +228,7 @@ def test_only_signed_in_customers_have_a_wishlist(client, admin_auth, sales_auth
         assert client.request(method, path).status_code == 401
         bad = client.request(method, path, headers={"Authorization": "Bearer nope"})
         assert bad.status_code == 401
-        for staff in (admin_auth, sales_auth):
+        for staff in (admin_auth,):  # the only staff role since SC-05
             res = client.request(method, path, headers=staff["headers"])
             assert res.status_code == 403 and res.json()["error"]["code"] == "customer_only"
 

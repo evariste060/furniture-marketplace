@@ -148,6 +148,9 @@ def test_brand_logo_constraints(media_engine: Engine):
 
 
 def test_the_finance_role_is_accepted_and_blocks_its_own_downgrade(pg_engine: Engine):
+    # Historical: SC-05 later keeps only the administrator role, so go back to the finance
+    # revision first (tests/integration/test_marketplace_administrator_migration.py).
+    _alembic(pg_engine, "downgrade", FINANCE)
     _staff(pg_engine, "finance")
     with pytest.raises(IntegrityError), pg_engine.begin() as conn:
         conn.execute(

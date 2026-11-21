@@ -2,8 +2,8 @@
 
 POST /support-messages is public (a signed-in customer's message is linked to their account) and
 rate limited. /customers/me/support-threads is for customer accounts. The staff routes need
-'support:read' (administrator, sales, management) to read and 'support:reply' (administrator,
-sales) to reply or change the status.
+'support:read' (administrator) to read and 'support:reply' (administrator) to reply or change
+the status.
 """
 
 import uuid
@@ -252,7 +252,7 @@ def reply_to_my_thread(
     response_model=Page[StaffSupportThreadSummary],
     summary="List support conversations",
     description=(
-        "Requires 'support:read' (administrator, sales, management). Most recent activity "
+        "Requires 'support:read' (administrator). Most recent activity "
         "first. `status` filters; `q` searches reference, name, subject, email, phone and order "
         "number."
     ),
@@ -276,7 +276,7 @@ def list_support_threads(
     "/{thread_id}",
     response_model=StaffSupportThreadDetail,
     summary="Read a support conversation",
-    description="Requires 'support:read' (administrator, sales, management).",
+    description="Requires 'support:read' (administrator).",
     responses={**GUARDED, **NOT_FOUND},
 )
 def get_support_thread(thread_id: uuid.UUID, _: SupportReader, db: Db) -> StaffSupportThreadDetail:
@@ -289,7 +289,7 @@ def get_support_thread(thread_id: uuid.UUID, _: SupportReader, db: Db) -> StaffS
     status_code=status.HTTP_201_CREATED,
     summary="Reply to a support conversation",
     description=(
-        "Requires 'support:reply' (administrator, sales). Sets the status to answered and "
+        "Requires 'support:reply' (administrator). Sets the status to answered and "
         "emails the reply to the sender's address when they gave one. Audited as "
         "'support.reply'."
     ),
@@ -314,7 +314,7 @@ def reply_to_support_thread(
     response_model=StaffSupportThreadDetail,
     summary="Change a support conversation's status",
     description=(
-        "Requires 'support:reply' (administrator, sales). open, answered or closed. Audited as "
+        "Requires 'support:reply' (administrator). open, answered or closed. Audited as "
         "'support.status_change'; setting the current status changes nothing and is not audited."
     ),
     responses={**GUARDED, **NOT_FOUND, **VALIDATION_422},

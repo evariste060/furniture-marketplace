@@ -516,7 +516,7 @@ export interface paths {
         };
         /**
          * Current staff identity
-         * @description Returns the authenticated staff member's account, role and effective permissions. Requires 'staff:self_read' (every staff role). Customers receive 403.
+         * @description Returns the authenticated staff member's account, role and effective permissions. Requires 'staff:self_read'. Customers and sellers receive 403.
          */
         get: operations["get_me_api_v1_staff_me_get"];
         put?: never;
@@ -562,7 +562,7 @@ export interface paths {
         put?: never;
         /**
          * Create a staff account
-         * @description Creates an active staff account with exactly one role and an initial password. Requires 'staff:manage' (administrator). The password is never returned or logged. Recorded in the audit trail as 'staff.create'.
+         * @description Creates an active Marketplace Administrator account with an initial password; `role` may be omitted and only 'administrator' is accepted. Requires 'staff:manage' (administrator). The password is never returned or logged. Recorded in the audit trail as 'staff.create'.
          */
         post: operations["create_staff_api_v1_staff_post"];
         delete?: never;
@@ -593,26 +593,6 @@ export interface paths {
          * @description Updates full_name and/or phone. Role, status, email, password and any other field are rejected with 422. Requires 'staff:manage' (administrator). Audited as 'staff.update'.
          */
         patch: operations["update_staff_api_v1_staff__staff_id__patch"];
-        trace?: never;
-    };
-    "/api/v1/staff/{staff_id}/role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Change a staff member's role
-         * @description Replaces the staff member's single role. Requires 'staff:manage' (administrator). A change revokes all of the member's sessions and is audited as 'staff.role_change' with the old and new role. Setting the current role is a no-op. Demoting the last active administrator returns 409.
-         */
-        patch: operations["change_staff_role_api_v1_staff__staff_id__role_patch"];
         trace?: never;
     };
     "/api/v1/staff/{staff_id}/status": {
@@ -2965,6 +2945,138 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/application": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read my seller application
+         * @description The caller's own store in any status, with the reason while it is rejected or suspended. 404 store_not_found when the caller has not applied.
+         */
+        get: operations["read_application_api_v1_seller_application_get"];
+        /**
+         * Edit or resubmit my seller application
+         * @description Sends every field again. A pending application is edited; a rejected one is resubmitted and becomes pending (acknowledged by email). Approved and suspended stores cannot use this route: 409 store_application_closed.
+         */
+        put: operations["update_application_api_v1_seller_application_put"];
+        /**
+         * Apply to become a seller
+         * @description Signed-in customers with a verified email. Creates the caller's store as 'pending'. One store per account: 409 store_exists. Store names are unique regardless of letter case: 409 store_name_taken. The owner, status, slug and commission cannot be sent (422). Emails an acknowledgement to the account's verified email.
+         */
+        post: operations["submit_application_api_v1_seller_application_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/store": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read my store
+         * @description Approved sellers only (403 seller_not_approved otherwise).
+         */
+        get: operations["read_store_api_v1_seller_store_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update my store
+         * @description Approved sellers only. Partial update of the name, description, contact details and location; the store's address (slug), status and commission cannot be changed here. Audited as 'store.profile_update'.
+         */
+        patch: operations["update_store_api_v1_seller_store_patch"];
+        trace?: never;
+    };
+    "/api/v1/staff/sellers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List stores and seller applications
+         * @description Requires 'sellers:read' (administrator). Newest submission first. `status` filters; `q` matches the store name or address, or the owner's name or email.
+         */
+        get: operations["list_sellers_api_v1_staff_sellers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staff/sellers/{store_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read a store and its history
+         * @description Requires 'sellers:read' (administrator).
+         */
+        get: operations["read_seller_api_v1_staff_sellers__store_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staff/sellers/{store_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Approve, reject, suspend or reinstate a store
+         * @description Requires 'sellers:manage' (administrator). pending -> approved or rejected; approved -> suspended; suspended -> approved (reinstated). A reason (10-500 characters) is required to reject or suspend and is shown to the seller. Anything else is 409 invalid_store_transition. Audited as 'store.status_change' and emailed to the owner.
+         */
+        patch: operations["change_seller_status_api_v1_staff_sellers__store_id__status_patch"];
+        trace?: never;
+    };
+    "/api/v1/staff/sellers/{store_id}/commission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Set a store's commission override
+         * @description Requires 'sellers:manage' (administrator). Whole basis points 0-10000 (1000 = 10%), or null to inherit the platform default (setting marketplace.default_commission_bps). Audited as 'store.commission_change'; setting the current value changes nothing.
+         */
+        patch: operations["change_seller_commission_api_v1_staff_sellers__store_id__commission_patch"];
         trace?: never;
     };
 }
@@ -5755,6 +5867,26 @@ export interface components {
              */
             size: number;
         };
+        /** Page[StaffStoreSummary] */
+        Page_StaffStoreSummary_: {
+            /** Items */
+            items: components["schemas"]["StaffStoreSummary"][];
+            /**
+             * Total
+             * @description Number of items matching the filters
+             */
+            total: number;
+            /**
+             * Page
+             * @description Page number, starting at 1
+             */
+            page: number;
+            /**
+             * Size
+             * @description Requested page size
+             */
+            size: number;
+        };
         /** Page[StaffSupportThreadSummary] */
         Page_StaffSupportThreadSummary_: {
             /** Items */
@@ -6886,6 +7018,60 @@ export interface components {
             periods: components["schemas"]["SalesPeriod"][];
             totals: components["schemas"]["SalesFigures"];
         };
+        /**
+         * SellerStoreResponse
+         * @description The caller's own store or application. Never carries another store's data, the owner's
+         *     account details, the commission override or the review history.
+         */
+        SellerStoreResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Description */
+            description: string | null;
+            /** Contact Email */
+            contact_email: string;
+            /** Contact Phone */
+            contact_phone: string;
+            /** District */
+            district: string;
+            /** Sector */
+            sector: string | null;
+            /** Street Address */
+            street_address: string | null;
+            logo: components["schemas"]["PublicImage"] | null;
+            cover: components["schemas"]["PublicImage"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "rejected" | "suspended";
+            /**
+             * Status Reason
+             * @description Why it is rejected or suspended, else null
+             */
+            status_reason: string | null;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Approved At */
+            approved_at: string | null;
+            /**
+             * Effective Commission Rate Bps
+             * @description The commission that applies to this store, in basis points (read-only)
+             */
+            effective_commission_rate_bps: number;
+        };
         /** ServiceCreateRequest */
         ServiceCreateRequest: {
             /**
@@ -7181,6 +7367,11 @@ export interface components {
              * @description The store's LinkedIn page link (public): a full https:// link on linkedin.com. An empty string removes it from the store.
              */
             "social.linkedin"?: string | null;
+            /**
+             * Marketplace.Default Commission Bps
+             * @description The platform commission on sellers' sales in basis points, 0-10000 (1000 = 10%). Unset means 1000. A store's own override, when set, wins over it.
+             */
+            "marketplace.default_commission_bps"?: number | null;
         };
         /**
          * SocialLinks
@@ -7372,9 +7563,10 @@ export interface components {
             password: string;
             /**
              * Role
-             * @enum {string}
+             * @default administrator
+             * @constant
              */
-            role: "administrator" | "sales" | "operations" | "management" | "finance";
+            role: "administrator";
         };
         /** StaffDeliveryZone */
         StaffDeliveryZone: {
@@ -7442,9 +7634,9 @@ export interface components {
             full_name?: string | null;
             /**
              * Role
-             * @enum {string}
+             * @constant
              */
-            role: "administrator" | "sales" | "operations" | "management" | "finance";
+            role: "administrator";
             /** Is Active */
             is_active: boolean;
             /**
@@ -7773,14 +7965,24 @@ export interface components {
         StaffPermissionsResponse: {
             /**
              * Role
-             * @enum {string}
+             * @constant
              */
-            role: "administrator" | "sales" | "operations" | "management" | "finance";
+            role: "administrator";
             /**
              * Permissions
              * @description Effective permissions from the server-side role mapping
              */
             permissions: string[];
+        };
+        /** StaffPerson */
+        StaffPerson: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Full Name */
+            full_name: string | null;
         };
         /**
          * StaffProductDetail
@@ -7991,9 +8193,9 @@ export interface components {
             full_name?: string | null;
             /**
              * Role
-             * @enum {string}
+             * @constant
              */
-            role: "administrator" | "sales" | "operations" | "management" | "finance";
+            role: "administrator";
             /** Is Active */
             is_active: boolean;
             /**
@@ -8047,14 +8249,6 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
-        };
-        /** StaffRoleUpdateRequest */
-        StaffRoleUpdateRequest: {
-            /**
-             * Role
-             * @enum {string}
-             */
-            role: "administrator" | "sales" | "operations" | "management" | "finance";
         };
         /** StaffService */
         StaffService: {
@@ -8179,6 +8373,100 @@ export interface components {
              * @description false disables the account and revokes its sessions
              */
             is_active: boolean;
+        };
+        /** StaffStoreDetail */
+        StaffStoreDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "rejected" | "suspended";
+            /** District */
+            district: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            owner: components["schemas"]["StaffStoreOwner"];
+            /** Description */
+            description: string | null;
+            /** Contact Email */
+            contact_email: string;
+            /** Contact Phone */
+            contact_phone: string;
+            /** Sector */
+            sector: string | null;
+            /** Street Address */
+            street_address: string | null;
+            logo: components["schemas"]["PublicImage"] | null;
+            cover: components["schemas"]["PublicImage"] | null;
+            /** Status Reason */
+            status_reason: string | null;
+            /** Approved At */
+            approved_at: string | null;
+            reviewed_by: components["schemas"]["StaffPerson"] | null;
+            /**
+             * Commission Rate Bps
+             * @description The store's override; null inherits
+             */
+            commission_rate_bps: number | null;
+            /** Effective Commission Rate Bps */
+            effective_commission_rate_bps: number;
+            /** History */
+            history: components["schemas"]["StoreHistoryEntry"][];
+        };
+        /** StaffStoreOwner */
+        StaffStoreOwner: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
+        };
+        /** StaffStoreSummary */
+        StaffStoreSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "rejected" | "suspended";
+            /** District */
+            district: string;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            owner: components["schemas"]["StaffStoreOwner"];
         };
         /** StaffSupportMessageItem */
         StaffSupportMessageItem: {
@@ -8424,6 +8712,111 @@ export interface components {
             available_quantity: number;
             /** Low Stock Skus */
             low_stock_skus: number;
+        };
+        /**
+         * StoreApplicationRequest
+         * @description A seller application, and its edit or resubmission (PUT sends every field again).
+         * @example {
+         *       "contact_email": "sales@oakworks.example.rw",
+         *       "contact_phone": "0788 123 456",
+         *       "description": "Hand-made solid wood tables and chairs.",
+         *       "district": "Gasabo",
+         *       "name": "Kigali Oak Works",
+         *       "sector": "Kimironko",
+         *       "street_address": "KG 11 Ave"
+         *     }
+         */
+        StoreApplicationRequest: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Contact Email */
+            contact_email: string;
+            /** Contact Phone */
+            contact_phone: string;
+            /** District */
+            district: string;
+            /** Sector */
+            sector?: string | null;
+            /** Street Address */
+            street_address?: string | null;
+        };
+        /**
+         * StoreCommissionRequest
+         * @description A store's own commission in whole basis points (1000 = 10%), or null to inherit the
+         *     platform default.
+         * @example {
+         *       "commission_rate_bps": 750
+         *     }
+         */
+        StoreCommissionRequest: {
+            /** Commission Rate Bps */
+            commission_rate_bps: number | null;
+        };
+        /** StoreHistoryEntry */
+        StoreHistoryEntry: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "approved" | "rejected" | "suspended";
+            /** Reason */
+            reason: string | null;
+            /** Store Name */
+            store_name: string;
+            actor: components["schemas"]["StaffPerson"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * StoreProfileUpdate
+         * @description Partial update of an approved store. name, contact_email, contact_phone and district
+         *     cannot be cleared; description, sector and street_address accept null.
+         * @example {
+         *       "description": "Solid wood only."
+         *     }
+         */
+        StoreProfileUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Contact Phone */
+            contact_phone?: string | null;
+            /** District */
+            district?: string | null;
+            /** Sector */
+            sector?: string | null;
+            /** Street Address */
+            street_address?: string | null;
+        };
+        /**
+         * StoreStatusRequest
+         * @description An administrator decision. A reason (10-500 characters) is required to reject or suspend
+         *     and is shown to the seller; it is optional when approving or reinstating and then kept in the
+         *     history only.
+         * @example {
+         *       "status": "approved"
+         *     }
+         * @example {
+         *       "reason": "Please add your shop's street address.",
+         *       "status": "rejected"
+         *     }
+         */
+        StoreStatusRequest: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "approved" | "rejected" | "suspended";
+            /** Reason */
+            reason?: string | null;
         };
         /** SupportCreated */
         SupportCreated: {
@@ -10427,7 +10820,7 @@ export interface operations {
         parameters: {
             query?: {
                 /** @description Filter by role */
-                role?: ("administrator" | "sales" | "operations" | "management" | "finance") | null;
+                role?: "administrator" | null;
                 /** @description Filter by account status */
                 is_active?: boolean | null;
                 /** @description Page number, starting at 1 */
@@ -10649,77 +11042,6 @@ export interface operations {
                 };
             };
             /** @description Email or phone already used by another account */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Request body, path or query failed validation */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    change_staff_role_api_v1_staff__staff_id__role_patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                staff_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["StaffRoleUpdateRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StaffResponse"];
-                };
-            };
-            /** @description Token missing, invalid, expired or revoked */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Account inactive, or role lacks the required permission */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description No staff account with this ID (customers included) */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Change would leave no active administrator */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -18915,6 +19237,525 @@ export interface operations {
             };
             /** @description Account inactive, or role lacks the required permission */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_application_api_v1_seller_application_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account is inactive or disabled */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_application_api_v1_seller_application_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreApplicationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description staff_cannot_sell, email_verification_required or inactive */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_application_closed or store_name_taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    submit_application_api_v1_seller_application_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreApplicationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description staff_cannot_sell, email_verification_required or inactive */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_exists, store_name_taken or store_slug_conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_store_api_v1_seller_store_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_store_api_v1_seller_store_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerStoreResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_name_taken */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_sellers_api_v1_staff_sellers_get: {
+        parameters: {
+            query?: {
+                status?: ("pending" | "approved" | "rejected" | "suspended") | null;
+                q?: string | null;
+                /** @description Page number, starting at 1 */
+                page?: number;
+                /** @description Items per page (1-100) */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_StaffStoreSummary_"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account inactive, or role lacks the required permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    read_seller_api_v1_staff_sellers__store_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffStoreDetail"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account inactive, or role lacks the required permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    change_seller_status_api_v1_staff_sellers__store_id__status_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffStoreDetail"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account inactive, or role lacks the required permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description invalid_store_transition */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    change_seller_commission_api_v1_staff_sellers__store_id__commission_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoreCommissionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffStoreDetail"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account inactive, or role lacks the required permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

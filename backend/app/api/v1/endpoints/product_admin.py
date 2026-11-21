@@ -1,7 +1,7 @@
 """Staff product and variant management (module 6), and the staff product list and detail.
 
-Changes require 'catalog:manage' (administrator and sales). The list and detail require
-'catalog:read' (every staff role but finance; 2026-10-26) and show drafts too. Rules and
+Changes require 'catalog:manage' (administrator). The list and detail require
+'catalog:read' (administrator) and show drafts too. Rules and
 concurrency are in app.services.product_admin. The public, read-only views are
 GET /catalog/products and GET /catalog/products/{slug}.
 """
@@ -86,7 +86,7 @@ Storage = Annotated[MediaStorage, Depends(get_media_storage)]
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 
-PERMISSION_NOTE = "Requires 'catalog:manage' (administrator, sales)."
+PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
 
 
 def _stock_fields(stock: ProductStock | None) -> dict[str, Any]:
@@ -114,7 +114,7 @@ def _product_response(product: Product) -> ProductResponse:
     response_model=Page[StaffProductListItem],
     summary="Staff product list, drafts included",
     description=(
-        "Requires 'catalog:read' (administrator, sales, operations, management). Every product "
+        "Requires 'catalog:read' (administrator). Every product "
         "whatever its status, most recently updated first. Filters: `status`; `has_images` "
         "(product images only, variant images not counted), e.g. `status=active&has_images=false` "
         "for active products without a photo or `status=draft&has_images=true` for drafts ready "
@@ -187,7 +187,7 @@ def list_products(
     response_model=StaffProductDetail,
     summary="Staff product detail, drafts included",
     description=(
-        "Requires 'catalog:read' (administrator, sales, operations, management). The product "
+        "Requires 'catalog:read' (administrator). The product "
         "whatever its status, every variant, and every image (variant images included) in "
         "display order."
     ),

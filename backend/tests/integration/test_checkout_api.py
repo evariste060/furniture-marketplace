@@ -446,16 +446,14 @@ def available(db: Session, variant: str) -> int:
     return int(on_hand or 0) - int(held or 0)
 
 
-def test_tc14_cancellation_releases_stock_and_code_exactly_once(
-    client, db, admin_auth, operations_auth, delivery
-):
+def test_tc14_cancellation_releases_stock_and_code_exactly_once(client, db, admin_auth, delivery):
     order, variant = placed(client, db, admin_auth)
     assert available(db, variant) == 0
     url = f"{STAFF}/{order['id']}/status"
     res = client.patch(
         url,
         json={"status": "cancelled", "reason": "Customer called"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 200, res.text
     assert available(db, variant) == 1
@@ -466,7 +464,7 @@ def test_tc14_cancellation_releases_stock_and_code_exactly_once(
         select(OrderStatusHistory.reason).where(OrderStatusHistory.status == "cancelled")
     ).all()
     assert history == ["Customer called"]
-    again = client.patch(url, json={"status": "cancelled"}, headers=operations_auth["headers"])
+    again = client.patch(url, json={"status": "cancelled"}, headers=admin_auth["headers"])
     assert again.status_code == 409 and code(again) == "invalid_transition"
     assert available(db, variant) == 1
     assert (
@@ -480,10 +478,10 @@ def test_tc14_cancellation_releases_stock_and_code_exactly_once(
 
 
 def test_q13_confirming_cod_commits_stock_so_it_can_no_longer_be_cancelled(
-    client, db, admin_auth, operations_auth, delivery
+    client, db, admin_auth, delivery
 ):
     order, variant = placed(client, db, admin_auth, with_code=False)
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     url = f"{STAFF}/{order['id']}/status"
     assert client.patch(url, json={"status": "confirmed"}, headers=h).status_code == 200
     db.expire_all()
@@ -493,11 +491,9 @@ def test_q13_confirming_cod_commits_stock_so_it_can_no_longer_be_cancelled(
     assert available(db, variant) == 0
 
 
-def test_q14_delivering_cod_marks_the_payment_succeeded(
-    client, db, admin_auth, operations_auth, delivery
-):
+def test_q14_delivering_cod_marks_the_payment_succeeded(client, db, admin_auth, delivery):
     order, _ = placed(client, db, admin_auth, with_code=False)
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     url = f"{STAFF}/{order['id']}/status"
     for status in ("confirmed", "processing", "dispatched"):
         assert client.patch(url, json={"status": status}, headers=h).status_code == 200, status
@@ -564,10 +560,6 @@ def test_customers_see_only_their_own_orders(
     ("who", "expected"),
     [
         ("admin_auth", 200),
-        ("sales_auth", 200),
-        ("operations_auth", 200),
-        ("finance_auth", 200),
-        ("management_auth", 200),  # orders:read since 2026-10-26
         ("customer_auth", 403),
         (None, 401),
     ],
@@ -579,7 +571,7 @@ def test_staff_order_read_permissions(client, db, request, delivery, who, expect
     assert client.get(f"{STAFF}/{order['id']}", headers=headers).status_code == expected
 
 
-def test_staff_list_filters_and_detail(client, db, admin_auth, operations_auth, delivery):
+def test_staff_list_filters_and_detail(client, db, admin_auth, delivery):
     h = admin_auth["headers"]
     cod = checkout(client, guest_cart(client, db)).json()["order"]
     momo = checkout(
@@ -588,7 +580,7 @@ def test_staff_list_filters_and_detail(client, db, admin_auth, operations_auth, 
     client.patch(
         f"{STAFF}/{momo['id']}/status",
         json={"status": "cancelled"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
 
     def ids(**params):
@@ -610,18 +602,6 @@ def test_staff_list_filters_and_detail(client, db, admin_auth, operations_auth, 
     assert client.get(f"{STAFF}/{uuid.uuid4()}", headers=h).status_code == 404
 
 
-def test_sales_can_read_but_not_change_order_status(client, db, sales_auth, delivery):
-    order = checkout(client, guest_cart(client, db)).json()["order"]
-    res = client.patch(
-        f"{STAFF}/{order['id']}/status", json={"status": "confirmed"}, headers=sales_auth["headers"]
-    )
-    assert res.status_code == 403
-    long_reason = {"status": "cancelled", "reason": "x" * 501}
-    assert client.patch(
-        f"{STAFF}/{order['id']}/status", json=long_reason, headers=sales_auth["headers"]
-    ).status_code in (403, 422)
-
-
 def test_order_numbers_are_random_not_sequential(client, db, delivery):
     numbers = {
         checkout(client, guest_cart(client, db)).json()["order"]["order_number"] for _ in range(3)
@@ -630,15 +610,13 @@ def test_order_numbers_are_random_not_sequential(client, db, delivery):
 
 
 # ---- D-O2: mobile money is never shown as paid before the payments module ------------------
-def test_mobile_money_orders_stay_unpaid_and_cannot_be_dispatched(
-    client, db, admin_auth, operations_auth, delivery
-):
+def test_mobile_money_orders_stay_unpaid_and_cannot_be_dispatched(client, db, admin_auth, delivery):
     res = checkout(
         client, guest_cart(client, db), {"address": INLINE, "payment_method": "mtn_momo"}
     )
     order = res.json()["order"]
     assert order["payment"]["status"] == "created"  # not started: no provider exists yet
-    h = operations_auth["headers"]
+    h = admin_auth["headers"]
     url = f"{STAFF}/{order['id']}/status"
     assert client.patch(url, json={"status": "confirmed"}, headers=h).status_code == 200
     assert client.patch(url, json={"status": "processing"}, headers=h).status_code == 200

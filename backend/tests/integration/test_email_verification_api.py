@@ -415,7 +415,7 @@ def test_existing_and_verified_accounts_sign_in_as_before(
 def test_staff_sign_in_is_unchanged_and_never_asks_for_verification(
     client: TestClient, db: Session, verification_mail: RecordingSender
 ) -> None:
-    staff = make_staff(db, "sales", "sales.verify@example.com", "+250788100500")
+    staff = make_staff(db, "administrator", "sales.verify@example.com", "+250788100500")
     db.execute(update(User).where(User.id == staff["user"].id).values(email_verified_at=None))
     db.commit()
     res = login(client, "sales.verify@example.com", staff["password"])
@@ -430,7 +430,7 @@ def test_resend_answers_the_same_for_every_kind_of_address(
 ) -> None:
     register(client, EMAIL_W)
     age_tokens(db, user_row(db, EMAIL_W), timedelta(minutes=5))
-    make_staff(db, "sales", "staff.enum@example.com", "+250788100600")
+    make_staff(db, "administrator", "staff.enum@example.com", "+250788100600")
     inactive = register(client, "inactive@example.com")
     db.execute(update(User).where(User.id == inactive["user"]["id"]).values(is_active=False))
     db.commit()

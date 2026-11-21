@@ -7,7 +7,7 @@ refuses (503) so the form cannot be used to flood the table. The request gets a 
 (Q-YYMMDD-XXXXXX, Kigali date) to quote when calling. Nothing is sent to the buyer or to staff
 yet (notifications are module 17).
 
-Staff with 'quotes:manage' (administrator, sales) list requests, newest first, and move them
+Staff with 'quotes:manage' (administrator) list requests, newest first, and move them
 between new, contacted and closed. handled_at and handled_by_user_id record who last moved a
 request out of 'new' (cleared when it goes back to new). Each change is audited as
 'quote.status_change'.

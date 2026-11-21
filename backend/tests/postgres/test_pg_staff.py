@@ -87,87 +87,34 @@ def test_bootstrap_cli_rejects_weak_password_without_echoing_it(stack: Stack):
 
 
 # ---- TC-16 over real HTTP --------------------------------------------------------------------
-def test_tc16_restricted_staff_cannot_reach_admin_functions(stack: Stack, admin: dict, unique: str):
-    victim = create_staff(stack, admin, unique, "sales", "victim")
-    permissions = {  # the final matrix (2026-10-26)
-        "sales": [
-            "catalog:manage",
-            "catalog:read",
-            "inventory:adjust",
-            "inventory:read",
-            "orders:read",
-            "promotions:read",
-            "quotes:manage",
-            "reviews:moderate",
-            "services:manage",
-            "services:read",
-            "staff:self_read",
-            "support:read",
-            "support:reply",
-        ],
-        "operations": [
-            "catalog:read",
-            "delivery:read",
-            "inventory:adjust",
-            "inventory:read",
-            "orders:fulfil",
-            "orders:read",
-            "staff:self_read",
-        ],
-        "management": [
-            "catalog:read",
-            "content:manage",
-            "delivery:read",
-            "inventory:read",
-            "orders:read",
-            "payments:read",
-            "promotions:read",
-            "reports:read",
-            "services:read",
-            "settings:read",
-            "staff:self_read",
-            "support:read",
-        ],
-        "finance": [
-            "audit:read",
-            "orders:read",
-            "payments:read",
-            "reports:read",
-            "staff:self_read",
-        ],
+def test_tc16_non_staff_cannot_reach_admin_functions(stack: Stack, admin: dict, unique: str):
+    """SC-05: the Marketplace Administrator is the only staff role, so TC-16 is checked against
+    customers and the database itself refuses any other role."""
+    victim = create_staff(stack, admin, unique, "administrator", "victim")
+    customer = register(stack, stack.servers[0], f"tc16.cust.{unique}@pg.test")
+    h, base = customer["headers"], stack.servers[1]
+    assert HTTP.get(f"{base}/staff/me", headers=h).status_code == 403
+    assert HTTP.get(f"{base}/audit-logs", headers=h).status_code == 403
+    new_admin = {
+        "email": f"esc.cust.{unique}@pg.test",
+        "full_name": "Escalation",
+        "password": STAFF_PASSWORD,
     }
+    assert HTTP.post(f"{base}/staff", json=new_admin, headers=h).status_code == 403
+    res = HTTP.patch(f"{base}/staff/{victim['id']}/status", json={"is_active": False}, headers=h)
+    assert res.status_code == 403
     for role in ("sales", "operations", "management", "finance"):
-        member = create_staff(stack, admin, unique, role, f"tc16{role}")
-        h = login(stack.servers[1], member["email"], STAFF_PASSWORD)
-        base = stack.servers[1]
-        assert HTTP.get(f"{base}/staff/me", headers=h).json()["permissions"] == permissions[role]
-        assert HTTP.get(f"{base}/staff", headers=h).status_code == 403
-        audit_status = 200 if role == "finance" else 403  # audit:read
-        assert HTTP.get(f"{base}/audit-logs", headers=h).status_code == audit_status
-        new_admin = {
-            "email": f"esc.{role}.{unique}@pg.test",
-            "full_name": "Escalation",
-            "password": STAFF_PASSWORD,
-            "role": "administrator",
-        }
-        assert HTTP.post(f"{base}/staff", json=new_admin, headers=h).status_code == 403
-        for target in (victim["id"], member["id"]):
-            res = HTTP.patch(
-                f"{base}/staff/{target}/role", json={"role": "administrator"}, headers=h
-            )
-            assert res.status_code == 403
-            res = HTTP.patch(f"{base}/staff/{target}/status", json={"is_active": False}, headers=h)
-            assert res.status_code == 403
+        body = {**new_admin, "email": f"esc.{role}.{unique}@pg.test", "role": role}
+        assert HTTP.post(f"{base}/staff", json=body, headers=admin).status_code == 422
     with stack.owner() as conn:
         assert one(
             conn, "SELECT count(*) FROM users WHERE email LIKE %s", f"esc.%.{unique}@pg.test"
         ) == (0,)
-        assert one(
-            conn,
-            "SELECT count(*) FROM staff_role_assignments s JOIN users u ON u.id=s.user_id "
-            "WHERE u.email LIKE %s AND s.role='administrator'",
-            f"%.{unique}@pg.test",
-        ) == (0,)
+        with pytest.raises(psycopg.errors.CheckViolation):
+            conn.execute(
+                "UPDATE staff_role_assignments SET role = 'sales' WHERE user_id = %s",
+                (victim["id"],),
+            )
 
 
 # ---- concurrency -----------------------------------------------------------------------------
@@ -175,7 +122,7 @@ def test_concurrent_duplicate_staff_creation_across_processes(
     stack: Stack, admin: dict, unique: str
 ):
     email = f"dup.staff.{unique}@pg.test"
-    body = {"email": email, "full_name": "Dup Staff", "password": STAFF_PASSWORD, "role": "sales"}
+    body = {"email": email, "full_name": "Dup Staff", "password": STAFF_PASSWORD}
     codes = parallel(
         lambda i: HTTP.post(f"{stack.servers[i % 2]}/staff", json=body, headers=admin).status_code,
         range(10),
@@ -191,7 +138,7 @@ def test_concurrent_duplicate_staff_creation_across_processes(
         ) == (1,)
 
 
-def test_concurrent_mutual_demotion_always_keeps_an_active_administrator(
+def test_concurrent_mutual_deactivation_always_keeps_an_active_administrator(
     stack: Stack, admin: dict, unique: str
 ):
     a = create_staff(stack, admin, unique, "administrator", "mutual.a")
@@ -210,18 +157,15 @@ def test_concurrent_mutual_demotion_always_keeps_an_active_administrator(
         ]
         conn.execute("UPDATE users SET is_active=false WHERE id = ANY(%s)", (others,))
     try:
-        jobs = [
-            (stack.servers[0], ha, b["id"], "role"),
-            (stack.servers[1], hb, a["id"], "role"),
-        ]
+        jobs = [(stack.servers[0], ha, b["id"]), (stack.servers[1], hb, a["id"])]
 
-        def demote(job):
-            base, headers, target, _ = job
+        def disable(job):
+            base, headers, target = job
             return HTTP.patch(
-                f"{base}/staff/{target}/role", json={"role": "sales"}, headers=headers
+                f"{base}/staff/{target}/status", json={"is_active": False}, headers=headers
             ).status_code
 
-        codes = parallel(demote, jobs, workers=2)
+        codes = parallel(disable, jobs, workers=2)
         assert codes.count(200) == 1, codes
         assert set(codes) <= {200, 401, 403, 409}
         with stack.owner() as conn:
@@ -239,13 +183,12 @@ def test_concurrent_mutual_demotion_always_keeps_an_active_administrator(
 
 
 # ---- sessions --------------------------------------------------------------------------------
-def test_role_change_and_disable_revoke_sessions_on_every_process(
-    stack: Stack, admin: dict, unique: str
-):
-    member = create_staff(stack, admin, unique, "sales", "revoke")
+def test_disabling_staff_revokes_sessions_on_every_process(stack: Stack, admin: dict, unique: str):
+    member = create_staff(stack, admin, unique, "administrator", "revoke")
     h = login(stack.servers[1], member["email"], STAFF_PASSWORD)
+    assert HTTP.get(f"{stack.servers[1]}/staff/me", headers=h).json()["role"] == "administrator"
     res = HTTP.patch(
-        f"{stack.servers[0]}/staff/{member['id']}/role", json={"role": "operations"}, headers=admin
+        f"{stack.servers[0]}/staff/{member['id']}/status", json={"is_active": False}, headers=admin
     )
     assert res.status_code == 200
     assert HTTP.get(f"{stack.servers[1]}/staff/me", headers=h).status_code == 401
@@ -256,21 +199,6 @@ def test_role_change_and_disable_revoke_sessions_on_every_process(
             "SELECT is_active, revoked_at IS NOT NULL FROM user_sessions WHERE token_hash=%s",
             hashlib.sha256(token.encode()).hexdigest(),
         ) == (False, True)
-        summary = one(
-            conn,
-            "SELECT change_summary FROM audit_records WHERE action='staff.role_change' "
-            "AND entity_id=%s",
-            member["id"],
-        )[0]
-        assert summary["old_role"] == "sales" and summary["new_role"] == "operations"
-
-    h2 = login(stack.servers[1], member["email"], STAFF_PASSWORD)
-    assert HTTP.get(f"{stack.servers[1]}/staff/me", headers=h2).json()["role"] == "operations"
-    res = HTTP.patch(
-        f"{stack.servers[0]}/staff/{member['id']}/status", json={"is_active": False}, headers=admin
-    )
-    assert res.status_code == 200
-    assert HTTP.get(f"{stack.servers[1]}/staff/me", headers=h2).status_code == 401
     res = HTTP.post(
         f"{stack.servers[1]}/auth/login",
         json={"identifier": member["email"], "password": STAFF_PASSWORD},
@@ -280,7 +208,7 @@ def test_role_change_and_disable_revoke_sessions_on_every_process(
 
 # ---- database guarantees ---------------------------------------------------------------------
 def test_database_allows_only_one_role_per_user(stack: Stack, admin: dict, unique: str):
-    member = create_staff(stack, admin, unique, "sales", "onerole")
+    member = create_staff(stack, admin, unique, "administrator", "onerole")
     with stack.owner() as conn, pytest.raises(psycopg.errors.UniqueViolation):
         conn.execute(
             "INSERT INTO staff_role_assignments (id, user_id, role) "
@@ -311,7 +239,7 @@ def test_audit_failure_rolls_back_staff_changes_over_http(
     stack: Stack, admin: dict, unique: str, failing_audit
 ):
     actor = create_staff(stack, admin, unique, "administrator", "rb.actor")
-    target = create_staff(stack, admin, unique, "sales", "rb.target")
+    target = create_staff(stack, admin, unique, "administrator", "rb.target")
     h = login(stack.servers[0], actor["email"], STAFF_PASSWORD)
     failing_audit(actor["email"])
     fresh = httpx.Client(timeout=60, headers={"Connection": "close"})
@@ -328,7 +256,6 @@ def test_audit_failure_rolls_back_staff_changes_over_http(
             headers=h,
         ),
         "update": fresh.patch(f"{base}/staff/{tid}", json={"full_name": "Rolled Back"}, headers=h),
-        "role": fresh.patch(f"{base}/staff/{tid}/role", json={"role": "administrator"}, headers=h),
         "status": fresh.patch(f"{base}/staff/{tid}/status", json={"is_active": False}, headers=h),
     }
     assert {k: r.status_code for k, r in attempts.items()} == dict.fromkeys(attempts, 500)
@@ -341,7 +268,7 @@ def test_audit_failure_rolls_back_staff_changes_over_http(
             True,
         )
         assert one(conn, "SELECT role FROM staff_role_assignments WHERE user_id=%s", tid) == (
-            "sales",
+            "administrator",
         )
 
 

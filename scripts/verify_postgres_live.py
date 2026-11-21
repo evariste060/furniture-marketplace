@@ -192,11 +192,8 @@ def run_checks(dbname: str) -> None:
         }
 
     alice, bob = account("alice"), account("bob")
-    staff = {
-        "administrator": account("admin"),
-        "sales": account("sales"),
-        "operations": account("ops"),
-    }
+    # The Marketplace Administrator is the only staff role (SC-05, 2026-11-21).
+    staff = {"administrator": account("admin")}
     run_emails = [a["email"] for a in (alice, bob, *staff.values())]
     run_emails.append(f"smoke.{run}.denied@{SMOKE_DOMAIN}")
 
@@ -241,12 +238,13 @@ def run_checks(dbname: str) -> None:
             "/api/v1/staff/me",
             "/api/v1/staff/me/permissions",
             "/api/v1/staff/{staff_id}",
-            "/api/v1/staff/{staff_id}/role",
             "/api/v1/staff/{staff_id}/status",
             "/api/v1/audit-logs",
         ]
         for p in required_paths:
             assert p in paths, f"Missing path in OpenAPI: {p}"
+        # SC-05: the Marketplace Administrator is the only staff role; no role-change route.
+        assert "/api/v1/staff/{staff_id}/role" not in paths, "The role-change route is back"
         print(f"[3] OpenAPI Schema Inventory: PASS ({len(paths)} endpoints documented)")
 
         # 4. Register customer Alice
@@ -380,33 +378,27 @@ def run_checks(dbname: str) -> None:
                 db.add(StaffRoleAssignment(user_id=user.id, role=role))
             db.commit()
         admin_hdrs = _login(client, staff["administrator"])
-        sales_hdrs = _login(client, staff["sales"])
-        ops_hdrs = _login(client, staff["operations"])
-
-        for hdrs in (sales_hdrs, ops_hdrs):
-            assert client.get("/api/v1/staff", headers=hdrs).status_code == 403
-            denied = client.post(
-                "/api/v1/staff",
-                json={
-                    "email": f"smoke.{run}.denied@{SMOKE_DOMAIN}",
-                    "full_name": "Denied Admin",
-                    "password": random_password(),
-                    "role": "administrator",
-                },
-                headers=hdrs,
-            )
-            assert denied.status_code == 403, "Sales/Ops must not create staff"
-            assert client.get("/api/v1/staff/me", headers=hdrs).status_code == 200
+        assert client.get("/api/v1/staff", headers=alice_headers).status_code == 403
+        denied = client.post(
+            "/api/v1/staff",
+            json={
+                "email": f"smoke.{run}.denied@{SMOKE_DOMAIN}",
+                "full_name": "Denied Admin",
+                "password": random_password(),
+            },
+            headers=alice_headers,
+        )
+        assert denied.status_code == 403, "A customer must not create staff"
         assert client.get("/api/v1/staff", headers=admin_hdrs).status_code == 200
+        assert client.get("/api/v1/staff/me", headers=admin_hdrs).status_code == 200
         assert client.get("/api/v1/staff/me", headers=alice_headers).status_code == 403
-        print("[10] Staff authorization: PASS (Sales/Ops blocked from staff administration)")
+        print("[10] Staff authorization: PASS (customers blocked from staff administration)")
 
         # 12. Security audit logs
         audit_res = client.get("/api/v1/audit-logs", headers=admin_hdrs)
         assert audit_res.status_code == 200, "Admin cannot retrieve audit logs"
         assert len(audit_res.json()) > 0, "No audit events recorded"
         assert client.get("/api/v1/audit-logs", headers=alice_headers).status_code == 403
-        assert client.get("/api/v1/audit-logs", headers=sales_hdrs).status_code == 403
         with SessionLocal() as db:
             audit_count = db.query(func.count(AuditRecord.id)).scalar()
             print(f"[11] Security Audit Logging: PASS ({audit_count} audit rows in PostgreSQL)")

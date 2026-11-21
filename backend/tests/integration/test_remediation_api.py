@@ -281,13 +281,10 @@ def test_replacement_and_deletion_keep_exactly_one_default(
 
 
 # ---- Phase 3 authorization boundaries -----------------------------------------------------
-def test_management_and_operations_denied_admin_paths(
-    client: TestClient, management_auth: dict, operations_auth: dict
-):
-    for auth in (management_auth, operations_auth):
-        h = auth["headers"]
-        assert client.get("/api/v1/audit-logs", headers=h).status_code == 403
-        assert client.get("/api/v1/staff", headers=h).status_code == 403
+def test_customers_are_denied_admin_paths(client: TestClient, customer_auth: dict):
+    h = customer_auth["headers"]
+    assert client.get("/api/v1/audit-logs", headers=h).status_code == 403
+    assert client.get("/api/v1/staff", headers=h).status_code == 403
 
 
 def test_inactive_account_token_and_login_refused(

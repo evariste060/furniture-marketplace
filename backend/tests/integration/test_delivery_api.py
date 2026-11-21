@@ -167,25 +167,12 @@ def test_public_list_excludes_inactive_zones_and_zones_without_a_current_fee(
 
 
 # ---- permissions (B6) ----------------------------------------------------------------------
-def test_management_can_view_but_not_change_delivery_or_settings(
-    client, admin_auth, management_auth, configured
-):
-    h = management_auth["headers"]
-    zone_id = configured["Gasabo"]["id"]
-    assert client.get(ZONES, headers=h).status_code == 200
-    assert client.get(SETTINGS, headers=h).status_code == 200
-    body = {"code": "x", "name": "X", "district": "Gasabo", "fee": 1}
-    assert client.post(ZONES, json=body, headers=h).status_code == 403
-    assert client.patch(f"{ZONES}/{zone_id}", json={"fee": 1}, headers=h).status_code == 403
-    assert client.patch(SETTINGS, json={THRESHOLD: 1}, headers=h).status_code == 403
-    assert client.get(PUBLIC).json()["items"][2]["fee"] == 2000  # unchanged
-    assert client.get(PUBLIC).json()["free_delivery_threshold"] == 200_000
 
 
 @pytest.mark.parametrize(
     ("who", "zones_read"),
     # Operations views delivery zones (delivery:read, final matrix 2026-10-26), nothing else.
-    [("sales_auth", 403), ("operations_auth", 200), ("customer_auth", 403), (None, 401)],
+    [("customer_auth", 403), (None, 401)],
 )
 def test_other_roles_and_anonymous_callers_are_refused(
     client, request, admin_auth, who, zones_read
@@ -533,19 +520,19 @@ def test_only_fee_rule_constraints_become_409_and_other_integrity_errors_propaga
         delivery_service._integrity_conflict(unrelated)
 
 
-def test_staff_list_includes_inactive_zones_with_history(client, admin_auth, management_auth):
+def test_staff_list_includes_inactive_zones_with_history(client, admin_auth):
     h = admin_auth["headers"]
     zone = create_zone(client, h, "Gasabo", 2000)
     client.patch(f"{ZONES}/{zone['id']}", json={"fee": 2200, "is_active": False}, headers=h)
-    [item] = client.get(ZONES, headers=management_auth["headers"]).json()["items"]
+    [item] = client.get(ZONES, headers=admin_auth["headers"]).json()["items"]
     assert item["is_active"] is False and item["fee"] == 2200
     assert [r["fee"] for r in item["fee_history"]] == [2200, 2000]
     assert client.get(PUBLIC).json()["items"] == []
 
 
 # ---- settings ------------------------------------------------------------------------------
-def test_settings_read_and_write_with_audit(client, db, admin_auth, management_auth):
-    empty = client.get(SETTINGS, headers=management_auth["headers"]).json()
+def test_settings_read_and_write_with_audit(client, db, admin_auth):
+    empty = client.get(SETTINGS, headers=admin_auth["headers"]).json()
     assert empty == {
         "items": [
             {"key": key, "value": None, "updated_at": None, "updated_by_user_id": None}
@@ -564,7 +551,7 @@ def test_settings_read_and_write_with_audit(client, db, admin_auth, management_a
         {"from": None, "to": 200_000},
         {"from": 200_000, "to": 150_000},
     ]
-    items = client.get(SETTINGS, headers=management_auth["headers"]).json()["items"]
+    items = client.get(SETTINGS, headers=admin_auth["headers"]).json()["items"]
     assert {i["key"]: i["value"] for i in items}[THRESHOLD] == 150_000
     db.expire_all()
     assert db.get(Setting, THRESHOLD).value == 150_000

@@ -1,9 +1,11 @@
 """Staff identity and staff account administration (ADR-006, approved 2026-10-22).
 
-Authorization uses require_permission with the code-defined matrix in app.core.roles:
-- staff:self_read (every staff role): /staff/me, /staff/me/permissions
-- staff:read (administrator): list and view staff accounts
-- staff:manage (administrator): create staff, edit details, change role or status
+Authorization uses require_permission with the code-defined matrix in app.core.roles. The
+Marketplace Administrator is the only staff role (SC-05, 2026-11-21) and holds every permission:
+- staff:self_read: /staff/me, /staff/me/permissions
+- staff:read: list and view staff accounts
+- staff:manage: create staff, edit details, enable or disable an account
+With a single role there is nothing to change a role to, so the role-change endpoint is gone.
 
 The first administrator is created with scripts/bootstrap_admin.py, never over HTTP.
 
@@ -38,7 +40,6 @@ from app.schemas.staff import (
     StaffPermissionsResponse,
     StaffResponse,
     StaffRoleName,
-    StaffRoleUpdateRequest,
     StaffStatusUpdateRequest,
     StaffUpdateRequest,
 )
@@ -71,7 +72,7 @@ Ctx = Annotated[RequestContext, Depends(get_request_context)]
     summary="Current staff identity",
     description=(
         "Returns the authenticated staff member's account, role and effective permissions. "
-        "Requires 'staff:self_read' (every staff role). Customers receive 403."
+        "Requires 'staff:self_read'. Customers and sellers receive 403."
     ),
     responses=GUARDED,
 )
@@ -130,7 +131,8 @@ def list_staff(
     status_code=status.HTTP_201_CREATED,
     summary="Create a staff account",
     description=(
-        "Creates an active staff account with exactly one role and an initial password. "
+        "Creates an active Marketplace Administrator account with an initial password; `role` may "
+        "be omitted and only 'administrator' is accepted. "
         "Requires 'staff:manage' (administrator). The password is never returned or logged. "
         "Recorded in the audit trail as 'staff.create'."
     ),
@@ -167,30 +169,6 @@ def update_staff(
     staff_id: uuid.UUID, req: StaffUpdateRequest, current_user: StaffManager, db: Db, ctx: Ctx
 ) -> StaffResponse:
     return StaffResponse.from_user(StaffService.update(db, current_user, staff_id, req, ctx))
-
-
-@router.patch(
-    "/{staff_id:uuid}/role",
-    response_model=StaffResponse,
-    summary="Change a staff member's role",
-    description=(
-        "Replaces the staff member's single role. Requires 'staff:manage' (administrator). "
-        "A change revokes all of the member's sessions and is audited as 'staff.role_change' "
-        "with the old and new role. Setting the current role is a no-op. Demoting the last "
-        "active administrator returns 409."
-    ),
-    responses={**GUARDED, **STAFF_404, **LAST_ADMIN_409, **VALIDATION_422},
-)
-def change_staff_role(
-    staff_id: uuid.UUID,
-    req: StaffRoleUpdateRequest,
-    current_user: StaffManager,
-    db: Db,
-    ctx: Ctx,
-) -> StaffResponse:
-    return StaffResponse.from_user(
-        StaffService.change_role(db, current_user, staff_id, req.role, ctx)
-    )
 
 
 @router.patch(

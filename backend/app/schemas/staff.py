@@ -79,7 +79,8 @@ class StaffCreateRequest(BaseModel):
         description="Initial password: 8-256 characters with upper and lower case and a digit "
         "or symbol. Never returned or logged.",
     )
-    role: StaffRoleName
+    # The Marketplace Administrator is the only staff role (SC-05); any other value is 422.
+    role: StaffRoleName = "administrator"
 
     @field_validator("email")
     @classmethod
@@ -123,12 +124,6 @@ class StaffUpdateRequest(BaseModel):
         if self.full_name is None and self.phone is None:
             raise ValueError("Provide at least one of: full_name, phone.")
         return self
-
-
-class StaffRoleUpdateRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    role: StaffRoleName
 
 
 class StaffStatusUpdateRequest(BaseModel):

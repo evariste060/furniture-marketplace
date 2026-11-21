@@ -60,10 +60,6 @@ def names(client, headers, **params) -> list[str]:
     ("who", "expected"),
     [
         ("admin_auth", 200),
-        ("sales_auth", 200),
-        ("operations_auth", 200),
-        ("management_auth", 200),
-        ("finance_auth", 403),
         ("customer_auth", 403),
         (None, 401),
     ],

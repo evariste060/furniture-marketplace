@@ -1,7 +1,7 @@
 "use client";
 
-import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BadgeDollarSign, Briefcase, Mail, Phone, ShieldCheck, Truck, UserCog, UserPlus, Users, Wallet, type LucideIcon } from "lucide-react";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Mail, Phone, UserCog, UserPlus, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
@@ -19,7 +19,7 @@ import { localPhone } from "@/lib/checkout";
 import { cx } from "@/lib/cx";
 import { formatDate, formatPhone } from "@/lib/format";
 import { useStaffAccess } from "./access";
-import { STAFF_ROLES, type StaffRole } from "./roles";
+import type { StaffRole } from "./roles";
 import { bodyFieldErrors, ListFooter, LoadError, must, PageHeader, useListParams } from "./ui";
 
 type Staff = components["schemas"]["StaffResponse"];
@@ -27,13 +27,9 @@ type Staff = components["schemas"]["StaffResponse"];
 const PAGE_SIZE = 50;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Staff.dc.html role badge colours. */
+/** Staff.dc.html role badge colour. The Marketplace Administrator is the only staff role (SC-05). */
 export const ROLE_TONE: Record<StaffRole, BadgeTone> = {
   administrator: "soft-info",
-  sales: "soft-purple",
-  operations: "soft-warn",
-  finance: "soft-ok",
-  management: "soft-neutral",
 };
 
 /** Initials for the avatar: the first letters of the first two words ("Jean Paul H" → "JP"). */
@@ -45,44 +41,25 @@ export function initials(name: string | null | undefined): string {
     .join("");
 }
 
-/** Role tiles: icon and colours per role ("" is everyone). */
-const ROLE_TILE: Record<StaffRole | "", { Icon: LucideIcon; tone: string }> = {
-  "": { Icon: Users, tone: "bg-subtle text-tx2" },
-  administrator: { Icon: ShieldCheck, tone: "bg-light text-pri-h" },
-  sales: { Icon: BadgeDollarSign, tone: "bg-pur-bg text-pur" },
-  operations: { Icon: Truck, tone: "bg-warn-bg text-warn-tx" },
-  finance: { Icon: Wallet, tone: "bg-ok-bg text-ok-tx" },
-  management: { Icon: Briefcase, tone: "bg-subtle text-tx2" },
-};
+/** Avatar colours of an active staff member. */
+const AVATAR_TONE = "bg-light text-pri-h";
 const STATUSES = ["", "active", "disabled"] as const;
 type StatusFilter = (typeof STATUSES)[number];
 
-function isRole(value: string): value is StaffRole {
-  return (STAFF_ROLES as readonly string[]).includes(value);
-}
-
-/** Staff.dc.html. Filters live in the URL: role, status, page. */
+/** Staff.dc.html. Filters live in the URL: status, page. Every staff member is a Marketplace
+ * Administrator (SC-05), so there is no role filter or role picker. */
 export function StaffView() {
   const t = useTranslations("admin");
   const { can, id: myId } = useStaffAccess();
   const { get, page, set, hrefWith } = useListParams();
   const manage = can("staff:manage");
-  const role = isRole(get("role")) ? (get("role") as StaffRole) : "";
   const status: StatusFilter = get("status") === "active" || get("status") === "disabled" ? (get("status") as StatusFilter) : "";
   const isActive = status === "" ? undefined : status === "active";
   const [editing, setEditing] = useState<Staff | "new" | null>(null);
   const list = useQuery({
-    queryKey: ["admin", "staff", { role, status, page }],
-    queryFn: () => must(browserApi.GET("/api/v1/staff", { params: { query: { role: role || undefined, is_active: isActive, page, size: PAGE_SIZE } } })),
+    queryKey: ["admin", "staff", { status, page }],
+    queryFn: () => must(browserApi.GET("/api/v1/staff", { params: { query: { is_active: isActive, page, size: PAGE_SIZE } } })),
     placeholderData: keepPreviousData,
-  });
-  const tiles = ["", ...STAFF_ROLES] as const;
-  // Each role's count under the status filter.
-  const counts = useQueries({
-    queries: tiles.map((r) => ({
-      queryKey: ["admin", "staff", "count", r, status],
-      queryFn: async () => (await must(browserApi.GET("/api/v1/staff", { params: { query: { role: r || undefined, is_active: isActive, size: 1 } } }))).total,
-    })),
   });
 
   return (
@@ -99,34 +76,6 @@ export function StaffView() {
           )
         }
       />
-
-      <div role="group" aria-label={t("staff.rolesLabel")} className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-        {tiles.map((r, i) => {
-          const on = r === role;
-          const { Icon, tone } = ROLE_TILE[r];
-          const n = counts[i].data;
-          return (
-            <button
-              key={r || "all"}
-              type="button"
-              aria-pressed={on}
-              onClick={() => set({ role: r })}
-              className={cx(
-                "flex cursor-pointer flex-col items-start gap-2.5 rounded-xl border p-3.5 text-left shadow-sh transition-[border-color,box-shadow,background-color] duration-150 motion-reduce:transition-none",
-                on ? "border-pri bg-light ring-1 ring-pri" : "border-bd bg-white hover:border-bd2 hover:shadow-sh2",
-              )}
-            >
-              <span aria-hidden="true" className={cx("flex size-9 items-center justify-center rounded-lg", tone)}>
-                <Icon size={18} />
-              </span>
-              <span className="flex w-full min-w-0 flex-col">
-                {n === undefined ? <Skeleton className="h-7 w-8" /> : <b className="t-h2 tabular-nums">{n}</b>}
-                <span className={cx("truncate text-sm font-medium", on ? "text-pri-h" : "text-tx2")}>{r ? t(`shell.roles.${r}`) : t("staff.everyone")}</span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
 
       <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
         <div className="flex flex-wrap items-center gap-3 border-b border-bd p-4">
@@ -160,7 +109,7 @@ export function StaffView() {
             <span aria-hidden="true" className="flex size-14 items-center justify-center rounded-full bg-subtle text-tx2">
               <Users size={26} />
             </span>
-            <p className="m-0 max-w-80 text-tx2">{role || status ? t("staff.noMatch") : t("staff.empty")}</p>
+            <p className="m-0 max-w-80 text-tx2">{status ? t("staff.noMatch") : t("staff.empty")}</p>
           </div>
         ) : (
           <Table aria-busy={list.isFetching}>
@@ -189,12 +138,11 @@ export function StaffView() {
                   ))
                 : list.data.items.map((s) => {
                     const name = s.full_name || s.email || s.phone || "—";
-                    const { tone } = ROLE_TILE[s.role];
                     return (
                       <tr key={s.id} className={cx("transition-colors duration-150 hover:bg-page motion-reduce:transition-none", !s.is_active && "text-tx2")}>
                         <Td>
                           <span className="flex items-center gap-3">
-                            <span aria-hidden="true" className={cx("flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold", s.is_active ? tone : "bg-subtle text-tx2")}>
+                            <span aria-hidden="true" className={cx("flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold", s.is_active ? AVATAR_TONE : "bg-subtle text-tx2")}>
                               {initials(name)}
                             </span>
                             <span className="flex min-w-0 flex-col">
@@ -268,7 +216,6 @@ function AddStaffDialog({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState<StaffRole>("sales");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -277,7 +224,7 @@ function AddStaffDialog({ onClose }: { onClose: () => void }) {
       const local = localPhone(phone);
       return must(
         browserApi.POST("/api/v1/staff", {
-          body: { full_name: name.trim(), email: email.trim() || null, phone: local ? `+250${local}` : null, role, password },
+          body: { full_name: name.trim(), email: email.trim() || null, phone: local ? `+250${local}` : null, role: "administrator", password },
         }),
       );
     },
@@ -327,17 +274,7 @@ function AddStaffDialog({ onClose }: { onClose: () => void }) {
         <Field label={t("staff.phone")} error={errors.phone} help={t("staff.contactHelp")}>
           {(c) => <Input {...c} type="tel" inputMode="tel" autoComplete="off" placeholder="07XX XXX XXX" value={phone} onChange={(e) => setPhone(e.target.value)} />}
         </Field>
-        <Field label={t("staff.columns.role")} error={errors.role}>
-          {(c) => (
-            <Select {...c} value={role} onChange={(e) => setRole(e.target.value as StaffRole)}>
-              {STAFF_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {t(`shell.roles.${r}`)}
-                </option>
-              ))}
-            </Select>
-          )}
-        </Field>
+        <p className="m-0 text-sm text-tx2">{t("staff.roleNote")}</p>
         <Field label={t("staff.password")} error={errors.password} help={t("staff.passwordHelp")}>
           {(c) => <Input {...c} type="password" autoComplete="new-password" maxLength={PASSWORD_MAX} value={password} onChange={(e) => setPassword(e.target.value)} />}
         </Field>
@@ -358,7 +295,6 @@ function ManageStaffDialog({ member, onClose }: { member: Staff; onClose: () => 
   const { id: myId } = useStaffAccess();
   const [name, setName] = useState(member.full_name ?? "");
   const [phone, setPhone] = useState(member.phone ? formatPhone(member.phone) : "");
-  const [role, setRole] = useState<StaffRole>(member.role);
   const [active, setActive] = useState(member.is_active);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const self = member.id === myId;
@@ -371,7 +307,6 @@ function ManageStaffDialog({ member, onClose }: { member: Staff; onClose: () => 
       if (name.trim() !== (member.full_name ?? "")) details.full_name = name.trim();
       if (local && `+250${local}` !== member.phone) details.phone = `+250${local}`;
       if (Object.keys(details).length > 0) await must(browserApi.PATCH("/api/v1/staff/{staff_id}", { ...path, body: details }));
-      if (role !== member.role) await must(browserApi.PATCH("/api/v1/staff/{staff_id}/role", { ...path, body: { role } }));
       if (active !== member.is_active) await must(browserApi.PATCH("/api/v1/staff/{staff_id}/status", { ...path, body: { is_active: active } }));
     },
     onSuccess: () => {
@@ -422,17 +357,6 @@ function ManageStaffDialog({ member, onClose }: { member: Staff; onClose: () => 
         </Field>
         <Field label={t("staff.phone")} error={errors.phone}>
           {(c) => <Input {...c} type="tel" inputMode="tel" placeholder="07XX XXX XXX" value={phone} onChange={(e) => setPhone(e.target.value)} />}
-        </Field>
-        <Field label={t("staff.columns.role")} help={role !== member.role ? t(self ? "staff.selfSignOut" : "staff.roleSignOut") : undefined}>
-          {(c) => (
-            <Select {...c} value={role} onChange={(e) => setRole(e.target.value as StaffRole)}>
-              {STAFF_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {t(`shell.roles.${r}`)}
-                </option>
-              ))}
-            </Select>
-          )}
         </Field>
         <Field label={t("staff.columns.status")} help={active !== member.is_active && !active ? t(self ? "staff.selfSignOut" : "staff.disableNote") : undefined}>
           {(c) => (

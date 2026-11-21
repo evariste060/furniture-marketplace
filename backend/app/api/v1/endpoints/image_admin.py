@@ -1,6 +1,6 @@
 """Staff product image management (module 7).
 
-Every route requires 'catalog:manage' (administrator and sales). Rules, file handling and
+Every route requires 'catalog:manage' (administrator). Rules, file handling and
 concurrency are in app.services.image_admin; validation and the public source in
 app.services.image_processing (ADR-009). Public image URLs appear in the catalogue product
 responses.
@@ -164,7 +164,7 @@ Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 Storage = Annotated[MediaStorage, Depends(get_media_storage)]
 
-PERMISSION_NOTE = "Requires 'catalog:manage' (administrator, sales)."
+PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
 
 
 def image_response(image: ProductImage, storage: MediaStorage) -> ImageResponse:

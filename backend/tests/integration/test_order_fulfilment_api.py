@@ -289,18 +289,9 @@ def test_only_authorized_staff_can_change_order_status(
     db: Session,
     customer_auth: dict,
     admin_auth: dict,
-    sales_auth: dict,
-    operations_auth: dict,
-    management_auth: dict,
-    finance_auth: dict,
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
-    for headers in (
-        customer_auth["headers"],
-        sales_auth["headers"],
-        management_auth["headers"],
-        finance_auth["headers"],
-    ):
+    for headers in (customer_auth["headers"],):  # SC-05: the administrator is the only staff role
         response = client.patch(
             f"/api/v1/staff/orders/{order_id}/status",
             json={"status": "confirmed"},
@@ -314,17 +305,17 @@ def test_only_authorized_staff_can_change_order_status(
         headers=admin_auth["headers"],
     )
     assert success.status_code == 200
-    by_operations = client.patch(
+    again = client.patch(
         f"/api/v1/staff/orders/{order_id}/status",
         json={"status": "processing"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
-    assert by_operations.status_code == 200 and by_operations.json()["status"] == "processing"
+    assert again.status_code == 200 and again.json()["status"] == "processing"
     assert (
         db.scalar(
             select(func.count(AuditRecord.id)).where(AuditRecord.action == "auth.access_denied")
         )
-        == 4  # customer, sales, management, finance
+        == 1  # the customer (SC-05: no other role is refused)
     )
 
 
@@ -333,13 +324,12 @@ def test_assignment_requires_active_staff_and_is_audited(
     session_factory,
     customer_auth: dict,
     admin_auth: dict,
-    operations_auth: dict,
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
     path = f"/api/v1/staff/orders/{order_id}/assignment"
     valid = client.patch(
         path,
-        json={"staff_user_id": str(operations_auth["user"].id)},
+        json={"staff_user_id": str(admin_auth["user"].id)},
         headers=admin_auth["headers"],
     )
     customer_target = client.patch(
@@ -354,12 +344,12 @@ def test_assignment_requires_active_staff_and_is_audited(
         headers=admin_auth["headers"],
     )
     assert valid.status_code == 200
-    assert valid.json()["fulfilment_assignee_user_id"] == str(operations_auth["user"].id)
+    assert valid.json()["fulfilment_assignee_user_id"] == str(admin_auth["user"].id)
     assert customer_target.status_code == 422
     assert missing_target.status_code == 422
     with session_factory() as session:
         order = session.get(Order, order_id)
-        assert order is not None and order.fulfilment_assignee_user_id == operations_auth["user"].id
+        assert order is not None and order.fulfilment_assignee_user_id == admin_auth["user"].id
         records = list(
             session.scalars(
                 select(AuditRecord).where(
@@ -372,7 +362,7 @@ def test_assignment_requires_active_staff_and_is_audited(
         success = next(record for record in records if record.change_summary["status"] == "success")
         failures = [record for record in records if record.change_summary["status"] == "failure"]
         assert success.actor_user_id == admin_auth["user"].id
-        assert success.change_summary["staff_user_id"] == str(operations_auth["user"].id)
+        assert success.change_summary["staff_user_id"] == str(admin_auth["user"].id)
         assert {record.change_summary["requested_staff_user_id"] for record in failures} == {
             customer_auth["user"]["id"],
             str(missing_user_id),
@@ -380,24 +370,22 @@ def test_assignment_requires_active_staff_and_is_audited(
 
 
 def test_assignment_denies_customer_and_reports_missing_order(
-    client: TestClient, customer_auth: dict, operations_auth: dict, management_auth: dict
+    client: TestClient, customer_auth: dict, admin_auth: dict
 ):
     missing_order_id = uuid4()
     response = client.patch(
         f"/api/v1/staff/orders/{missing_order_id}/assignment",
-        json={"staff_user_id": str(operations_auth["user"].id)},
+        json={"staff_user_id": str(admin_auth["user"].id)},
         headers=customer_auth["headers"],
     )
     assert response.status_code == 403
     status_path = f"/api/v1/staff/orders/{missing_order_id}/status"
     denied = client.patch(
-        status_path, json={"status": "confirmed"}, headers=management_auth["headers"]
+        status_path, json={"status": "confirmed"}, headers=customer_auth["headers"]
     )
     assert denied.status_code == 403
-    # Operations may fulfil orders, so a missing order is reported as such.
-    missing = client.patch(
-        status_path, json={"status": "confirmed"}, headers=operations_auth["headers"]
-    )
+    # The administrator may fulfil orders, so a missing order is reported as such.
+    missing = client.patch(status_path, json={"status": "confirmed"}, headers=admin_auth["headers"])
     assert missing.status_code == 404
     assert missing.json()["error"]["code"] == "order_not_found"
 
@@ -505,7 +493,6 @@ def test_audit_failure_rolls_back_assignment(
     session_factory,
     customer_auth: dict,
     admin_auth: dict,
-    operations_auth: dict,
     monkeypatch,
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
@@ -517,7 +504,7 @@ def test_audit_failure_rolls_back_assignment(
     try:
         client.patch(
             f"/api/v1/staff/orders/{order_id}/assignment",
-            json={"staff_user_id": str(operations_auth["user"].id)},
+            json={"staff_user_id": str(admin_auth["user"].id)},
             headers=admin_auth["headers"],
         )
     except RuntimeError:
@@ -535,15 +522,13 @@ def test_assignment_follows_the_fulfilment_permission(
     client: TestClient,
     session_factory,
     customer_auth: dict,
-    sales_auth: dict,
-    operations_auth: dict,
-    management_auth: dict,
+    admin_auth: dict,
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
     path = f"/api/v1/staff/orders/{order_id}/assignment"
-    body = {"staff_user_id": str(operations_auth["user"].id)}
-    for denied in (sales_auth, management_auth, customer_auth):
+    body = {"staff_user_id": str(admin_auth["user"].id)}
+    for denied in (customer_auth,):  # SC-05: the administrator is the only staff role
         assert client.patch(path, json=body, headers=denied["headers"]).status_code == 403
-    response = client.patch(path, json=body, headers=operations_auth["headers"])
+    response = client.patch(path, json=body, headers=admin_auth["headers"])
     assert response.status_code == 200
-    assert response.json()["fulfilment_assignee_user_id"] == str(operations_auth["user"].id)
+    assert response.json()["fulfilment_assignee_user_id"] == str(admin_auth["user"].id)

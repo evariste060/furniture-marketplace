@@ -4,6 +4,34 @@ The original requirement documents stay unchanged (see `original-checksums.txt`)
 to the MVP scope approved by the project owner after they were written is recorded here, newest
 first. Where this file and an original document disagree, this file wins.
 
+## SC-05: the Marketplace Administrator is the only staff role (2026-11-21)
+
+Approved by the project owner on 2026-11-21. Trello card: none (no furniture board exists).
+
+The sales, operations, management and finance staff roles were designed for the original
+single-business shop and are not carried into the marketplace. FurniHub V1 has one staff role,
+the **Marketplace Administrator** (stored as `administrator`).
+
+- **Permissions stay.** Every staff route still requires its own fine-grained permission
+  (`catalog:manage`, `sellers:manage`, ...); the Marketplace Administrator holds them all. The
+  authorization checks themselves are unchanged, so a role can be added later as a new scope
+  change without touching the routes.
+- **Staff accounts.** Administrators still create, edit, disable and re-enable other
+  administrators, and the last active administrator can never be disabled. With one role there
+  is nothing to change a role to: `PATCH /api/v1/staff/{staff_id}/role` and the admin's role
+  filter and role pickers are removed; `role` may be omitted when creating staff and only
+  `administrator` is accepted.
+- **Database.** `staff_role_assignments.role` accepts only `administrator` (migration
+  `a9d3f5b7c1e2`). The upgrade refuses to run while any staff account holds another role, and
+  reports only the count per role; it never converts, disables or deletes an account.
+- **Unchanged:** customer sign-in and accounts, seller authorization (sellers are store owners,
+  not staff, ADR-014), the `/admin` server-side session check.
+- **Product creation is moderation only** (confirmed with SC-05, built with ADR-014 phase 2):
+  administrators review, edit, hide and archive any store's products but do not create products
+  for sellers. Staff product creation is refused with 409 `staff_product_creation_disabled`, and
+  an import row naming a product that does not exist is refused on that row (`product_slug`);
+  import rows that update existing products still apply.
+
 ## SC-04: multi-vendor furniture marketplace (2026-11-21)
 
 Approved by the project owner on 2026-11-21. Trello card: none (no furniture board exists).

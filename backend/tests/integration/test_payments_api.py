@@ -164,12 +164,12 @@ def test_guest_failures_count_on_the_lookup_limits(client, db, delivery):
     assert blocked.status_code == 429 and int(blocked.headers["Retry-After"]) > 0
 
 
-def test_closed_or_lapsed_orders_cannot_be_paid(client, db, delivery, operations_auth, monkeypatch):
+def test_closed_or_lapsed_orders_cannot_be_paid(client, db, delivery, admin_auth, monkeypatch):
     order = momo_order(client, db)
     client.patch(
         f"{STAFF}/{order['id']}/status",
         json={"status": "cancelled"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
     res = initiate(client, order["order_number"])
     assert res.status_code == 409 and code(res) == "order_not_payable"
@@ -426,9 +426,7 @@ def test_a_failure_while_applying_rolls_everything_back(client, db, delivery, mo
 
 
 # ---- cash on delivery (TC-12) --------------------------------------------------------------
-def test_cash_on_delivery_stays_pending_until_delivery(
-    client, db, delivery, admin_auth, operations_auth
-):
+def test_cash_on_delivery_stays_pending_until_delivery(client, db, delivery, admin_auth):
     order = checkout(client, guest_cart(client, db)).json()["order"]
     res = initiate(client, order["order_number"])
     assert res.status_code == 200 and res.json()["provider"] == "cod"
@@ -442,7 +440,7 @@ def test_cash_on_delivery_stays_pending_until_delivery(
     url = f"{STAFF}/{order['id']}/status"
     for step in ("confirmed", "processing", "dispatched", "delivered"):
         assert (
-            client.patch(url, json={"status": step}, headers=operations_auth["headers"]).status_code
+            client.patch(url, json={"status": step}, headers=admin_auth["headers"]).status_code
             == 200
         )
     done = client.post(confirm, headers=admin_auth["headers"])
@@ -469,9 +467,6 @@ def test_only_cod_payments_can_be_confirmed_as_cash(client, db, delivery, admin_
     ("who", "read", "manage"),
     [
         ("admin_auth", 200, 409),
-        ("management_auth", 200, 403),
-        ("sales_auth", 403, 403),
-        ("operations_auth", 403, 403),
         ("customer_auth", 403, 403),
         (None, 401, 401),
     ],

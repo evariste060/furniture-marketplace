@@ -89,10 +89,8 @@ class StaffRoleAssignment(Entity):
     __table_args__ = (
         # One role per staff user (ADR-006, approved 2026-10-22).
         UniqueConstraint("user_id"),
-        CheckConstraint(
-            "role IN ('administrator', 'sales', 'operations', 'management', 'finance')",
-            name="valid_role",
-        ),
+        # The Marketplace Administrator is the only staff role (SC-05, 2026-11-21).
+        CheckConstraint("role IN ('administrator')", name="valid_role"),
     )
 
     user_id: Mapped[UUID] = mapped_column(

@@ -208,10 +208,7 @@ def test_staff_read_a_job_and_retry_only_its_retryable_failed_items(client, db, 
 @pytest.mark.parametrize(
     ("who", "expected"),
     [
-        ("sales_auth", 200),
-        ("operations_auth", 403),
-        ("management_auth", 403),
-        ("finance_auth", 403),
+        ("admin_auth", 200),
         ("customer_auth", 403),
         (None, 401),
     ],

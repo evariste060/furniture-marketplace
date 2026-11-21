@@ -153,9 +153,9 @@ def as_date(value):
 
 # ---- sales: what counts ------------------------------------------------------------------------
 def test_sales_count_paid_and_delivered_cod_orders_once_and_nothing_else(
-    client, db, shop, admin_auth, operations_auth, monkeypatch
+    client, db, shop, admin_auth, monkeypatch
 ):
-    ops = operations_auth["headers"]
+    ops = admin_auth["headers"]
     a, b = sku(db, price=7_000), sku(db, price=2_500)
     momo = paid(client, db, [(a, 2), (b, 1)])  # two lines: still one order
     delivered = cod(client, db, [(b, 3)], ops, DELIVERED)
@@ -306,9 +306,7 @@ def test_invalid_parameters_are_422_validation_errors(client, admin_auth, path, 
 
 
 # ---- top products --------------------------------------------------------------------------
-def test_top_products_rank_by_units_then_revenue_then_name(
-    client, db, shop, admin_auth, operations_auth
-):
+def test_top_products_rank_by_units_then_revenue_then_name(client, db, shop, admin_auth):
     big, bravo, alpha, unsold = (sku(db, price=p) for p in (3_000, 1_000, 1_000, 9_000))
     big_id = product(db, big, "Zulu laptop")
     bravo_id = product(db, bravo, "Bravo cable")
@@ -316,7 +314,7 @@ def test_top_products_rank_by_units_then_revenue_then_name(
     product(db, unsold, "Only in a pending order")
     paid(client, db, [(big, 2), (bravo, 2)])
     paid(client, db, [(bravo, 1), (alpha, 1)])
-    cod(client, db, [(big, 1), (alpha, 2)], operations_auth["headers"], DELIVERED)
+    cod(client, db, [(big, 1), (alpha, 2)], admin_auth["headers"], DELIVERED)
     started_momo(client, db, [(unsold, 5)])  # not a sale
     day = today()
     window = {"from": day - timedelta(days=1), "to": day + timedelta(days=1)}
@@ -404,7 +402,7 @@ ENDPOINTS = [
 ]
 
 
-@pytest.mark.parametrize("who", ["admin_auth", "management_auth", "finance_auth"])
+@pytest.mark.parametrize("who", ["admin_auth"])
 def test_reports_read_holders_can_use_every_report(client, request, who):
     headers = request.getfixturevalue(who)["headers"]
     for path, params in ENDPOINTS:
@@ -412,7 +410,7 @@ def test_reports_read_holders_can_use_every_report(client, request, who):
         assert res.status_code == 200, (path, res.text)
 
 
-@pytest.mark.parametrize("who", ["sales_auth", "operations_auth", "customer_auth"])
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_everyone_else_gets_403_on_every_report(client, request, who):
     headers = request.getfixturevalue(who)["headers"]
     for path, params in ENDPOINTS:

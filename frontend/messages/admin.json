@@ -40,11 +40,7 @@
     "skipToContent": "Skip to content",
     "close": "Close",
     "roles": {
-      "administrator": "Administrator",
-      "sales": "Sales",
-      "operations": "Operations",
-      "management": "Management",
-      "finance": "Finance"
+      "administrator": "Marketplace Administrator"
     },
     "language": "Language",
     "languageOf": "Language: {language}",
@@ -1026,8 +1022,6 @@
   "staff": {
     "title": "Staff & roles",
     "description": "Everyone who can sign in to the admin, their role and whether their account is active.",
-    "rolesLabel": "Filter by role",
-    "everyone": "All staff",
     "statusLabel": "Filter by status",
     "statuses": {
       "all": "All",
@@ -1059,7 +1053,7 @@
     "contactHelp": "Enter an email, a phone number or both. Either one signs in.",
     "password": "Initial password",
     "passwordHelp": "At least 8 characters with upper and lower case and a digit or symbol. Share it with them in person; they can change it in their account.",
-    "roleSignOut": "Changing the role signs them out on every device.",
+    "roleNote": "New staff accounts are Marketplace Administrators, with access to the whole admin.",
     "disableNote": "Disabling signs them out and blocks sign-in.",
     "selfSignOut": "This is your own account: saving signs you out.",
     "errors": {

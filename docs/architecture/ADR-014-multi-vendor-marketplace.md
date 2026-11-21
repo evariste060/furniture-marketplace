@@ -46,6 +46,10 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Not started |
 | 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
 
+## Staff roles: SC-05 (2026-11-21)
+
+Between phases 1 and 2 the owner approved SC-05: the Marketplace Administrator (`administrator`) is the only staff role, holding every permission; sales, operations, management and finance are removed (migration `a9d3f5b7c1e2`, which refuses to run while another role is assigned and changes no account). Permissions and their per-route checks are unchanged. The phase 1 decision "only administrators hold `sellers:read` and `sellers:manage`" is now true of every staff permission. Staff product creation becomes moderation only, built in phase 2. Details: `docs/requirements/scope-changes.md`.
+
 ## Phase 1 as built (2026-11-21)
 
 Owner decisions for phase 1 (2026-11-21): a verified account email is required to apply; only administrators hold `sellers:read` and `sellers:manage`; store names are unique regardless of letter case; the default commission is 1,000 basis points.

@@ -103,7 +103,7 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     report = seeded()
     assert report.problems == []
     got = outcomes(report)
-    assert got["staff"] == {"created": 5}
+    assert got["staff"] == {"created": 1}  # SC-05: the Marketplace Administrator only
     assert got["customers"] == {"created": 5}
     assert got["categories"] == {"created": 5, "updated": 5}  # created, then the image
     assert got["brands"] == {"created": 12, "updated": 12}
@@ -191,7 +191,7 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     assert count(db, ProductReview) == 0
     assert count(db, WishlistItem) == 0
     assert removed["orders"] == 15 and removed["products"] == len(data.products)
-    assert removed["people"] == 10 and removed["banners"] == 3
+    assert removed["people"] == 6 and removed["banners"] == 3  # SC-05: 1 administrator, 5 customers
     for model in (Order, Product, ProductVariant, StockReservation, Banner):
         assert count(db, model) == 0, model
     assert count(db, User, User.email.endswith("@seed.3sixty.local")) == 0

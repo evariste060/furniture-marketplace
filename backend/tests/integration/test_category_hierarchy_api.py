@@ -188,10 +188,10 @@ def test_hidden_categories_are_part_of_the_order(client, tree):
     assert res.status_code == 204
 
 
-def test_reordering_needs_catalog_manage(client, tree, sales_auth, operations_auth):
+def test_reordering_needs_catalog_manage(client, tree, admin_auth, customer_auth):
     ids = [tree["phones"]["id"], tree["laptops"]["id"]]
-    assert order(client, sales_auth["headers"], None, ids).status_code == 204
-    assert order(client, operations_auth["headers"], None, ids).status_code == 403
+    assert order(client, admin_auth["headers"], None, ids).status_code == 204
+    assert order(client, customer_auth["headers"], None, ids).status_code == 403
     res = client.put(f"{STAFF}/categories/order", json={"category_ids": ids})
     assert res.status_code == 401
 
@@ -414,8 +414,8 @@ def test_deleting_a_listed_brand_or_category_removes_it_from_menus(client, tree)
     assert public_menu(client)["phones"] == []
 
 
-def test_menu_brands_need_catalog_manage(client, tree, operations_auth):
-    res = menu_brands(client, operations_auth["headers"], tree["phones"]["id"], [])
+def test_menu_brands_need_catalog_manage(client, tree, customer_auth):
+    res = menu_brands(client, customer_auth["headers"], tree["phones"]["id"], [])
     assert error(res) == (403, "permission_denied")
 
 

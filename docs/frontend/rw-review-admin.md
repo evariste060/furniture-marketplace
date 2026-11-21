@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1408 strings.
+1402 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -46,11 +46,7 @@ updates `messages/admin.rw.json`.
 | `shell.searchShortcut` | Ctrl + K | Ctrl + K | |
 | `shell.skipToContent` | Skip to content | Jya ku bikubiyemo | |
 | `shell.close` | Close | Funga | |
-| `shell.roles.administrator` | Administrator | Umuyobozi mukuru | |
-| `shell.roles.sales` | Sales | Ugurisha | |
-| `shell.roles.operations` | Operations | Ibikorwa | |
-| `shell.roles.management` | Management | Ubuyobozi | |
-| `shell.roles.finance` | Finance | Imari | |
+| `shell.roles.administrator` | Marketplace Administrator | Umuyobozi w'Isoko | |
 | `shell.language` | Language | Ururimi | |
 | `shell.languageOf` | Language: {language} | Ururimi: {language} | |
 | `shell.languages.en` | English | English | |
@@ -861,8 +857,6 @@ updates `messages/admin.rw.json`.
 | `promotions.sections.status` | Status | Aho igeze | |
 | `staff.title` | Staff & roles | Abakozi n'inshingano | |
 | `staff.description` | Everyone who can sign in to the admin, their role and whether their account is active. | Abashobora kwinjira mu buyobozi bose, inshingano zabo n'uko konti zabo zikora. | |
-| `staff.rolesLabel` | Filter by role | Yungurura ukurikije inshingano | |
-| `staff.everyone` | All staff | Abakozi bose | |
 | `staff.statusLabel` | Filter by status | Yungurura ukurikije aho bigeze | |
 | `staff.statuses.all` | All | Bose | |
 | `staff.statuses.active` | Active | Barakora | |
@@ -890,7 +884,7 @@ updates `messages/admin.rw.json`.
 | `staff.contactHelp` | Enter an email, a phone number or both. Either one signs in. | Andika imeri, nimero ya telefoni cyangwa byombi. Kimwe muri byo kirahagije kwinjira. | |
 | `staff.password` | Initial password | Ijambobanga rya mbere | |
 | `staff.passwordHelp` | At least 8 characters with upper and lower case and a digit or symbol. Share it with them in person; they can change it in their account. | Nibura inyuguti 8 zirimo inyuguti nkuru n'into n'umubare cyangwa ikimenyetso. Ribahe imbonankubone; bashobora kurihindura muri konti yabo. | |
-| `staff.roleSignOut` | Changing the role signs them out on every device. | Guhindura inshingano bimusohora ku bikoresho byose. | |
+| `staff.roleNote` | New staff accounts are Marketplace Administrators, with access to the whole admin. | Konti nshya z'abakozi ni iz'Abayobozi b'Isoko, bafite uburenganzira ku buyobozi bwose. | |
 | `staff.disableNote` | Disabling signs them out and blocks sign-in. | Kumuhagarika bimusohora kandi bikabuza kwinjira. | |
 | `staff.selfSignOut` | This is your own account: saving signs you out. | Iyi ni konti yawe: kubika birakusohora. | |
 | `staff.errors.contact` | Enter an email or a phone number. | Andika imeri cyangwa nimero ya telefoni. | |

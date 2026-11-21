@@ -219,7 +219,7 @@ def test_bulk_activate_validates_its_input(client, admin_auth, ids):
     assert res.status_code == 422
 
 
-@pytest.mark.parametrize("who", ["operations_auth", "management_auth", "finance_auth"])
+@pytest.mark.parametrize("who", ["customer_auth"])
 def test_bulk_activate_needs_catalog_manage(client, request, who):
     headers = request.getfixturevalue(who)["headers"]
     res = client.post(

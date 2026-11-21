@@ -85,7 +85,7 @@ def test_an_administrator_recovers_a_refused_invoice_once(
     assert download.status_code == 200
 
 
-@pytest.mark.parametrize("role", ["sales_auth", "operations_auth", "management_auth"])
+@pytest.mark.parametrize("role", ["customer_auth"])
 def test_only_invoice_recoverers_can_recover(client, db, delivery, admin_auth, role, request):  # noqa: F811
     configure(client, admin_auth)
     order, _ = started(client, db)
@@ -97,7 +97,7 @@ def test_only_invoice_recoverers_can_recover(client, db, delivery, admin_auth, r
             AuditRecord.action == "auth.access_denied", AuditRecord.entity_id == url
         )
     ).all()
-    assert [r.actor_user_id for r in denied] == [member["user"].id]  # the denial is audited
+    assert [str(r.actor_user_id) for r in denied] == [member["user"]["id"]]  # audited
     assert recover(client, order["id"], {}).status_code == 401
     missing = recover(client, str(uuid.uuid4()), admin_auth["headers"])
     assert missing.status_code == 404 and code(missing) == "order_not_found"
@@ -111,20 +111,22 @@ def test_invoices_recover_not_payments_manage_gates_recovery(
     db,
     delivery,  # noqa: F811
     admin_auth,
-    management_auth,
     customer_auth,
     monkeypatch,
 ):
     order = paid_customer_order(client, db, customer_auth["headers"])  # refused: seller unset
     configure(client, admin_auth)
-    base = ROLE_PERMISSIONS["management"]
-    monkeypatch.setitem(ROLE_PERMISSIONS, "management", base | {Permission.PAYMENTS_MANAGE.value})
-    refused = recover(client, order["id"], management_auth["headers"])
+    # The administrator is the only staff role (SC-05): take invoices:recover away from it alone.
+    everything = ROLE_PERMISSIONS["administrator"]
+    without = everything - {Permission.INVOICES_RECOVER.value}
+    assert Permission.PAYMENTS_MANAGE.value in without
+    monkeypatch.setitem(ROLE_PERMISSIONS, "administrator", without)
+    refused = recover(client, order["id"], admin_auth["headers"])
     assert refused.status_code == 403 and invoices(db) == []  # payments:manage is not enough
-    monkeypatch.setitem(ROLE_PERMISSIONS, "management", base | {Permission.INVOICES_RECOVER.value})
-    first = recover(client, order["id"], management_auth["headers"])
+    monkeypatch.setitem(ROLE_PERMISSIONS, "administrator", everything)
+    first = recover(client, order["id"], admin_auth["headers"])
     assert first.status_code == 201 and first.json()["issued"] is True
-    second = recover(client, order["id"], management_auth["headers"])
+    second = recover(client, order["id"], admin_auth["headers"])
     assert second.status_code == 200 and second.json()["issued"] is False
     assert len(invoices(db)) == 1 and counter(db) == 1
     db.expire_all()
@@ -133,7 +135,7 @@ def test_invoices_recover_not_payments_manage_gates_recovery(
             AuditRecord.action == "invoice.issue", AuditRecord.entity_id == order["id"]
         )
     ).all()[-1:]
-    assert issued.actor_user_id == management_auth["user"].id
+    assert issued.actor_user_id == admin_auth["user"].id
     assert issued.change_summary["status"] == "success" and issued.change_summary["recovery"]
 
 
@@ -142,14 +144,13 @@ def test_unpaid_orders_cannot_be_invoiced_by_recovery(
     db,
     delivery,  # noqa: F811
     admin_auth,
-    operations_auth,
 ):
     configure(client, admin_auth)
     unpaid = momo_order(client, db)
     res = recover(client, unpaid["id"], admin_auth["headers"])
     assert res.status_code == 409 and code(res) == "invoice_not_issuable"
     cod = checkout(client, guest_cart(client, db)).json()["order"]
-    deliver(client, cod, operations_auth["headers"])  # dispatched, not delivered: not paid
+    deliver(client, cod, admin_auth["headers"])  # dispatched, not delivered: not paid
     res = recover(client, cod["id"], admin_auth["headers"])
     assert res.status_code == 409 and code(res) == "invoice_not_issuable"
     assert invoices(db) == [] and counter(db) is None
@@ -224,14 +225,13 @@ def test_delivery_always_settles_a_cod_payment_so_confirmation_never_needs_to(
     db,
     delivery,  # noqa: F811
     admin_auth,
-    operations_auth,
 ):
     configure(client, admin_auth)
     order = checkout(client, guest_cart(client, db)).json()["order"]
-    deliver(client, order, operations_auth["headers"], steps=("confirmed", "processing"))
+    deliver(client, order, admin_auth["headers"], steps=("confirmed", "processing"))
     db.expire_all()
     assert db.scalar(select(PaymentAttempt.status)) == "pending"
-    deliver(client, order, operations_auth["headers"], steps=("dispatched", "delivered"))
+    deliver(client, order, admin_auth["headers"], steps=("dispatched", "delivered"))
     db.expire_all()
     assert db.scalar(select(PaymentAttempt.status)) == "succeeded"  # Q14, in the same change
     [invoice] = invoices(db)
@@ -247,17 +247,16 @@ def test_a_cod_delivery_without_seller_details_is_refused_then_recovered_unchang
     db,
     delivery,  # noqa: F811
     admin_auth,
-    operations_auth,
 ):
     """Seller details unset when a cash-on-delivery order is delivered: the delivery and the
     cash payment commit, no invoice or number is used, the refusal is audited; an administrator
     later recovers the invoice without changing the order or its payment."""
     order = checkout(client, guest_cart(client, db)).json()["order"]
-    deliver(client, order, operations_auth["headers"])  # confirmed, processing, dispatched
+    deliver(client, order, admin_auth["headers"])  # confirmed, processing, dispatched
     res = client.patch(
         f"{STAFF}/{order['id']}/status",
         json={"status": "delivered"},
-        headers=operations_auth["headers"],
+        headers=admin_auth["headers"],
     )
     assert res.status_code == 200, res.text  # the refusal never blocks the delivery
     db.expire_all()
@@ -273,7 +272,7 @@ def test_a_cod_delivery_without_seller_details_is_refused_then_recovered_unchang
     ).all()
     assert refused.change_summary["status"] == "failure"
     assert refused.change_summary["reason"] == "seller_details_missing"
-    assert refused.actor_user_id == operations_auth["user"].id  # the delivering staff member
+    assert refused.actor_user_id == admin_auth["user"].id  # the delivering staff member
     before = (stored.status, stored.total, stored.tax_total, stored.updated_at)
     paid = (attempt.status, attempt.amount, attempt.succeeded_at, attempt.updated_at)
     # Recovery is refused while the details are unset, then issues once they are.
@@ -301,13 +300,12 @@ def test_staff_cod_confirmation_of_an_unsettled_delivered_order_issues_the_invoi
     db,
     delivery,  # noqa: F811
     admin_auth,
-    operations_auth,
 ):
     """The API cannot produce a delivered order with a pending cash payment (delivery settles
     it); this state is built directly to cover the defensive issuance in confirm_cod."""
     configure(client, admin_auth)
     order = checkout(client, guest_cart(client, db)).json()["order"]
-    deliver(client, order, operations_auth["headers"], steps=("confirmed", "processing"))
+    deliver(client, order, admin_auth["headers"], steps=("confirmed", "processing"))
     db.execute(text("UPDATE orders SET status = 'delivered' WHERE id = :id"), {"id": order["id"]})
     db.commit()
     attempt = db.scalar(select(PaymentAttempt))
@@ -330,13 +328,12 @@ def test_delivery_note_eligibility_for_every_reachable_state(
     db,
     delivery,  # noqa: F811
     admin_auth,
-    operations_auth,
     customer_auth,
 ):
     """Implemented rule (pending owner approval): not cancelled, and all stock committed for
     delivery or fulfilled."""
     configure(client, admin_auth)
-    ops = operations_auth["headers"]
+    ops = admin_auth["headers"]
     # Mobile money: received and unpaid (stock on hold) -> no; received and paid -> yes.
     unpaid = momo_order(client, db)
     assert note(client, unpaid["id"], ops) == 409
