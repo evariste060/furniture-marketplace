@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Checkout — Contact</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts bg-page" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="CheckoutHeader" step="1" hint-size="100%,76px"></dc-import>
+  <main class="wrap row wrapx" style="align-items: flex-start; gap: 24px; padding-top: 32px; padding-bottom: 56px">
+    <div class="col" style="gap: 20px; flex: 999 1 560px; min-width: 0">
+      <div class="card p24 row wrapx between" style="gap: 12px">
+        <div class="col" style="gap: 2px"><b class="fw6">Already have an account?</b><span class="t-sm c-mut">Sign in to use your saved addresses. You can also check out as a guest.</span></div>
+        <a class="btn btn-o btn-sm" href="Login.dc.html">Sign in</a>
+      </div>
+      <form class="card p32 col" style="gap: 20px">
+        <div class="col" style="gap: 4px"><h1 class="t-h2">Contact details</h1><p class="c-tx2">We’ll send order updates and the delivery code to this phone.</p></div>
+        <div class="g g2">
+          <div class="field"><label class="lbl" for="fn">First name</label><input id="fn" class="inp" defaultValue="Aline"></div>
+          <div class="field"><label class="lbl" for="ln">Last name</label><input id="ln" class="inp" defaultValue="Mukamana"></div>
+        </div>
+        <div class="field"><label class="lbl" for="ph">Phone number</label><div class="prefix focus" style="border-color: #0866F5; box-shadow: 0 0 0 3px rgba(8,102,245,.15)"><span>RW +250</span><input id="ph" defaultValue="788 000 111" aria-describedby="phh"></div><span class="help" id="phh">Used for SMS updates and mobile money payment.</span></div>
+        <div class="field"><label class="lbl" for="em">Email <span class="c-mut" style="font-weight: 400">(optional)</span></label><input id="em" type="email" class="inp" placeholder="you@example.com"><span class="help">We email your invoice if you add one.</span></div>
+        <label class="chk"><input type="checkbox" defaultChecked="{{ true }}">Send me WhatsApp updates about this order</label>
+        <div class="row between wrapx" style="gap: 12px; padding-top: 8px; border-top: 1px solid #E2E8F0">
+          <a class="row fw5 t-sm" href="Cart.dc.html" style="gap: 6px; padding-top: 16px"><span class="ic ic-arrow-l i16" aria-hidden="true"></span>Back to cart</a>
+          <a class="btn btn-p btn-lg" href="CheckoutDelivery.dc.html" style="margin-top: 16px">Continue to delivery<span class="ic ic-arrow-r i18" aria-hidden="true"></span></a>
+        </div>
+      </form>
+    </div>
+    <aside class="card p24 col" style="gap: 16px; flex: 1 1 320px; max-width: 400px">
+      <h2 class="t-h3">Order summary</h2>
+      <div class="row" style="gap: 12px"><span class="imgbox" style="width: 56px; height: 56px"><span class="dev dev-ph-violet" aria-hidden="true" style="width: 46px; height: 46px"></span></span><span class="col grow" style="gap: 0"><span class="t-sm fw5">Samsung Galaxy A55 5G</span><span class="t-cap c-mut">Awesome Navy · 128GB · Qty 1</span></span><span class="t-sm fw5">RWF 520,000</span></div>
+      <div class="row" style="gap: 12px"><span class="imgbox" style="width: 56px; height: 56px"><span class="dev dev-buds" aria-hidden="true" style="width: 46px; height: 46px"></span></span><span class="col grow" style="gap: 0"><span class="t-sm fw5">Samsung Galaxy Buds2 Pro</span><span class="t-cap c-mut">Bora Purple · Qty 1</span></span><span class="t-sm fw5">RWF 245,000</span></div>
+      <hr class="hr">
+      <div class="kv"><span>Subtotal</span><b class="fw5">RWF 765,000</b></div>
+      <div class="kv"><span>Delivery</span><span class="c-mut">Next step</span></div>
+      <hr class="hr">
+      <div class="row between"><span class="t-h4">Total</span><span class="t-price" style="color: #0D2D52">RWF 765,000</span></div>
+      <div class="row t-cap c-mut" style="gap: 6px"><span class="ic ic-lock i14 c-ok" aria-hidden="true"></span>Your details are encrypted and never shared.</div>
+    </aside>
+  </main>
+  <div class="wrap row between wrapx t-cap c-mut" style="padding-bottom: 32px; gap: 12px"><span>© 2026 3 Sixty Technologies</span><span class="row" style="gap: 16px"><a href="Policy.dc.html">Delivery</a><a href="Policy.dc.html">Returns</a><a href="https://wa.me/250788123456">Help on WhatsApp</a></span></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

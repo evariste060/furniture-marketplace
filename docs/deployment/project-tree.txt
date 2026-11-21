@@ -1,0 +1,140 @@
+rwanda-electronics-ecommerce/
+|-- .github/
+|   `-- workflows/
+|       `-- ci.yml
+|-- backend/
+|   |-- alembic/
+|   |   |-- versions/
+|   |   |   `-- .gitkeep
+|   |   |-- env.py
+|   |   `-- script.py.mako
+|   |-- app/
+|   |   |-- api/
+|   |   |   |-- v1/
+|   |   |   |   |-- endpoints/
+|   |   |   |   |   |-- __init__.py
+|   |   |   |   |   `-- health.py
+|   |   |   |   |-- __init__.py
+|   |   |   |   `-- router.py
+|   |   |   `-- __init__.py
+|   |   |-- core/
+|   |   |   |-- security/
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- __init__.py
+|   |   |   `-- config.py
+|   |   |-- db/
+|   |   |   |-- __init__.py
+|   |   |   |-- base.py
+|   |   |   `-- session.py
+|   |   |-- integrations/
+|   |   |   |-- notifications/
+|   |   |   |   `-- .gitkeep
+|   |   |   `-- payments/
+|   |   |       `-- .gitkeep
+|   |   |-- models/
+|   |   |   `-- .gitkeep
+|   |   |-- repositories/
+|   |   |   `-- .gitkeep
+|   |   |-- schemas/
+|   |   |   |-- __init__.py
+|   |   |   `-- health.py
+|   |   |-- services/
+|   |   |   `-- .gitkeep
+|   |   |-- __init__.py
+|   |   `-- main.py
+|   |-- tests/
+|   |   |-- integration/
+|   |   |   `-- .gitkeep
+|   |   |-- unit/
+|   |   |   `-- test_health.py
+|   |   `-- conftest.py
+|   |-- .env.example
+|   |-- alembic.ini
+|   |-- pyproject.toml
+|   `-- uv.lock
+|-- docs/
+|   |-- api/
+|   |   `-- .gitkeep
+|   |-- architecture/
+|   |   `-- ADR-001-nextjs-fastapi-postgresql.md
+|   |-- database/
+|   |   `-- .gitkeep
+|   |-- deployment/
+|   |   |-- README.md
+|   |   |-- development-mobile.png
+|   |   |-- generated-files.md
+|   |   |-- project-tree.txt
+|   |   `-- verification.md
+|   `-- requirements/
+|       |-- README.md
+|       `-- original-checksums.txt
+|-- frontend/
+|   |-- public/
+|   |   `-- .gitkeep
+|   |-- src/
+|   |   |-- app/
+|   |   |   |-- (admin)/
+|   |   |   |   `-- admin/
+|   |   |   |       `-- page.tsx
+|   |   |   |-- (storefront)/
+|   |   |   |   `-- page.tsx
+|   |   |   |-- error.tsx
+|   |   |   |-- favicon.ico
+|   |   |   |-- globals.css
+|   |   |   |-- layout.tsx
+|   |   |   `-- loading.tsx
+|   |   |-- components/
+|   |   |   |-- layout/
+|   |   |   |   `-- site-shell.tsx
+|   |   |   |-- shared/
+|   |   |   |   `-- backend-health.tsx
+|   |   |   `-- ui/
+|   |   |       `-- .gitkeep
+|   |   |-- features/
+|   |   |   |-- admin/
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- auth/
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- cart/
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- categories/
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- checkout/
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- orders/
+|   |   |   |   `-- .gitkeep
+|   |   |   `-- products/
+|   |   |       `-- .gitkeep
+|   |   |-- hooks/
+|   |   |   `-- .gitkeep
+|   |   |-- i18n/
+|   |   |   `-- .gitkeep
+|   |   |-- lib/
+|   |   |   `-- api-client.ts
+|   |   `-- types/
+|   |       `-- .gitkeep
+|   |-- .env.example
+|   |-- .gitignore
+|   |-- AGENTS.md
+|   |-- README.md
+|   |-- eslint.config.mjs
+|   |-- next-env.d.ts
+|   |-- next.config.ts
+|   |-- package-lock.json
+|   |-- package.json
+|   `-- tsconfig.json
+|-- infrastructure/
+|   |-- production/
+|   |   |-- backend.env.example
+|   |   `-- frontend.env.example
+|   `-- staging/
+|       |-- backend.env.example
+|       `-- frontend.env.example
+|-- scripts/
+|   `-- check_database.py
+|-- .editorconfig
+|-- .env.example
+|-- .gitignore
+|-- AGENTS.md
+|-- README.md
+`-- docker-compose.yml

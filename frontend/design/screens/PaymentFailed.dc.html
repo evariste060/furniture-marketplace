@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Payment not completed</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts bg-page" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="CheckoutHeader" step="0" hint-size="100%,76px"></dc-import>
+  <main class="wrap col" style="align-items: center; padding-top: 56px; padding-bottom: 64px">
+    <section class="card p32 col sh" role="alert" style="gap: 20px; width: 100%; max-width: 560px; align-items: center; text-align: center">
+      <span style="width: 88px; height: 88px; border-radius: 50%; background: #FEE2E2; display: flex; align-items: center; justify-content: center; color: #DC2626"><span class="ic ic-alert i40" aria-hidden="true"></span></span>
+      <div class="col" style="gap: 6px; align-items: center"><h1 class="t-h2">Payment not completed</h1><p class="c-tx2" style="max-width: 440px">The MoMo request timed out before it was approved. Your order <b class="fw6" style="color: #0F172A">#3S-10482</b> is saved and unpaid — nothing was charged.</p></div>
+      <div class="col r12" style="gap: 8px; padding: 16px 20px; background: #F5F8FC; width: 100%; text-align: left">
+        <div class="kv"><span>Amount</span><b class="fw6">RWF 713,000</b></div>
+        <div class="kv"><span>Method</span><span>MTN MoMo · +250 788 000 111</span></div>
+        <div class="kv"><span>Reason</span><span class="c-err fw5">Request expired (no approval within 5 minutes)</span></div>
+      </div>
+      <div class="col" style="gap: 10px; width: 100%">
+        <a class="btn btn-p btn-lg btn-block" href="PaymentWaiting.dc.html"><span class="ic ic-refresh i18" aria-hidden="true"></span>Try again with the same number</a>
+        <a class="btn btn-o btn-block" href="CheckoutPayment.dc.html">Choose another payment method</a>
+        <a class="btn btn-oa btn-block" href="https://wa.me/250788123456"><span class="ic ic-chat i18" aria-hidden="true"></span>Get help on WhatsApp</a>
+      </div>
+      <p class="t-cap c-mut">Your items are held for 30 minutes while you complete payment.</p>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

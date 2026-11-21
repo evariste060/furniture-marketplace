@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Checkout — Review</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts bg-page" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="CheckoutHeader" step="4" hint-size="100%,76px"></dc-import>
+  <main class="wrap row wrapx" style="align-items: flex-start; gap: 24px; padding-top: 32px; padding-bottom: 56px">
+    <div class="col" style="gap: 16px; flex: 999 1 560px; min-width: 0">
+      <h1 class="t-h2">Review your order</h1>
+      <div class="card p24 g g3" style="gap: 20px">
+        <div class="col" style="gap: 4px"><span class="row between"><b class="t-sm fw6">Contact</b><a href="CheckoutContact.dc.html" class="t-cap fw5">Edit</a></span><span class="t-sm c-tx2">Aline Mukamana</span><span class="t-sm c-tx2">+250 788 000 111</span></div>
+        <div class="col" style="gap: 4px"><span class="row between"><b class="t-sm fw6">Delivery</b><a href="CheckoutDelivery.dc.html" class="t-cap fw5">Edit</a></span><span class="t-sm c-tx2">KG 11 Ave, House 24, Kimironko, Gasabo, Kigali</span><span class="t-cap c-ok fw5">Arrives Tue 27 – Wed 28 Oct</span></div>
+        <div class="col" style="gap: 4px"><span class="row between"><b class="t-sm fw6">Payment</b><a href="CheckoutPayment.dc.html" class="t-cap fw5">Edit</a></span><span class="row t-sm c-tx2" style="gap: 8px"><span class="badge" style="background: #FFCC00; color: #0F172A">MoMo</span>MTN Mobile Money</span><span class="t-sm c-tx2">+250 788 000 111</span></div>
+      </div>
+      <section class="card p24 col" style="gap: 0" aria-label="Items">
+        <h2 class="t-h4" style="padding-bottom: 8px">Items (2)</h2>
+        <div class="row" style="gap: 16px; padding: 16px 0; border-bottom: 1px solid #E2E8F0"><span class="imgbox" style="width: 72px; height: 72px"><span class="dev dev-ph-violet" aria-hidden="true" style="width: 60px; height: 60px"></span></span><span class="col grow" style="gap: 2px"><b class="fw6">Samsung Galaxy A55 5G</b><span class="t-sm c-mut">Awesome Navy · 8GB · 128GB · Qty 1</span><span class="t-cap c-tx2">1-year manufacturer warranty</span></span><b class="fw6">RWF 520,000</b></div>
+        <div class="row" style="gap: 16px; padding: 16px 0"><span class="imgbox" style="width: 72px; height: 72px"><span class="dev dev-buds" aria-hidden="true" style="width: 60px; height: 60px"></span></span><span class="col grow" style="gap: 2px"><b class="fw6">Samsung Galaxy Buds2 Pro</b><span class="t-sm c-mut">Bora Purple · Qty 1</span><span class="t-cap c-tx2">1-year manufacturer warranty</span></span><b class="fw6">RWF 245,000</b></div>
+      </section>
+      <div class="field card p24"><label class="lbl" for="note">Note for the rider <span class="c-mut" style="font-weight: 400">(optional)</span></label><textarea id="note" class="inp" placeholder="e.g. Call me when you reach the blue gate" style="min-height: 80px"></textarea></div>
+    </div>
+    <aside class="col" style="gap: 14px; flex: 1 1 320px; max-width: 400px">
+      <div class="card p24 col" style="gap: 14px">
+        <h2 class="t-h3">Order total</h2>
+        <div class="kv"><span>Subtotal (2 items)</span><b class="fw5">RWF 765,000</b></div>
+        <div class="kv"><span>Delivery · Kigali (Gasabo)</span><b class="fw5 c-ok">Free</b></div>
+        <div class="kv"><span>Discount (SAVE10)</span><b class="fw5 c-ok">− RWF 52,000</b></div>
+        <div class="kv"><span>VAT (included)</span><span class="c-mut">RWF 108,763</span></div>
+        <hr class="hr">
+        <div class="row between"><span class="t-h4">Total to pay</span><span class="t-price-l" style="color: #0D2D52">RWF 713,000</span></div>
+      </div>
+      <label class="chk" style="align-items: flex-start"><input type="checkbox" defaultChecked="{{ true }}" style="margin-top: 2px"><span class="t-sm c-tx2">I agree to the <a href="Policy.dc.html">Terms</a>, <a href="Policy.dc.html">Delivery</a> and <a href="Policy.dc.html">Returns</a> policies.</span></label>
+      <a class="btn btn-p btn-lg btn-block" href="PaymentWaiting.dc.html"><span class="ic ic-lock i18" aria-hidden="true"></span>Place order · RWF 713,000</a>
+      <a class="row fw5 t-sm" href="CheckoutPayment.dc.html" style="gap: 6px; justify-content: center"><span class="ic ic-arrow-l i16" aria-hidden="true"></span>Back to payment</a>
+    </aside>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

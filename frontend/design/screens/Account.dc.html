@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>My account</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="0" account="Aline" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap row wrapx" style="align-items: flex-start; gap: 24px; padding-top: 32px; padding-bottom: 64px">
+      <nav class="card p16 col" aria-label="Account" style="gap: 4px; flex: 1 1 240px; max-width: 260px">
+        <div class="row" style="gap: 12px; padding: 8px 12px 16px"><span class="avatar" style="width: 44px; height: 44px; font-size: 15px">AM</span><span class="col" style="gap: 0"><b class="fw6">Aline Mukamana</b><span class="t-cap c-mut">+250 788 000 111</span></span></div>
+        <a class="alink on" href="Account.dc.html" aria-current="page"><span class="ic ic-home i18" aria-hidden="true"></span>Overview</a>
+        <a class="alink" href="MyOrders.dc.html"><span class="ic ic-package i18" aria-hidden="true"></span>My orders</a>
+        <a class="alink" href="Addresses.dc.html"><span class="ic ic-pin i18" aria-hidden="true"></span>Addresses</a>
+        <a class="alink" href="Profile.dc.html"><span class="ic ic-user i18" aria-hidden="true"></span>Profile &amp; security</a>
+        <a class="alink" href="Main.dc.html" style="color: #DC2626"><span class="ic ic-logout i18" aria-hidden="true"></span>Log out</a>
+      </nav>
+      <div class="col" style="gap: 20px; flex: 999 1 560px; min-width: 0">
+        <div class="col" style="gap: 4px"><h1 class="t-h1" style="color: #0D2D52">Hello, Aline</h1><p class="c-tx2">Here’s what’s happening with your orders.</p></div>
+        <div class="g g3">
+          <a href="MyOrders.dc.html" class="card p20 row" style="gap: 14px; color: #0F172A"><span style="width: 44px; height: 44px; border-radius: 10px; background: #EAF3FF; color: #0866F5; display: flex; align-items: center; justify-content: center"><span class="ic ic-truck i22" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="t-h3">1</b><span class="t-sm c-mut">On the way</span></span></a>
+          <a href="MyOrders.dc.html" class="card p20 row" style="gap: 14px; color: #0F172A"><span style="width: 44px; height: 44px; border-radius: 10px; background: #DCFCE7; color: #15803D; display: flex; align-items: center; justify-content: center"><span class="ic ic-check-c i22" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="t-h3">6</b><span class="t-sm c-mut">Delivered</span></span></a>
+          <a href="WriteReview.dc.html" class="card p20 row" style="gap: 14px; color: #0F172A"><span style="width: 44px; height: 44px; border-radius: 10px; background: #FEF3C7; color: #92400E; display: flex; align-items: center; justify-content: center"><span class="ic ic-star i22" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="t-h3">2</b><span class="t-sm c-mut">Waiting for your review</span></span></a>
+        </div>
+        <section class="card p24 col" style="gap: 4px">
+          <div class="row between" style="padding-bottom: 8px"><h2 class="t-h3">Recent orders</h2><a href="MyOrders.dc.html" class="row t-sm fw5" style="gap: 6px">See all<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a></div>
+          <a href="OrderDetail.dc.html" class="row wrapx" style="gap: 16px; padding: 16px 0; border-top: 1px solid #E2E8F0; color: #0F172A"><span class="row" style="gap: 8px"><span class="imgbox" style="width: 52px; height: 52px"><span class="dev dev-ph-violet" aria-hidden="true" style="width: 42px; height: 42px"></span></span><span class="imgbox" style="width: 52px; height: 52px"><span class="dev dev-buds" aria-hidden="true" style="width: 42px; height: 42px"></span></span></span><span class="col grow" style="gap: 2px; min-width: 160px"><b class="fw6">#3S-10482</b><span class="t-sm c-mut">24 Oct 2026 · 2 items</span></span><span class="badge s-info">Out for delivery</span><b class="fw6" style="width: 130px; text-align: right">RWF 713,000</b><span class="ic ic-chev-r i18 c-mut" aria-hidden="true"></span></a>
+          <a href="OrderDetail.dc.html" class="row wrapx" style="gap: 16px; padding: 16px 0; border-top: 1px solid #E2E8F0; color: #0F172A"><span class="row" style="gap: 8px"><span class="imgbox" style="width: 52px; height: 52px"><span class="dev dev-laptop" aria-hidden="true" style="width: 42px; height: 42px"></span></span></span><span class="col grow" style="gap: 2px; min-width: 160px"><b class="fw6">#3S-09917</b><span class="t-sm c-mut">2 Sep 2026 · 1 item</span></span><span class="badge s-ok">Delivered</span><b class="fw6" style="width: 130px; text-align: right">RWF 820,000</b><span class="ic ic-chev-r i18 c-mut" aria-hidden="true"></span></a>
+          <a href="OrderDetail.dc.html" class="row wrapx" style="gap: 16px; padding: 16px 0; border-top: 1px solid #E2E8F0; color: #0F172A"><span class="row" style="gap: 8px"><span class="imgbox" style="width: 52px; height: 52px"><span class="dev dev-mouse" aria-hidden="true" style="width: 42px; height: 42px"></span></span><span class="imgbox" style="width: 52px; height: 52px"><span class="dev dev-power" aria-hidden="true" style="width: 42px; height: 42px"></span></span></span><span class="col grow" style="gap: 2px; min-width: 160px"><b class="fw6">#3S-09540</b><span class="t-sm c-mut">18 Jul 2026 · 2 items</span></span><span class="badge s-ok">Delivered</span><b class="fw6" style="width: 130px; text-align: right">RWF 130,000</b><span class="ic ic-chev-r i18 c-mut" aria-hidden="true"></span></a>
+        </section>
+        <div class="g g2">
+          <section class="card p24 col" style="gap: 8px"><div class="row between"><h2 class="t-h4">Default address</h2><a href="Addresses.dc.html" class="t-sm fw5">Manage</a></div><p class="t-sm c-tx2">Home · KG 11 Ave, House 24, Kimironko, Gasabo, Kigali</p></section>
+          <section class="card p24 col" style="gap: 8px"><div class="row between"><h2 class="t-h4">Profile</h2><a href="Profile.dc.html" class="t-sm fw5">Edit</a></div><p class="t-sm c-tx2">aline@example.com · Language: English</p></section>
+        </div>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1350}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

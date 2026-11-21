@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Audit log</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Audit Log" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Audit log</b></nav><h1 class="t-h1">Audit log</h1><p class="c-tx2">Who changed what, and when. Entries can’t be edited or deleted.</p></div>
+      <section class="card" style="overflow: hidden">
+        <div class="row wrapx" style="gap: 12px; padding: 16px 20px; border-bottom: 1px solid #E2E8F0">
+          <select class="inp" aria-label="Staff member" style="width: 200px; height: 36px"><option>All staff</option></select>
+          <select class="inp" aria-label="Area" style="width: 180px; height: 36px"><option>All areas</option><option>Orders</option><option>Products</option><option>Settings</option></select>
+          <button type="button" class="btn btn-n btn-sm"><span class="ic ic-calendar i16" aria-hidden="true"></span>Last 7 days</button>
+        </div>
+        <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">Area</th><th scope="col">Action</th><th scope="col">Change</th></tr></thead><tbody>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="9"><tr><td class="c-tx2" style="white-space: nowrap">{{r.t}}</td><td><span class="col" style="gap: 0"><b class="fw5">{{r.w}}</b><span class="t-cap c-mut">{{r.role}}</span></span></td><td><span class="badge s-neu">{{r.a}}</span></td><td>{{r.act}}</td><td class="t-cap c-tx2" style="font-family: ui-monospace, monospace">{{r.ch}}</td></tr></sc-for>
+        </tbody></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const r = (t, w, role, a, act, ch) => ({ t, w, role, a, act, ch });
+    return { rows: [
+      r('24 Oct, 11:02', 'Claudine M.', 'Operations', 'Orders', 'Changed status of #3S-10482', 'Paid → Processing'),
+      r('24 Oct, 10:15', 'Jean Paul H.', 'Sales', 'Products', 'Edited price · Galaxy A55 256GB', 'RWF 600,000 → RWF 580,000'),
+      r('24 Oct, 09:40', 'Jean Paul H.', 'Sales', 'Reviews', 'Approved review on HP Pavilion 15', 'Pending → Approved'),
+      r('23 Oct, 17:22', 'Evariste N.', 'Admin', 'Settings', 'Updated WhatsApp number', '+250 788 123 400 → +250 788 123 456'),
+      r('23 Oct, 16:06', 'System', 'Payments', 'Payments', 'Payment failed for #3S-10478', 'MoMo: insufficient balance'),
+      r('23 Oct, 15:00', 'Claudine M.', 'Operations', 'Inventory', 'Adjusted stock · JBL Flip 6', '1 → 0 (damaged)'),
+      r('23 Oct, 11:48', 'Evariste N.', 'Admin', 'Promotions', 'Created promotion SCHOOL26', '8% · Laptops · 1–30 Nov'),
+      r('22 Oct, 09:05', 'Evariste N.', 'Admin', 'Staff', 'Invited Alice Uwera', 'Role: Sales'),
+      r('21 Oct, 14:31', 'Jean Paul H.', 'Sales', 'Import', 'Imported october-phones-update.xlsx', '36 created · 369 updated · 7 skipped')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

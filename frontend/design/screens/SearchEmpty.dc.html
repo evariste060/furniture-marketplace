@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search — no results</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="position: relative; width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" q="iphone 17 pro max 1tb" hint-size="100%,160px"></dc-import>
+  <main>
+    <section class="bg-page">
+      <div class="wrap col" style="align-items: center; text-align: center; gap: 16px; padding-top: 72px; padding-bottom: 64px">
+        <span style="width: 96px; height: 96px; border-radius: 50%; background: #EAF3FF; display: flex; align-items: center; justify-content: center; color: #0866F5"><span class="ic ic-search i40" aria-hidden="true"></span></span>
+        <h1 class="t-h2">No results for “iphone 17 pro max 1tb”</h1>
+        <p class="t-lg c-tx2" style="max-width: 560px">We couldn’t find a match in stock. We may still be able to get it for you — ask our team.</p>
+        <div class="row wrapx" style="gap: 12px; justify-content: center">
+          <a class="btn btn-wa" href="https://wa.me/250788123456"><span class="ic ic-chat i18" aria-hidden="true"></span>Ask us on WhatsApp</a>
+          <a class="btn btn-o" href="Contact.dc.html"><span class="ic ic-mail i18" aria-hidden="true"></span>Contact us</a>
+        </div>
+        <ul class="col" style="gap: 8px; padding-top: 12px; text-align: left">
+          <li class="row" style="gap: 8px"><span class="ic ic-check i16 c-ok" aria-hidden="true"></span><span class="c-tx2">Check the spelling of your search</span></li>
+          <li class="row" style="gap: 8px"><span class="ic ic-check i16 c-ok" aria-hidden="true"></span><span class="c-tx2">Try a more general word, like “iPhone” or “laptop”</span></li>
+          <li class="row" style="gap: 8px"><span class="ic ic-check i16 c-ok" aria-hidden="true"></span><span class="c-tx2">Browse a popular category below</span></li>
+        </ul>
+        <div class="row wrapx" style="gap: 10px; justify-content: center; padding-top: 8px">
+          <a class="chip-o" href="Category.dc.html">Phones</a><a class="chip-o" href="Category.dc.html">Laptops</a><a class="chip-o" href="Category.dc.html">TVs &amp; Audio</a><a class="chip-o" href="Category.dc.html">Home Appliances</a><a class="chip-o" href="Category.dc.html">Accessories</a><a class="chip-o" href="Category.dc.html">Gaming</a>
+        </div>
+      </div>
+    </section>
+    <section class="sec">
+      <div class="wrap col" style="gap: 24px">
+        <div class="row between"><h2 class="t-h2">Popular right now</h2><a class="row fw5 t-sm" style="gap: 6px" href="Category.dc.html">View all phones<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a></div>
+        <div class="g g5"><sc-for list="{{items}}" as="it" hint-placeholder-count="5"><dc-import name="ProductCard" p="{{it}}" hint-size="100%,360px"></dc-import></sc-for></div>
+      </div>
+    </section>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { items: [
+      { name: 'iPhone 15 128GB', price: 'RWF 1,450,000', img: 'dev-ph-pink', rating: '4.8 (210)' },
+      { name: 'Samsung Galaxy A55 5G 128GB', price: 'RWF 495,000', img: 'dev-ph-violet', rating: '4.8 (120)' },
+      { name: 'Tecno Spark 20 128GB', price: 'RWF 295,000', img: 'dev-ph-blue', rating: '4.6 (180)' },
+      { name: 'Google Pixel 8', price: 'RWF 1,350,000', img: 'dev-ph-green', rating: '4.7 (19)' },
+      { name: 'Xiaomi Redmi Note 13 Pro', price: 'RWF 420,000', img: 'dev-ph-green', rating: '4.6 (29)' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

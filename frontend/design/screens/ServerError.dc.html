@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Something went wrong</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap col" style="align-items: center; text-align: center; gap: 16px; padding-top: 72px; padding-bottom: 80px">
+      <span style="width: 96px; height: 96px; border-radius: 50%; background: #FEF3C7; color: #92400E; display: flex; align-items: center; justify-content: center"><span class="ic ic-alert-t i40" aria-hidden="true"></span></span>
+      <h1 class="t-h1">Something went wrong on our side</h1>
+      <p class="t-lg c-tx2" style="max-width: 520px">Please try again in a moment. If you were paying, check your SMS before retrying so you’re not charged twice.</p>
+      <div class="row wrapx" style="gap: 12px; justify-content: center"><button type="button" class="btn btn-p"><span class="ic ic-refresh i18" aria-hidden="true"></span>Try again</button><a class="btn btn-o" href="Main.dc.html"><span class="ic ic-home i18" aria-hidden="true"></span>Go to homepage</a><a class="btn btn-oa" href="https://wa.me/250788123456"><span class="ic ic-chat i18" aria-hidden="true"></span>WhatsApp support</a></div>
+      <span class="t-cap c-mut">Error reference: 7F3A-21C9 — share it with support if this keeps happening.</span>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

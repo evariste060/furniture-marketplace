@@ -1,0 +1,55 @@
+[project]
+name = "rwanda-electronics-api"
+version = "0.1.0"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "pydantic>=2,<3",
+    "pydantic-settings>=2,<3",
+    "sqlalchemy>=2,<3",
+    "alembic>=1.14,<2",
+    "psycopg[binary]>=3.2,<4",
+    "uvicorn[standard]>=0.34,<1",
+    "redis>=5.2,<7",
+    "pillow>=12,<14",
+    "python-multipart>=0.0.20,<1",
+    "openpyxl>=3.1.5,<4",
+    "tzdata>=2025.2",
+    "reportlab>=4.2,<5",
+    "pyjwt[crypto]>=2.10,<3",
+    "httpx>=0.28,<1",
+]
+[dependency-groups]
+dev = [
+    "pytest>=8,<10",
+    "httpx>=0.28,<1",
+    "httpx2>=2,<3",  # starlette.testclient prefers httpx2; tests/postgres still use httpx
+    "ruff>=0.11,<1",
+    "openapi-spec-validator>=0.7,<0.8",
+    "mypy>=1.13,<2",
+    "python-dotenv>=1,<2",
+]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+[tool.mypy]
+python_version = "3.12"
+files = ["app", "tests"]
+explicit_package_bases = true
+mypy_path = "$MYPY_CONFIG_FILE_DIR"
+exclude = ["pytest-cache-files-.*"]
+show_error_codes = true
+warn_unused_configs = true
+[[tool.mypy.overrides]]
+# openpyxl ships no type information (module 8); its calls are covered by tests.
+module = ["openpyxl", "openpyxl.*"]
+ignore_missing_imports = true
+[[tool.mypy.overrides]]
+# reportlab ships no type information (module 16); its calls are covered by tests.
+module = ["reportlab", "reportlab.*"]
+ignore_missing_imports = true
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mobile — Checkout payment</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="position: relative; width: 390px; height: 1500px; overflow: hidden; background: #F5F8FC; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <header style="background: #fff; border-bottom: 1px solid #E2E8F0">
+    <div class="row between" style="height: 56px; padding: 0 12px"><a href="MobileCart.dc.html" class="icbtn" aria-label="Back" style="border: 0"><span class="ic ic-arrow-l i22" aria-hidden="true"></span></a><img src="../assets/3sixty-logo.jpeg" alt="3 Sixty Technologies" style="height: 34px; mix-blend-mode: multiply"><span class="row t-cap fw6 c-ok" style="gap: 4px"><span class="ic ic-lock i14" aria-hidden="true"></span>Secure</span></div>
+    <div style="padding: 0 16px 12px"><div class="row between t-cap fw5" style="margin-bottom: 6px"><span class="c-mut">Step 3 of 4</span><span>Payment</span></div><div class="track" style="height: 6px"><span style="width: 75%"></span></div></div>
+  </header>
+  <div class="col" style="gap: 12px; padding: 16px">
+    <h1 class="t-h3">How would you like to pay?</h1>
+    <div class="opt on" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 14px">
+      <label class="row" style="gap: 12px"><span class="radio" aria-hidden="true"></span><span class="badge" style="width: 52px; height: 34px; justify-content: center; background: #FFCC00; color: #0F172A; border-radius: 8px">MoMo</span><span class="col grow" style="gap: 0"><b class="t-sm fw6">MTN Mobile Money</b><span class="t-cap c-mut">Approve with your PIN</span></span></label>
+      <div class="field"><label class="lbl" for="mm">MoMo number</label><div class="prefix"><span>+250</span><input id="mm" defaultValue="788 000 111"></div></div>
+    </div>
+    <label class="opt" style="padding: 14px; gap: 12px"><span class="radio" aria-hidden="true"></span><span class="badge" style="width: 52px; height: 34px; justify-content: center; background: #E40000; color: #fff; border-radius: 8px">airtel</span><span class="col grow" style="gap: 0"><b class="t-sm fw6">Airtel Money</b><span class="t-cap c-mut">Approve with your PIN</span></span></label>
+    <label class="opt" style="padding: 14px; gap: 12px"><span class="radio" aria-hidden="true"></span><span class="badge" style="width: 52px; height: 34px; justify-content: center; background: #0D2D52; color: #fff; border-radius: 8px"><span class="ic ic-card i16" aria-hidden="true"></span></span><span class="col grow" style="gap: 0"><b class="t-sm fw6">Visa / Mastercard</b><span class="t-cap c-mut">3-D Secure</span></span></label>
+    <label class="opt" style="padding: 14px; gap: 12px"><span class="radio" aria-hidden="true"></span><span class="badge" style="width: 52px; height: 34px; justify-content: center; background: #15803D; color: #fff; border-radius: 8px"><span class="ic ic-dollar i16" aria-hidden="true"></span></span><span class="col grow" style="gap: 0"><b class="t-sm fw6">Cash on delivery</b><span class="t-cap c-mut">Kigali only</span></span></label>
+    <details class="card p16" open="{{ true }}">
+      <summary class="row between fw6" style="list-style: none; cursor: pointer"><span>Order summary (2 items)</span><span class="ic ic-chev-u i16 c-mut" aria-hidden="true"></span></summary>
+      <div class="col" style="gap: 8px; padding-top: 12px">
+        <div class="kv"><span>Samsung Galaxy A55 5G</span><span>RWF 520,000</span></div>
+        <div class="kv"><span>Galaxy Buds2 Pro</span><span>RWF 245,000</span></div>
+        <div class="kv"><span>Delivery · Kigali</span><span class="c-ok fw5">Free</span></div>
+        <hr class="hr">
+        <div class="row between"><b class="fw6">Total</b><b class="t-price" style="color: #0D2D52">RWF 765,000</b></div>
+      </div>
+    </details>
+    <p class="t-cap c-mut row" style="gap: 6px"><span class="ic ic-shield i14 c-ok" aria-hidden="true"></span>We never store your PIN or card number.</p>
+  </div>
+  <div class="col" style="position: absolute; left: 0; right: 0; bottom: 0; gap: 8px; padding: 12px 16px 16px; background: #fff; border-top: 1px solid #E2E8F0">
+    <a class="btn btn-p btn-block" href="PaymentWaiting.dc.html">Review order<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

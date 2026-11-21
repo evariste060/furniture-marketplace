@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mini-cart drawer</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="position: relative; width: 1440px; height: 900px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="Phones" cart="3" hint-size="100%,160px"></dc-import>
+  <div class="wrap row" aria-hidden="true" style="align-items: flex-start; gap: 40px; padding-top: 40px">
+    <div class="imgbox r16" style="width: 600px; height: 480px"><span class="dev dev-ph-violet" style="width: 380px; height: 380px"></span></div>
+    <div class="col" style="gap: 16px; flex: 1"><span class="t-over c-pri">Samsung</span><span class="t-h1">Samsung Galaxy A55 5G</span><span class="t-price-l" style="color: #0D2D52">RWF 520,000</span><span style="height: 44px; width: 70%; background: #0866F5; border-radius: 8px"></span></div>
+  </div>
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(7,31,66,.45)"></div>
+  <aside role="dialog" aria-modal="true" aria-label="Added to cart" class="col sh2" style="position: absolute; top: 0; right: 0; width: 420px; height: 900px; background: #fff; gap: 0">
+    <div class="row" style="gap: 10px; padding: 20px 24px; border-bottom: 1px solid #E2E8F0"><span class="ic ic-check-c i22 c-ok" aria-hidden="true"></span><h2 class="t-h4 grow">Added to your cart</h2><button type="button" class="icbtn" aria-label="Close" style="border: 0"><span class="ic ic-x i18" aria-hidden="true"></span></button></div>
+    <div class="row" style="gap: 14px; padding: 20px 24px">
+      <span class="imgbox" style="width: 80px; height: 80px"><span class="dev dev-ph-violet" aria-hidden="true" style="width: 66px; height: 66px"></span></span>
+      <span class="col grow" style="gap: 2px"><b class="fw6">Samsung Galaxy A55 5G</b><span class="t-cap c-mut">Awesome Navy · 128GB · Qty 1</span><span class="fw6" style="color: #0D2D52">RWF 520,000</span></span>
+    </div>
+    <div class="row between" style="padding: 16px 24px; background: #F5F8FC"><span class="t-sm c-tx2">Cart subtotal (3 items)</span><b class="fw6">RWF 945,000</b></div>
+    <div class="col" style="gap: 10px; padding: 20px 24px">
+      <a class="btn btn-p btn-block" href="Cart.dc.html">View cart &amp; checkout<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a>
+      <a class="btn btn-o btn-block" href="Product.dc.html">Continue shopping</a>
+    </div>
+    <div class="col" style="gap: 12px; padding: 8px 24px 24px">
+      <h3 class="fw6" style="font-size: 14px">You may also need</h3>
+      <div class="row" style="gap: 12px"><span class="imgbox" style="width: 56px; height: 56px"><span class="dev dev-power" aria-hidden="true" style="width: 44px; height: 44px"></span></span><span class="col grow" style="gap: 0"><span class="t-sm fw5">Samsung 25W Fast Charger</span><span class="t-sm c-mut">RWF 25,000</span></span><button type="button" class="btn btn-s btn-sm">Add</button></div>
+      <div class="row" style="gap: 12px"><span class="imgbox" style="width: 56px; height: 56px"><span class="dev dev-buds" aria-hidden="true" style="width: 44px; height: 44px"></span></span><span class="col grow" style="gap: 0"><span class="t-sm fw5">Galaxy A55 Clear Case</span><span class="t-sm c-mut">RWF 15,000</span></span><button type="button" class="btn btn-s btn-sm">Add</button></div>
+    </div>
+  </aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

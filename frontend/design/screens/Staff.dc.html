@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Staff &amp; roles</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Staff &amp; Roles" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Staff &amp; roles</b></nav><h1 class="t-h1">Staff &amp; roles</h1></div>
+        <button type="button" class="btn btn-p btn-sm"><span class="ic ic-plus i16" aria-hidden="true"></span>Invite staff member</button>
+      </div>
+      <section class="card" style="overflow: hidden">
+        <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Name</th><th scope="col">Role</th><th scope="col">Phone / email</th><th scope="col">Last active</th><th scope="col">Status</th><th scope="col"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead><tbody>
+          <sc-for list="{{staff}}" as="s" hint-placeholder-count="6"><tr><td><span class="row" style="gap: 10px"><span class="avatar" style="background: {{s.bg}}">{{s.i}}</span><b class="fw5">{{s.n}}</b></span></td><td><span class="badge {{s.rc}}">{{s.r}}</span></td><td class="c-tx2">{{s.c}}</td><td class="c-tx2">{{s.l}}</td><td><span class="badge {{s.sc}}">{{s.s}}</span></td><td><button type="button" class="icbtn" aria-label="Manage {{s.n}}" style="width: 30px; height: 30px; border: 0"><span class="ic ic-more-v i16" aria-hidden="true"></span></button></td></tr></sc-for>
+        </tbody></table></div>
+      </section>
+      <section class="card" style="overflow: hidden">
+        <h2 class="t-h3" style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0">What each role can open</h2>
+        <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Area</th><th scope="col">Admin</th><th scope="col">Sales</th><th scope="col">Operations</th><th scope="col">Finance</th><th scope="col">Management</th></tr></thead><tbody>
+          <sc-for list="{{matrix}}" as="m" hint-placeholder-count="9"><tr><td class="fw5">{{m.a}}</td><sc-for list="{{m.v}}" as="v" hint-placeholder-count="5"><td><span class="ic {{v.ic}} i16" aria-label="{{v.label}}" role="img" style="color: {{v.col}}"></span></td></sc-for></tr></sc-for>
+        </tbody></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const R = { Admin: 's-info', Sales: 's-pur', Operations: 's-warn', Finance: 's-ok', Management: 's-neu' };
+    const s = (n, r, c, l, st, bg) => ({ n, i: n.split(' ').map((x) => x[0]).join('').slice(0, 2), r, rc: R[r], c, l, s: st, sc: st === 'Active' ? 's-ok' : st === 'Invited' ? 's-info' : 's-neu', bg });
+    const yes = { ic: 'ic-check', label: 'Yes', col: '#15803D' }, no = { ic: 'ic-minus', label: 'No', col: '#CBD5E1' };
+    const m = (a, flags) => ({ a, v: flags.map((f) => (f ? yes : no)) });
+    return {
+      staff: [ s('Evariste Nkurunziza', 'Admin', '+250 788 100 200', 'Now', 'Active', '#0866F5'), s('Claudine Mukeshimana', 'Operations', '+250 788 300 411', '12 min ago', 'Active', '#F59E0B'), s('Jean Paul Habimana', 'Sales', 'jp@3sixtytech.rw', '1 h ago', 'Active', '#7C3AED'), s('Solange Ingabire', 'Finance', 'finance@3sixtytech.rw', 'Yesterday', 'Active', '#16A34A'), s('David Kamanzi', 'Management', 'david@3sixtytech.rw', '3 days ago', 'Active', '#0D2D52'), s('Alice Uwera', 'Sales', '+250 722 555 018', '—', 'Invited', '#64748B') ],
+      matrix: [ m('Dashboard', [1,1,1,1,1]), m('Orders', [1,1,1,0,0]), m('Payments', [1,0,0,1,0]), m('Products, categories, import', [1,1,0,0,0]), m('Inventory', [1,1,1,0,0]), m('Reviews', [1,1,0,0,0]), m('Delivery zones', [1,0,1,0,0]), m('Promotions', [1,0,0,0,0]), m('Analytics & reports', [1,0,0,0,1]), m('Staff, settings, notifications, audit', [1,0,0,0,0]) ]
+    };
+  }
+}
+</script>
+</body>
+</html>

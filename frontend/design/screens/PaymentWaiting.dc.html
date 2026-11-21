@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Approve payment on your phone</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts bg-page" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="CheckoutHeader" step="0" hint-size="100%,76px"></dc-import>
+  <main class="wrap col" style="align-items: center; padding-top: 56px; padding-bottom: 64px">
+    <section class="card p32 col sh" role="status" aria-live="polite" style="gap: 20px; width: 100%; max-width: 560px; align-items: center; text-align: center">
+      <div style="position: relative; width: 112px; height: 112px">
+        <span style="position: absolute; inset: 0; border-radius: 50%; border: 6px solid #EAF3FF"></span>
+        <span style="position: absolute; inset: 0; border-radius: 50%; border: 6px solid transparent; border-top-color: #0866F5; border-right-color: #0866F5"></span>
+        <span style="position: absolute; inset: 22px; border-radius: 50%; background: #FFCC00; display: flex; align-items: center; justify-content: center; color: #0F172A"><span class="ic ic-smartphone i32" aria-hidden="true"></span></span>
+      </div>
+      <div class="col" style="gap: 6px; align-items: center"><h1 class="t-h2">Approve the payment on your phone</h1><p class="c-tx2" style="max-width: 440px">We sent an MTN MoMo request to <b class="fw6" style="color: #0F172A">+250 788 000 111</b>. Enter your MoMo PIN on your phone to pay <b class="fw6" style="color: #0F172A">RWF 713,000</b>.</p></div>
+      <ol class="col r12" style="gap: 10px; padding: 16px 20px; background: #F5F8FC; text-align: left; width: 100%">
+        <li class="row" style="gap: 10px"><span class="step done" style="width: 24px; height: 24px; font-size: 12px">✓</span><span class="t-sm">Order #3S-10482 created</span></li>
+        <li class="row" style="gap: 10px"><span class="step now" style="width: 24px; height: 24px; font-size: 12px">2</span><span class="t-sm fw6">Waiting for your approval…</span></li>
+        <li class="row" style="gap: 10px"><span class="step todo" style="width: 24px; height: 24px; font-size: 12px">3</span><span class="t-sm c-mut">Payment confirmed</span></li>
+      </ol>
+      <p class="t-sm c-mut">No prompt? Dial <b class="fw6" style="color: #0F172A">*182*7*1#</b> to see pending approvals. This page updates automatically — keep it open. Request expires in <b class="fw6" style="color: #0F172A">04:32</b>.</p>
+      <div class="row wrapx" style="gap: 12px; justify-content: center">
+        <button type="button" class="btn btn-o"><span class="ic ic-refresh i16" aria-hidden="true"></span>Resend request</button>
+        <a class="btn btn-n" href="CheckoutPayment.dc.html">Change payment method</a>
+      </div>
+      <p class="t-cap c-mut">Closed this page by mistake? The SMS we sent has a link back here.</p>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

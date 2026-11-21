@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Write a review</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="0" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap col" style="gap: 20px; padding-top: 40px; padding-bottom: 64px; max-width: 880px">
+      <div class="col" style="gap: 6px"><h1 class="t-h1" style="color: #0D2D52">How was your order?</h1><p class="c-tx2">Order #3S-09917 · delivered 3 Sep 2026. Your review helps other shoppers in Rwanda choose well. It appears after our team checks it.</p></div>
+      <form class="card p24 col" style="gap: 18px">
+        <div class="row" style="gap: 14px"><span class="imgbox" style="width: 72px; height: 72px"><span class="dev dev-laptop" aria-hidden="true" style="width: 60px; height: 60px"></span></span><span class="col" style="gap: 2px"><b class="fw6">HP Pavilion 15 Laptop</b><span class="t-sm c-mut">Intel i5 · 8GB · 512GB SSD</span></span></div>
+        <fieldset class="col" style="gap: 8px; border: 0; padding: 0; margin: 0">
+          <legend class="lbl" style="padding: 0; margin-bottom: 8px">Your rating <span class="c-err">*</span></legend>
+          <div class="row" style="gap: 6px">
+            <sc-for list="{{stars}}" as="s" hint-placeholder-count="5"><button type="button" aria-label="{{s.label}}" onClick="{{s.pick}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; color: {{s.color}}"><span class="ic ic-star i32" aria-hidden="true"></span></button></sc-for>
+            <span class="t-sm fw5" style="margin-left: 8px">{{word}}</span>
+          </div>
+        </fieldset>
+        <div class="field"><label class="lbl" for="tt">Title <span class="c-mut" style="font-weight: 400">(optional)</span></label><input id="tt" class="inp" defaultValue="Fast and good for school work"></div>
+        <div class="field"><label class="lbl" for="cm">Your review <span class="c-err">*</span></label><textarea id="cm" class="inp">Boots quickly and the battery lasts about 6 hours of browsing. The keyboard is comfortable. Delivery to Kimironko was the next day.</textarea><span class="help">At least 20 characters. Please don’t include phone numbers or personal details.</span></div>
+        <div class="col" style="gap: 8px"><span class="lbl">Photos <span class="c-mut" style="font-weight: 400">(optional, up to 3)</span></span>
+          <div class="row" style="gap: 10px">
+            <span class="imgbox" style="width: 84px; height: 84px; position: relative"><span class="dev dev-laptop" aria-hidden="true" style="width: 64px; height: 64px"></span><button type="button" aria-label="Remove photo" style="position: absolute; top: -6px; right: -6px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: #0F172A; color: #fff; display: flex; align-items: center; justify-content: center"><span class="ic ic-x i12" aria-hidden="true"></span></button></span>
+            <button type="button" class="col" style="width: 84px; height: 84px; border: 1.5px dashed #CBD5E1; border-radius: 10px; background: #fff; align-items: center; justify-content: center; gap: 4px; color: #475569"><span class="ic ic-image i22" aria-hidden="true"></span><span class="t-cap">Add photo</span></button>
+          </div>
+        </div>
+        <div class="field" style="max-width: 320px"><label class="lbl" for="dn">Display name</label><input id="dn" class="inp" defaultValue="Aline M."><span class="help">First name and last initial, shown with a Verified purchase badge.</span></div>
+        <div class="row between wrapx" style="gap: 12px; border-top: 1px solid #E2E8F0; padding-top: 16px"><span class="t-sm c-mut">1 of 2 products</span><button type="button" class="btn btn-p">Submit review</button></div>
+      </form>
+      <div class="card p20 row" style="gap: 14px"><span class="imgbox" style="width: 56px; height: 56px"><span class="dev dev-mouse" aria-hidden="true" style="width: 46px; height: 46px"></span></span><span class="col grow" style="gap: 0"><b class="fw6">Logitech Wireless Mouse</b><span class="t-sm c-mut">Already reviewed — thank you!</span></span><span class="badge s-ok"><span class="ic ic-check i12" aria-hidden="true"></span>Reviewed</span></div>
+      <h2 class="t-h4" style="padding-top: 12px">Other states of this page</h2>
+      <div class="g g3">
+        <div class="card p20 col" style="gap: 8px; align-items: center; text-align: center"><span style="width: 48px; height: 48px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center"><span class="ic ic-check-c i24" aria-hidden="true"></span></span><b class="fw6">Thank you!</b><span class="t-sm c-tx2">Your review is waiting for approval. We’ll publish it soon.</span><a href="Main.dc.html" class="t-sm fw5">Continue shopping</a></div>
+        <div class="card p20 col" style="gap: 8px; align-items: center; text-align: center"><span style="width: 48px; height: 48px; border-radius: 50%; background: #FEF3C7; color: #92400E; display: flex; align-items: center; justify-content: center"><span class="ic ic-clock i24" aria-hidden="true"></span></span><b class="fw6">This link has expired</b><span class="t-sm c-tx2">Review links last 30 days. Sign in to review from your order.</span><a href="Login.dc.html" class="t-sm fw5">Sign in</a></div>
+        <div class="card p20 col" style="gap: 8px; align-items: center; text-align: center"><span style="width: 48px; height: 48px; border-radius: 50%; background: #EAF3FF; color: #0866F5; display: flex; align-items: center; justify-content: center"><span class="ic ic-star i24" aria-hidden="true"></span></span><b class="fw6">Already reviewed</b><span class="t-sm c-tx2">You’ve reviewed every product in this order.</span><a href="Product.dc.html" class="t-sm fw5">See your review</a></div>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { rating: 4 }; }
+  renderVals() {
+    const r = this.state.rating;
+    const words = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
+    const stars = [1, 2, 3, 4, 5].map((n) => ({ label: n + ' star' + (n > 1 ? 's' : ''), color: n <= r ? '#F5A524' : '#CBD5E1', pick: () => this.setState({ rating: n }) }));
+    return { stars, word: words[r] };
+  }
+}
+</script>
+</body>
+</html>

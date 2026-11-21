@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Checkout header</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<header class="ts" style="width: 100%; background: #fff; border-bottom: 1px solid #E2E8F0; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="wrap row wrapx between" style="min-height: 76px; gap: 24px; padding-top: 10px; padding-bottom: 10px">
+    <a href="Main.dc.html" aria-label="3 Sixty Technologies — home"><img src="../assets/3sixty-logo.jpeg" alt="3 Sixty Technologies" style="height: 48px; display: block; mix-blend-mode: multiply"></a>
+    <sc-if value="{{showSteps}}" hint-placeholder-val="{{ true }}">
+      <ol class="row" aria-label="Checkout steps" style="gap: 12px">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+          <li class="row" style="gap: 8px">
+            <span class="step {{s.cls}}" aria-hidden="true">{{s.mark}}</span>
+            <span class="t-sm {{s.tcls}}">{{s.label}}</span>
+            <sc-if value="{{s.line}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="width: 48px; height: 2px; background: {{s.lineColor}}; margin-left: 4px"></span></sc-if>
+          </li>
+        </sc-for>
+      </ol>
+    </sc-if>
+    <div class="row" style="gap: 8px"><span class="ic ic-lock i18 c-ok" aria-hidden="true"></span><span class="fw6">Secure checkout</span></div>
+  </div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"step":{"editor":"int","min":0,"max":4,"default":1},"$preview":{"width":1440,"height":76}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const step = Number(this.props.step ?? 1);
+    const labels = ['Contact', 'Delivery', 'Payment', 'Review'];
+    const steps = labels.map((label, i) => {
+      const n = i + 1, done = n < step, now = n === step;
+      return { label, mark: done ? '✓' : String(n), cls: done ? 'done' : now ? 'now' : 'todo', tcls: now ? 'fw6' : done ? 'fw5' : 'c-mut fw5', line: n < 4, lineColor: done ? '#16A34A' : '#E2E8F0' };
+    });
+    return { steps, showSteps: step > 0 };
+  }
+}
+</script>
+</body>
+</html>

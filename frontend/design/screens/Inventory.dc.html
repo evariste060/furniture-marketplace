@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Inventory</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="position: relative; width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Inventory" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main" style="position: relative">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Inventory</b></nav><h1 class="t-h1">Inventory</h1></div>
+        <button type="button" class="btn btn-n btn-sm"><span class="ic ic-download i16" aria-hidden="true"></span>Export stock</button>
+      </div>
+      <div class="g g4">
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Variants in stock</span><b class="t-price-l">386</b></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Low stock (≤ 5)</span><b class="t-price-l c-warn">12</b></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Out of stock</span><b class="t-price-l c-err">7</b></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Stock value</span><b class="t-price-l">RWF 214M</b></div>
+      </div>
+      <section class="card" style="overflow: hidden">
+        <div class="row wrapx" style="gap: 12px; padding: 16px 20px; border-bottom: 1px solid #E2E8F0">
+          <label class="row" style="gap: 8px; height: 38px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 8px; flex: 1 1 240px; max-width: 340px; color: #64748B"><span class="ic ic-search i16" aria-hidden="true"></span><input aria-label="Search inventory" placeholder="Product or SKU" style="border: 0; outline: 0; flex: 1; font-size: 13px"></label>
+          <span class="chip-o on">Low stock</span><span class="chip-o">Out of stock</span><span class="chip-o">All</span>
+        </div>
+        <div class="scrollx"><table class="tbl">
+          <thead><tr><th scope="col">Product / variant</th><th scope="col">SKU</th><th scope="col">In stock</th><th scope="col">Reserved</th><th scope="col">Available</th><th scope="col">Last movement</th><th scope="col"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+              <tr><td><span class="row" style="gap: 10px"><span class="imgbox" style="width: 40px; height: 40px"><span class="dev {{r.img}}" aria-hidden="true" style="width: 32px; height: 32px"></span></span><span class="col" style="gap: 0"><b class="fw5">{{r.n}}</b><span class="t-cap c-mut">{{r.v}}</span></span></span></td><td class="c-tx2">{{r.s}}</td><td>{{r.q}}</td><td class="c-tx2">{{r.res}}</td><td><span class="badge {{r.bc}}">{{r.a}}</span></td><td class="t-cap c-tx2">{{r.m}}</td><td><button type="button" class="btn btn-o btn-sm">Adjust</button></td></tr>
+            </sc-for>
+          </tbody>
+        </table></div>
+      </section>
+    </main>
+    <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(7,31,66,.45)"></div>
+    <section role="dialog" aria-modal="true" aria-label="Adjust stock" class="card col sh2" style="position: absolute; top: 160px; left: 50%; width: 480px; margin-left: -240px; padding: 24px; gap: 16px">
+      <div class="row between"><h2 class="t-h3">Adjust stock</h2><button type="button" class="icbtn" aria-label="Close" style="border: 0"><span class="ic ic-x i18" aria-hidden="true"></span></button></div>
+      <div class="row r12" style="gap: 12px; padding: 12px; background: #F5F8FC"><span class="imgbox" style="width: 48px; height: 48px; background: #fff"><span class="dev dev-ph-pink" aria-hidden="true" style="width: 40px; height: 40px"></span></span><span class="col" style="gap: 0"><b class="t-sm fw6">Apple iPhone 15 · 128GB · Pink</b><span class="t-cap c-mut">IPH15-128-PK · current stock 3</span></span></div>
+      <div class="g g2" role="radiogroup" aria-label="Adjustment type" style="gap: 10px"><label class="opt on" style="padding: 10px 12px"><span class="radio" aria-hidden="true"></span><span class="t-sm fw5">Add stock</span></label><label class="opt" style="padding: 10px 12px"><span class="radio" aria-hidden="true"></span><span class="t-sm fw5">Remove stock</span></label></div>
+      <div class="field"><label class="lbl" for="qty">Quantity</label><input id="qty" class="inp" defaultValue="20"><span class="help">New stock will be <b class="fw6" style="color: #0F172A">23</b></span></div>
+      <div class="field"><label class="lbl" for="rs">Reason</label><select id="rs" class="inp"><option>New delivery from supplier</option><option>Returned by customer</option><option>Damaged / defective</option><option>Stock count correction</option></select></div>
+      <div class="field"><label class="lbl" for="rn">Note <span class="c-mut" style="font-weight: 400">(optional)</span></label><input id="rn" class="inp" placeholder="e.g. Supplier invoice INV-2291"></div>
+      <div class="row" style="gap: 10px; justify-content: flex-end"><button type="button" class="btn btn-n">Cancel</button><button type="button" class="btn btn-p">Save adjustment</button></div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const r = (n, v, s, q, res, m, img) => { const a = q - res; return { n, v, s, q: String(q), res: String(res), a: a + ' left', bc: a <= 0 ? 's-err' : a <= 5 ? 's-warn' : 's-ok', m, img }; };
+    return { rows: [
+      r('Apple iPhone 15', '128GB · Pink', 'IPH15-128-PK', 3, 0, 'Sold 1 · 24 Oct, 09:40', 'dev-ph-pink'),
+      r('LG 43" Smart TV', 'Standard', 'LG43-SM', 4, 1, 'Sold 1 · 23 Oct, 16:12', 'dev-tv'),
+      r('HP 15-dw3000 Laptop', 'i5 · 8GB · 512GB', 'HP15-DW3', 5, 0, 'Received 10 · 2 Oct', 'dev-laptop'),
+      r('Logitech Wireless Mouse', 'M331 · Black', 'LOG-M331', 6, 2, 'Sold 3 · 22 Oct', 'dev-mouse'),
+      r('TP-Link Archer C6 Router', 'AC1200', 'TPL-C6', 3, 0, 'Sold 2 · 21 Oct', 'dev-router'),
+      r('Samsung Galaxy A55 5G', '8GB · 256GB · Navy', 'SM-A556E-256-NV', 0, 0, 'Sold out · 19 Oct', 'dev-ph-violet'),
+      r('JBL Flip 6 Speaker', 'Black', 'JBL-FLIP6-BK', 0, 0, 'Damaged 1 · 18 Oct', 'dev-speaker')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# Photos stay local; only this folder's README is tracked.
+*
+!.gitignore
+!README.md

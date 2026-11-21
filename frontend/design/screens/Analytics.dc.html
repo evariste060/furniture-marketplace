@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Analytics</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Analytics" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Analytics</b></nav><h1 class="t-h1">Analytics</h1><p class="c-tx2">Revenue counts paid orders only. All amounts in RWF.</p></div>
+        <div class="row wrapx" style="gap: 8px"><span class="chip-o">Today</span><span class="chip-o">7 days</span><span class="chip-o on">30 days</span><span class="chip-o">This month</span><span class="chip-o"><span class="ic ic-calendar i14" aria-hidden="true"></span>Custom</span><span class="row t-sm fw5" style="gap: 8px; margin-left: 8px"><span class="toggle on" role="switch" aria-checked="true" aria-label="Compare to previous period"></span>Compare</span></div>
+      </div>
+      <div class="g g4">
+        <div class="card p20 col" style="gap: 4px"><span class="t-sm c-tx2">Revenue</span><b class="t-price-l">RWF 28.45M</b><span class="row t-sm fw5 c-ok" style="gap: 4px"><span class="ic ic-arrow-u i14" aria-hidden="true"></span>18% vs prev. 30 days</span></div>
+        <div class="card p20 col" style="gap: 4px"><span class="t-sm c-tx2">Orders</span><b class="t-price-l">142</b><span class="row t-sm fw5 c-ok" style="gap: 4px"><span class="ic ic-arrow-u i14" aria-hidden="true"></span>12%</span></div>
+        <div class="card p20 col" style="gap: 4px"><span class="t-sm c-tx2">Avg. order value</span><b class="t-price-l">RWF 200,352</b><span class="row t-sm fw5 c-ok" style="gap: 4px"><span class="ic ic-arrow-u i14" aria-hidden="true"></span>5%</span></div>
+        <div class="card p20 col" style="gap: 4px"><span class="t-sm c-tx2">New customers</span><b class="t-price-l">87</b><span class="row t-sm fw5 c-err" style="gap: 4px"><span class="ic ic-arrow-d i14" aria-hidden="true"></span>3%</span></div>
+      </div>
+      <section class="card p24 col" style="gap: 12px">
+        <div class="row between wrapx" style="gap: 12px"><h2 class="t-h3">Revenue &amp; orders over time</h2><div class="row t-cap c-tx2" style="gap: 16px"><span class="row" style="gap: 6px"><span style="width: 18px; height: 3px; background: #0866F5; border-radius: 2px"></span>This period</span><span class="row" style="gap: 6px"><span style="width: 18px; border-top: 2px dashed #94A3B8"></span>Previous period</span></div></div>
+        <svg viewBox="0 0 1000 220" role="img" aria-label="Revenue this period is above the previous period on most days, peaking mid-month" style="width: 100%; height: auto; display: block">
+          <g stroke="#E2E8F0"><path d="M40 20H1000M40 80H1000M40 140H1000M40 200H1000"/></g>
+          <g font-family="Inter, sans-serif" font-size="11" fill="#64748B"><text x="0" y="24">6M</text><text x="0" y="84">4M</text><text x="0" y="144">2M</text><text x="0" y="204">0</text></g>
+          <path d="M40 150 L120 140 L200 158 L280 128 L360 136 L440 110 L520 96 L600 118 L680 88 L760 104 L840 82 L920 96 L1000 78" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 6"/>
+          <path d="M40 132 L120 118 L200 136 L280 104 L360 112 L440 86 L520 64 L600 92 L680 70 L760 80 L840 56 L920 74 L1000 60 L1000 200 L40 200 Z" fill="#0866F5" fill-opacity=".08"/>
+          <path d="M40 132 L120 118 L200 136 L280 104 L360 112 L440 86 L520 64 L600 92 L680 70 L760 80 L840 56 L920 74 L1000 60" fill="none" stroke="#0866F5" stroke-width="2.5"/>
+        </svg>
+      </section>
+      <div class="g g3">
+        <section class="card p24 col" style="gap: 14px"><h2 class="t-h4">Sales by category</h2>
+          <div class="row" style="gap: 16px"><svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Phones 43%, Laptops 31%, TVs 14%, Accessories 10%, Appliances 2%"><g transform="rotate(-90 60 60)" fill="none" stroke-width="40"><circle cx="60" cy="60" r="40" stroke="#0866F5" stroke-dasharray="108 251.3"/><circle cx="60" cy="60" r="40" stroke="#0D2D52" stroke-dasharray="77.9 251.3" stroke-dashoffset="-108"/><circle cx="60" cy="60" r="40" stroke="#18B4F5" stroke-dasharray="35.2 251.3" stroke-dashoffset="-185.9"/><circle cx="60" cy="60" r="40" stroke="#F59E0B" stroke-dasharray="25.1 251.3" stroke-dashoffset="-221.1"/><circle cx="60" cy="60" r="40" stroke="#94A3B8" stroke-dasharray="5.1 251.3" stroke-dashoffset="-246.2"/></g></svg>
+          <ul class="col t-sm" style="gap: 6px"><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #0866F5"></span>Phones 43%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #0D2D52"></span>Laptops 31%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #18B4F5"></span>TVs &amp; Audio 14%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #F59E0B"></span>Accessories 10%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #94A3B8"></span>Appliances 2%</li></ul></div>
+        </section>
+        <section class="card p24 col" style="gap: 14px"><h2 class="t-h4">Payment methods</h2>
+          <div class="row" style="gap: 16px"><svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="MoMo 58%, Airtel 18%, Card 16%, Cash 8%"><g transform="rotate(-90 60 60)" fill="none" stroke-width="18"><circle cx="60" cy="60" r="46" stroke="#FFCC00" stroke-dasharray="167.6 289"/><circle cx="60" cy="60" r="46" stroke="#E40000" stroke-dasharray="52 289" stroke-dashoffset="-167.6"/><circle cx="60" cy="60" r="46" stroke="#0D2D52" stroke-dasharray="46.2 289" stroke-dashoffset="-219.6"/><circle cx="60" cy="60" r="46" stroke="#15803D" stroke-dasharray="23.1 289" stroke-dashoffset="-265.8"/></g></svg>
+          <ul class="col t-sm" style="gap: 6px"><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #FFCC00"></span>MTN MoMo 58%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #E40000"></span>Airtel Money 18%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #0D2D52"></span>Card 16%</li><li class="row" style="gap: 8px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #15803D"></span>Cash 8%</li></ul></div>
+        </section>
+        <section class="card p24 col" style="gap: 12px"><h2 class="t-h4">Ratings breakdown</h2>
+          <sc-for list="{{ratings}}" as="r" hint-placeholder-count="5"><div class="row t-sm" style="gap: 10px"><span style="width: 28px">{{r.s}} ★</span><span class="track grow"><span style="width: {{r.w}}; background: #F5A524"></span></span><span class="c-tx2" style="width: 32px; text-align: right">{{r.c}}</span></div></sc-for>
+          <span class="t-cap c-mut">Average 4.5 from 312 approved reviews</span>
+        </section>
+      </div>
+      <div class="g g2">
+        <section class="card p24 col" style="gap: 12px"><h2 class="t-h4">Top products by revenue</h2>
+          <sc-for list="{{top}}" as="t" hint-placeholder-count="6"><div class="col" style="gap: 4px"><div class="row between t-sm"><span>{{t.n}}</span><b class="fw5">{{t.v}}</b></div><span class="track"><span style="width: {{t.w}}"></span></span></div></sc-for>
+        </section>
+        <section class="card p24 col" style="gap: 12px"><h2 class="t-h4">Sales by delivery zone</h2>
+          <div class="row" style="gap: 14px; align-items: flex-end; height: 200px; padding-top: 10px">
+            <sc-for list="{{zones}}" as="z" hint-placeholder-count="6"><div class="col grow" style="gap: 6px; align-items: center; justify-content: flex-end; height: 100%"><span class="t-cap fw5">{{z.v}}</span><span style="width: 100%; max-width: 48px; height: {{z.h}}; background: #0866F5; border-radius: 6px 6px 0 0"></span><span class="t-cap c-tx2" style="text-align: center">{{z.n}}</span></div></sc-for>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      ratings: [ { s: 5, w: '64%', c: 200 }, { s: 4, w: '22%', c: 69 }, { s: 3, w: '8%', c: 25 }, { s: 2, w: '4%', c: 12 }, { s: 1, w: '2%', c: 6 } ],
+      top: [ { n: 'HP Pavilion 15 Laptop', v: 'RWF 27.9M', w: '100%' }, { n: 'Samsung Galaxy A55 5G', v: 'RWF 27.7M', w: '99%' }, { n: 'LG 55" 4K Smart TV', v: 'RWF 24.9M', w: '89%' }, { n: 'Canon EOS 250D', v: 'RWF 17.1M', w: '61%' }, { n: 'iPhone 15 128GB', v: 'RWF 14.5M', w: '52%' }, { n: 'JBL Flip 6', v: 'RWF 4.7M', w: '17%' } ],
+      zones: [ { n: 'Gasabo', v: '9.8M', h: '140px' }, { n: 'Kicukiro', v: '6.1M', h: '88px' }, { n: 'Nyarugenge', v: '4.4M', h: '64px' }, { n: 'Eastern', v: '1.9M', h: '28px' }, { n: 'Southern', v: '1.2M', h: '18px' }, { n: 'Western', v: '0.8M', h: '12px' } ]
+    };
+  }
+}
+</script>
+</body>
+</html>

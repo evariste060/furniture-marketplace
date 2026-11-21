@@ -1,0 +1,338 @@
+@import "tailwindcss";
+
+/* Design tokens: frontend/design/tokens-and-components.css. Use these, never new values. */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-navy: #0d2d52;
+  --color-deep: #071f42;
+  --color-pri: #0866f5;
+  --color-pri-h: #0652c8;
+  /* The store's category navigation bar (owner choice 2026-11-11) and its hovered/current item. */
+  --color-nav: #315da4;
+  --color-nav-h: #264a85;
+  --color-light: #eaf3ff;
+  --color-cyan: #18b4f5;
+  --color-page: #f5f8fc;
+  --color-subtle: #f1f5f9;
+  --color-bd: #e2e8f0;
+  --color-bd2: #cbd5e1;
+  --color-tx: #0f172a;
+  --color-tx2: #475569;
+  --color-mut: #64748b;
+  --color-odm: #a9bcd6;
+  --color-ok: #16a34a;
+  --color-ok-tx: #15803d;
+  --color-ok-bg: #dcfce7;
+  --color-warn: #f59e0b;
+  --color-warn-tx: #92400e;
+  --color-warn-bg: #fef3c7;
+  --color-warn-ink: #422006;
+  --color-err: #dc2626;
+  --color-err-tx: #b91c1c;
+  --color-err-bg: #fee2e2;
+  --color-err-bd: #fca5a5;
+  --color-pur: #7c3aed;
+  --color-pur-bg: #ede9fe;
+  --color-star: #f5a524;
+  --color-wa: #25d366;
+  --color-wa-ink: #052e16;
+  --color-overlay: rgb(7 31 66 / 0.45);
+
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+
+  /* Type scale: size / line height (weight is set by the utility below). */
+  --text-display: 44px;
+  --text-display--line-height: 52px;
+  --text-h1: 32px;
+  --text-h1--line-height: 40px;
+  --text-h2: 24px;
+  --text-h2--line-height: 32px;
+  --text-h3: 18px;
+  --text-h3--line-height: 26px;
+  --text-h4: 16px;
+  --text-h4--line-height: 24px;
+  --text-lg: 16px;
+  --text-lg--line-height: 24px;
+  --text-base: 14px;
+  --text-base--line-height: 22px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-cap: 12px;
+  --text-cap--line-height: 16px;
+  --text-xs: 11px;
+  --text-xs--line-height: 18px;
+  --text-price: 18px;
+  --text-price--line-height: 26px;
+  --text-price-l: 28px;
+  --text-price-l--line-height: 36px;
+  --text-btn-lg: 15px;
+  --text-btn-lg--line-height: 20px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-img: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  --shadow-sh: 0 2px 10px rgb(13 31 64 / 0.06);
+  --shadow-sh2: 0 8px 24px rgb(13 31 64 / 0.14);
+  --shadow-focus: 0 0 0 3px rgb(8 102 245 / 0.15);
+  /* Product card hover/focus lift (product-card.tsx): a navy depth shadow and a faint --pri glow. */
+  --shadow-lift: 0 24px 44px -12px rgb(13 31 64 / 0.3), 0 10px 22px -8px rgb(8 102 245 / 0.26);
+  /* Product card motion: a quick start that settles softly. */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  /* A slight overshoot, for things that pop into place. */
+  --ease-pop: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* Home hero entrance (page.tsx Hero): the copy pops in, the banner image rises into place and
+   * then floats gently. Delays are set per element; motion-reduce:animate-none turns them off. */
+  --animate-hero-pop: hero-pop 650ms var(--ease-pop) both;
+  --animate-hero-rise: hero-rise 1000ms var(--ease-soft) both;
+  --animate-hero-float: hero-float 6s ease-in-out infinite;
+  /* A banner leaving before the next one comes in (hero-carousel.tsx). */
+  --animate-hero-exit: hero-exit 450ms ease-in both;
+  /* The home hero showcase's timer (hero-showcase.tsx): the active dot fills while a
+   * category is shown (duration set inline: showTime). */
+  --animate-hero-progress: hero-progress linear both;
+  @keyframes hero-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  /* The home hero showcase (hero-showcase.tsx, owner 2026-11-18). The copy fades up into place
+   * (no overshoot). The four related tiles come in together, fading and rising into their places
+   * in the grid, and leave together when the category changes. */
+  --animate-hero-fade: hero-fade 600ms var(--ease-soft) both;
+  --animate-tiles-in: tiles-in 700ms var(--ease-soft) 120ms both;
+  --animate-tile-out: tile-out 220ms ease-in both;
+  @keyframes hero-fade {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes tiles-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes tile-out {
+    to {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+    }
+  }
+  /* The mega menu's products panel when another category is shown (category-mega-menu.tsx). */
+  --animate-mega-in: mega-in 160ms var(--ease-soft) both;
+  /* The store header's actions row sliding back in, pinned to the top (header-actions.tsx). No
+     fill mode: once done it leaves no translate, which would trap the header's fixed menus. */
+  --animate-header-in: header-in 350ms var(--ease-soft);
+  @keyframes header-in {
+    from {
+      translate: 0 -100%;
+    }
+  }
+  @keyframes mega-in {
+    from {
+      opacity: 0;
+      transform: translateX(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes hero-exit {
+    to {
+      opacity: 0;
+      transform: translateY(-16px) scale(0.98);
+    }
+  }
+  @keyframes hero-pop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(56px) scale(0.96);
+    }
+    40% {
+      opacity: 1;
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Uses `translate`, separate from the entrance's `transform`, so the two can run on one box. */
+  @keyframes hero-float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -8px;
+    }
+  }
+
+  /* Trusted Brands (brand-marquee.tsx): the track holds the logos twice and slides left by one
+   * copy, so the loop has no seam. Duration set inline (by how many logos there are). */
+  --animate-marquee: marquee linear infinite;
+  @keyframes marquee {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: -50% 0;
+    }
+  }
+
+  --breakpoint-sm: 701px; /* the design's mobile layouts are ≤700px */
+  --breakpoint-lg: 1101px;
+}
+
+@utility wrap {
+  width: 100%;
+  max-width: 1288px; /* 1240px content + 24px padding each side */
+  margin-inline: auto;
+  padding-inline: 16px;
+  @media (width >= 701px) {
+    padding-inline: 24px;
+  }
+}
+
+@utility t-display {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  @media (width >= 701px) {
+    font-size: var(--text-display);
+    line-height: var(--text-display--line-height);
+  }
+}
+@utility t-h1 {
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  @media (width >= 701px) {
+    font-size: var(--text-h1);
+    line-height: var(--text-h1--line-height);
+  }
+}
+@utility t-h2 {
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+@utility t-h3 {
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  font-weight: 600;
+}
+@utility t-h4 {
+  font-size: var(--text-h4);
+  line-height: var(--text-h4--line-height);
+  font-weight: 600;
+}
+@utility t-over {
+  font-size: var(--text-cap);
+  line-height: var(--text-cap--line-height);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+@utility t-price {
+  font-size: var(--text-price);
+  line-height: var(--text-price--line-height);
+  font-weight: 700;
+}
+@utility t-price-l {
+  font-size: var(--text-price-l);
+  line-height: var(--text-price-l--line-height);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+/* .kv and .hr in tokens-and-components.css: a label and its value on one row (summaries), and a
+   1px divider. */
+@utility kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  & > span:first-child {
+    color: var(--color-tx2);
+  }
+}
+@utility hr {
+  height: 1px;
+  background: var(--color-bd);
+  border: 0;
+  margin: 0;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  /* The sticky store header's height (store-header.tsx): HeaderHeight sets the measured value on
+   * <html>; these are the first-paint fallbacks (111px on phones, up to 193px when the desktop row
+   * wraps on tablets, 125px wide). The listing filters stick under it, and #anchor jumps and
+   * focused fields stay clear of it. */
+  html:has([data-sticky-header]) {
+    --store-header-h: 111px;
+    scroll-padding-top: calc(var(--store-header-h) + 1rem);
+    @media (width >= 701px) {
+      --store-header-h: 193px;
+    }
+    @media (width >= 1101px) {
+      --store-header-h: 125px;
+    }
+  }
+  body {
+    margin: 0;
+    background: var(--color-white);
+    color: var(--color-tx);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: var(--color-pri);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-pri-h);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-pri);
+    outline-offset: 2px;
+  }
+}

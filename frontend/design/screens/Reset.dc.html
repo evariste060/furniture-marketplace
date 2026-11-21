@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reset password</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap" style="padding-top: 56px; padding-bottom: 72px">
+      <form class="card p32 col sh" style="max-width: 480px; margin: 0 auto; gap: 18px">
+        <div class="col" style="gap: 6px"><h1 class="t-h2">Reset your password</h1><p class="c-tx2">We sent a 6-digit code to <b class="fw6" style="color: #0F172A">+250 788 ••• 111</b>.</p></div>
+        <fieldset class="col" style="gap: 8px; border: 0; padding: 0; margin: 0">
+          <legend class="lbl" style="padding: 0; margin-bottom: 8px">Verification code</legend>
+          <div class="row" style="gap: 10px">
+            <input class="inp" aria-label="Digit 1" defaultValue="4" style="width: 52px; height: 56px; text-align: center; font-size: 22px; font-weight: 600; padding: 0">
+            <input class="inp" aria-label="Digit 2" defaultValue="8" style="width: 52px; height: 56px; text-align: center; font-size: 22px; font-weight: 600; padding: 0">
+            <input class="inp" aria-label="Digit 3" defaultValue="2" style="width: 52px; height: 56px; text-align: center; font-size: 22px; font-weight: 600; padding: 0">
+            <input class="inp focus" aria-label="Digit 4" style="width: 52px; height: 56px; text-align: center; font-size: 22px; font-weight: 600; padding: 0">
+            <input class="inp" aria-label="Digit 5" style="width: 52px; height: 56px; text-align: center; font-size: 22px; font-weight: 600; padding: 0">
+            <input class="inp" aria-label="Digit 6" style="width: 52px; height: 56px; text-align: center; font-size: 22px; font-weight: 600; padding: 0">
+          </div>
+          <span class="help">Didn’t get it? <button type="button" class="fw5" style="border: 0; background: transparent; color: #64748B; padding: 0">Resend in 0:45</button></span>
+        </fieldset>
+        <div class="field"><label class="lbl" for="np">New password</label><input id="np" type="password" class="inp" placeholder="At least 8 characters"></div>
+        <div class="field"><label class="lbl" for="cp">Confirm new password</label><input id="cp" type="password" class="inp" placeholder="Type it again"></div>
+        <a class="btn btn-p btn-lg btn-block" href="Login.dc.html">Reset password</a>
+        <div role="status" class="row r8 t-sm" style="gap: 8px; padding: 10px 12px; background: #DCFCE7; color: #15803D"><span class="ic ic-check-c i16" aria-hidden="true"></span>On success you’re sent to Sign in with “Password updated”.</div>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

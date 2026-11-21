@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search results — galaxy</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="position: relative; width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" q="galaxy" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <section style="background: #fff; border-bottom: 1px solid #E2E8F0">
+      <div class="wrap col" style="gap: 8px; padding-top: 28px; padding-bottom: 24px">
+        <nav class="crumb" aria-label="Breadcrumb"><a href="Main.dc.html" style="color: #64748B">Home</a><span aria-hidden="true">/</span><b>Search</b></nav>
+        <h1 class="t-h1">Results for “galaxy”</h1>
+        <p class="c-tx2">12 products match by name, brand or model. In-stock items are shown first.</p>
+        <div class="row wrapx" style="gap: 8px; padding-top: 8px">
+          <span class="chip-o on">All (12)</span><span class="chip-o">Phones (7)</span><span class="chip-o">Tablets (1)</span><span class="chip-o">Watches (2)</span><span class="chip-o">Audio (2)</span>
+        </div>
+      </div>
+    </section>
+    <div class="wrap col" style="gap: 20px; padding-top: 24px; padding-bottom: 56px">
+      <div class="row wrapx" style="gap: 12px">
+        <button type="button" class="btn btn-n btn-sm"><span class="ic ic-sliders i16" aria-hidden="true"></span>Filters</button>
+        <select class="inp" aria-label="Brand" style="width: 160px; height: 36px"><option>Brand: Samsung</option></select>
+        <select class="inp" aria-label="Price" style="width: 160px; height: 36px"><option>Any price</option></select>
+        <label class="chk" style="margin-left: 4px"><input type="checkbox" defaultChecked="{{ true }}">In stock only</label>
+        <span class="grow"></span>
+        <select class="inp" aria-label="Sort by" style="width: 210px; height: 36px"><option>Sort by: Best match</option><option>Price: low to high</option><option>Newest</option></select>
+      </div>
+      <div class="g g4"><sc-for list="{{items}}" as="it" hint-placeholder-count="8"><dc-import name="ProductCard" p="{{it}}" hint-size="100%,390px"></dc-import></sc-for></div>
+      <nav class="row" aria-label="Pagination" style="justify-content: center; gap: 8px; padding-top: 8px">
+        <a class="btn btn-n btn-sm" href="Search.dc.html" style="color: #64748B"><span class="ic ic-chev-l i14" aria-hidden="true"></span>Previous</a>
+        <a class="btn btn-p btn-sm" href="Search.dc.html" aria-current="page" style="width: 36px; padding: 0">1</a>
+        <a class="btn btn-n btn-sm" href="Search.dc.html" style="width: 36px; padding: 0">2</a>
+        <a class="btn btn-n btn-sm" href="Search.dc.html">Next<span class="ic ic-chev-r i14" aria-hidden="true"></span></a>
+      </nav>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2050}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { items: [
+      { name: 'Samsung Galaxy A55 5G 128GB', spec: '8GB RAM · Awesome Navy', price: 'RWF 520,000', img: 'dev-ph-violet', rating: '4.6 (23)' },
+      { name: 'Samsung Galaxy A35 5G 128GB', spec: '8GB RAM · Awesome Lilac', price: 'RWF 450,000', old: 'RWF 500,000', img: 'dev-ph-lilac', badge: '10% OFF', tone: 'err', rating: '4.5 (18)' },
+      { name: 'Samsung Galaxy S24 5G 256GB', spec: '8GB RAM · Onyx Black', price: 'RWF 1,220,000', img: 'dev-ph-gold', rating: '4.9 (41)' },
+      { name: 'Samsung Galaxy Z Flip5', spec: '8GB RAM · 256GB · Mint', price: 'RWF 1,050,000', img: 'dev-ph-lilac', badge: 'Low Stock', tone: 'warn', rating: '4.7 (8)' },
+      { name: 'Samsung Galaxy A15', spec: '6GB RAM · Blue Black', price: 'RWF 320,000', img: 'dev-ph-blue', rating: '4.4 (37)' },
+      { name: 'Samsung Galaxy Tab S9 FE', spec: '10.9" · 128GB · Wi-Fi', price: 'RWF 560,000', img: 'dev-laptop' },
+      { name: 'Samsung Galaxy Watch 6 44mm', spec: 'Bluetooth · Graphite', price: 'RWF 480,000', img: 'dev-watch', rating: '4.6 (31)' },
+      { name: 'Samsung Galaxy Buds2 Pro', spec: 'ANC · Bora Purple', price: 'RWF 230,000', img: 'dev-buds', rating: '4.7 (22)' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Orders</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Orders" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Orders</b></nav><h1 class="t-h1">Orders</h1></div>
+        <button type="button" class="btn btn-n btn-sm"><span class="ic ic-download i16" aria-hidden="true"></span>Export CSV</button>
+      </div>
+      <section class="card" style="overflow: hidden">
+        <div class="tabs" style="padding: 0 20px"><span class="tab on">All (142)</span><span class="tab">Pending payment (12)</span><span class="tab">Paid · to pack (9)</span><span class="tab">Ready (8)</span><span class="tab">Out for delivery (6)</span><span class="tab">Delivered (98)</span><span class="tab">Cancelled (6)</span></div>
+        <div class="row wrapx" style="gap: 12px; padding: 16px 20px; border-bottom: 1px solid #E2E8F0">
+          <label class="row" style="gap: 8px; height: 38px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 8px; flex: 1 1 260px; max-width: 360px; color: #64748B"><span class="ic ic-search i16" aria-hidden="true"></span><input aria-label="Search orders" placeholder="Order number or customer phone" style="border: 0; outline: 0; flex: 1; font-size: 13px"></label>
+          <button type="button" class="btn btn-n btn-sm"><span class="ic ic-calendar i16" aria-hidden="true"></span>Last 30 days</button>
+          <select class="inp" aria-label="Payment method" style="width: 180px; height: 36px"><option>All payment methods</option><option>MTN MoMo</option><option>Airtel Money</option><option>Card</option><option>Cash on delivery</option></select>
+          <select class="inp" aria-label="Delivery zone" style="width: 160px; height: 36px"><option>All zones</option></select>
+        </div>
+        <div class="scrollx">
+          <table class="tbl">
+            <thead><tr><th scope="col"><input type="checkbox" aria-label="Select all"></th><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Date</th><th scope="col">Items</th><th scope="col">Total</th><th scope="col">Payment</th><th scope="col">Status</th><th scope="col"><span class="sr" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+                <tr>
+                  <td><input type="checkbox" aria-label="Select order {{r.n}}"></td>
+                  <td><a href="AdminOrderDetail.dc.html" class="fw6">{{r.n}}</a></td>
+                  <td><span class="col" style="gap: 0"><b class="fw5">{{r.c}}</b><span class="t-cap c-mut">{{r.p}}</span></span></td>
+                  <td class="c-tx2" style="white-space: nowrap">{{r.d}}</td>
+                  <td class="c-tx2">{{r.i}}</td>
+                  <td class="fw6" style="white-space: nowrap">{{r.t}}</td>
+                  <td><span class="col" style="gap: 2px"><span class="t-cap c-tx2">{{r.m}}</span><span><span class="badge {{r.pc}}">{{r.ps}}</span></span></span></td>
+                  <td><span class="badge {{r.sc}}">{{r.s}}</span></td>
+                  <td><a href="AdminOrderDetail.dc.html" class="icbtn" aria-label="Open order {{r.n}}" style="width: 32px; height: 32px; border: 0"><span class="ic ic-chev-r i16" aria-hidden="true"></span></a></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div class="row between wrapx t-sm c-tx2" style="gap: 12px; padding: 14px 20px; border-top: 1px solid #E2E8F0"><span>Showing 1–10 of 142</span><nav class="row" aria-label="Pagination" style="gap: 6px"><a class="btn btn-n btn-sm" href="Orders.dc.html" aria-label="Previous page" style="width: 36px; padding: 0"><span class="ic ic-chev-l i14" aria-hidden="true"></span></a><a class="btn btn-p btn-sm" href="Orders.dc.html" aria-current="page" style="width: 36px; padding: 0">1</a><a class="btn btn-n btn-sm" href="Orders.dc.html" style="width: 36px; padding: 0">2</a><a class="btn btn-n btn-sm" href="Orders.dc.html" style="width: 36px; padding: 0">3</a><span>…</span><a class="btn btn-n btn-sm" href="Orders.dc.html" style="width: 36px; padding: 0">15</a><a class="btn btn-n btn-sm" href="Orders.dc.html" aria-label="Next page" style="width: 36px; padding: 0"><span class="ic ic-chev-r i14" aria-hidden="true"></span></a></nav></div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const S = { 'Pending payment': 's-warn', 'Paid': 's-ok', 'Processing': 's-info', 'Ready': 's-pur', 'Out for delivery': 's-info', 'Delivered': 's-ok', 'Cancelled': 's-err' };
+    const P = { Paid: 's-ok', Pending: 's-warn', Failed: 's-err', 'On delivery': 's-neu' };
+    const r = (n, c, p, d, i, t, m, ps, s) => ({ n, c, p, d, i, t, m, ps, pc: P[ps], s, sc: S[s] });
+    return { rows: [
+      r('#3S-10482', 'Aline Mukamana', '+250 788 000 111', '24 Oct, 10:24', '2', 'RWF 713,000', 'MTN MoMo', 'Paid', 'Processing'),
+      r('#3S-10481', 'Eric Ndayisaba', '+250 722 341 908', '24 Oct, 09:58', '1', 'RWF 950,000', 'Airtel Money', 'Pending', 'Pending payment'),
+      r('#3S-10480', 'Diane Uwase', '+250 788 552 017', '24 Oct, 09:12', '3', 'RWF 145,000', 'Cash on delivery', 'On delivery', 'Ready'),
+      r('#3S-10479', 'Patrick Habimana', '+250 783 110 245', '23 Oct, 18:40', '1', 'RWF 820,000', 'Card', 'Paid', 'Out for delivery'),
+      r('#3S-10478', 'Claudine Iradukunda', '+250 790 664 381', '23 Oct, 16:05', '2', 'RWF 1,670,000', 'MTN MoMo', 'Failed', 'Cancelled'),
+      r('#3S-10477', 'Jean Bosco Mugisha', '+250 788 902 556', '23 Oct, 14:22', '1', 'RWF 180,000', 'MTN MoMo', 'Paid', 'Delivered'),
+      r('#3S-10476', 'Grace Mutoni', '+250 728 405 773', '23 Oct, 11:47', '4', 'RWF 312,000', 'Airtel Money', 'Paid', 'Delivered'),
+      r('#3S-10475', 'Kigali Heights Ltd', '+250 788 300 900', '22 Oct, 15:30', '25', 'RWF 19,500,000', 'Card', 'Paid', 'Processing'),
+      r('#3S-10474', 'Olivier Nshuti', '+250 785 219 664', '22 Oct, 12:03', '1', 'RWF 45,000', 'Cash on delivery', 'On delivery', 'Out for delivery'),
+      r('#3S-10473', 'Sandrine Uwimana', '+250 789 774 120', '22 Oct, 09:15', '2', 'RWF 535,000', 'MTN MoMo', 'Paid', 'Delivered')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

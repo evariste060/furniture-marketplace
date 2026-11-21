@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cart</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="position: relative; width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="3" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap col" style="gap: 20px; padding-top: 32px; padding-bottom: 64px">
+      <div class="row between wrapx" style="align-items: flex-end">
+        <div class="col" style="gap: 6px"><nav class="crumb" aria-label="Breadcrumb"><a href="Main.dc.html" style="color: #64748B">Home</a><span aria-hidden="true">/</span><b>Cart</b></nav><h1 class="t-h1" style="color: #0D2D52">Shopping Cart</h1><p class="c-tx2">3 items in your cart</p></div>
+        <a class="row fw5 t-sm" style="gap: 6px" href="Category.dc.html"><span class="ic ic-arrow-l i16" aria-hidden="true"></span>Continue shopping</a>
+      </div>
+      <div role="status" class="rowt r12" style="gap: 14px; padding: 16px; background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E">
+        <span class="ic ic-alert-t i22" aria-hidden="true"></span>
+        <div class="col grow" style="gap: 4px"><b class="fw6">Some items changed since you added them</b><span class="t-sm">Samsung Galaxy Buds2 Pro went from RWF 230,000 to RWF 245,000. JBL Flip 6 is now out of stock and is not counted in your total.</span></div>
+        <button type="button" class="btn btn-dk btn-sm">Accept changes</button>
+      </div>
+      <div class="row wrapx" style="align-items: flex-start; gap: 24px">
+        <section class="card p24" aria-label="Cart items" style="flex: 999 1 560px; min-width: 0">
+          <div class="row hide-sm t-cap fw6 c-mut" style="gap: 20px; padding-bottom: 12px; border-bottom: 1px solid #E2E8F0"><span class="grow">Product</span><span style="width: 120px">Price</span><span style="width: 120px">Quantity</span><span style="width: 120px; text-align: right">Total</span></div>
+          <sc-for list="{{items}}" as="it" hint-placeholder-count="3">
+            <div class="row wrapx" style="gap: 20px; padding: 20px 0; border-bottom: 1px solid #E2E8F0; opacity: {{it.op}}">
+              <a href="Product.dc.html" class="imgbox" aria-label="{{it.n}}" style="width: 96px; height: 96px"><span class="dev {{it.img}}" aria-hidden="true" style="width: 80px; height: 80px"></span></a>
+              <div class="col grow" style="gap: 4px; min-width: 200px">
+                <a href="Product.dc.html" class="fw6" style="color: #0F172A">{{it.n}}</a>
+                <span class="t-sm c-mut">{{it.v}}</span>
+                <span><span class="badge {{it.bc}}">{{it.b}}</span></span>
+                <div class="row" style="gap: 16px; padding-top: 4px"><button type="button" class="row t-cap fw5 c-mut" style="gap: 4px; border: 0; background: transparent; padding: 0; cursor: pointer"><span class="ic ic-heart i14" aria-hidden="true"></span>Save for later</button><button type="button" class="row t-cap fw5 c-err" style="gap: 4px; border: 0; background: transparent; padding: 0; cursor: pointer"><span class="ic ic-trash i14" aria-hidden="true"></span>Remove</button></div>
+              </div>
+              <div class="col" style="width: 120px; gap: 0"><span class="fw5">{{it.u}}</span><span class="t-cap c-mut">per item</span></div>
+              <div class="row" style="width: 120px; gap: 0; border: 1px solid #E2E8F0; border-radius: 8px; height: 38px; overflow: hidden">
+                <button type="button" aria-label="Decrease" style="width: 38px; height: 100%; border: 0; background: #fff; color: #475569; display: flex; align-items: center; justify-content: center"><span class="ic ic-minus i14" aria-hidden="true"></span></button>
+                <span class="fw6" style="flex: 1; text-align: center; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0; line-height: 36px">1</span>
+                <button type="button" aria-label="Increase" style="width: 38px; height: 100%; border: 0; background: #fff; color: #475569; display: flex; align-items: center; justify-content: center"><span class="ic ic-plus i14" aria-hidden="true"></span></button>
+              </div>
+              <span class="fw6" style="width: 120px; text-align: right">{{it.t}}</span>
+            </div>
+          </sc-for>
+          <div class="row wrapx" style="gap: 12px; align-items: flex-start; padding-top: 20px">
+            <div class="field" style="width: 320px"><label class="lbl" for="code">Discount code</label><input id="code" class="inp err" defaultValue="WELCOME5"><span class="help err">This code has expired. Try another one.</span></div>
+            <button type="button" class="btn btn-s" style="margin-top: 26px"><span class="ic ic-tag i16" aria-hidden="true"></span>Apply</button>
+          </div>
+        </section>
+        <aside class="col" style="gap: 14px; flex: 1 1 320px; max-width: 400px">
+          <div class="card p24 col" style="gap: 14px">
+            <h2 class="t-h3">Order summary</h2>
+            <div class="kv"><span>Subtotal (2 items)</span><b class="fw5">RWF 765,000</b></div>
+            <div class="kv"><span>Delivery</span><span class="t-sm c-mut">Calculated at checkout</span></div>
+            <div class="row r8 t-sm" style="gap: 8px; padding: 10px 12px; background: #DCFCE7; color: #15803D"><span class="ic ic-truck i16" aria-hidden="true"></span>You qualify for free delivery in Kigali</div>
+            <hr class="hr">
+            <div class="row between"><span class="t-h4">Total</span><span class="t-price" style="color: #0D2D52">RWF 765,000</span></div>
+            <p class="t-cap c-mut">Prices include VAT. The delivery fee is shown before you place the order.</p>
+          </div>
+          <a class="btn btn-p btn-lg btn-block" href="CheckoutContact.dc.html">Proceed to Checkout<span class="ic ic-arrow-r i18" aria-hidden="true"></span></a>
+          <div class="row t-cap c-mut" style="justify-content: center; gap: 6px"><span class="ic ic-lock i14 c-ok" aria-hidden="true"></span>Secure checkout · MoMo · Airtel Money · Card · Cash</div>
+          <div class="card p16 col" style="gap: 4px"><b class="t-sm fw5">Have an account?</b><span class="t-cap c-mut">Sign in for saved addresses and faster checkout. Guests can check out too.</span><a href="Login.dc.html" class="t-sm fw5">Sign in</a></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { items: [
+      { n: 'Samsung Galaxy A55 5G', v: 'Awesome Navy · 8GB · 128GB', u: 'RWF 520,000', t: 'RWF 520,000', img: 'dev-ph-violet', b: 'In stock', bc: 's-ok', op: 1 },
+      { n: 'Samsung Galaxy Buds2 Pro', v: 'Bora Purple', u: 'RWF 245,000', t: 'RWF 245,000', img: 'dev-buds', b: 'Price updated: was RWF 230,000', bc: 's-warn', op: 1 },
+      { n: 'JBL Flip 6 Bluetooth Speaker', v: 'Black', u: 'RWF 180,000', t: '—', img: 'dev-speaker', b: 'Out of stock — remove to continue', bc: 's-err', op: 0.6 }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

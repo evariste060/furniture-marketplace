@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Order #3S-10482</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Orders" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 4px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><a href="Orders.dc.html" style="color: #64748B">Orders</a><span aria-hidden="true">/</span><b>#3S-10482</b></nav><div class="row wrapx" style="gap: 12px"><h1 class="t-h1">Order #3S-10482</h1><span class="badge s-info">Processing</span><span class="badge s-ok">Paid</span></div><span class="t-sm c-mut">Placed 24 Oct 2026, 10:24 · Web · Guest checkout</span></div>
+        <div class="row wrapx" style="gap: 10px"><button type="button" class="btn btn-n btn-sm"><span class="ic ic-printer i16" aria-hidden="true"></span>Delivery note</button><button type="button" class="btn btn-n btn-sm"><span class="ic ic-download i16" aria-hidden="true"></span>Invoice</button><button type="button" class="btn btn-do btn-sm">Cancel order</button></div>
+      </div>
+      <section class="card p20 row wrapx between" style="gap: 16px; background: #EAF3FF; border-color: #EAF3FF">
+        <div class="col" style="gap: 2px"><b class="fw6" style="color: #0D2D52">Next step: mark as Ready for delivery</b><span class="t-sm c-tx2">Only allowed next statuses are shown. The customer gets an SMS on each change.</span></div>
+        <div class="row" style="gap: 10px"><button type="button" class="btn btn-p btn-sm"><span class="ic ic-package i16" aria-hidden="true"></span>Mark as Ready</button><button type="button" class="btn btn-n btn-sm">Assign rider</button></div>
+      </section>
+      <div class="row wrapx" style="gap: 20px; align-items: flex-start">
+        <div class="col" style="gap: 20px; flex: 999 1 520px; min-width: 0">
+          <section class="card" style="overflow: hidden">
+            <h2 class="t-h3" style="padding: 18px 20px; border-bottom: 1px solid #E2E8F0">Items</h2>
+            <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Product</th><th scope="col">SKU</th><th scope="col">Qty</th><th scope="col">Unit price</th><th scope="col" style="text-align: right">Total</th></tr></thead><tbody>
+              <tr><td><span class="row" style="gap: 10px"><span class="imgbox" style="width: 44px; height: 44px"><span class="dev dev-ph-violet" aria-hidden="true" style="width: 36px; height: 36px"></span></span><span class="col" style="gap: 0"><b class="fw5">Samsung Galaxy A55 5G</b><span class="t-cap c-mut">Awesome Navy · 8GB · 128GB</span></span></span></td><td class="c-tx2">SM-A556E-128-NV</td><td>1</td><td>RWF 520,000</td><td class="fw6" style="text-align: right">RWF 520,000</td></tr>
+              <tr><td><span class="row" style="gap: 10px"><span class="imgbox" style="width: 44px; height: 44px"><span class="dev dev-buds" aria-hidden="true" style="width: 36px; height: 36px"></span></span><span class="col" style="gap: 0"><b class="fw5">Samsung Galaxy Buds2 Pro</b><span class="t-cap c-mut">Bora Purple</span></span></span></td><td class="c-tx2">SM-R510-PRP</td><td>1</td><td>RWF 245,000</td><td class="fw6" style="text-align: right">RWF 245,000</td></tr>
+            </tbody></table></div>
+            <div class="col" style="gap: 8px; padding: 16px 20px; border-top: 1px solid #E2E8F0; margin-left: auto; width: 100%; max-width: 360px">
+              <div class="kv"><span>Subtotal</span><span>RWF 765,000</span></div><div class="kv"><span>Delivery · Kigali (Gasabo)</span><span>Free</span></div><div class="kv"><span>Discount SAVE10</span><span class="c-ok">− RWF 52,000</span></div><div class="row between" style="padding-top: 6px; border-top: 1px solid #E2E8F0"><b class="fw6">Total</b><b class="t-price">RWF 713,000</b></div>
+            </div>
+          </section>
+          <section class="card p20 col" style="gap: 14px">
+            <h2 class="t-h3">Status history</h2>
+            <ol class="col" style="gap: 12px">
+              <li class="rowt" style="gap: 12px"><span class="step now" style="width: 24px; height: 24px; font-size: 11px">●</span><span class="col grow" style="gap: 0"><b class="t-sm fw6">Processing</b><span class="t-cap c-mut">24 Oct, 11:02 · by Claudine (Operations)</span></span></li>
+              <li class="rowt" style="gap: 12px"><span class="step done" style="width: 24px; height: 24px; font-size: 11px">✓</span><span class="col grow" style="gap: 0"><b class="t-sm fw6">Payment confirmed</b><span class="t-cap c-mut">24 Oct, 10:26 · MTN MoMo callback · ref MP241024.1026.A55</span></span></li>
+              <li class="rowt" style="gap: 12px"><span class="step done" style="width: 24px; height: 24px; font-size: 11px">✓</span><span class="col grow" style="gap: 0"><b class="t-sm fw6">Order placed</b><span class="t-cap c-mut">24 Oct, 10:24 · SMS sent to customer</span></span></li>
+            </ol>
+            <div class="field"><label class="lbl" for="note">Internal note</label><div class="row" style="gap: 8px"><input id="note" class="inp grow" placeholder="Visible to staff only"><button type="button" class="btn btn-s">Add note</button></div></div>
+          </section>
+        </div>
+        <div class="col" style="gap: 20px; flex: 1 1 300px">
+          <section class="card p20 col" style="gap: 8px"><h2 class="t-h4">Customer</h2><b class="t-sm fw5">Aline Mukamana</b><span class="t-sm c-tx2">+250 788 000 111</span><span class="t-sm c-tx2">aline@example.com</span><span class="t-cap c-mut">Guest · 1st order</span><a class="btn btn-oa btn-sm" href="https://wa.me/250788000111" style="margin-top: 6px"><span class="ic ic-chat i16" aria-hidden="true"></span>WhatsApp customer</a></section>
+          <section class="card p20 col" style="gap: 6px"><h2 class="t-h4">Delivery</h2><span class="t-sm c-tx2">KG 11 Ave, House 24, Kimironko, Gasabo, Kigali</span><span class="t-cap c-mut">Landmark: near Kimironko market, blue gate</span><span class="t-sm"><b class="fw5">Zone:</b> Kigali — Gasabo · Free</span><span class="t-sm"><b class="fw5">Rider note:</b> Call at the blue gate</span></section>
+          <section class="card p20 col" style="gap: 6px"><h2 class="t-h4">Payment</h2><div class="kv"><span>Method</span><span>MTN MoMo</span></div><div class="kv"><span>Payer</span><span>+250 788 000 111</span></div><div class="kv"><span>Reference</span><span>MP241024.1026.A55</span></div><div class="kv"><span>Amount</span><b class="fw6">RWF 713,000</b></div><a href="Payments.dc.html" class="t-sm fw5" style="padding-top: 4px">View payment record</a></section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

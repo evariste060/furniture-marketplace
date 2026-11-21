@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Listing card</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<article class="ts card" style="position: relative; width: 100%; height: 100%; padding: 36px 14px 14px; display: flex; flex-direction: column; gap: 12px; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="row" style="position: absolute; top: 10px; left: 12px; gap: 6px">
+    <sc-if value="{{hasDisc}}" hint-placeholder-val="{{ false }}"><span class="badge b-err">{{p.disc}}</span></sc-if>
+    <span class="badge {{stockCls}}">{{p.stock}}</span>
+  </div>
+  <div class="row" style="gap: 12px; align-items: center; flex: 1">
+    <a href="Product.dc.html" aria-label="{{p.name}}" style="width: 104px; height: 124px; display: flex; align-items: center; justify-content: center; flex: none"><span class="dev {{p.img}}" aria-hidden="true" style="width: 104px; height: 104px"></span></a>
+    <div class="col" style="gap: 3px; min-width: 0; flex: 1">
+      <span class="t-over c-pri">{{p.brand}}</span>
+      <a href="Product.dc.html" class="t-h4" style="color: #0F172A">{{p.name}}</a>
+      <span class="t-cap c-mut">{{p.spec}}</span>
+      <sc-if value="{{hasRating}}" hint-placeholder-val="{{ true }}">
+        <span class="row" style="gap: 6px"><span class="stars" aria-hidden="true"><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span></span><span class="t-cap c-mut">{{p.rating}}</span></span>
+      </sc-if>
+      <span class="t-price" style="color: {{priceColor}}; margin-top: 2px">{{p.price}}</span>
+      <sc-if value="{{hasOld}}" hint-placeholder-val="{{ false }}"><span class="t-cap c-mut strike">{{p.old}}</span></sc-if>
+    </div>
+  </div>
+  <div class="row" style="gap: 8px">
+    <a class="btn btn-p btn-sm" href="Product.dc.html" style="flex: 1">View Details</a>
+    <button type="button" class="btn btn-o btn-sm" style="flex: 1"><span class="ic ic-cart i16" aria-hidden="true"></span>Add to Cart</button>
+  </div>
+</article>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"p":{"editor":null},"$preview":{"width":300,"height":280}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props.p ?? { brand: 'Samsung', name: 'Galaxy A55 5G', spec: '8GB RAM · 128GB · Awesome Navy', price: 'RWF 520,000', img: 'dev-ph-violet', stock: 'In Stock', rating: '4.6 (23)' };
+    const stockCls = p.stock === 'Low Stock' ? 'b-warn' : p.stock === 'Out of Stock' ? 'b-err' : 'b-ok';
+    return { p, stockCls, hasDisc: !!p.disc, hasOld: !!p.old, hasRating: !!p.rating, priceColor: p.old ? '#DC2626' : '#0F172A' };
+  }
+}
+</script>
+</body>
+</html>

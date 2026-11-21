@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Forgot password</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap" style="padding-top: 56px; padding-bottom: 72px">
+      <form class="card p32 col sh" style="max-width: 480px; margin: 0 auto; gap: 18px">
+        <span style="width: 56px; height: 56px; border-radius: 14px; background: #EAF3FF; color: #0866F5; display: flex; align-items: center; justify-content: center"><span class="ic ic-key i28" aria-hidden="true"></span></span>
+        <div class="col" style="gap: 6px"><h1 class="t-h2">Forgot your password?</h1><p class="c-tx2">Enter the phone number or email on your account. We’ll send you a 6-digit code to reset it.</p></div>
+        <div class="field"><label class="lbl" for="id">Phone number or email</label><input id="id" class="inp focus" defaultValue="+250 788 000 111"></div>
+        <div class="g g2" role="radiogroup" aria-label="Send code by" style="gap: 12px">
+          <label class="opt on" style="padding: 12px 14px"><span class="radio" aria-hidden="true"></span><span class="t-sm fw5">Send by SMS</span></label>
+          <label class="opt" style="padding: 12px 14px"><span class="radio" aria-hidden="true"></span><span class="t-sm fw5">Send by email</span></label>
+        </div>
+        <a class="btn btn-p btn-lg btn-block" href="Reset.dc.html">Send reset code</a>
+        <a class="row fw5 t-sm" href="Login.dc.html" style="gap: 6px; justify-content: center"><span class="ic ic-arrow-l i16" aria-hidden="true"></span>Back to sign in</a>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Notifications log</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Notifications" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Notifications log</b></nav><h1 class="t-h1">Notifications log</h1><p class="c-tx2">Every SMS and email the store sent to customers, with delivery status.</p></div>
+      <div class="g g3">
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Sent today</span><b class="t-price-l">86</b></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Delivered</span><b class="t-price-l c-ok">97.6%</b></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Failed — needs retry</span><b class="t-price-l c-err">2</b></div>
+      </div>
+      <section class="card" style="overflow: hidden">
+        <div class="tabs" style="padding: 0 20px"><span class="tab on">All</span><span class="tab">SMS</span><span class="tab">Email</span><span class="tab">Failed (2)</span></div>
+        <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Sent</th><th scope="col">Channel</th><th scope="col">To</th><th scope="col">Template</th><th scope="col">Order</th><th scope="col">Status</th><th scope="col"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead><tbody>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="9"><tr><td class="c-tx2" style="white-space: nowrap">{{r.t}}</td><td><span class="badge s-neu">{{r.c}}</span></td><td>{{r.to}}</td><td>{{r.tpl}}</td><td><a href="AdminOrderDetail.dc.html" class="fw5">{{r.o}}</a></td><td><span class="col" style="gap: 2px"><span><span class="badge {{r.sc}}">{{r.s}}</span></span><span class="t-cap c-mut">{{r.e}}</span></span></td><td><sc-if value="{{r.failed}}" hint-placeholder-val="{{ false }}"><button type="button" class="btn btn-o btn-sm"><span class="ic ic-refresh i14" aria-hidden="true"></span>Retry</button></sc-if></td></tr></sc-for>
+        </tbody></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const r = (t, c, to, tpl, o, s, e) => ({ t, c, to, tpl, o, s, sc: s === 'Delivered' ? 's-ok' : s === 'Failed' ? 's-err' : 's-info', e: e || '', failed: s === 'Failed' });
+    return { rows: [
+      r('24 Oct, 11:02', 'SMS', '+250 788 000 111', 'Order processing', '#3S-10482', 'Delivered'),
+      r('24 Oct, 10:26', 'SMS', '+250 788 000 111', 'Payment received', '#3S-10482', 'Delivered'),
+      r('24 Oct, 10:26', 'Email', 'aline@example.com', 'Invoice', '#3S-10482', 'Delivered'),
+      r('24 Oct, 09:59', 'SMS', '+250 733 341 908', 'Approve MoMo payment', '#3S-10481', 'Sent'),
+      r('24 Oct, 09:00', 'SMS', '+250 788 902 556', 'Review request', '#3S-10477', 'Delivered'),
+      r('23 Oct, 18:41', 'SMS', '+250 783 110 245', 'Out for delivery + code', '#3S-10479', 'Failed', 'Number unreachable'),
+      r('23 Oct, 16:06', 'SMS', '+250 790 664 381', 'Payment failed', '#3S-10478', 'Delivered'),
+      r('23 Oct, 14:23', 'Email', 'grace.m@example.com', 'Order delivered', '#3S-10476', 'Failed', 'Mailbox full'),
+      r('22 Oct, 15:31', 'Email', 'procurement@kigaliheights.rw', 'Invoice', '#3S-10475', 'Delivered')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

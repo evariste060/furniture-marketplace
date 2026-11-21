@@ -1,0 +1,8 @@
+# Lets `ruff check .` and `ruff format .` run from the repository root with the project's settings
+# ([tool.ruff] in backend/pyproject.toml) instead of Ruff's built-in defaults. Ruff uses the
+# nearest config per file, so this also applies to scripts/ when checked from backend/.
+extend = "backend/pyproject.toml"
+# First-party packages (app, tests) live in backend/, as when Ruff runs from there.
+src = ["backend"]
+# The project formats Python only; Ruff would otherwise also format the Markdown docs.
+extend-exclude = ["*.md"]

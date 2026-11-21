@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile &amp; security</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="0" account="Aline" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap row wrapx" style="align-items: flex-start; gap: 24px; padding-top: 32px; padding-bottom: 64px">
+      <nav class="card p16 col" aria-label="Account" style="gap: 4px; flex: 1 1 240px; max-width: 260px">
+        <div class="row" style="gap: 12px; padding: 8px 12px 16px"><span class="avatar" style="width: 44px; height: 44px; font-size: 15px">AM</span><span class="col" style="gap: 0"><b class="fw6">Aline Mukamana</b><span class="t-cap c-mut">+250 788 000 111</span></span></div>
+        <a class="alink" href="Account.dc.html"><span class="ic ic-home i18" aria-hidden="true"></span>Overview</a>
+        <a class="alink" href="MyOrders.dc.html"><span class="ic ic-package i18" aria-hidden="true"></span>My orders</a>
+        <a class="alink" href="Addresses.dc.html"><span class="ic ic-pin i18" aria-hidden="true"></span>Addresses</a>
+        <a class="alink on" href="Profile.dc.html" aria-current="page"><span class="ic ic-user i18" aria-hidden="true"></span>Profile &amp; security</a>
+        <a class="alink" href="Main.dc.html" style="color: #DC2626"><span class="ic ic-logout i18" aria-hidden="true"></span>Log out</a>
+      </nav>
+      <div class="col" style="gap: 16px; flex: 999 1 560px; min-width: 0; max-width: 820px">
+        <h1 class="t-h1" style="color: #0D2D52">Profile &amp; security</h1>
+        <form class="card p24 col" style="gap: 16px">
+          <h2 class="t-h3">Personal details</h2>
+          <div class="g g2" style="gap: 16px">
+            <div class="field"><label class="lbl" for="fn">First name</label><input id="fn" class="inp" defaultValue="Aline"></div>
+            <div class="field"><label class="lbl" for="ln">Last name</label><input id="ln" class="inp" defaultValue="Mukamana"></div>
+            <div class="field"><label class="lbl" for="ph">Phone number</label><div class="prefix"><span>+250</span><input id="ph" defaultValue="788 000 111"></div><span class="help">Changing it sends a confirmation code by SMS.</span></div>
+            <div class="field"><label class="lbl" for="em">Email</label><input id="em" class="inp" defaultValue="aline@example.com"></div>
+          </div>
+          <div class="field" style="max-width: 320px"><label class="lbl" for="lg">Language</label><select id="lg" class="inp"><option>English</option><option>Kinyarwanda</option></select></div>
+          <div class="row" style="gap: 10px"><button type="button" class="btn btn-p">Save changes</button><span role="status" class="row t-sm c-ok" style="gap: 6px"><span class="ic ic-check-c i16" aria-hidden="true"></span>Saved</span></div>
+        </form>
+        <form class="card p24 col" style="gap: 16px">
+          <h2 class="t-h3">Change password</h2>
+          <div class="field" style="max-width: 420px"><label class="lbl" for="cp">Current password</label><input id="cp" type="password" class="inp" placeholder="••••••••"></div>
+          <div class="g g2" style="gap: 16px; max-width: 860px"><div class="field"><label class="lbl" for="np">New password</label><input id="np" type="password" class="inp"></div><div class="field"><label class="lbl" for="rp">Confirm new password</label><input id="rp" type="password" class="inp"></div></div>
+          <div><button type="button" class="btn btn-o">Update password</button></div>
+        </form>
+        <section class="card p24 col" style="gap: 14px">
+          <h2 class="t-h3">Notifications</h2>
+          <div class="row between" style="gap: 12px"><span class="col" style="gap: 0"><b class="t-sm fw5">Order updates by SMS</b><span class="t-cap c-mut">Required for delivery codes</span></span><span class="toggle on" role="switch" aria-checked="true" aria-label="Order updates by SMS"></span></div>
+          <div class="row between" style="gap: 12px"><span class="col" style="gap: 0"><b class="t-sm fw5">WhatsApp updates</b><span class="t-cap c-mut">Order status and rider contact</span></span><span class="toggle on" role="switch" aria-checked="true" aria-label="WhatsApp updates"></span></div>
+          <div class="row between" style="gap: 12px"><span class="col" style="gap: 0"><b class="t-sm fw5">Deals and new arrivals</b><span class="t-cap c-mut">At most one message a week</span></span><span class="toggle" role="switch" aria-checked="false" aria-label="Deals and new arrivals"></span></div>
+        </section>
+        <section class="card p24 row between wrapx" style="gap: 12px; border-color: #FCA5A5"><span class="col" style="gap: 2px"><b class="fw6">Log out on all devices</b><span class="t-sm c-mut">Use this if you lost your phone.</span></span><a class="btn btn-do btn-sm" href="Main.dc.html"><span class="ic ic-logout i16" aria-hidden="true"></span>Log out everywhere</a></section>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

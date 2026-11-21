@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home — 3 Sixty Technologies</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="position: relative; width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <main>
+    <section style="background: #EAF3FF; overflow: hidden">
+      <div class="wrap row wrapx" style="gap: 40px; padding-top: 56px; padding-bottom: 56px">
+        <div class="col" style="gap: 20px; flex: 1 1 480px; max-width: 600px">
+          <span class="t-over c-pri">Latest electronics, better everyday life</span>
+          <h1 class="t-display" style="color: #0D2D52">Power Your World<br>With the Latest Tech</h1>
+          <p class="t-lg c-tx2" style="max-width: 520px">Smartphones, laptops, TVs, home appliances and accessories from trusted brands — delivered fast across Kigali and all of Rwanda.</p>
+          <div class="row wrapx" style="gap: 12px">
+            <a class="btn btn-p btn-lg" href="Category.dc.html">Shop Now<span class="ic ic-arrow-r i18" aria-hidden="true"></span></a>
+            <a class="btn btn-o btn-lg" href="Category.dc.html">View Deals</a>
+          </div>
+          <div class="row wrapx" style="gap: 28px; padding-top: 12px">
+            <div class="row" style="gap: 10px"><span class="ic ic-truck i28 c-pri" aria-hidden="true"></span><span class="col" style="gap: 0"><b class="t-cap fw6">Fast &amp; Reliable</b><span class="t-cap c-tx2">Delivery</span></span></div>
+            <div class="row" style="gap: 10px"><span class="ic ic-shield i28 c-pri" aria-hidden="true"></span><span class="col" style="gap: 0"><b class="t-cap fw6">Genuine Products</b><span class="t-cap c-tx2">With warranty</span></span></div>
+            <div class="row" style="gap: 10px"><span class="ic ic-headset i28 c-pri" aria-hidden="true"></span><span class="col" style="gap: 0"><b class="t-cap fw6">Expert Support</b><span class="t-cap c-tx2">Local team</span></span></div>
+          </div>
+        </div>
+        <div aria-hidden="true" style="position: relative; flex: 1 1 420px; height: 380px; min-width: 300px">
+          <span style="position: absolute; left: 50%; top: 50%; width: 420px; height: 420px; margin: -210px 0 0 -210px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,0) 70%)"></span>
+          <span style="position: absolute; left: 50%; top: 50%; width: 340px; height: 340px; margin: -170px 0 0 -170px; border-radius: 50%; border: 2px dashed rgba(8,102,245,.18)"></span>
+          <span class="dev dev-laptop" style="position: absolute; left: 12%; top: 4%; width: 360px; height: 360px"></span>
+          <span class="dev dev-ph-blue" style="position: absolute; right: 2%; bottom: 0; width: 190px; height: 190px"></span>
+          <span class="dev dev-watch" style="position: absolute; right: 6%; top: 2%; width: 110px; height: 110px"></span>
+          <span class="dev dev-buds" style="position: absolute; left: 8%; bottom: 4%; width: 100px; height: 100px"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="wrap col" style="gap: 24px">
+        <div class="row between wrapx" style="align-items: flex-end"><div class="col" style="gap: 4px"><h2 class="t-h2">Shop by Category</h2><p class="c-mut">Find exactly what you need from our wide range of electronics.</p></div><a class="row fw5 t-sm" style="gap: 6px" href="Category.dc.html">View all categories<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a></div>
+        <div class="g g6" style="gap: 16px">
+          <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+            <a class="card p16 col" href="Category.dc.html" style="gap: 10px; color: #0F172A">
+              <span style="height: 96px; display: flex; align-items: center; justify-content: center"><span class="dev {{c.img}}" aria-hidden="true" style="width: 88px; height: 88px"></span></span>
+              <span class="fw6">{{c.t}}</span><span class="t-cap c-mut">{{c.s}}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section style="background: #EAF3FF">
+      <div class="wrap g g4" style="padding-top: 24px; padding-bottom: 24px; gap: 0">
+        <div class="row" style="gap: 14px; justify-content: center; padding: 8px 12px; border-right: 1px solid #CBD5E1"><span class="ic ic-truck i32 c-pri" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Free Delivery in Kigali</b><span class="t-cap c-tx2">On orders above RWF 50,000</span></span></div>
+        <div class="row" style="gap: 14px; justify-content: center; padding: 8px 12px; border-right: 1px solid #CBD5E1"><span class="ic ic-shield i32 c-pri" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Genuine &amp; Original Products</b><span class="t-cap c-tx2">With manufacturer warranty</span></span></div>
+        <div class="row" style="gap: 14px; justify-content: center; padding: 8px 12px; border-right: 1px solid #CBD5E1"><span class="ic ic-return i32 c-pri" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Easy Returns</b><span class="t-cap c-tx2">Simple and transparent process</span></span></div>
+        <div class="row" style="gap: 14px; justify-content: center; padding: 8px 12px"><span class="ic ic-headset i32 c-pri" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Local Support</b><span class="t-cap c-tx2">Talk to our friendly team</span></span></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="wrap col" style="gap: 24px">
+        <div class="row between wrapx" style="align-items: flex-end"><div class="col" style="gap: 4px"><h2 class="t-h2">Featured Products</h2><p class="c-mut">Handpicked electronics for the best experience.</p></div><a class="row fw5 t-sm" style="gap: 6px" href="Category.dc.html">View all featured<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a></div>
+        <div class="g g5">
+          <sc-for list="{{featured}}" as="it" hint-placeholder-count="5"><dc-import name="ProductCard" p="{{it}}" hint-size="100%,380px"></dc-import></sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec bg-page">
+      <div class="wrap col" style="gap: 24px">
+        <div class="row between wrapx" style="align-items: flex-end"><div class="col" style="gap: 4px"><h2 class="t-h2">Bestselling Products</h2><p class="c-mut">Most popular choices from our customers.</p></div><a class="row fw5 t-sm" style="gap: 6px" href="Category.dc.html">View all bestselling<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a></div>
+        <div class="g g5">
+          <sc-for list="{{best}}" as="it" hint-placeholder-count="5"><dc-import name="ProductCard" p="{{it}}" hint-size="100%,330px"></dc-import></sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="wrap col" style="gap: 24px">
+        <div class="row between wrapx" style="align-items: flex-end"><div class="col" style="gap: 4px"><h2 class="t-h2">New Arrivals</h2><p class="c-mut">Be the first to get the latest electronics.</p></div><a class="row fw5 t-sm" style="gap: 6px" href="Category.dc.html">View all new arrivals<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a></div>
+        <div class="g g5">
+          <sc-for list="{{fresh}}" as="it" hint-placeholder-count="5"><dc-import name="ProductCard" p="{{it}}" hint-size="100%,310px"></dc-import></sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec bg-page">
+      <div class="wrap col" style="gap: 24px">
+        <div class="col" style="gap: 4px"><h2 class="t-h2">How Shopping Works</h2><p class="c-mut">Get your favourite electronics in a few simple steps.</p></div>
+        <ol class="g g4">
+          <li class="card p20 rowt" style="gap: 14px"><span class="step now">1</span><span class="col" style="gap: 4px"><b class="fw6">Browse &amp; Choose</b><span class="t-cap c-tx2">Explore categories and find the right device.</span></span></li>
+          <li class="card p20 rowt" style="gap: 14px"><span class="step now">2</span><span class="col" style="gap: 4px"><b class="fw6">Add to Cart</b><span class="t-cap c-tx2">Pick quantity, then check out — no account needed.</span></span></li>
+          <li class="card p20 rowt" style="gap: 14px"><span class="step now">3</span><span class="col" style="gap: 4px"><b class="fw6">Make Payment</b><span class="t-cap c-tx2">MTN MoMo, Airtel Money, card, or cash on delivery.</span></span></li>
+          <li class="card p20 rowt" style="gap: 14px"><span class="step now">4</span><span class="col" style="gap: 4px"><b class="fw6">Get Your Delivery</b><span class="t-cap c-tx2">Track your order by SMS until it reaches you.</span></span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section style="background: #071F42; color: #fff">
+      <div class="wrap row wrapx between" style="gap: 40px; padding-top: 56px; padding-bottom: 56px">
+        <div class="col" style="gap: 14px; flex: 1 1 520px">
+          <h2 class="t-h1" style="color: #fff">Need Electronics for Your Business?</h2>
+          <p class="t-lg" style="color: #A9BCD6; max-width: 600px">Special pricing for bulk orders, corporate purchases and institutional supplies. Our team will prepare a quote within one working day.</p>
+          <div class="row wrapx" style="gap: 12px; padding-top: 8px">
+            <a class="btn btn-w" href="Contact.dc.html">Contact Us</a>
+            <a class="btn btn-ow" href="Contact.dc.html">Request a Quote<span class="ic ic-arrow-r i16" aria-hidden="true"></span></a>
+          </div>
+        </div>
+        <div class="col" style="gap: 18px; flex: 0 1 320px">
+          <div class="row" style="gap: 14px"><span style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center"><span class="ic ic-phone i18" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="t-sm fw5">Call us</b><span class="t-sm" style="color: #A9BCD6">+250 788 123 456</span></span></div>
+          <div class="row" style="gap: 14px"><span style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center"><span class="ic ic-mail i18" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="t-sm fw5">Email us</b><span class="t-sm" style="color: #A9BCD6">business@3sixtytech.rw</span></span></div>
+          <div class="row" style="gap: 14px"><span style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center"><span class="ic ic-pin i18" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="t-sm fw5">Visit us</b><span class="t-sm" style="color: #A9BCD6">KN 5 Ave, Kigali, Rwanda</span></span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+  <a class="fab" href="https://wa.me/250788123456" aria-label="Chat with us on WhatsApp" style="position: fixed"><span class="ic ic-chat i28" aria-hidden="true"></span></a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      cats: [
+        { t: 'Phones', s: 'Smartphones & accessories', img: 'dev-ph-violet' },
+        { t: 'Laptops', s: 'For work, study & gaming', img: 'dev-laptop' },
+        { t: 'TVs & Audio', s: 'TVs, soundbars & more', img: 'dev-tv' },
+        { t: 'Home Appliances', s: 'For a smarter home', img: 'dev-appliance' },
+        { t: 'Accessories', s: 'Audio, chargers & more', img: 'dev-head' },
+        { t: 'Gaming', s: 'Consoles & games', img: 'dev-console' }
+      ],
+      featured: [
+        { name: 'Samsung Galaxy A55 5G 128GB', spec: '8GB RAM · 128GB', price: 'RWF 495,000', img: 'dev-ph-violet', badge: 'New', tone: 'ok', rating: '4.8 (120)' },
+        { name: 'HP Pavilion 15 Laptop', spec: 'Intel i5 · 8GB · 512GB SSD', price: 'RWF 820,000', img: 'dev-laptop', rating: '4.6 (85)' },
+        { name: 'LG 55" 4K Smart TV', spec: 'UHD ThinQ AI', price: 'RWF 890,000', img: 'dev-tv', rating: '4.7 (42)' },
+        { name: 'JBL Flip 6 Bluetooth Speaker', spec: 'Waterproof · 12h battery', price: 'RWF 180,000', old: 'RWF 200,000', img: 'dev-speaker', badge: '−10%', tone: 'err', rating: '4.5 (67)' },
+        { name: 'Canon EOS 250D DSLR Camera', spec: '24.1MP · 4K video', price: 'RWF 950,000', img: 'dev-camera', rating: '4.8 (34)' }
+      ],
+      best: [
+        { name: 'iPhone 15 128GB', price: 'RWF 1,450,000', img: 'dev-ph-pink', rating: '4.8 (210)', btn: false },
+        { name: 'Tecno Spark 20 128GB', price: 'RWF 295,000', img: 'dev-ph-blue', rating: '4.6 (180)', btn: false },
+        { name: 'Hisense 43" Smart TV', price: 'RWF 520,000', img: 'dev-tv', rating: '4.5 (65)', btn: false },
+        { name: 'Logitech Wireless Mouse', price: 'RWF 45,000', img: 'dev-mouse', rating: '4.4 (120)', btn: false },
+        { name: 'Anker Power Bank 20,000mAh', price: 'RWF 85,000', img: 'dev-power', rating: '4.7 (150)', btn: false }
+      ],
+      fresh: [
+        { name: 'Google Pixel 8', price: 'RWF 1,350,000', img: 'dev-ph-green', badge: 'New', tone: 'ok', btn: false },
+        { name: 'Dell Inspiron 15', price: 'RWF 780,000', img: 'dev-laptop', badge: 'New', tone: 'ok', btn: false },
+        { name: 'Sony WH-1000XM5', price: 'RWF 620,000', img: 'dev-head', badge: 'New', tone: 'ok', btn: false },
+        { name: 'Samsung Galaxy Watch 6', price: 'RWF 480,000', img: 'dev-watch', badge: 'New', tone: 'ok', btn: false },
+        { name: 'PlayStation 5', price: 'RWF 1,200,000', img: 'dev-console', badge: 'New', tone: 'ok', btn: false }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

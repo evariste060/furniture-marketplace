@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Edit product</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Products" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 4px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><a href="Products.dc.html" style="color: #64748B">Products</a><span aria-hidden="true">/</span><b>Samsung Galaxy A55 5G</b></nav><div class="row" style="gap: 12px"><h1 class="t-h1">Samsung Galaxy A55 5G</h1><span class="badge s-ok">Published</span></div></div>
+        <div class="row wrapx" style="gap: 10px"><a class="btn btn-n btn-sm" href="Product.dc.html"><span class="ic ic-eye i16" aria-hidden="true"></span>View on store</a><a class="btn btn-n btn-sm" href="Products.dc.html">Cancel</a><a class="btn btn-p btn-sm" href="Products.dc.html">Save changes</a></div>
+      </div>
+      <div class="row wrapx" style="gap: 20px; align-items: flex-start">
+        <div class="col" style="gap: 20px; flex: 999 1 560px; min-width: 0">
+          <section class="card p24 col" style="gap: 16px">
+            <h2 class="t-h3">Details</h2>
+            <div class="tabs" style="margin-top: -4px"><span class="tab on">English</span><span class="tab">Kinyarwanda</span></div>
+            <div class="field"><label class="lbl" for="pn">Product name</label><input id="pn" class="inp" defaultValue="Samsung Galaxy A55 5G"></div>
+            <div class="field"><label class="lbl" for="sd">Short description</label><textarea id="sd" class="inp" style="min-height: 80px">6.6" Super AMOLED 120Hz display, 50MP OIS camera, Exynos 1480 and a 5000mAh battery with 25W fast charging. IP67.</textarea></div>
+            <!-- Category hierarchy (approved 2026-11-16): Main category, then its Subcategory (optional; it
+                 lists only the chosen main category's subcategories and resets when the main one changes). -->
+            <div class="g g2" style="gap: 16px">
+              <div class="field"><label class="lbl" for="mc">Main category</label><select id="mc" class="inp"><option>Phones &amp; Tablets</option></select></div>
+              <div class="field"><label class="lbl" for="ct">Subcategory</label><select id="ct" class="inp"><option>Smartphones</option></select></div>
+              <div class="field"><label class="lbl" for="br">Brand</label><select id="br" class="inp"><option>Samsung</option></select></div>
+              <div class="field"><label class="lbl" for="md">Model</label><input id="md" class="inp" defaultValue="SM-A556E"></div>
+            </div>
+            <div class="field" style="max-width: 320px"><label class="lbl" for="wr">Warranty</label><select id="wr" class="inp"><option>12 months — manufacturer</option></select></div>
+          </section>
+          <section class="card p24 col" style="gap: 14px">
+            <div class="row between"><h2 class="t-h3">Images</h2><span class="t-cap c-mut">Drag to reorder · first image is the cover</span></div>
+            <div class="row wrapx" style="gap: 12px">
+              <span class="imgbox" style="width: 112px; height: 112px; border: 2px solid #0866F5; position: relative"><span class="dev dev-ph-violet" aria-hidden="true" style="width: 88px; height: 88px"></span><span class="badge b-info" style="position: absolute; bottom: 6px; left: 6px; font-size: 10px; padding: 1px 6px">Cover</span></span>
+              <span class="imgbox" style="width: 112px; height: 112px; border: 1px solid #E2E8F0"><span class="dev dev-ph-lilac" aria-hidden="true" style="width: 88px; height: 88px"></span></span>
+              <span class="imgbox" style="width: 112px; height: 112px; border: 1px solid #E2E8F0"><span class="dev dev-ph-blue" aria-hidden="true" style="width: 88px; height: 88px"></span></span>
+              <button type="button" class="col" style="width: 112px; height: 112px; border: 1.5px dashed #CBD5E1; border-radius: 10px; background: #F5F8FC; align-items: center; justify-content: center; gap: 4px; color: #475569"><span class="ic ic-upload i22" aria-hidden="true"></span><span class="t-cap fw5">Upload</span></button>
+            </div>
+          </section>
+          <section class="card" style="overflow: hidden">
+            <div class="row between" style="padding: 18px 20px; border-bottom: 1px solid #E2E8F0"><h2 class="t-h3">Variants, price &amp; stock</h2><button type="button" class="btn btn-s btn-sm"><span class="ic ic-plus i16" aria-hidden="true"></span>Add variant</button></div>
+            <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Colour</th><th scope="col">Storage</th><th scope="col">SKU</th><th scope="col">Price (RWF)</th><th scope="col">Compare at</th><th scope="col">Stock</th><th scope="col">Active</th></tr></thead><tbody>
+              <tr><td>Awesome Navy</td><td>8GB · 128GB</td><td class="c-tx2">SM-A556E-128-NV</td><td><input class="inp" aria-label="Price" defaultValue="520,000" style="height: 36px; width: 120px"></td><td><input class="inp" aria-label="Compare at price" placeholder="—" style="height: 36px; width: 110px"></td><td><input class="inp" aria-label="Stock" defaultValue="14" style="height: 36px; width: 70px"></td><td><span class="toggle on" role="switch" aria-checked="true" aria-label="Active"></span></td></tr>
+              <tr><td>Awesome Lilac</td><td>8GB · 128GB</td><td class="c-tx2">SM-A556E-128-LL</td><td><input class="inp" aria-label="Price" defaultValue="520,000" style="height: 36px; width: 120px"></td><td><input class="inp" aria-label="Compare at price" placeholder="—" style="height: 36px; width: 110px"></td><td><input class="inp" aria-label="Stock" defaultValue="22" style="height: 36px; width: 70px"></td><td><span class="toggle on" role="switch" aria-checked="true" aria-label="Active"></span></td></tr>
+              <tr><td>Awesome Navy</td><td>8GB · 256GB</td><td class="c-tx2">SM-A556E-256-NV</td><td><input class="inp" aria-label="Price" defaultValue="580,000" style="height: 36px; width: 120px"></td><td><input class="inp" aria-label="Compare at price" defaultValue="620,000" style="height: 36px; width: 110px"></td><td><input class="inp err" aria-label="Stock" defaultValue="0" style="height: 36px; width: 70px"></td><td><span class="toggle" role="switch" aria-checked="false" aria-label="Active"></span></td></tr>
+            </tbody></table></div>
+          </section>
+          <section class="card p24 col" style="gap: 12px">
+            <div class="row between"><h2 class="t-h3">Specifications</h2><button type="button" class="btn btn-g btn-sm" style="padding: 0"><span class="ic ic-plus i16" aria-hidden="true"></span>Add row</button></div>
+            <div class="g g2" style="gap: 10px"><input class="inp" aria-label="Spec name 1" defaultValue="Display"><input class="inp" aria-label="Spec value 1" defaultValue="6.6&quot; Super AMOLED, 120Hz"><input class="inp" aria-label="Spec name 2" defaultValue="Processor"><input class="inp" aria-label="Spec value 2" defaultValue="Exynos 1480 (4nm)"><input class="inp" aria-label="Spec name 3" defaultValue="Battery"><input class="inp" aria-label="Spec value 3" defaultValue="5000mAh, 25W"></div>
+          </section>
+        </div>
+        <div class="col" style="gap: 20px; flex: 1 1 300px">
+          <section class="card p20 col" style="gap: 12px"><h2 class="t-h4">Visibility</h2><label class="opt on" style="padding: 12px"><span class="radio" aria-hidden="true"></span><span class="col" style="gap: 0"><b class="t-sm fw6">Published</b><span class="t-cap c-mut">Visible on the store</span></span></label><label class="opt" style="padding: 12px"><span class="radio" aria-hidden="true"></span><span class="col" style="gap: 0"><b class="t-sm fw6">Hidden</b><span class="t-cap c-mut">Only staff can see it</span></span></label></section>
+          <section class="card p20 col" style="gap: 10px"><h2 class="t-h4">Stock summary</h2><div class="kv"><span>Total in stock</span><b class="fw6">36</b></div><div class="kv"><span>Low-stock alert at</span><span>5 units</span></div><a href="Inventory.dc.html" class="t-sm fw5">Open in Inventory</a></section>
+          <section class="card p20 col" style="gap: 10px"><h2 class="t-h4">Search &amp; SEO</h2><div class="field"><label class="lbl" for="sl">URL slug</label><input id="sl" class="inp" defaultValue="samsung-galaxy-a55-5g"></div><div class="field"><label class="lbl" for="mt">Meta title</label><input id="mt" class="inp" defaultValue="Samsung Galaxy A55 5G price in Rwanda"></div></section>
+          <section class="card p20 col" style="gap: 6px"><h2 class="t-h4">Reviews</h2><span class="row t-sm" style="gap: 6px"><span class="stars" aria-hidden="true"><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span></span>4.6 · 23 approved</span><a href="Reviews.dc.html" class="t-sm fw5">2 waiting for approval</a></section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1550}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

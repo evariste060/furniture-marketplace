@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Promotions</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Promotions" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Promotions</b></nav><h1 class="t-h1">Promotions</h1></div>
+        <button type="button" class="btn btn-p btn-sm"><span class="ic ic-plus i16" aria-hidden="true"></span>New promotion</button>
+      </div>
+      <div class="row wrapx" style="gap: 20px; align-items: flex-start">
+        <section class="card" style="overflow: hidden; flex: 999 1 560px; min-width: 0">
+          <div class="tabs" style="padding: 0 20px"><span class="tab on">Active (3)</span><span class="tab">Scheduled (1)</span><span class="tab">Expired (8)</span></div>
+          <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Name / code</th><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Applies to</th><th scope="col">Valid</th><th scope="col">Used</th><th scope="col">Status</th></tr></thead><tbody>
+            <sc-for list="{{promos}}" as="p" hint-placeholder-count="4"><tr><td><span class="col" style="gap: 2px"><b class="fw5">{{p.n}}</b><span class="badge s-neu" style="align-self: flex-start; font-family: ui-monospace, monospace">{{p.c}}</span></span></td><td class="c-tx2">{{p.t}}</td><td class="fw6">{{p.v}}</td><td class="c-tx2">{{p.a}}</td><td class="t-cap c-tx2" style="white-space: nowrap">{{p.d}}</td><td><span class="col" style="gap: 4px; min-width: 90px"><span class="t-cap">{{p.u}}</span><span class="track" style="height: 4px"><span style="width: {{p.w}}"></span></span></span></td><td><span class="badge {{p.sc}}">{{p.s}}</span></td></tr></sc-for>
+          </tbody></table></div>
+        </section>
+        <form class="card p24 col sh2" aria-label="New promotion" style="gap: 14px; flex: 1 1 340px">
+          <div class="row between"><h2 class="t-h3">New promotion</h2><button type="button" class="icbtn" aria-label="Close" style="border: 0"><span class="ic ic-x i18" aria-hidden="true"></span></button></div>
+          <div class="field"><label class="lbl" for="pn">Name</label><input id="pn" class="inp" defaultValue="Back to school laptops"></div>
+          <div class="g g2" role="radiogroup" aria-label="Promotion type" style="gap: 10px"><label class="opt on" style="padding: 10px 12px"><span class="radio" aria-hidden="true"></span><span class="t-sm fw5">Discount code</span></label><label class="opt" style="padding: 10px 12px"><span class="radio" aria-hidden="true"></span><span class="t-sm fw5">Product price cut</span></label></div>
+          <div class="g g2" style="gap: 12px"><div class="field"><label class="lbl" for="cd">Code</label><input id="cd" class="inp" defaultValue="SCHOOL26" style="text-transform: uppercase"></div><div class="field"><label class="lbl" for="vl">Discount</label><div class="prefix"><input id="vl" defaultValue="8"><span style="border-right: 0; border-left: 1px solid #E2E8F0">%</span></div></div></div>
+          <div class="field"><label class="lbl" for="ap">Applies to</label><select id="ap" class="inp"><option>Category: Laptops</option><option>All products</option><option>Selected products</option></select></div>
+          <div class="g g2" style="gap: 12px"><div class="field"><label class="lbl" for="sd">Starts</label><input id="sd" type="date" class="inp" defaultValue="2026-11-01"></div><div class="field"><label class="lbl" for="ed">Ends</label><input id="ed" type="date" class="inp" defaultValue="2026-11-30"></div></div>
+          <div class="g g2" style="gap: 12px"><div class="field"><label class="lbl" for="mn">Min. order</label><input id="mn" class="inp" placeholder="RWF 0"></div><div class="field"><label class="lbl" for="lm">Usage limit</label><input id="lm" class="inp" defaultValue="200"></div></div>
+          <label class="chk"><input type="checkbox" defaultChecked="{{ true }}">One use per customer phone number</label>
+          <button type="button" class="btn btn-p">Create promotion</button>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = (n, c, t, v, a, d, used, lim, s) => ({ n, c, t, v, a, d, u: used + ' / ' + lim, w: Math.round(used / lim * 100) + '%', s, sc: s === 'Active' ? 's-ok' : s === 'Scheduled' ? 's-info' : 's-neu' });
+    return { promos: [
+      p('October savings', 'SAVE10', 'Code', '10% off', 'All products', '1 – 31 Oct', 64, 300, 'Active'),
+      p('JBL speaker deal', '—', 'Price cut', 'RWF 20,000 off', 'JBL Flip 6', '15 – 31 Oct', 26, 100, 'Active'),
+      p('First order', 'WELCOME5', 'Code', '5% off', 'First order only', 'Ongoing', 118, 1000, 'Active'),
+      p('Back to school laptops', 'SCHOOL26', 'Code', '8% off', 'Laptops', '1 – 30 Nov', 0, 200, 'Scheduled')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

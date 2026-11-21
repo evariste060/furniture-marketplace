@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap" style="padding-top: 48px; padding-bottom: 64px">
+      <div class="card row wrapx sh" style="max-width: 960px; margin: 0 auto; overflow: hidden; align-items: stretch; gap: 0">
+        <div class="col" style="flex: 1 1 360px; padding: 40px; gap: 18px; background: #0D2D52; color: #fff">
+          <h2 class="t-h2" style="color: #fff">Welcome back</h2>
+          <p style="color: #A9BCD6">Sign in to check out faster, see your orders and manage warranty.</p>
+          <ul class="col" style="gap: 12px; padding-top: 8px">
+            <li class="row" style="gap: 10px"><span class="ic ic-check-c i18" aria-hidden="true" style="color: #18B4F5"></span>Saved delivery addresses</li>
+            <li class="row" style="gap: 10px"><span class="ic ic-check-c i18" aria-hidden="true" style="color: #18B4F5"></span>Order history &amp; invoices</li>
+            <li class="row" style="gap: 10px"><span class="ic ic-check-c i18" aria-hidden="true" style="color: #18B4F5"></span>Track every delivery</li>
+          </ul>
+          <span class="grow"></span>
+          <p class="t-cap" style="color: #A9BCD6">Staff members sign in here too — you’ll be taken to the admin panel.</p>
+        </div>
+        <form class="col" style="flex: 1 1 400px; padding: 40px; gap: 18px">
+          <div class="col" style="gap: 4px"><h1 class="t-h2">Sign in</h1><p class="c-tx2 t-sm">New to 3 Sixty? <a href="Register.dc.html" class="fw5">Create an account</a></p></div>
+          <div class="field"><label class="lbl" for="id">Email or phone number</label><input id="id" class="inp" defaultValue="aline@example.com"></div>
+          <div class="field"><span class="row between"><label class="lbl" for="pw">Password</label><a href="Forgot.dc.html" class="t-sm fw5">Forgot password?</a></span><span style="position: relative; display: block"><input id="pw" type="password" class="inp" defaultValue="password123" style="padding-right: 44px"><button type="button" aria-label="Show password" style="position: absolute; right: 6px; top: 6px; width: 32px; height: 32px; border: 0; background: transparent; color: #64748B; display: flex; align-items: center; justify-content: center"><span class="ic ic-eye i18" aria-hidden="true"></span></button></span></div>
+          <label class="chk"><input type="checkbox" defaultChecked="{{ true }}">Keep me signed in</label>
+          <a class="btn btn-p btn-lg btn-block" href="Account.dc.html">Sign in</a>
+          <div class="row t-cap c-mut" style="gap: 10px"><span class="grow hr"></span>or<span class="grow hr"></span></div>
+          <a class="btn btn-n btn-block" href="OrderConfirmed.dc.html">Continue as guest</a>
+          <p class="t-cap c-mut">By signing in you agree to our <a href="Policy.dc.html">Terms</a> and <a href="Policy.dc.html">Privacy Policy</a>.</p>
+        </form>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1050}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

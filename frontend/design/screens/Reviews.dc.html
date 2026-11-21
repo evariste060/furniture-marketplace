@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Reviews</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Reviews" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Reviews</b></nav><h1 class="t-h1">Reviews</h1><p class="c-tx2">Only reviews from delivered orders arrive here. Nothing appears on the store until you approve it.</p></div>
+      <div class="row wrapx" style="gap: 20px; align-items: flex-start">
+        <section class="card" style="overflow: hidden; flex: 1 1 420px; min-width: 0">
+          <div class="tabs" style="padding: 0 20px"><span class="tab on">Pending (5)</span><span class="tab">Approved (312)</span><span class="tab">Rejected (14)</span></div>
+          <div class="row wrapx" style="gap: 10px; padding: 14px 20px; border-bottom: 1px solid #E2E8F0"><select class="inp" aria-label="Rating" style="width: 140px; height: 36px"><option>All ratings</option><option>5 stars</option><option>1–2 stars</option></select><select class="inp" aria-label="Product" style="width: 200px; height: 36px"><option>All products</option></select></div>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+            <button type="button" class="col" style="gap: 6px; width: 100%; text-align: left; padding: 16px 20px; border: 0; border-bottom: 1px solid #E2E8F0; background: {{r.bg}}; border-left: 3px solid {{r.bl}}; cursor: pointer; font: inherit; color: #0F172A">
+              <span class="row between" style="gap: 8px"><span class="stars" aria-label="{{r.stars}} stars" style="color: {{r.sc}}"><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span><span class="ic ic-star i14"></span></span><span class="t-cap c-mut">{{r.d}}</span></span>
+              <b class="t-sm fw6">{{r.t}}</b>
+              <span class="t-cap c-tx2">{{r.p}} · {{r.u}}</span>
+            </button>
+          </sc-for>
+        </section>
+        <section class="card p24 col" aria-label="Review detail" style="gap: 16px; flex: 999 1 480px; min-width: 0">
+          <div class="row between wrapx" style="gap: 12px"><div class="row" style="gap: 10px"><span class="stars" aria-label="4 out of 5 stars"><span class="ic ic-star i18"></span><span class="ic ic-star i18"></span><span class="ic ic-star i18"></span><span class="ic ic-star i18"></span><span class="ic ic-star i18" style="color: #CBD5E1"></span></span><span class="badge s-warn">Pending</span><span class="badge s-ok"><span class="ic ic-check i12" aria-hidden="true"></span>Verified purchase</span></div><span class="t-sm c-mut">Submitted 24 Oct 2026, 08:12</span></div>
+          <h2 class="t-h3">Fast and good for school work</h2>
+          <p class="c-tx2">Boots quickly and the battery lasts about 6 hours of browsing. The keyboard is comfortable. Delivery to Kimironko was the next day.</p>
+          <div class="row" style="gap: 8px"><button type="button" class="imgbox" aria-label="Open photo" style="width: 80px; height: 80px; border: 0"><span class="dev dev-laptop" style="width: 64px; height: 64px"></span></button></div>
+          <div class="g g3 r12" style="gap: 12px; padding: 14px; background: #F5F8FC">
+            <div class="col" style="gap: 0"><span class="t-cap c-mut">Product</span><a href="ProductEditor.dc.html" class="t-sm fw5">HP Pavilion 15 Laptop</a></div>
+            <div class="col" style="gap: 0"><span class="t-cap c-mut">Customer</span><span class="t-sm fw5">Aline M. · +250 788 •••111</span></div>
+            <div class="col" style="gap: 0"><span class="t-cap c-mut">Order</span><a href="AdminOrderDetail.dc.html" class="t-sm fw5">#3S-09917 · delivered 3 Sep</a></div>
+          </div>
+          <div class="field"><label class="lbl" for="reply">Store reply <span class="c-mut" style="font-weight: 400">(optional, shown under the review)</span></label><textarea id="reply" class="inp" placeholder="Thank the customer or answer their question…" style="min-height: 80px"></textarea></div>
+          <div class="row wrapx" style="gap: 10px; padding-top: 4px; border-top: 1px solid #E2E8F0">
+            <button type="button" class="btn btn-p" style="margin-top: 14px"><span class="ic ic-check i16" aria-hidden="true"></span>Approve &amp; publish</button>
+            <div class="row" style="gap: 8px; margin-top: 14px"><select class="inp" aria-label="Reject reason" style="width: 220px"><option>Reject reason…</option><option>Spam</option><option>Offensive</option><option>Off-topic</option><option>Contains personal info</option></select><button type="button" class="btn btn-do">Reject</button></div>
+          </div>
+          <p class="t-cap c-mut">Approving updates the product’s average rating (now 4.6 from 23) and review count immediately.</p>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const r = (stars, t, p, u, d, on) => ({ stars: String(stars), t, p, u, d, bg: on ? '#EAF3FF' : '#fff', bl: on ? '#0866F5' : 'transparent', sc: '#F5A524' });
+    return { rows: [
+      r(4, 'Fast and good for school work', 'HP Pavilion 15 Laptop', 'Aline M.', '24 Oct', true),
+      r(5, 'Best phone I have owned', 'Samsung Galaxy A55 5G', 'Eric N.', '23 Oct', false),
+      r(2, 'Battery drains quickly', 'Tecno Spark 20', 'Patrick H.', '23 Oct', false),
+      r(5, 'Great sound, delivered same day', 'JBL Flip 6 Speaker', 'Grace M.', '22 Oct', false),
+      r(1, 'Call me on 0788…', 'Logitech Wireless Mouse', 'Unknown', '21 Oct', false)
+    ] };
+  }
+}
+</script>
+</body>
+</html>

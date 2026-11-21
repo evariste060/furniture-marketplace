@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Delivery information</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap row wrapx" style="align-items: flex-start; gap: 32px; padding-top: 32px; padding-bottom: 64px">
+      <nav class="card p16 col" aria-label="Help topics" style="gap: 2px; flex: 1 1 240px; max-width: 260px">
+        <span class="t-over c-mut" style="padding: 8px 12px">Help &amp; policies</span>
+        <a class="alink" href="Policy.dc.html">About us</a>
+        <a class="alink on" href="Policy.dc.html" aria-current="page">Delivery information</a>
+        <a class="alink" href="Policy.dc.html">Returns &amp; refunds</a>
+        <a class="alink" href="Policy.dc.html">Warranty</a>
+        <a class="alink" href="Policy.dc.html">Privacy policy</a>
+        <a class="alink" href="Policy.dc.html">Terms &amp; conditions</a>
+      </nav>
+      <article class="card col" style="gap: 20px; padding: 40px; flex: 999 1 560px; min-width: 0; max-width: 860px">
+        <nav class="crumb" aria-label="Breadcrumb"><a href="Main.dc.html" style="color: #64748B">Home</a><span aria-hidden="true">/</span><span>Help</span><span aria-hidden="true">/</span><b>Delivery information</b></nav>
+        <div class="col" style="gap: 6px"><h1 class="t-h1" style="color: #0D2D52">Delivery information</h1><span class="t-sm c-mut">Last updated 20 Oct 2026 · <a href="Policy.dc.html">Soma mu Kinyarwanda</a></span></div>
+        <p class="t-lg c-tx2">We deliver to every district in Rwanda. You see the exact delivery fee at checkout before you place your order.</p>
+        <h2 class="t-h3">Delivery zones and fees</h2>
+        <div class="card scrollx"><table class="tbl" style="font-size: 14px"><thead><tr><th scope="col">Zone</th><th scope="col">Fee</th><th scope="col">Arrives</th></tr></thead><tbody>
+          <tr><td>Kigali — orders over RWF 50,000</td><td class="c-ok fw6">Free</td><td>1–2 working days</td></tr>
+          <tr><td>Kigali — orders under RWF 50,000</td><td>[Kigali fee]</td><td>1–2 working days</td></tr>
+          <tr><td>Rest of Rwanda</td><td>RWF 3,000 – 5,000</td><td>2–4 working days</td></tr>
+          <tr><td>Store pickup, KN 5 Ave</td><td class="c-ok fw6">Free</td><td>Same day</td></tr>
+        </tbody></table></div>
+        <h2 class="t-h3">On delivery day</h2>
+        <ul class="col" style="gap: 10px">
+          <li class="rowt" style="gap: 10px"><span class="ic ic-check i16 c-ok" aria-hidden="true" style="margin-top: 3px"></span><span class="c-tx2">You get an SMS with the rider’s name and phone when your order leaves our store.</span></li>
+          <li class="rowt" style="gap: 10px"><span class="ic ic-check i16 c-ok" aria-hidden="true" style="margin-top: 3px"></span><span class="c-tx2">Give the rider the 4-digit delivery code from your SMS. Don’t share it before the parcel is in your hands.</span></li>
+          <li class="rowt" style="gap: 10px"><span class="ic ic-check i16 c-ok" aria-hidden="true" style="margin-top: 3px"></span><span class="c-tx2">Check the box is sealed before you sign. Cash on delivery is available in Kigali.</span></li>
+        </ul>
+        <div class="rowt r12" style="gap: 12px; padding: 16px; background: #EAF3FF"><span class="ic ic-info i20 c-pri" aria-hidden="true"></span><span class="t-sm c-tx2">Address outside our zones? We’ll call to arrange delivery, or you can choose store pickup. <a href="Contact.dc.html">Contact us</a></span></div>
+        <div class="row wrapx between" style="gap: 12px; padding-top: 12px; border-top: 1px solid #E2E8F0"><span class="t-sm c-mut">Still have a question?</span><span class="row" style="gap: 10px"><a class="btn btn-oa btn-sm" href="https://wa.me/250788123456"><span class="ic ic-chat i16" aria-hidden="true"></span>WhatsApp</a><a class="btn btn-o btn-sm" href="Contact.dc.html">Contact us</a></span></div>
+      </article>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

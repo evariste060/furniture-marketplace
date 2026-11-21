@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Reports</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Reports" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Reports</b></nav><h1 class="t-h1">Reports</h1><p class="c-tx2">Tables you can export to Excel. For charts, see <a href="Analytics.dc.html">Analytics</a>.</p></div>
+        <div class="row wrapx" style="gap: 10px"><button type="button" class="btn btn-n btn-sm"><span class="ic ic-calendar i16" aria-hidden="true"></span>Week 43 · 19 – 25 Oct</button><button type="button" class="btn btn-p btn-sm"><span class="ic ic-download i16" aria-hidden="true"></span>Export to Excel</button></div>
+      </div>
+      <div class="g g4">
+        <button type="button" class="card p16 rowt" style="gap: 12px; text-align: left; border: 2px solid #0866F5; background: #EAF3FF; font: inherit; color: inherit; cursor: pointer"><span class="ic ic-chart i22 c-pri" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Sales</b><span class="t-cap c-tx2">Daily / weekly totals</span></span></button>
+        <button type="button" class="card p16 rowt" style="gap: 12px; text-align: left; font: inherit; color: inherit; cursor: pointer"><span class="ic ic-package i22 c-tx2" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Top products</b><span class="t-cap c-tx2">Units and revenue</span></span></button>
+        <button type="button" class="card p16 rowt" style="gap: 12px; text-align: left; font: inherit; color: inherit; cursor: pointer"><span class="ic ic-box i22 c-tx2" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Stock</b><span class="t-cap c-tx2">Levels &amp; movements</span></span></button>
+        <button type="button" class="card p16 rowt" style="gap: 12px; text-align: left; font: inherit; color: inherit; cursor: pointer"><span class="ic ic-card i22 c-tx2" aria-hidden="true"></span><span class="col" style="gap: 2px"><b class="fw6">Payments</b><span class="t-cap c-tx2">By method &amp; status</span></span></button>
+      </div>
+      <section class="card" style="overflow: hidden">
+        <div class="row between wrapx" style="gap: 12px; padding: 16px 20px; border-bottom: 1px solid #E2E8F0"><h2 class="t-h3">Daily sales — week 43</h2><div class="row" style="gap: 8px"><span class="chip-o on">Daily</span><span class="chip-o">Weekly</span><span class="chip-o">Monthly</span></div></div>
+        <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Date</th><th scope="col">Orders</th><th scope="col">Items sold</th><th scope="col">Gross sales</th><th scope="col">Discounts</th><th scope="col">Delivery fees</th><th scope="col">Net revenue (paid)</th></tr></thead><tbody>
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="7"><tr><td class="fw5">{{d.d}}</td><td>{{d.o}}</td><td>{{d.i}}</td><td>{{d.g}}</td><td class="c-ok">{{d.disc}}</td><td class="c-tx2">{{d.f}}</td><td class="fw6">{{d.n}}</td></tr></sc-for>
+          <tr style="background: #F5F8FC"><td class="fw7">Total</td><td class="fw7">39</td><td class="fw7">61</td><td class="fw7">RWF 8,640,000</td><td class="fw7 c-ok">− RWF 312,000</td><td class="fw7">RWF 46,000</td><td class="fw7">RWF 8,374,000</td></tr>
+        </tbody></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const d = (d, o, i, g, disc, f, n) => ({ d, o: String(o), i: String(i), g, disc, f, n });
+    return { days: [
+      d('Mon 19 Oct', 5, 7, 'RWF 1,020,000', '− RWF 40,000', 'RWF 6,000', 'RWF 986,000'),
+      d('Tue 20 Oct', 6, 9, 'RWF 1,310,000', '− RWF 52,000', 'RWF 8,000', 'RWF 1,266,000'),
+      d('Wed 21 Oct', 4, 6, 'RWF 760,000', '− RWF 18,000', 'RWF 4,000', 'RWF 746,000'),
+      d('Thu 22 Oct', 7, 11, 'RWF 2,080,000', '− RWF 96,000', 'RWF 10,000', 'RWF 1,994,000'),
+      d('Fri 23 Oct', 8, 13, 'RWF 1,890,000', '− RWF 60,000', 'RWF 9,000', 'RWF 1,839,000'),
+      d('Sat 24 Oct', 9, 15, 'RWF 1,580,000', '− RWF 46,000', 'RWF 9,000', 'RWF 1,543,000'),
+      d('Sun 25 Oct', 0, 0, '—', '—', '—', '—')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Addresses</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="0" account="Aline" hint-size="100%,160px"></dc-import>
+  <main class="bg-page">
+    <div class="wrap row wrapx" style="align-items: flex-start; gap: 24px; padding-top: 32px; padding-bottom: 64px">
+      <nav class="card p16 col" aria-label="Account" style="gap: 4px; flex: 1 1 240px; max-width: 260px">
+        <div class="row" style="gap: 12px; padding: 8px 12px 16px"><span class="avatar" style="width: 44px; height: 44px; font-size: 15px">AM</span><span class="col" style="gap: 0"><b class="fw6">Aline Mukamana</b><span class="t-cap c-mut">+250 788 000 111</span></span></div>
+        <a class="alink" href="Account.dc.html"><span class="ic ic-home i18" aria-hidden="true"></span>Overview</a>
+        <a class="alink" href="MyOrders.dc.html"><span class="ic ic-package i18" aria-hidden="true"></span>My orders</a>
+        <a class="alink on" href="Addresses.dc.html" aria-current="page"><span class="ic ic-pin i18" aria-hidden="true"></span>Addresses</a>
+        <a class="alink" href="Profile.dc.html"><span class="ic ic-user i18" aria-hidden="true"></span>Profile &amp; security</a>
+        <a class="alink" href="Main.dc.html" style="color: #DC2626"><span class="ic ic-logout i18" aria-hidden="true"></span>Log out</a>
+      </nav>
+      <div class="col" style="gap: 16px; flex: 999 1 560px; min-width: 0">
+        <div class="row between wrapx" style="gap: 12px"><h1 class="t-h1" style="color: #0D2D52">Addresses</h1><button type="button" class="btn btn-p btn-sm"><span class="ic ic-plus i16" aria-hidden="true"></span>Add new address</button></div>
+        <div class="row wrapx" style="gap: 20px; align-items: flex-start">
+          <div class="col" style="gap: 14px; flex: 1 1 340px">
+            <article class="card p20 col" style="gap: 6px; border: 2px solid #0866F5"><div class="row" style="gap: 8px"><b class="fw6">Home</b><span class="badge s-info">Default</span></div><span class="t-sm c-tx2">Aline Mukamana · +250 788 000 111</span><span class="t-sm c-tx2">KG 11 Ave, House 24, Kimironko, Gasabo, Kigali</span><span class="t-cap c-mut">Landmark: near Kimironko market, blue gate</span><div class="row" style="gap: 16px; padding-top: 6px"><button type="button" class="t-sm fw5 c-pri" style="border: 0; background: transparent; padding: 0">Edit</button><button type="button" class="t-sm fw5 c-err" style="border: 0; background: transparent; padding: 0">Delete</button></div></article>
+            <article class="card p20 col" style="gap: 6px"><b class="fw6">Office</b><span class="t-sm c-tx2">Aline Mukamana · +250 788 000 111</span><span class="t-sm c-tx2">KN 4 Ave, Kigali Heights, 3rd floor, Nyarugenge</span><div class="row" style="gap: 16px; padding-top: 6px"><button type="button" class="t-sm fw5 c-pri" style="border: 0; background: transparent; padding: 0">Edit</button><button type="button" class="t-sm fw5 c-err" style="border: 0; background: transparent; padding: 0">Delete</button><button type="button" class="t-sm fw5" style="border: 0; background: transparent; padding: 0; color: #475569">Set as default</button></div></article>
+            <article class="card p20 col" style="gap: 6px"><b class="fw6">Mum’s house</b><span class="t-sm c-tx2">Josiane Uwase · +250 722 000 333</span><span class="t-sm c-tx2">Huye District, Ngoma Sector, Butare</span><span class="badge s-warn" style="align-self: flex-start">Outside Kigali · RWF 5,000 delivery</span><div class="row" style="gap: 16px; padding-top: 6px"><button type="button" class="t-sm fw5 c-pri" style="border: 0; background: transparent; padding: 0">Edit</button><button type="button" class="t-sm fw5 c-err" style="border: 0; background: transparent; padding: 0">Delete</button></div></article>
+          </div>
+          <form class="card p24 col sh2" aria-label="Edit address" style="gap: 14px; flex: 1 1 340px">
+            <div class="row between"><h2 class="t-h3">Edit address</h2><button type="button" class="icbtn" aria-label="Close" style="border: 0"><span class="ic ic-x i18" aria-hidden="true"></span></button></div>
+            <div class="field"><label class="lbl" for="al">Label</label><input id="al" class="inp" defaultValue="Home"></div>
+            <div class="g g2" style="gap: 12px"><div class="field"><label class="lbl" for="nm">Recipient name</label><input id="nm" class="inp" defaultValue="Aline Mukamana"></div><div class="field"><label class="lbl" for="pn">Phone</label><input id="pn" class="inp" defaultValue="+250 788 000 111"></div></div>
+            <div class="g g2" style="gap: 12px"><div class="field"><label class="lbl" for="d">District</label><select id="d" class="inp"><option>Gasabo</option></select></div><div class="field"><label class="lbl" for="s">Sector</label><input id="s" class="inp" defaultValue="Kimironko"></div></div>
+            <div class="field"><label class="lbl" for="st">Street &amp; house</label><input id="st" class="inp" defaultValue="KG 11 Ave, House 24"></div>
+            <div class="field"><label class="lbl" for="lm">Landmark</label><input id="lm" class="inp" defaultValue="Near Kimironko market, blue gate"></div>
+            <label class="chk"><input type="checkbox" defaultChecked="{{ true }}">Use as my default address</label>
+            <div class="row" style="gap: 10px"><button type="button" class="btn btn-p" style="flex: 1">Save address</button><button type="button" class="btn btn-n">Cancel</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

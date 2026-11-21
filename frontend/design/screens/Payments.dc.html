@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Payments</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Payments" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="row between wrapx" style="gap: 12px; align-items: flex-end">
+        <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Payments</b></nav><h1 class="t-h1">Payments</h1></div>
+        <div class="row" style="gap: 10px"><button type="button" class="btn btn-n btn-sm"><span class="ic ic-calendar i16" aria-hidden="true"></span>1 – 24 Oct 2026</button><button type="button" class="btn btn-n btn-sm"><span class="ic ic-download i16" aria-hidden="true"></span>Export</button></div>
+      </div>
+      <div class="g g4">
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Received</span><b class="t-price-l c-ok">RWF 27.9M</b><span class="t-cap c-mut">131 payments</span></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Pending</span><b class="t-price-l c-warn">RWF 4.1M</b><span class="t-cap c-mut">12 waiting for approval</span></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Failed</span><b class="t-price-l c-err">RWF 2.3M</b><span class="t-cap c-mut">9 failed or expired</span></div>
+        <div class="card p20 col" style="gap: 2px"><span class="t-sm c-tx2">Cash to collect</span><b class="t-price-l">RWF 1.2M</b><span class="t-cap c-mut">7 on delivery</span></div>
+      </div>
+      <section class="card" style="overflow: hidden">
+        <div class="tabs" style="padding: 0 20px"><span class="tab on">All</span><span class="tab">Successful</span><span class="tab">Pending (12)</span><span class="tab">Failed (9)</span></div>
+        <div class="row wrapx" style="gap: 12px; padding: 16px 20px; border-bottom: 1px solid #E2E8F0">
+          <label class="row" style="gap: 8px; height: 38px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 8px; flex: 1 1 240px; max-width: 360px; color: #64748B"><span class="ic ic-search i16" aria-hidden="true"></span><input aria-label="Search payments" placeholder="Provider reference, order or phone" style="border: 0; outline: 0; flex: 1; font-size: 13px"></label>
+          <select class="inp" aria-label="Method" style="width: 180px; height: 36px"><option>All methods</option><option>MTN MoMo</option><option>Airtel Money</option><option>Card</option><option>Cash</option></select>
+        </div>
+        <div class="scrollx"><table class="tbl">
+          <thead><tr><th scope="col">Provider reference</th><th scope="col">Order</th><th scope="col">Method</th><th scope="col">Payer</th><th scope="col">Date</th><th scope="col">Amount</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+              <tr><td class="fw5">{{r.ref}}</td><td><a href="AdminOrderDetail.dc.html" class="fw5">{{r.o}}</a></td><td><span class="row" style="gap: 8px"><span class="badge" style="background: {{r.mb}}; color: {{r.mt}}; min-width: 52px; justify-content: center">{{r.ml}}</span></span></td><td class="c-tx2">{{r.p}}</td><td class="c-tx2" style="white-space: nowrap">{{r.d}}</td><td class="fw6" style="white-space: nowrap">{{r.a}}</td><td><span class="col" style="gap: 2px"><span><span class="badge {{r.sc}}">{{r.s}}</span></span><span class="t-cap c-mut">{{r.why}}</span></span></td></tr>
+            </sc-for>
+          </tbody>
+        </table></div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const M = { MoMo: ['#FFCC00', '#0F172A'], Airtel: ['#E40000', '#fff'], Card: ['#0D2D52', '#fff'], Cash: ['#15803D', '#fff'] };
+    const S = { Successful: 's-ok', Pending: 's-warn', Failed: 's-err', 'To collect': 's-neu' };
+    const r = (ref, o, ml, p, d, a, s, why) => ({ ref, o, ml, mb: M[ml][0], mt: M[ml][1], p, d, a, s, sc: S[s], why: why || '' });
+    return { rows: [
+      r('MP241024.1026.A55', '#3S-10482', 'MoMo', '+250 788 000 111', '24 Oct, 10:26', 'RWF 713,000', 'Successful'),
+      r('AM-58301177', '#3S-10481', 'Airtel', '+250 733 341 908', '24 Oct, 09:59', 'RWF 950,000', 'Pending', 'Waiting for PIN · 3 min'),
+      r('—', '#3S-10480', 'Cash', '+250 788 552 017', '24 Oct, 09:12', 'RWF 145,000', 'To collect', 'Rider collects on delivery'),
+      r('CH_3QpL9ZkT2', '#3S-10479', 'Card', 'Visa •••• 4417', '23 Oct, 18:41', 'RWF 820,000', 'Successful'),
+      r('MP231023.1605.Z8', '#3S-10478', 'MoMo', '+250 790 664 381', '23 Oct, 16:05', 'RWF 1,670,000', 'Failed', 'Insufficient balance'),
+      r('MP231023.1422.K1', '#3S-10477', 'MoMo', '+250 788 902 556', '23 Oct, 14:22', 'RWF 180,000', 'Successful'),
+      r('AM-58291044', '#3S-10476', 'Airtel', '+250 728 405 773', '23 Oct, 11:48', 'RWF 312,000', 'Successful'),
+      r('CH_3QoX1bRt7', '#3S-10475', 'Card', 'Mastercard •••• 9031', '22 Oct, 15:31', 'RWF 19,500,000', 'Successful'),
+      r('MP221022.0915.R4', '#3S-10473', 'MoMo', '+250 789 774 120', '22 Oct, 09:16', 'RWF 535,000', 'Failed', 'Request expired')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3 Sixty — Style guide</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 1440px; min-height: 1900px; padding: 56px 64px; box-sizing: border-box; background: #fff; font-family: Inter, system-ui, sans-serif; color: #0F172A; display: flex; flex-direction: column; gap: 40px">
+  <div class="row between wrapx" style="gap: 24px">
+    <div class="col" style="gap: 6px"><span class="t-over c-pri">Design system</span><h1 class="t-display" style="color: #0D2D52">3 Sixty Technologies UI</h1><p class="t-lg c-tx2" style="max-width: 640px">One set of tokens and components for the storefront and the admin panel. Font: Inter. Every screen on this canvas is built from these parts.</p></div>
+    <div class="row" style="gap: 16px"><div class="card p16"><img src="../assets/3sixty-logo.jpeg" alt="3 Sixty Technologies logo on light" style="height: 64px; display: block; mix-blend-mode: multiply"></div><div style="background: #0D2D52; border-radius: 12px; padding: 16px"><div style="background: #fff; border-radius: 8px; padding: 6px 10px"><img src="../assets/3sixty-logo.jpeg" alt="Logo on dark, in a white plate" style="height: 48px; display: block; mix-blend-mode: multiply"></div></div></div>
+  </div>
+  <section class="col" style="gap: 16px">
+    <h2 class="t-h2">Colours and where they go</h2>
+    <div class="g g4" style="gap: 16px">
+      <sc-for list="{{colors}}" as="c" hint-placeholder-count="15">
+        <div class="card" style="overflow: hidden"><div style="height: 64px; background: {{c.hex}}; border-bottom: 1px solid #E2E8F0"></div><div class="col" style="gap: 2px; padding: 12px 14px"><b class="t-sm fw6">{{c.name}} · {{c.hex}}</b><span class="t-cap c-tx2">{{c.use}}</span></div></div>
+      </sc-for>
+    </div>
+  </section>
+  <div class="row wrapx" style="gap: 40px; align-items: flex-start">
+    <section class="col" style="gap: 12px; flex: 1 1 520px">
+      <h2 class="t-h2">Type scale — Inter</h2>
+      <div class="card p24 col" style="gap: 14px">
+        <div class="row between"><span class="t-display">Display 44</span><span class="t-cap c-mut">800 · hero</span></div>
+        <div class="row between"><span class="t-h1">Heading 1 · 32</span><span class="t-cap c-mut">700 · page titles</span></div>
+        <div class="row between"><span class="t-h2">Heading 2 · 24</span><span class="t-cap c-mut">700 · sections</span></div>
+        <div class="row between"><span class="t-h3">Heading 3 · 18</span><span class="t-cap c-mut">600 · cards, panels</span></div>
+        <div class="row between"><span class="t-price">RWF 520,000</span><span class="t-cap c-mut">Price · 18 / 700</span></div>
+        <div class="row between"><span>Body 14 — default text across the store and admin.</span><span class="t-cap c-mut">400</span></div>
+        <div class="row between"><span class="t-cap c-mut">Caption 12 — helper text, meta, table headers</span><span class="t-over c-pri">Overline</span></div>
+      </div>
+    </section>
+    <section class="col" style="gap: 12px; flex: 1 1 520px">
+      <h2 class="t-h2">Buttons</h2>
+      <div class="card p24 col" style="gap: 16px">
+        <div class="row wrapx" style="gap: 10px"><button type="button" class="btn btn-p"><span class="ic ic-cart i18" aria-hidden="true"></span>Primary</button><button type="button" class="btn btn-o">Outline</button><button type="button" class="btn btn-s">Secondary</button><button type="button" class="btn btn-g">Ghost</button><button type="button" class="btn btn-dk">Dark</button></div>
+        <div class="row wrapx" style="gap: 10px"><button type="button" class="btn btn-d">Danger</button><button type="button" class="btn btn-do">Danger outline</button><button type="button" class="btn btn-wa"><span class="ic ic-chat i18" aria-hidden="true"></span>WhatsApp</button><button type="button" class="btn btn-n">Neutral</button><button type="button" class="btn btn-p dis">Disabled</button></div>
+        <div class="row wrapx" style="gap: 10px"><button type="button" class="btn btn-p btn-sm">Small 36</button><button type="button" class="btn btn-p">Medium 44</button><button type="button" class="btn btn-p btn-lg">Large 52</button></div>
+        <p class="t-cap c-mut">Radius 8 · one primary action per area · Outline for the second action on cards (Add to Cart beside View Details).</p>
+      </div>
+    </section>
+  </div>
+  <div class="row wrapx" style="gap: 40px; align-items: flex-start">
+    <section class="col" style="gap: 12px; flex: 1 1 520px">
+      <h2 class="t-h2">Status badges</h2>
+      <div class="card p24 col" style="gap: 14px">
+        <div class="row wrapx" style="gap: 8px"><span class="badge b-ok">In Stock</span><span class="badge b-warn">Low Stock</span><span class="badge b-err">Out of Stock</span><span class="badge b-err">10% OFF</span><span class="badge b-ok">New</span><span class="t-cap c-mut">Solid — on product images</span></div>
+        <div class="row wrapx" style="gap: 8px"><span class="badge s-ok">Delivered · Paid</span><span class="badge s-warn">Pending payment</span><span class="badge s-err">Failed · Cancelled</span><span class="badge s-info">Processing</span><span class="badge s-pur">Ready</span><span class="badge s-neu">Draft</span><span class="t-cap c-mut">Soft — tables &amp; admin</span></div>
+      </div>
+      <h2 class="t-h2" style="padding-top: 16px">Form fields</h2>
+      <div class="card p24 g g2" style="gap: 16px">
+        <div class="field"><label class="lbl" for="sg1">Default</label><input id="sg1" class="inp" placeholder="Placeholder"><span class="help">Helper text</span></div>
+        <div class="field"><label class="lbl" for="sg2">Focus</label><input id="sg2" class="inp focus" defaultValue="Kimironko"></div>
+        <div class="field"><label class="lbl" for="sg3">Error</label><input id="sg3" class="inp err" defaultValue="0788"><span class="help err">Enter a valid Rwandan phone number</span></div>
+        <div class="field"><label class="lbl" for="sg4">Phone</label><div class="prefix"><span>+250</span><input id="sg4" placeholder="7XX XXX XXX"></div></div>
+        <div class="field"><label class="lbl" for="sg5">Select</label><select id="sg5" class="inp"><option>Kigali — Gasabo</option></select></div>
+        <div class="col" style="gap: 10px; padding-top: 24px"><label class="chk"><input type="checkbox" defaultChecked="{{ true }}">Checkbox</label><label class="chk"><input type="radio" defaultChecked="{{ true }}">Radio</label><span class="row t-sm" style="gap: 8px"><span class="toggle on" role="img" aria-label="Toggle on"></span>Toggle</span></div>
+      </div>
+    </section>
+    <section class="col" style="gap: 12px; flex: 1 1 520px">
+      <h2 class="t-h2">Product cards</h2>
+      <div class="row wrapx" style="gap: 16px; align-items: flex-start">
+        <div style="width: 232px"><dc-import name="ProductCard" hint-size="232px,390px"></dc-import></div>
+        <div style="width: 290px"><dc-import name="ListingCard" hint-size="290px,270px"></dc-import></div>
+      </div>
+      <h2 class="t-h2" style="padding-top: 16px">Icons &amp; spacing</h2>
+      <div class="card p24 col" style="gap: 14px">
+        <div class="row wrapx c-tx2" style="gap: 16px"><span class="ic ic-search"></span><span class="ic ic-cart"></span><span class="ic ic-user"></span><span class="ic ic-heart"></span><span class="ic ic-truck"></span><span class="ic ic-shield"></span><span class="ic ic-headset"></span><span class="ic ic-phone"></span><span class="ic ic-chat"></span><span class="ic ic-card"></span><span class="ic ic-package"></span><span class="ic ic-box"></span><span class="ic ic-chart"></span><span class="ic ic-pie"></span><span class="ic ic-bell"></span><span class="ic ic-settings"></span><span class="ic ic-users"></span><span class="ic ic-tag"></span><span class="ic ic-upload"></span><span class="ic ic-download"></span><span class="ic ic-edit"></span><span class="ic ic-trash"></span><span class="ic ic-lock"></span><span class="ic ic-star" style="color: #F5A524"></span></div>
+        <p class="t-cap c-mut">2px-stroke line icons (Lucide set) at 16 / 18 / 20 / 24. Spacing on a 4px grid: 4 · 8 · 12 · 16 · 20 · 24 · 32 · 56. Radius: 4 badges · 8 buttons &amp; inputs · 12 cards · 16 large media. Page content max width 1240px; mobile gutters 16px.</p>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const c = (name, hex, use) => ({ name, hex, use });
+    return { colors: [
+      c('Brand Navy', '#0D2D52', 'Announcement bar, footer, headings'),
+      c('Deep Navy', '#071F42', 'Admin sidebar, business band'),
+      c('Primary Blue', '#0866F5', 'Primary buttons, active nav, links, admin active item, sales chart'),
+      c('Light Blue', '#EAF3FF', 'Home hero, selected filter chips, info boxes'),
+      c('White', '#FFFFFF', 'Store header, product cards, admin KPI cards & tables'),
+      c('Page Background', '#F5F8FC', 'Admin content area, store section backgrounds'),
+      c('Border', '#E2E8F0', 'Filter panel, cards, inputs, table rows'),
+      c('Text', '#0F172A', 'Main text'),
+      c('Text secondary', '#475569', 'Descriptions, labels'),
+      c('Muted', '#64748B', 'Helper text, meta, placeholders'),
+      c('Green', '#16A34A', 'In stock, paid, delivered, success'),
+      c('Amber', '#F59E0B', 'Low stock, pending payment, warnings'),
+      c('Red', '#DC2626', 'Out of stock, failed payment, discounts, errors'),
+      c('Purple', '#7C3AED', 'Customers KPI, Ready status'),
+      c('Star', '#F5A524', 'Ratings only'),
+      c('WhatsApp', '#25D366', 'WhatsApp button only')
+    ] };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Store header</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="bg-navy" style="color: #fff">
+    <div class="wrap row between" style="height: 36px; font-size: 12px; line-height: 16px">
+      <div class="row" style="gap: 8px"><span class="ic ic-truck i16" aria-hidden="true"></span><span class="fw5">Free delivery in Kigali on orders above RWF 50,000</span></div>
+      <div class="row hide-sm" style="gap: 12px; color: #A9BCD6"><span>Genuine products</span><span aria-hidden="true">|</span><span>Warranty on all products</span><span aria-hidden="true">|</span><span class="fw5" style="color: #fff">Need help? Call +250 788 123 456</span></div>
+    </div>
+  </div>
+  <header style="background: #fff; border-bottom: 1px solid #E2E8F0">
+    <div class="wrap row wrapx" style="gap: 28px; padding-top: 12px; padding-bottom: 12px">
+      <a href="Main.dc.html" aria-label="3 Sixty Technologies — home" style="display: block"><img src="../assets/3sixty-logo.jpeg" alt="3 Sixty Technologies" style="height: 52px; width: auto; display: block; mix-blend-mode: multiply"></a>
+      <form role="search" class="grow" style="display: flex; min-width: 260px; height: 44px; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden">
+        <label class="row" style="flex: 1; padding: 0 14px; gap: 10px; color: #64748B">
+          <span class="ic ic-search i18" aria-hidden="true"></span>
+          <span class="sr" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search products</span>
+          <input type="search" defaultValue="{{q}}" placeholder="Search for phones, laptops, TVs, accessories…" style="border: 0; outline: 0; flex: 1; min-width: 0; font-size: 13px; color: #0F172A; background: transparent">
+        </label>
+        <button type="submit" aria-label="Search" style="width: 52px; border: 0; background: #0866F5; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer"><span class="ic ic-search i18" aria-hidden="true"></span></button>
+      </form>
+      <button type="button" class="row" style="gap: 6px; border: 0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: #0F172A; padding: 0" aria-label="Language: English">
+        <span aria-hidden="true" style="width: 20px; height: 14px; border-radius: 2px; overflow: hidden; display: flex; flex-direction: column"><span style="flex: 2; background: #00A1DE"></span><span style="flex: 1; background: #FAD201"></span><span style="flex: 1; background: #20603D"></span></span>
+        EN <span class="ic ic-chev-d i14" aria-hidden="true" style="color: #64748B"></span>
+      </button>
+      <a class="hlink" href="{{accountHref}}"><span class="ic ic-user i22" aria-hidden="true"></span><span class="col" style="gap: 0"><span class="t-cap c-mut" style="font-weight: 400">My Account</span><span>{{account}}</span></span></a>
+      <a class="hlink hide-sm" href="Account.dc.html"><span class="ic ic-heart i22" aria-hidden="true"></span>Wishlist</a>
+      <a class="hlink" href="Cart.dc.html" aria-label="Cart, {{cart}} items"><span style="position: relative; display: inline-flex"><span class="ic ic-cart i24" aria-hidden="true"></span><span class="count" style="position: absolute; top: -8px; right: -10px">{{cart}}</span></span><span style="margin-left: 4px">Cart</span></a>
+    </div>
+    <nav aria-label="Categories" style="border-top: 1px solid #E2E8F0">
+      <div class="wrap row" style="gap: 32px; overflow-x: auto">
+        <button type="button" class="row" style="gap: 8px; height: 48px; border: 0; background: transparent; font-size: 13px; font-weight: 600; color: #0F172A; cursor: pointer; padding: 0; white-space: nowrap"><span class="ic ic-menu i18" aria-hidden="true"></span>All Categories</button>
+        <sc-for list="{{nav}}" as="n" hint-placeholder-count="6">
+          <a class="{{n.cls}}" href="{{n.href}}">{{n.label}}</a>
+        </sc-for>
+        <a class="navlink deal" href="Category.dc.html"><span class="ic ic-zap i16" aria-hidden="true" style="margin-right: 6px"></span>Deals</a>
+        <span class="grow"></span>
+        <a class="navlink" href="Track.dc.html" style="color: #475569"><span class="ic ic-truck i16" aria-hidden="true" style="margin-right: 6px"></span>Track Order</a>
+      </div>
+    </nav>
+  </header>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["None","Phones","Laptops","TVs & Audio","Home Appliances","Accessories","Brands"],"default":"None"},"cart":{"editor":"text","default":"2"},"account":{"editor":"text","default":"Sign in"},"q":{"editor":null},"$preview":{"width":1440,"height":160}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const active = this.props.active ?? 'None';
+    const labels = ['Phones','Laptops','TVs & Audio','Home Appliances','Accessories','Brands'];
+    const nav = labels.map((l) => ({ label: l, href: 'Category.dc.html', cls: l === active ? 'navlink on' : 'navlink' }));
+    const account = this.props.account ?? 'Sign in';
+    return { nav, cart: this.props.cart ?? '2', account, accountHref: account === 'Sign in' ? 'Login.dc.html' : 'Account.dc.html', q: this.props.q ?? '' };
+  }
+}
+</script>
+</body>
+</html>

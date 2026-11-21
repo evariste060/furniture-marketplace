@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contact &amp; bulk quote</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <dc-import name="Header" active="None" cart="2" hint-size="100%,160px"></dc-import>
+  <section style="background: #EAF3FF">
+    <div class="wrap col" style="gap: 10px; padding-top: 40px; padding-bottom: 40px">
+      <nav class="crumb" aria-label="Breadcrumb"><a href="Main.dc.html" style="color: #64748B">Home</a><span aria-hidden="true">/</span><b>Contact</b></nav>
+      <h1 class="t-h1" style="color: #0D2D52">Talk to us</h1>
+      <p class="c-tx2 t-lg" style="max-width: 640px">Questions about a product, an order, or buying for your business? We reply within one working day — WhatsApp is fastest.</p>
+    </div>
+  </section>
+  <main class="bg-page">
+    <div class="wrap row wrapx" style="align-items: flex-start; gap: 24px; padding-top: 32px; padding-bottom: 64px">
+      <div class="col" style="gap: 14px; flex: 1 1 320px; max-width: 400px">
+        <a class="card p20 row" href="https://wa.me/250788123456" style="gap: 14px; color: #0F172A"><span style="width: 44px; height: 44px; border-radius: 10px; background: #DCFCE7; color: #15803D; display: flex; align-items: center; justify-content: center"><span class="ic ic-chat i22" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="fw6">WhatsApp</b><span class="t-sm c-tx2">+250 788 123 456 · replies in minutes</span></span></a>
+        <a class="card p20 row" href="tel:+250788123456" style="gap: 14px; color: #0F172A"><span style="width: 44px; height: 44px; border-radius: 10px; background: #EAF3FF; color: #0866F5; display: flex; align-items: center; justify-content: center"><span class="ic ic-phone i22" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="fw6">Call us</b><span class="t-sm c-tx2">+250 788 123 456 · Mon–Sat 8:00–18:00</span></span></a>
+        <a class="card p20 row" href="mailto:info@3sixtytech.rw" style="gap: 14px; color: #0F172A"><span style="width: 44px; height: 44px; border-radius: 10px; background: #EAF3FF; color: #0866F5; display: flex; align-items: center; justify-content: center"><span class="ic ic-mail i22" aria-hidden="true"></span></span><span class="col" style="gap: 0"><b class="fw6">Email</b><span class="t-sm c-tx2">info@3sixtytech.rw · business@3sixtytech.rw</span></span></a>
+        <div class="card" style="overflow: hidden">
+          <div aria-label="Map placeholder" role="img" style="height: 180px; background: #F1F5F9; display: flex; align-items: center; justify-content: center; color: #475569; flex-direction: column; gap: 6px"><span class="ic ic-pin i28 c-pri" aria-hidden="true"></span><span class="t-cap">[Google map embed]</span></div>
+          <div class="p20 col" style="gap: 4px"><b class="fw6">Visit our store</b><span class="t-sm c-tx2">KN 5 Ave, Kigali, Rwanda</span><span class="t-sm c-tx2">Mon – Sat: 8:00 AM – 6:00 PM</span></div>
+        </div>
+      </div>
+      <form class="card p32 col" style="gap: 18px; flex: 999 1 560px; min-width: 0">
+        <div class="col" style="gap: 4px"><div class="row" style="gap: 8px"><span class="ic ic-building i22 c-pri" aria-hidden="true"></span><h2 class="t-h2">Request a business quote</h2></div><p class="c-tx2">For 10+ units, corporate purchases, schools and institutions.</p></div>
+        <div class="g g2" style="gap: 16px">
+          <div class="field"><label class="lbl" for="co">Company / institution</label><input id="co" class="inp" placeholder="e.g. Green Hills Academy"></div>
+          <div class="field"><label class="lbl" for="cn">Contact person</label><input id="cn" class="inp" placeholder="Full name"></div>
+          <div class="field"><label class="lbl" for="cp">Phone</label><div class="prefix"><span>+250</span><input id="cp" placeholder="7XX XXX XXX"></div></div>
+          <div class="field"><label class="lbl" for="ce">Email</label><input id="ce" class="inp" placeholder="you@company.rw"></div>
+        </div>
+        <div class="col" style="gap: 8px"><span class="lbl">Products &amp; quantities</span>
+          <div class="row" style="gap: 10px"><input class="inp grow" aria-label="Product 1" defaultValue="HP Pavilion 15 Laptop (i5, 8GB, 512GB)"><input class="inp" aria-label="Quantity 1" defaultValue="25" style="width: 90px"></div>
+          <div class="row" style="gap: 10px"><input class="inp grow" aria-label="Product 2" placeholder="Product name or model"><input class="inp" aria-label="Quantity 2" placeholder="Qty" style="width: 90px"></div>
+          <button type="button" class="btn btn-g btn-sm" style="align-self: flex-start; padding: 0"><span class="ic ic-plus i16" aria-hidden="true"></span>Add another product</button>
+        </div>
+        <div class="g g2" style="gap: 16px"><div class="field"><label class="lbl" for="dl">Delivery location</label><input id="dl" class="inp" placeholder="District / city"></div><div class="field"><label class="lbl" for="dd">Needed by</label><input id="dd" type="date" class="inp"></div></div>
+        <div class="field"><label class="lbl" for="msg">Anything else?</label><textarea id="msg" class="inp" placeholder="Invoice details, installation, warranty terms…"></textarea></div>
+        <div class="row wrapx" style="gap: 12px"><button type="button" class="btn btn-p btn-lg"><span class="ic ic-send i18" aria-hidden="true"></span>Send quote request</button><span class="t-sm c-mut">We’ll reply within one working day.</span></div>
+        <div role="status" class="rowt r12" style="gap: 12px; padding: 14px 16px; background: #DCFCE7; color: #166534"><span class="ic ic-check-c i20" aria-hidden="true"></span><span class="t-sm"><b class="fw6">Success state:</b> Thanks — we’ve received your request and will reply within one working day. Urgent? <a href="https://wa.me/250788123456" style="color: #166534; text-decoration: underline">WhatsApp us</a>.</span></div>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,440px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1600}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

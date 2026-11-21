@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Categories &amp; brands</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div class="ts adm" style="width: 100%; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <div class="adm-side" style="background: #071F42"><dc-import name="AdminSidebar" active="Categories &amp; Brands" hint-size="240px,1120px"></dc-import></div>
+  <div class="adm-main">
+    <dc-import name="AdminTopbar" hint-size="100%,68px"></dc-import>
+    <main class="adm-body">
+      <div class="col" style="gap: 2px"><nav class="crumb" aria-label="Breadcrumb"><a href="Dashboard.dc.html" style="color: #64748B">Dashboard</a><span aria-hidden="true">/</span><b>Categories &amp; brands</b></nav><h1 class="t-h1">Categories &amp; brands</h1></div>
+      <div class="row wrapx" style="gap: 20px; align-items: flex-start">
+        <section class="card" style="overflow: hidden; flex: 1 1 460px; min-width: 0">
+          <div class="row between" style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0"><h2 class="t-h3">Category tree</h2><button type="button" class="btn btn-p btn-sm"><span class="ic ic-plus i16" aria-hidden="true"></span>Add category</button></div>
+          <!-- Category hierarchy (approved 2026-11-16): search by name or slug and filter by status; while
+               either is used, matches show with their main category and every branch is open. -->
+          <div class="row wrapx" style="gap: 12px; padding: 12px 20px; border-bottom: 1px solid #E2E8F0">
+            <label style="position: relative; flex: 1 1 220px; min-width: 0"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search categories</span><span class="ic ic-search i16 c-mut" aria-hidden="true" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%)"></span><input type="search" class="inp" placeholder="Name or slug" style="padding-left: 36px"></label>
+            <label style="flex: 0 1 180px; min-width: 0"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Show</span><select class="inp"><option>All categories</option><option>Shown on the store</option><option>Hidden</option></select></label>
+          </div>
+          <ul class="col" style="gap: 0">
+            <sc-for list="{{tree}}" as="c" hint-placeholder-count="10">
+              <li class="row" style="gap: 10px; padding: 10px 20px 10px {{c.pad}}; border-bottom: 1px solid #F1F5F9">
+                <span class="ic {{c.chev}} i14 c-mut" aria-hidden="true"></span>
+                <span class="grow t-sm {{c.fw}}" style="color: {{c.col}}">{{c.n}}</span>
+                <span class="t-cap c-mut" style="width: 120px">{{c.count}}</span>
+                <!-- Move up / down among its siblings (PUT /staff/categories/order); disabled at either end. -->
+                <button type="button" class="icbtn" aria-label="Move {{c.n}} up" style="width: 30px; height: 30px"><span class="ic ic-chev-u i14" aria-hidden="true"></span></button>
+                <button type="button" class="icbtn" aria-label="Move {{c.n}} down" style="width: 30px; height: 30px"><span class="ic ic-chev-d i14" aria-hidden="true"></span></button>
+                <span class="toggle {{c.tc}}" role="switch" aria-checked="{{c.on}}" aria-label="Show {{c.n}}"></span>
+                <sc-if value="{{c.main}}"><button type="button" class="icbtn" aria-label="Add a subcategory to {{c.n}}" style="width: 30px; height: 30px; border: 0"><span class="ic ic-plus i14" aria-hidden="true"></span></button></sc-if>
+                <button type="button" class="icbtn" aria-label="Edit {{c.n}}" style="width: 30px; height: 30px; border: 0"><span class="ic ic-edit i14" aria-hidden="true"></span></button>
+              </li>
+            </sc-for>
+          </ul>
+        </section>
+        <section class="card" style="overflow: hidden; flex: 1 1 420px; min-width: 0">
+          <div class="row between" style="padding: 16px 20px; border-bottom: 1px solid #E2E8F0"><h2 class="t-h3">Brands</h2><button type="button" class="btn btn-s btn-sm"><span class="ic ic-plus i16" aria-hidden="true"></span>Add brand</button></div>
+          <div class="scrollx"><table class="tbl"><thead><tr><th scope="col">Brand</th><th scope="col">Products</th><th scope="col">Shown in menu</th><th scope="col"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead><tbody>
+            <sc-for list="{{brands}}" as="b" hint-placeholder-count="8"><tr><td><span class="row" style="gap: 10px"><span class="avatar" style="background: #EAF3FF; color: #0866F5; border-radius: 8px">{{b.i}}</span><b class="fw5">{{b.n}}</b></span></td><td class="c-tx2">{{b.c}}</td><td><span class="toggle {{b.tc}}" role="switch" aria-checked="{{b.on}}" aria-label="Show {{b.n}} in menu"></span></td><td><button type="button" class="icbtn" aria-label="Edit {{b.n}}" style="width: 30px; height: 30px; border: 0"><span class="ic ic-edit i14" aria-hidden="true"></span></button></td></tr></sc-for>
+          </tbody></table></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // A main category with subcategories counts its whole branch ("in total").
+    const c = (n, level, count, on, open) => ({ n, main: level === 0, count: level === 0 && open !== undefined ? count + ' products in total' : count + ' products', pad: (20 + level * 24) + 'px', chev: level === 0 ? (open ? 'ic-chev-d' : 'ic-chev-r') : 'ic-minus', fw: level === 0 ? 'fw6' : '', col: on ? '#0F172A' : '#64748B', tc: on ? 'on' : '', on: on ? 'true' : 'false' });
+    const b = (n, cnt, on) => ({ n, i: n.slice(0, 2).toUpperCase(), c: String(cnt), tc: on ? 'on' : '', on: on ? 'true' : 'false' });
+    return {
+      tree: [ c('Phones & Tablets', 0, 64, true, true), c('Smartphones', 1, 52, true), c('Tablets', 1, 12, true), c('Laptops & Computers', 0, 38, true, true), c('Laptops', 1, 24, true), c('Gaming Laptops', 1, 14, true), c('TVs & Audio', 0, 41, true, false), c('Home Appliances', 0, 22, true, false), c('Accessories', 0, 33, true, false), c('Cameras & Photography', 0, 9, true, false), c('Networking', 0, 7, false) ],
+      brands: [ b('Samsung', 48, true), b('Apple', 21, true), b('HP', 17, true), b('LG', 15, true), b('Xiaomi', 12, true), b('Tecno', 11, true), b('JBL', 8, true), b('Hisense', 6, false) ]
+    };
+  }
+}
+</script>
+</body>
+</html>

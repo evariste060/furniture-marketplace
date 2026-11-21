@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Product card</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="../tokens-and-components.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<article class="ts card" style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #0F172A">
+  <a href="Product.dc.html" aria-label="{{p.name}}" style="display: flex; align-items: center; justify-content: center; height: 160px; background: #fff">
+    <span class="dev {{p.img}}" aria-hidden="true" style="width: 128px; height: 128px"></span>
+  </a>
+  <sc-if value="{{hasBadge}}" hint-placeholder-val="{{ true }}">
+    <span class="badge {{badgeCls}}" style="position: absolute; top: 10px; left: 10px">{{p.badge}}</span>
+  </sc-if>
+  <button type="button" aria-label="Add to wishlist" style="position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E2E8F0; background: #fff; display: flex; align-items: center; justify-content: center; color: #64748B; cursor: pointer"><span class="ic ic-heart i16" aria-hidden="true"></span></button>
+  <div class="col" style="gap: 6px; padding: 12px 14px 14px; flex: 1">
+    <a href="Product.dc.html" class="fw6" style="color: #0F172A; font-size: 14px; line-height: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px">{{p.name}}</a>
+    <sc-if value="{{hasSpec}}" hint-placeholder-val="{{ true }}"><span class="t-cap c-mut">{{p.spec}}</span></sc-if>
+    <sc-if value="{{hasRating}}" hint-placeholder-val="{{ true }}">
+      <span class="row" style="gap: 6px"><span class="stars" aria-hidden="true"><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span><span class="ic ic-star i12"></span></span><span class="t-cap c-mut">{{p.rating}}</span></span>
+    </sc-if>
+    <sc-if value="{{noRating}}" hint-placeholder-val="{{ false }}"><span style="height: 16px; display: block"></span></sc-if>
+    <span class="row" style="gap: 8px; align-items: baseline; flex-wrap: wrap; margin-top: auto">
+      <span class="t-price" style="color: {{priceColor}}">{{p.price}}</span>
+      <sc-if value="{{hasOld}}" hint-placeholder-val="{{ false }}"><span class="t-cap c-mut strike">{{p.old}}</span></sc-if>
+    </span>
+    <sc-if value="{{hasBtn}}" hint-placeholder-val="{{ true }}">
+      <button type="button" class="btn btn-p btn-sm btn-block" style="margin-top: 4px"><span class="ic ic-cart i16" aria-hidden="true"></span>Add to Cart</button>
+    </sc-if>
+  </div>
+</article>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"p":{"editor":null},"$preview":{"width":240,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props.p ?? { name: 'Samsung Galaxy A55 5G 128GB', spec: '8GB RAM · 128GB', price: 'RWF 495,000', img: 'dev-ph-violet', badge: 'New', tone: 'ok', rating: '4.8 (120)', btn: true };
+    const tones = { ok: 'b-ok', err: 'b-err', warn: 'b-warn', info: 'b-info' };
+    return {
+      p,
+      hasBadge: !!p.badge, badgeCls: tones[p.tone || 'ok'],
+      hasSpec: !!p.spec, hasRating: !!p.rating, noRating: !p.rating,
+      hasOld: !!p.old, priceColor: p.old ? '#DC2626' : '#0F172A',
+      hasBtn: p.btn !== false
+    };
+  }
+}
+</script>
+</body>
+</html>
