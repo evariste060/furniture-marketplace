@@ -11,7 +11,7 @@ Baseline before the change: commit `03bb5cc`.
 
 The original documents describe a single electronics store. The owner changed both the business
 model and the domain: the platform becomes a **multi-vendor furniture marketplace**, provisionally
-named **FurnitureHub**, where sellers apply, are approved by a platform administrator, and run
+named **FurniHub**, where sellers apply, are approved by a platform administrator, and run
 their own store, products, stock and orders. Existing features are reused, not rebuilt.
 
 - **Sellers.** A customer applies with their shop details; administrators approve, reject,

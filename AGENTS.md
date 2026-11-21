@@ -1,5 +1,5 @@
 # Working agreements
-Read the original project requirements linked in docs/requirements/README.md first, then the approved scope changes in docs/requirements/scope-changes.md. SC-04 and docs/architecture/ADR-014-multi-vendor-marketplace.md turn the single electronics store into a multi-vendor furniture marketplace (provisional name FurnitureHub); where they disagree with the original documents, they win.
+Read the original project requirements linked in docs/requirements/README.md first, then the approved scope changes in docs/requirements/scope-changes.md. SC-04 and docs/architecture/ADR-014-multi-vendor-marketplace.md turn the single electronics store into a multi-vendor furniture marketplace (provisional name FurniHub); where they disagree with the original documents, they win.
 Use Next.js App Router/TypeScript for frontend and FastAPI/Pydantic v2 for backend.
 Use PostgreSQL, SQLAlchemy 2 and Alembic. Review data design before creating models or migrations.
 Follow modular API/schema/model/repository/service/integration boundaries.

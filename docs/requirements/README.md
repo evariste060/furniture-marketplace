@@ -9,6 +9,6 @@ Board access failed during setup; card IDs and current order are unverified.
 
 Approved changes to the MVP scope since these documents were written are in
 [scope-changes.md](scope-changes.md), newest first. The largest is SC-04 (2026-11-21): the
-platform becomes a multi-vendor furniture marketplace (FurnitureHub), specified in
+platform becomes a multi-vendor furniture marketplace (FurniHub), specified in
 [ADR-014](../architecture/ADR-014-multi-vendor-marketplace.md). These original documents describe
 the single-vendor electronics store and are kept unchanged for reference.

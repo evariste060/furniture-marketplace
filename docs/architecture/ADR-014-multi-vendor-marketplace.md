@@ -1,6 +1,6 @@
 # ADR-014: Multi-vendor furniture marketplace
 
-Status: **Accepted** by the project owner on 2026-11-21 (scope change SC-04). Trello card: none (no furniture board exists; card IDs are not invented). Scope: turning the single-store electronics platform into a multi-vendor furniture marketplace, provisionally named **FurnitureHub**. Baseline before any change: commit `03bb5cc`.
+Status: **Accepted** by the project owner on 2026-11-21 (scope change SC-04). Trello card: none (no furniture board exists; card IDs are not invented). Scope: turning the single-store electronics platform into a multi-vendor furniture marketplace, provisionally named **FurniHub**. Baseline before any change: commit `03bb5cc`.
 
 This ADR records the approved architecture. Each implementation phase (see "Phases") updates it with what was built, the migrations and the tests, and is reviewed by the owner before the next phase starts.
 
@@ -25,7 +25,7 @@ The codebase is a working single-vendor store: every product belongs to "the sho
 13. **Delivery.** The existing platform delivery fee by district (module 12) is kept for the whole order. Per-seller delivery fees are not built.
 14. **Furniture domain.** Categories come from a furniture taxonomy loaded as data (no schema change). Product attributes stay in the existing `specifications` JSONB, guided by a code-defined attribute set per category (dimensions, material, color, style, finish, weight, condition, assembly required; warranty keeps its own field), so no attribute is forced on every product. Brands stay optional ("manufacturer").
 15. **Repurposed features.** Technical services (ADR-013) are reused for furniture services (assembly, installation and related work) with the same tables, endpoints and UI. Quote requests (module 19) are reused for bulk furniture purchasing by offices, hotels, schools and other organizations, without widening the existing implementation.
-16. **Branding.** The provisional name FurnitureHub is held in one place per layer (frontend configuration and messages, backend settings) so a later rename touches configuration, not components. English and Kinyarwanda messages change together.
+16. **Branding.** The provisional name FurniHub is held in one place per layer (frontend configuration and messages, backend settings) so a later rename touches configuration, not components. English and Kinyarwanda messages change together.
 17. **Development data.** The development catalogue is reseeded with furniture products across several demo stores, and the electronics demo data is removed by the existing development-only tooling, which refuses unless `APP_ENV=development` and the database is local. No production or staging data is touched, and no destructive database action runs without confirming the environment.
 
 ## Not built in V1
@@ -44,7 +44,7 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Not started |
 | 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Not started |
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Not started |
-| 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurnitureHub branding (English and Kinyarwanda), furniture seed data | Not started |
+| 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
 
 ## Consequences
 

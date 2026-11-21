@@ -1,5 +1,5 @@
-# FurnitureHub — multi-vendor furniture marketplace
-FurnitureHub (provisional name) is being built from a working single-store electronics platform, cloned from `tsonGroup/rwanda-electronics-ecommerce`. Currency: RWF. Languages: English and Kinyarwanda.
+# FurniHub — multi-vendor furniture marketplace
+FurniHub (provisional name) is being built from a working single-store electronics platform, cloned from `tsonGroup/rwanda-electronics-ecommerce`. Currency: RWF. Languages: English and Kinyarwanda.
 
 **Transformation in progress (SC-04, ADR-014).** The marketplace has customers, sellers (who apply, are approved and run their own store, products, stock and orders) and platform administrators. The work is done in approved phases; see the phase table in [ADR-014](docs/architecture/ADR-014-multi-vendor-marketplace.md). Commit `03bb5cc` is the unmodified electronics baseline. **Until those phases are done, the code still behaves as the single-vendor electronics store this README describes:** seller features, stores and the furniture catalogue do not exist yet.
 
