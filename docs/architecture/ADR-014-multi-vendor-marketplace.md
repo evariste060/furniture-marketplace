@@ -43,7 +43,7 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 2 | `products.store_id`, store-scoped seller product, image and inventory APIs, approved-store catalogue filter, public store endpoints, cross-store isolation tests | Implemented (2026-11-21); see "Phase 2 as built" |
 | 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Built (2026-11-22, owner decisions 2026-11-21); see "Phase 3 as built" |
 | 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Built (2026-11-22); see "Phase 4 as built" |
-| 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Not started |
+| 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Built (2026-11-22); see "Phase 5 as built" |
 | 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
 
 ## Staff roles: SC-05 (2026-11-21)
@@ -186,12 +186,63 @@ Frontend only: no backend route, schema, migration or permission changed. Every 
 ### Not in this phase, and points for the owner
 
 - **Not built:**
-  - the public store page and "Sold by" on cards, the product page and the cart (phase 5), so the dashboard has no "view my store" link yet;
-  - the admin Sellers page (phase 5);
+  - the public store page and "Sold by" on cards, the product page and the cart, and the admin Sellers page (all built in phase 5);
   - seller notifications of new orders: the Orders badge counts orders waiting for the store's confirmation, read when a page loads.
 - **Not run in a browser:** the development database is still before migration `c6e8a0b2d4f7`, which refuses to run while the development orders exist. Seeing the dashboard with data needs the seed cleanup, the upgrade and a reseed on the local development database, which deletes its demo data and needs the owner's go-ahead.
 - **Branding:** the seller dashboard shows the current logo and no marketplace name ("Seller dashboard" in titles); the FurniHub name and logo arrive in phase 6.
 - **Categories and brands:** sellers choose from the public category and brand lists (active ones only). A product whose category was hidden later keeps its category, but the picker cannot show its name to the seller.
+
+## Phase 5 as built (2026-11-22)
+
+Frontend, plus one read-only backend field. No migration, permission, route or business rule changed.
+
+### Backend
+
+- `CartLine.store` (`StoreReference`: id, name, slug) on every cart response, joined from the product's store in `cart_repository.lines`. It is display only: the store is never read from the request, and a line of a store that is no longer approved is already `unavailable` (phase 2). Test: `test_each_line_names_the_store_that_sells_it`. API types regenerated (`frontend/src/lib/api/schema.d.ts`).
+
+### Storefront
+
+- **"Sold by <store>"** (`components/store/sold-by.tsx`) on the product card, the listing card, the product page (under the title), the cart page and the mini cart. The store's name links to its page.
+- **`/store/[slug]`** (`/rw/store/[slug]` in Kinyarwanda):
+  - the store's cover, logo (a store icon when it has none), name, district and description, from `GET /stores/{slug}`;
+  - its products in the existing category listing, filtered by `store=<slug>`, with the same filters, sorting and pages. The listing's base query (`BaseQuery`) gained `store`.
+  - Pending, rejected, suspended and unknown stores are 404, as the API answers; the page never shows contact details, the street address or the owner (the public API does not send them).
+  - There is no stores index page (not in the approved scope).
+
+### Seller dashboard
+
+- A "View my store" button in the top bar opens the store's public page in a new tab.
+
+### Admin: Sellers (`/admin/sellers`, `sellers:read`)
+
+- **Menu:** in the Store group, with a count of pending applications.
+- **List:** stores and applications, newest submission first, filtered by status and searched by store, address, owner name or email (the API's own search). Shows the store, owner (name, email), district, submission and last decision dates, and status.
+- **Detail (`/admin/sellers/[id]`):** the application (slug, about, address, contact email and phone, logo, cover, first approval), the owner's account, the history (who, when, status, reason or note), and for stores that have been approved, the pending and earned totals (read-only; payouts are not built).
+- **Decisions (`sellers:manage`):** exactly the backend's transitions: pending → Approve or Reject; approved → Suspend; suspended → Reinstate. Each is behind a confirmation that says what happens. Rejecting and suspending need a reason of 10 to 500 characters, which the seller sees; approving and reinstating take an optional note kept in the history. A 409 `invalid_store_transition` (another administrator decided first) reloads the store and says so. The view-only state (no `sellers:manage`) shows no buttons and no commission form.
+- **Commission (`sellers:manage`):** the store's effective rate, and an override typed as a percentage with up to two decimals (0 to 100), sent as whole basis points; empty sends null (use the platform default). As the backend already defines, a change applies to orders placed afterwards (the rate is snapshotted at checkout).
+- **Public page link:** "View public page" opens `/store/<slug>` while the store is approved.
+
+### Messages
+
+English and Kinyarwanda together: `store.soldBy`, `store.storePage`, `admin.sellers.*`, `admin.shell.nav.sellers`, `admin.titles.sellers`/`seller`, `admin.seller.shell.viewStore`. The Kinyarwanda is a draft listed in `docs/frontend/rw-review.md` and `rw-review-admin.md`.
+
+### Tests
+
+- Backend: the cart line names its store (plus the existing cart, cart price, plan and security suites, and the PostgreSQL cart test).
+- `frontend/src/features/admin/sellers-admin.test.tsx`:
+  - the allowed decisions, the reason rule and percentage to basis points;
+  - the menu item needs `sellers:read`;
+  - the list filter and the approve, reject (reason required) and 409 flows, with the bodies they send;
+  - Reinstate on a suspended store, the public link only while approved;
+  - setting and clearing the override, the read-only view without `sellers:manage`, and not found.
+- `product-card.test.tsx`: "Sold by" names the store and links to `/store/<slug>`.
+
+### Not in this phase, and points for the owner
+
+- **Not seen in a browser:** the development database is still before migration `c6e8a0b2d4f7` (phase 3), so the store page and the Sellers page have not been run against real data. Upgrading needs the seed cleanup, the upgrade and a reseed of the local development database (it deletes its demo data) and the owner's go-ahead.
+- **Order screens:** the customer's order pages and the admin order detail do not show "Sold by" per line or the stores' parts. Only the cart was in this phase's scope.
+- **The Sellers page** has no owner contact action beyond email and phone links, and no bulk decisions.
+- **Branding:** the store page uses the current storefront frame; furniture taxonomy and FurniHub branding are phase 6.
 
 ## Consequences
 

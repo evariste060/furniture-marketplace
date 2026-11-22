@@ -102,6 +102,18 @@ def test_the_first_add_creates_a_guest_cart_and_shows_the_token_once(client, db)
     assert len(carts(db)) == 1
 
 
+def test_each_line_names_the_store_that_sells_it(client, db):
+    """ADR-014 phase 5: "Sold by" in the cart, from the product's store (never the browser)."""
+    variant = sku(db)
+    _, body = new_guest_cart(client, variant)
+    product = db.get(ProductVariant, uuid.UUID(variant)).product
+    assert body["lines"][0]["store"] == {
+        "id": str(product.store.id),
+        "name": product.store.name,
+        "slug": product.store.slug,
+    }
+
+
 def test_two_guests_without_tokens_get_separate_carts(client, db):
     variant = sku(db)
     first, _ = new_guest_cart(client, variant)

@@ -28,7 +28,8 @@
       "quotes": "Quote requests",
       "messages": "Support",
       "services": "Services",
-      "serviceRequests": "Service requests"
+      "serviceRequests": "Service requests",
+      "sellers": "Sellers"
     },
     "newCount": "{count} new",
     "logout": "Log out",
@@ -1535,7 +1536,9 @@
     "staff": "Staff & roles",
     "brands": "Brands",
     "services": "Services",
-    "serviceRequests": "Service requests"
+    "serviceRequests": "Service requests",
+    "sellers": "Sellers",
+    "seller": "Seller"
   },
   "services": {
     "title": "Services",
@@ -1722,7 +1725,8 @@
         "products": "Products",
         "inventory": "Inventory",
         "store": "Store profile"
-      }
+      },
+      "viewStore": "View my store"
     },
     "titles": {
       "suffix": "Seller dashboard",
@@ -1892,6 +1896,96 @@
         "phone": "Enter a Rwandan mobile number, for example 0788 123 456.",
         "district": "Enter your district."
       }
+    }
+  },
+  "sellers": {
+    "title": "Sellers",
+    "description": "Stores and seller applications. Approve or reject applications, suspend or reinstate stores, and set a store’s commission.",
+    "statusLabel": "Filter by status",
+    "allStatuses": "All",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "suspended": "Suspended"
+    },
+    "searchLabel": "Search stores",
+    "searchPlaceholder": "Store, address, owner name or email",
+    "count": "{count, plural, one {# store} other {# stores}}",
+    "empty": "No seller applications yet.",
+    "emptyFiltered": "No stores match these filters.",
+    "noName": "No name",
+    "columns": {
+      "store": "Store",
+      "owner": "Owner",
+      "district": "District",
+      "submitted": "Submitted",
+      "reviewed": "Last decision",
+      "status": "Status"
+    },
+    "notFound": "This store doesn’t exist.",
+    "back": "All sellers",
+    "submitted": "Submitted {date}",
+    "viewStore": "View public page",
+    "currentReason": "Reason shown to the seller: {reason}",
+    "storeTitle": "Store",
+    "logo": "Store logo",
+    "cover": "Store cover",
+    "ownerTitle": "Owner’s account",
+    "historyTitle": "History",
+    "history": {
+      "when": "When",
+      "status": "Status",
+      "by": "By",
+      "reason": "Reason or note",
+      "owner": "Owner"
+    },
+    "fields": {
+      "slug": "Web address",
+      "description": "About",
+      "address": "Address",
+      "email": "Email",
+      "phone": "Phone",
+      "approved": "First approved",
+      "name": "Name"
+    },
+    "pendingHint": "Confirmed orders not yet delivered and paid.",
+    "earnedHint": "Delivered and paid orders. Payouts are not built yet.",
+    "sellerShare": "Seller’s share",
+    "commission": {
+      "title": "Commission",
+      "inherits": "This store uses the platform default, now {rate}%.",
+      "override": "This store’s own rate: {rate}%.",
+      "label": "Store’s rate (%)",
+      "help": "Up to two decimals, 0 to 100. Leave empty to use the platform default. Applies to orders placed from now on.",
+      "save": "Save rate",
+      "saved": "Commission is now {rate}%",
+      "invalid": "Enter a percentage from 0 to 100, with up to two decimals.",
+      "failed": "We couldn’t save the rate. Try again."
+    },
+    "decide": {
+      "approved": "Approve",
+      "rejected": "Reject",
+      "suspended": "Suspend",
+      "reinstate": "Reinstate"
+    },
+    "confirmTitle": "{action} {store}?",
+    "confirmBody": {
+      "approved": "The store opens: its active products become public and its owner can use the seller dashboard. The owner is emailed.",
+      "rejected": "The owner sees your reason and can change the application and send it again. The owner is emailed.",
+      "suspended": "The store’s products are hidden and stop selling at once, and the owner can’t use the seller dashboard. Orders already placed are not changed. The owner is emailed with your reason.",
+      "reinstate": "The store opens again: its products become public and its owner can use the seller dashboard. The owner is emailed."
+    },
+    "reasonLabel": "Reason",
+    "reasonHelp": "10 to 500 characters. The seller sees it.",
+    "noteLabel": "Note",
+    "noteHelp": "Kept in the history only.",
+    "decided": "{store} is now {status}",
+    "errors": {
+      "required": "Give a reason.",
+      "short": "Write at least 10 characters.",
+      "stale": "This store changed since you opened it. Check its status and try again.",
+      "failed": "We couldn’t save the decision. Try again."
     }
   }
 }

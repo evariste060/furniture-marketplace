@@ -1450,6 +1450,12 @@
         "more": "{count, plural, one {+ # kindi ku rupapuro rw'ibisobanuro} other {+ # ibindi ku rupapuro rw'ibisobanuro}}",
         "noItems": "Reba urupapuro rw'ibisobanuro cyangwa ubaze itsinda ryacu ibyo iyi serivisi ikubiyemo."
       }
+    },
+    "soldBy": {
+      "label": "Bigurishwa na <store></store>"
+    },
+    "storePage": {
+      "location": "Aho iherereye:"
     }
   }
 }

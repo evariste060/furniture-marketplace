@@ -103,7 +103,17 @@ function useNavCounts(): Partial<Record<NavKey, number>> {
         })
       ).data?.total ?? 0,
   });
-  return { orders: orders.data, reviews: reviews.data, quotes: quotes.data, serviceRequests: serviceRequests.data, messages: messages.data };
+  const sellers = useQuery({
+    queryKey: ["admin", "count", "sellers-pending"],
+    enabled: can("sellers:read"),
+    queryFn: async () =>
+      (
+        await browserApi.GET("/api/v1/staff/sellers", {
+          params: { query: { status: "pending", size: 1 } },
+        })
+      ).data?.total ?? 0,
+  });
+  return { sellers: sellers.data, orders: orders.data, reviews: reviews.data, quotes: quotes.data, serviceRequests: serviceRequests.data, messages: messages.data };
 }
 
 /** Orders by number or phone, otherwise products by name, model or SKU (the API's own searches). */

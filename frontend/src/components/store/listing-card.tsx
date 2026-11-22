@@ -10,6 +10,7 @@ import { IMAGE_SIZES } from "@/lib/images";
 import { AddToCartButton } from "./product-actions";
 import { CARD_HOVER, CARD_IMAGE_ZOOM, CARD_TITLE_HOVER, cardData, STOCK } from "./product-card";
 import { RatingStars } from "./rating-stars";
+import { SoldBy } from "./sold-by";
 
 
 /** The photo is sized by the card's inner width (a container query). Below 300px (the 3-column
@@ -40,6 +41,7 @@ export function ListingCard({ product, preload = false }: { product: CatalogProd
             {product.name}
           </Link>
           {variant?.name && <span className="text-cap text-mut">{variant.name}</span>}
+          <SoldBy store={product.store} />
           {product.rating.count > 0 && <RatingStars rating={product.rating} />}
           {variant && (
             <>

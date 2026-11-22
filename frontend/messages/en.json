@@ -1450,6 +1450,12 @@
         "more": "{count, plural, one {+ # more on the details page} other {+ # more on the details page}}",
         "noItems": "See the details page or ask our team what this service includes."
       }
+    },
+    "soldBy": {
+      "label": "Sold by <store></store>"
+    },
+    "storePage": {
+      "location": "Location:"
     }
   }
 }

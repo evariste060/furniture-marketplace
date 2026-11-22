@@ -6,7 +6,7 @@ Every Kinyarwanda string on the storefront is a **draft** until a native speaker
 or "OK" in the last column (or in a review comment) and the developer updates `messages/rw.json`. Banner text comes from
 the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the admin, not here.
 
-1263 strings.
+1265 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -1273,3 +1273,5 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.services.card.showFront` | Back to overview | Subira ku ncamake | |
 | `store.services.card.more` | {count, plural, one {+ # more on the details page} other {+ # more on the details page}} | {count, plural, one {+ # kindi ku rupapuro rw'ibisobanuro} other {+ # ibindi ku rupapuro rw'ibisobanuro}} | |
 | `store.services.card.noItems` | See the details page or ask our team what this service includes. | Reba urupapuro rw'ibisobanuro cyangwa ubaze itsinda ryacu ibyo iyi serivisi ikubiyemo. | |
+| `store.soldBy.label` | Sold by <store></store> | Bigurishwa na <store></store> | |
+| `store.storePage.location` | Location: | Aho iherereye: | |

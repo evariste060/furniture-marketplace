@@ -1,5 +1,6 @@
 "use client";
 
+import { SoldBy } from "@/components/store/sold-by";
 import { ArrowRight, CircleCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
@@ -54,6 +55,7 @@ function MiniCartDrawer({ variantId, onClose }: { variantId: string | null; onCl
             <span className="text-cap text-mut">
               {line.variant_name} · {t("qty", { count: line.quantity })}
             </span>
+            <SoldBy store={line.store} />
             {line.unit_price !== null && <span className="font-semibold text-navy">{formatMoney(line.unit_price)}</span>}
           </span>
         </div>

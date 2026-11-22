@@ -26,7 +26,8 @@ import { bandKey, bandLabel, type PriceBand } from "./price-bands";
 type Filters = ListingFilters;
 /** The page's own fixed filter (Deals: on_sale=true; a category page: its category; a brand
  * page: its brand; search: the text). */
-export type BaseQuery = { on_sale?: boolean; category?: string; brand?: string[]; q?: string };
+/** `store` (ADR-014 phase 5): one approved store's products (/store/[slug]). */
+export type BaseQuery = { on_sale?: boolean; category?: string; brand?: string[]; q?: string; store?: string };
 /** Which choice group comes first: Brand (default) or, on a brand page, Category. */
 export type FirstGroup = "brand" | "category";
 /** On a category page: its main category's subcategories, offered as the first filter group

@@ -91,7 +91,8 @@ function Waiting({ href, Icon, tone, label, hint, value }: { href: string; Icon:
   );
 }
 
-function EarningsCard({ title, hint, bucket }: { title: string; hint: string; bucket: SellerEarnings["pending"] | undefined }) {
+/** A pending or earned total; also on the admin's seller page, where `netLabel` names the share. */
+export function EarningsCard({ title, hint, bucket, netLabel }: { title: string; hint: string; bucket: SellerEarnings["pending"] | undefined; netLabel?: string }) {
   const t = useTranslations("admin.seller.dashboard");
   return (
     <Card padding={24} className="flex flex-col gap-3">
@@ -113,7 +114,7 @@ function EarningsCard({ title, hint, bucket }: { title: string; hint: string; bu
               <dd className="m-0 tabular-nums">−{formatMoney(bucket.commission_amount)}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="font-semibold">{t("net")}</dt>
+              <dt className="font-semibold">{netLabel ?? t("net")}</dt>
               <dd className="m-0 font-semibold tabular-nums">{formatMoney(bucket.seller_net_amount)}</dd>
             </div>
           </dl>

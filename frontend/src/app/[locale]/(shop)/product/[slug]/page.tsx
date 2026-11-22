@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense, type ReactNode } from "react";
 import { ProductCard } from "@/components/store/product-card";
 import { RatingStars } from "@/components/store/rating-stars";
+import { SoldBy } from "@/components/store/sold-by";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -113,6 +114,7 @@ async function ProductContent({ params }: Pick<Props, "params">) {
             </span>
           </div>
           <h1 className="t-h1 max-sm:text-[22px] max-sm:leading-7">{product.name}</h1>
+          <SoldBy store={product.store} className="-mt-3 text-sm max-sm:-mt-2" />
           <div className="flex flex-wrap items-center gap-2 text-sm">
             {rating.count > 0 ? (
               <>

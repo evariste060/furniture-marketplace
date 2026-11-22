@@ -9,7 +9,7 @@ from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
-from app.models import Cart, CartItem, Product, ProductVariant
+from app.models import Cart, CartItem, Product, ProductVariant, Store
 
 GUEST_CART_LIFETIME = timedelta(days=30)  # §7 Q10
 
@@ -25,6 +25,9 @@ class LineRow:
     product_slug: str
     price_at_add: int | None
     product_id: uuid.UUID
+    store_id: uuid.UUID
+    store_name: str
+    store_slug: str
 
 
 def _active(query, *, lock: bool):
@@ -95,9 +98,13 @@ def lines(db: Session, cart_id: uuid.UUID) -> list[LineRow]:
             Product.slug,
             CartItem.price_at_add,
             Product.id,
+            Store.id,
+            Store.name,
+            Store.slug,
         )
         .join(ProductVariant, ProductVariant.id == CartItem.variant_id)
         .join(Product, Product.id == ProductVariant.product_id)
+        .join(Store, Store.id == Product.store_id)
         .where(CartItem.cart_id == cart_id)
         .order_by(CartItem.created_at, CartItem.id)
     ).all()

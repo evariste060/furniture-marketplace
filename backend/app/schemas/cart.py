@@ -10,6 +10,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.schemas.catalog import StoreReference
 from app.schemas.images import PublicImage
 
 MAX_LINE_QUANTITY = 99  # §7 Q10
@@ -74,6 +75,10 @@ class CartLine(BaseModel):
     )
     image: PublicImage | None = Field(
         default=None, description="The variant's first image, else the product's; null if none"
+    )
+    store: StoreReference = Field(
+        description='The store that sells the line ("Sold by", ADR-014 phase 5). Shown for '
+        "every line; a line of a store that is no longer approved is unavailable."
     )
 
 

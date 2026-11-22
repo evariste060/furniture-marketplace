@@ -1,5 +1,6 @@
 "use client";
 
+import { SoldBy } from "@/components/store/sold-by";
 import { ArrowLeft, ArrowRight, Heart, Lock, Minus, Plus, ShoppingCart, Tag, Trash2, TriangleAlert, Truck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
@@ -303,6 +304,7 @@ function LineRow({ line }: { line: CartLine }) {
           {line.product_name}
         </Link>
         <span className="text-cap text-mut sm:text-sm">{line.variant_name}</span>
+        <SoldBy store={line.store} className="sm:text-sm" />
         <span>
           <LineBadge line={line} />
         </span>

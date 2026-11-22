@@ -28,7 +28,8 @@
       "quotes": "Ubusabe bw'ibiciro",
       "messages": "Ubufasha",
       "services": "Serivisi",
-      "serviceRequests": "Ubusabe bwa serivisi"
+      "serviceRequests": "Ubusabe bwa serivisi",
+      "sellers": "Abacuruzi"
     },
     "newCount": "{count} bishya",
     "logout": "Sohoka",
@@ -1535,7 +1536,9 @@
     "staff": "Abakozi n'inshingano",
     "brands": "Ibirango",
     "services": "Serivisi",
-    "serviceRequests": "Ubusabe bwa serivisi"
+    "serviceRequests": "Ubusabe bwa serivisi",
+    "sellers": "Abacuruzi",
+    "seller": "Umucuruzi"
   },
   "services": {
     "title": "Serivisi",
@@ -1722,7 +1725,8 @@
         "products": "Ibicuruzwa",
         "inventory": "Ububiko",
         "store": "Umwirondoro w'iduka"
-      }
+      },
+      "viewStore": "Reba iduka ryanjye"
     },
     "titles": {
       "suffix": "Ubuyobozi bw'umucuruzi",
@@ -1892,6 +1896,96 @@
         "phone": "Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456.",
         "district": "Andika akarere kawe."
       }
+    }
+  },
+  "sellers": {
+    "title": "Abacuruzi",
+    "description": "Amaduka n’ubusabe bwo gucuruza. Emeza cyangwa wange ubusabe, hagarika cyangwa usubizeho iduka, kandi ushyireho komisiyo y’iduka.",
+    "statusLabel": "Shungura ukurikije uko bihagaze",
+    "allStatuses": "Byose",
+    "status": {
+      "pending": "Birategereje",
+      "approved": "Byemejwe",
+      "rejected": "Byanzwe",
+      "suspended": "Byahagaritswe"
+    },
+    "searchLabel": "Shakisha amaduka",
+    "searchPlaceholder": "Iduka, aderesi, izina cyangwa imeri ya nyiraryo",
+    "count": "{count, plural, one {Iduka #} other {Amaduka #}}",
+    "empty": "Nta busabe bwo gucuruza buraboneka.",
+    "emptyFiltered": "Nta maduka ahuye n’ibi washunguye.",
+    "noName": "Nta zina",
+    "columns": {
+      "store": "Iduka",
+      "owner": "Nyiraryo",
+      "district": "Akarere",
+      "submitted": "Ryoherejwe",
+      "reviewed": "Icyemezo cya nyuma",
+      "status": "Uko rihagaze"
+    },
+    "notFound": "Iri duka ntiribaho.",
+    "back": "Abacuruzi bose",
+    "submitted": "Ryoherejwe {date}",
+    "viewStore": "Reba urupapuro rwaryo",
+    "currentReason": "Impamvu umucuruzi abona: {reason}",
+    "storeTitle": "Iduka",
+    "logo": "Ikirango cy’iduka",
+    "cover": "Ifoto y’igifuniko cy’iduka",
+    "ownerTitle": "Konti ya nyiraryo",
+    "historyTitle": "Amateka",
+    "history": {
+      "when": "Igihe",
+      "status": "Uko ryari rihagaze",
+      "by": "Byakozwe na",
+      "reason": "Impamvu cyangwa icyitonderwa",
+      "owner": "Nyiraryo"
+    },
+    "fields": {
+      "slug": "Aderesi kuri interineti",
+      "description": "Ibyerekeye iduka",
+      "address": "Aderesi",
+      "email": "Imeri",
+      "phone": "Telefoni",
+      "approved": "Ryemejwe bwa mbere",
+      "name": "Izina"
+    },
+    "pendingHint": "Ibyemejwe bitaragezwa ku bakiriya ngo byishyurwe.",
+    "earnedHint": "Ibyagejejwe ku bakiriya kandi byishyuwe. Kwishyura abacuruzi ntibirakorwa.",
+    "sellerShare": "Umugabane w’umucuruzi",
+    "commission": {
+      "title": "Komisiyo",
+      "inherits": "Iri duka rikoresha igipimo rusange cy’urubuga, ubu ni {rate}%.",
+      "override": "Igipimo cyihariye cy’iri duka: {rate}%.",
+      "label": "Igipimo cy’iduka (%)",
+      "help": "Kugeza ku mibare ibiri nyuma y’akadomo, kuva kuri 0 kugeza ku 100. Siga ubusa kugira ngo hakoreshwe igipimo rusange. Gikurikizwa ku byatumijwe guhera ubu.",
+      "save": "Bika igipimo",
+      "saved": "Komisiyo ubu ni {rate}%",
+      "invalid": "Andika ijanisha kuva kuri 0 kugeza ku 100, rifite kugeza ku mibare ibiri nyuma y’akadomo.",
+      "failed": "Ntitwashoboye kubika igipimo. Ongera ugerageze."
+    },
+    "decide": {
+      "approved": "Emeza",
+      "rejected": "Wange",
+      "suspended": "Hagarika",
+      "reinstate": "Subizaho"
+    },
+    "confirmTitle": "{action} {store}?",
+    "confirmBody": {
+      "approved": "Iduka rirafunguka: ibicuruzwa byaryo bikora bigaragara ku rubuga kandi nyiraryo agakoresha ikibaho cy’umucuruzi. Nyiraryo yoherezwa imeri.",
+      "rejected": "Nyiraryo abona impamvu yawe kandi ashobora guhindura ubusabe akongera kubwohereza. Nyiraryo yoherezwa imeri.",
+      "suspended": "Ibicuruzwa by’iduka bihita bihishwa kandi ntibicuruzwe, kandi nyiraryo ntashobora gukoresha ikibaho cy’umucuruzi. Ibyamaze gutumizwa ntibihinduka. Nyiraryo yoherezwa imeri irimo impamvu yawe.",
+      "reinstate": "Iduka rirongera rirafunguka: ibicuruzwa byaryo bigaragara ku rubuga kandi nyiraryo agakoresha ikibaho cy’umucuruzi. Nyiraryo yoherezwa imeri."
+    },
+    "reasonLabel": "Impamvu",
+    "reasonHelp": "Inyuguti 10 kugeza kuri 500. Umucuruzi arayibona.",
+    "noteLabel": "Icyitonderwa",
+    "noteHelp": "Kibikwa mu mateka gusa.",
+    "decided": "{store} ubu ni {status}",
+    "errors": {
+      "required": "Tanga impamvu.",
+      "short": "Andika nibura inyuguti 10.",
+      "stale": "Iri duka ryahindutse kuva warifungura. Reba uko rihagaze wongere ugerageze.",
+      "failed": "Ntitwashoboye kubika icyemezo. Ongera ugerageze."
     }
   }
 }

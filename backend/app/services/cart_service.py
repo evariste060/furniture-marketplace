@@ -75,6 +75,7 @@ from app.schemas.cart import (
     CartResponse,
     MergeLine,
 )
+from app.schemas.catalog import StoreReference
 from app.services import promotion_service
 from app.services.audit_service import AuditService
 from app.services.delivery_service import (
@@ -217,6 +218,7 @@ def build_response(
             discount_amount=(shares.get(row.variant_id, 0) if row.variant_id in priced else None),
             previous_unit_price=_previous_price(row, priced),
             image=images.get(row.variant_id),
+            store=StoreReference(id=row.store_id, name=row.store_name, slug=row.store_slug),
         )
         for row in rows
     ]

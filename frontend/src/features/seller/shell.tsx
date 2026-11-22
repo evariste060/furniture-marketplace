@@ -1,12 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Boxes, House, Package, ShoppingCart, Store } from "lucide-react";
+import { Boxes, ExternalLink, House, Package, ShoppingCart, Store } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { CatalogScopeProvider, SELLER_SCOPE } from "@/features/admin/catalog-scope";
-import { PanelShell, type PanelGroup } from "@/features/admin/panel-shell";
+import { PanelShell, TOP_BUTTON, type PanelGroup } from "@/features/admin/panel-shell";
 import { must } from "@/features/admin/ui";
 import { browserApi } from "@/lib/api/client";
 import { SellerStoreProvider, type ClientSellerStore } from "./store-context";
@@ -78,8 +78,16 @@ export function SellerShell({ store, fullName, children }: { store: ClientSeller
           groups={groups}
           person={{ name: fullName || store.name, subtitle: `${t("owner")} · ${store.name}` }}
           cookiePath="/seller"
-          // The public store page (/store/[slug]) is ADR-014 phase 5.
-          topbar={{ start: <b className="truncate text-base font-semibold text-navy">{store.name}</b> }}
+          topbar={{
+            start: <b className="truncate text-base font-semibold text-navy">{store.name}</b>,
+            // The public store page is in the storefront: a new tab, full page load.
+            end: (
+              <a href={`/store/${store.slug}`} target="_blank" rel="noopener" className={TOP_BUTTON}>
+                <ExternalLink size={16} aria-hidden="true" />
+                <span className="max-sm:sr-only">{t("viewStore")}</span>
+              </a>
+            ),
+          }}
         >
           {children}
         </PanelShell>

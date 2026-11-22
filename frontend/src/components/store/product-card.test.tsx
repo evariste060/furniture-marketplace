@@ -29,6 +29,7 @@ function product(variants: { in_stock: boolean; stock_status: string; compare_at
     slug: "tecno-spark-20",
     images: [],
     rating: { average: null, count: 0 },
+    store: { id: "s1", name: "Oak Works", slug: "oak-works" },
     variants: variants.map((v, i) => ({ id: `v${i}`, name: null, price: 295000, compare_at_price: null, images: [], ...v })),
   } as unknown as CatalogProduct;
 }
@@ -58,5 +59,13 @@ describe("ProductCard stock badge", () => {
     unmount();
     renderCard(<ProductCard product={product([{ in_stock: true, stock_status: "in_stock" }])} />);
     expect(screen.queryByText("In Stock")).toBeNull();
+  });
+});
+
+describe("ProductCard Sold by (ADR-014 phase 5)", () => {
+  it("names the product's store and links to its page", () => {
+    renderCard(<ProductCard product={product([{ in_stock: true, stock_status: "in_stock" }])} />);
+    expect(screen.getByText(/Sold by/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Oak Works" })).toHaveAttribute("href", "/store/oak-works");
   });
 });

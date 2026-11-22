@@ -8,6 +8,7 @@ import { formatMoney } from "@/lib/format";
 import { IMAGE_SIZES, primaryImage } from "@/lib/images";
 import { AddToCartButton, WishlistButton } from "./product-actions";
 import { RatingStars } from "./rating-stars";
+import { SoldBy } from "./sold-by";
 
 /** The cards' hover and keyboard-focus lift: the card rises 6px onto a deep shadow with a faint
  * brand glow, its border tints blue, and it presses back down a little when clicked. Hover styles
@@ -93,6 +94,7 @@ export function ProductCard({
           {product.name}
         </Link>
         {variant?.name && <span className="text-cap text-mut">{variant.name}</span>}
+        <SoldBy store={product.store} className="truncate" />
         {/* The empty no-rating row keeps the other cards' lines level; dense cards skip it so the
             price follows the details. */}
         {(!dense || product.rating.count > 0) && <RatingStars rating={product.rating} />}

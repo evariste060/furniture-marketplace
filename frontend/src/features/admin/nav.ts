@@ -1,4 +1,4 @@
-import { Boxes, Building2, ClipboardCheck, CreditCard, FileUp, Headset, History, House, Layers, MapPin, MessageSquare, Package, Settings, ShoppingCart, Tag, Upload, Users, Wrench, type LucideIcon } from "lucide-react";
+import { Boxes, Building2, ClipboardCheck, CreditCard, FileUp, Headset, History, House, Layers, MapPin, MessageSquare, Package, Settings, ShoppingCart, Store, Tag, Upload, Users, Wrench, type LucideIcon } from "lucide-react";
 
 /** The staff permissions the admin checks (backend app/core/roles.py). The backend enforces every
  * one again; the admin only uses them to decide what to show. */
@@ -29,10 +29,12 @@ export type Permission =
   | "support:read"
   | "support:reply"
   | "services:read"
-  | "services:manage";
+  | "services:manage"
+  | "sellers:read"
+  | "sellers:manage";
 
 export type NavKey =
-  "dashboard" | "orders" | "payments" | "quotes" | "serviceRequests" | "messages" | "services" | "products" | "bulkImages" | "categories" | "import" | "inventory" | "reviews" | "delivery" | "promotions" | "staff" | "settings" | "audit";
+  "dashboard" | "orders" | "payments" | "quotes" | "serviceRequests" | "messages" | "services" | "products" | "bulkImages" | "categories" | "import" | "inventory" | "reviews" | "delivery" | "promotions" | "sellers" | "staff" | "settings" | "audit";
 
 export type NavItem = {
   key: NavKey;
@@ -158,6 +160,13 @@ export const NAV: {
         href: "/admin/promotions",
         Icon: Tag,
         anyOf: ["promotions:read"],
+      },
+      {
+        // ADR-014 phase 5: stores and seller applications.
+        key: "sellers",
+        href: "/admin/sellers",
+        Icon: Store,
+        anyOf: ["sellers:read"],
       },
     ],
   },

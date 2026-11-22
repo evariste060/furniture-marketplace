@@ -123,6 +123,18 @@ async function cachedPage(slug: string, lang: "en" | "rw") {
   return data;
 }
 
+/** One approved store's public profile (ADR-014 phase 5); null when there is none: unknown,
+ * pending, rejected and suspended stores all answer 404. Never contact details or the owner. */
+async function cachedStore(slug: string) {
+  "use cache";
+  cacheLife("catalogue");
+  cacheTag("catalogue");
+  const { data, error, response } = await publicApi().GET("/api/v1/stores/{slug}", { params: { path: { slug } } });
+  if (response.status === 404) return null;
+  if (!data) throw ApiError.from(response.status, error);
+  return data;
+}
+
 async function atRequestTime<T>(read: () => Promise<T>): Promise<T> {
   await connection();
   return read();
@@ -162,6 +174,10 @@ export function getProductReviews(slug: string, page = 1, size = 3) {
 
 export function getStoreContact() {
   return atRequestTime(() => cachedStoreContact());
+}
+
+export function getStore(slug: string) {
+  return atRequestTime(() => cachedStore(slug));
 }
 
 export function getPage(slug: string, lang: "en" | "rw") {

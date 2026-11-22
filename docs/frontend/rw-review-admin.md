@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1557 strings.
+1633 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -37,6 +37,7 @@ updates `messages/admin.rw.json`.
 | `shell.nav.messages` | Support | Ubufasha | |
 | `shell.nav.services` | Services | Serivisi | |
 | `shell.nav.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
+| `shell.nav.sellers` | Sellers | Abacuruzi | |
 | `shell.newCount` | {count} new | {count} bishya | |
 | `shell.logout` | Log out | Sohoka | |
 | `shell.openMenu` | Open admin menu | Fungura menu y'ubuyobozi | |
@@ -1273,6 +1274,8 @@ updates `messages/admin.rw.json`.
 | `titles.brands` | Brands | Ibirango | |
 | `titles.services` | Services | Serivisi | |
 | `titles.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
+| `titles.sellers` | Sellers | Abacuruzi | |
+| `titles.seller` | Seller | Umucuruzi | |
 | `services.title` | Services | Serivisi | |
 | `services.description` | The technical services on the store’s Services pages, in their order. Services are not sold online: each one has a request form. | Serivisi za tekiniki ziri ku mpapuro za Serivisi z'iduka, uko zikurikirana. Serivisi ntizigurishwa kuri interineti: buri imwe ifite ifishi y'ubusabe. | |
 | `services.add` | Add service | Ongeraho serivisi | |
@@ -1427,6 +1430,7 @@ updates `messages/admin.rw.json`.
 | `seller.shell.nav.products` | Products | Ibicuruzwa | |
 | `seller.shell.nav.inventory` | Inventory | Ububiko | |
 | `seller.shell.nav.store` | Store profile | Umwirondoro w'iduka | |
+| `seller.shell.viewStore` | View my store | Reba iduka ryanjye | |
 | `seller.titles.suffix` | Seller dashboard | Ubuyobozi bw'umucuruzi | |
 | `seller.titles.dashboard` | Dashboard | Imbonerahamwe | |
 | `seller.titles.orders` | Orders | Amatumiza | |
@@ -1568,3 +1572,75 @@ updates `messages/admin.rw.json`.
 | `seller.store.errors.email` | Enter a valid email address. | Andika email yemewe. | |
 | `seller.store.errors.phone` | Enter a Rwandan mobile number, for example 0788 123 456. | Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456. | |
 | `seller.store.errors.district` | Enter your district. | Andika akarere kawe. | |
+| `sellers.title` | Sellers | Abacuruzi | |
+| `sellers.description` | Stores and seller applications. Approve or reject applications, suspend or reinstate stores, and set a store’s commission. | Amaduka n’ubusabe bwo gucuruza. Emeza cyangwa wange ubusabe, hagarika cyangwa usubizeho iduka, kandi ushyireho komisiyo y’iduka. | |
+| `sellers.statusLabel` | Filter by status | Shungura ukurikije uko bihagaze | |
+| `sellers.allStatuses` | All | Byose | |
+| `sellers.status.pending` | Pending | Birategereje | |
+| `sellers.status.approved` | Approved | Byemejwe | |
+| `sellers.status.rejected` | Rejected | Byanzwe | |
+| `sellers.status.suspended` | Suspended | Byahagaritswe | |
+| `sellers.searchLabel` | Search stores | Shakisha amaduka | |
+| `sellers.searchPlaceholder` | Store, address, owner name or email | Iduka, aderesi, izina cyangwa imeri ya nyiraryo | |
+| `sellers.count` | {count, plural, one {# store} other {# stores}} | {count, plural, one {Iduka #} other {Amaduka #}} | |
+| `sellers.empty` | No seller applications yet. | Nta busabe bwo gucuruza buraboneka. | |
+| `sellers.emptyFiltered` | No stores match these filters. | Nta maduka ahuye n’ibi washunguye. | |
+| `sellers.noName` | No name | Nta zina | |
+| `sellers.columns.store` | Store | Iduka | |
+| `sellers.columns.owner` | Owner | Nyiraryo | |
+| `sellers.columns.district` | District | Akarere | |
+| `sellers.columns.submitted` | Submitted | Ryoherejwe | |
+| `sellers.columns.reviewed` | Last decision | Icyemezo cya nyuma | |
+| `sellers.columns.status` | Status | Uko rihagaze | |
+| `sellers.notFound` | This store doesn’t exist. | Iri duka ntiribaho. | |
+| `sellers.back` | All sellers | Abacuruzi bose | |
+| `sellers.submitted` | Submitted {date} | Ryoherejwe {date} | |
+| `sellers.viewStore` | View public page | Reba urupapuro rwaryo | |
+| `sellers.currentReason` | Reason shown to the seller: {reason} | Impamvu umucuruzi abona: {reason} | |
+| `sellers.storeTitle` | Store | Iduka | |
+| `sellers.logo` | Store logo | Ikirango cy’iduka | |
+| `sellers.cover` | Store cover | Ifoto y’igifuniko cy’iduka | |
+| `sellers.ownerTitle` | Owner’s account | Konti ya nyiraryo | |
+| `sellers.historyTitle` | History | Amateka | |
+| `sellers.history.when` | When | Igihe | |
+| `sellers.history.status` | Status | Uko ryari rihagaze | |
+| `sellers.history.by` | By | Byakozwe na | |
+| `sellers.history.reason` | Reason or note | Impamvu cyangwa icyitonderwa | |
+| `sellers.history.owner` | Owner | Nyiraryo | |
+| `sellers.fields.slug` | Web address | Aderesi kuri interineti | |
+| `sellers.fields.description` | About | Ibyerekeye iduka | |
+| `sellers.fields.address` | Address | Aderesi | |
+| `sellers.fields.email` | Email | Imeri | |
+| `sellers.fields.phone` | Phone | Telefoni | |
+| `sellers.fields.approved` | First approved | Ryemejwe bwa mbere | |
+| `sellers.fields.name` | Name | Izina | |
+| `sellers.pendingHint` | Confirmed orders not yet delivered and paid. | Ibyemejwe bitaragezwa ku bakiriya ngo byishyurwe. | |
+| `sellers.earnedHint` | Delivered and paid orders. Payouts are not built yet. | Ibyagejejwe ku bakiriya kandi byishyuwe. Kwishyura abacuruzi ntibirakorwa. | |
+| `sellers.sellerShare` | Seller’s share | Umugabane w’umucuruzi | |
+| `sellers.commission.title` | Commission | Komisiyo | |
+| `sellers.commission.inherits` | This store uses the platform default, now {rate}%. | Iri duka rikoresha igipimo rusange cy’urubuga, ubu ni {rate}%. | |
+| `sellers.commission.override` | This store’s own rate: {rate}%. | Igipimo cyihariye cy’iri duka: {rate}%. | |
+| `sellers.commission.label` | Store’s rate (%) | Igipimo cy’iduka (%) | |
+| `sellers.commission.help` | Up to two decimals, 0 to 100. Leave empty to use the platform default. Applies to orders placed from now on. | Kugeza ku mibare ibiri nyuma y’akadomo, kuva kuri 0 kugeza ku 100. Siga ubusa kugira ngo hakoreshwe igipimo rusange. Gikurikizwa ku byatumijwe guhera ubu. | |
+| `sellers.commission.save` | Save rate | Bika igipimo | |
+| `sellers.commission.saved` | Commission is now {rate}% | Komisiyo ubu ni {rate}% | |
+| `sellers.commission.invalid` | Enter a percentage from 0 to 100, with up to two decimals. | Andika ijanisha kuva kuri 0 kugeza ku 100, rifite kugeza ku mibare ibiri nyuma y’akadomo. | |
+| `sellers.commission.failed` | We couldn’t save the rate. Try again. | Ntitwashoboye kubika igipimo. Ongera ugerageze. | |
+| `sellers.decide.approved` | Approve | Emeza | |
+| `sellers.decide.rejected` | Reject | Wange | |
+| `sellers.decide.suspended` | Suspend | Hagarika | |
+| `sellers.decide.reinstate` | Reinstate | Subizaho | |
+| `sellers.confirmTitle` | {action} {store}? | {action} {store}? | |
+| `sellers.confirmBody.approved` | The store opens: its active products become public and its owner can use the seller dashboard. The owner is emailed. | Iduka rirafunguka: ibicuruzwa byaryo bikora bigaragara ku rubuga kandi nyiraryo agakoresha ikibaho cy’umucuruzi. Nyiraryo yoherezwa imeri. | |
+| `sellers.confirmBody.rejected` | The owner sees your reason and can change the application and send it again. The owner is emailed. | Nyiraryo abona impamvu yawe kandi ashobora guhindura ubusabe akongera kubwohereza. Nyiraryo yoherezwa imeri. | |
+| `sellers.confirmBody.suspended` | The store’s products are hidden and stop selling at once, and the owner can’t use the seller dashboard. Orders already placed are not changed. The owner is emailed with your reason. | Ibicuruzwa by’iduka bihita bihishwa kandi ntibicuruzwe, kandi nyiraryo ntashobora gukoresha ikibaho cy’umucuruzi. Ibyamaze gutumizwa ntibihinduka. Nyiraryo yoherezwa imeri irimo impamvu yawe. | |
+| `sellers.confirmBody.reinstate` | The store opens again: its products become public and its owner can use the seller dashboard. The owner is emailed. | Iduka rirongera rirafunguka: ibicuruzwa byaryo bigaragara ku rubuga kandi nyiraryo agakoresha ikibaho cy’umucuruzi. Nyiraryo yoherezwa imeri. | |
+| `sellers.reasonLabel` | Reason | Impamvu | |
+| `sellers.reasonHelp` | 10 to 500 characters. The seller sees it. | Inyuguti 10 kugeza kuri 500. Umucuruzi arayibona. | |
+| `sellers.noteLabel` | Note | Icyitonderwa | |
+| `sellers.noteHelp` | Kept in the history only. | Kibikwa mu mateka gusa. | |
+| `sellers.decided` | {store} is now {status} | {store} ubu ni {status} | |
+| `sellers.errors.required` | Give a reason. | Tanga impamvu. | |
+| `sellers.errors.short` | Write at least 10 characters. | Andika nibura inyuguti 10. | |
+| `sellers.errors.stale` | This store changed since you opened it. Check its status and try again. | Iri duka ryahindutse kuva warifungura. Reba uko rihagaze wongere ugerageze. | |
+| `sellers.errors.failed` | We couldn’t save the decision. Try again. | Ntitwashoboye kubika icyemezo. Ongera ugerageze. | |

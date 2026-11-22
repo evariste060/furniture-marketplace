@@ -4147,6 +4147,8 @@ export interface components {
             previous_unit_price?: number | null;
             /** @description The variant's first image, else the product's; null if none */
             image?: components["schemas"]["PublicImage"] | null;
+            /** @description The store that sells the line ("Sold by", ADR-014 phase 5). Shown for every line; a line of a store that is no longer approved is unavailable. */
+            store: components["schemas"]["StoreReference"];
         };
         /** CartMergeResponse */
         CartMergeResponse: {
