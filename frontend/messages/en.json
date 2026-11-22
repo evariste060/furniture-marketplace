@@ -15,14 +15,14 @@
   },
   "hero": {
     "overline": "Many furniture stores, one marketplace",
-    "title": "Power Your World With the Latest Tech",
+    "title": "Furniture for Every Room, From Stores You Trust",
     "subtitle": "Sofas, beds, dining, office and outdoor furniture from Rwanda's trusted furniture stores — delivered across Kigali and all of Rwanda.",
     "shopNow": "Shop Now",
     "viewDeals": "View Deals",
     "fast": "Fast & Reliable",
     "fastSub": "Delivery",
-    "genuine": "Genuine Products",
-    "genuineSub": "With warranty",
+    "genuine": "Approved Stores",
+    "genuineSub": "Checked by our team",
     "support": "Expert Support",
     "supportSub": "Local team",
     "banners": "Banners",
@@ -33,8 +33,8 @@
     "explore": "Explore {category}",
     "viewAll": "View all ({count})",
     "showCategory": "Show {category}",
-    "ourService": "Our technical services",
-    "servicesHeadline": "Technical Services",
+    "ourService": "Our furniture services",
+    "servicesHeadline": "Furniture Services",
     "exploreServices": "Explore services"
   },
   "store": {
@@ -43,8 +43,8 @@
     "announcement": {
       "freeDelivery": "Free delivery in Kigali on orders above {amount}",
       "freeDeliveryShort": "Free delivery in Kigali over {amount}",
-      "genuine": "Genuine products",
-      "warranty": "Warranty on all products",
+      "genuine": "Approved furniture stores",
+      "warranty": "Pay on delivery in Kigali",
       "help": "Need help? Call {phone}"
     },
     "header": {
@@ -88,7 +88,7 @@
       "trackOrder": "Track order",
       "business": "Business & bulk orders",
       "language": "Language",
-      "services": "Technical services"
+      "services": "Furniture services"
     },
     "megaMenu": {
       "browseAll": "Browse all products",
@@ -194,7 +194,7 @@
     },
     "brands": {
       "title": "Brands",
-      "text": "Genuine products from the brands you trust.",
+      "text": "Makers and brands sold by our stores.",
       "products": "{count, plural, one {# product} other {# products}}",
       "empty": "No brands to show yet.",
       "error": "We couldn't load the brands. Please refresh the page."
@@ -277,8 +277,8 @@
       "deliveryFees": "Delivery to {zones}: {min} – {max}. The exact fee is shown at checkout.",
       "deliveryTitle": "Delivery in {zones}",
       "deliveryInfo": "Delivery info",
-      "warrantyTitle": "Manufacturer warranty",
-      "warrantyText": "Genuine stock. Keep your invoice for warranty claims.",
+      "warrantyTitle": "Warranty",
+      "warrantyText": "Each store sets its own warranty. Keep your invoice for warranty claims.",
       "warrantyLink": "Warranty",
       "payTitle": "Pay your way",
       "payText": "MTN MoMo · Airtel Money · Cash on delivery",
@@ -1325,9 +1325,9 @@
       }
     },
     "services": {
-      "metaTitle": "Our Technical Services",
+      "metaTitle": "Our Furniture Services",
       "metaDescription": "Furniture assembly, installation, delivery and setup, upholstery and repair for homes, offices, hotels and schools in Rwanda.",
-      "title": "Our Technical Services",
+      "title": "Our Furniture Services",
       "intro": "Beyond the furniture itself, {marketplace} connects you with trained fitters for assembly, wall mounting, delivery and room setup, upholstery and wood repair — for homes, offices, hotels and schools across Rwanda.",
       "listLabel": "Services",
       "empty": "Our services will be listed here soon. Talk to our team in the meantime.",
@@ -1336,7 +1336,7 @@
       "ctaText": "Tell us about your home, office or institution and we’ll recommend the right solution.",
       "call": "Call us",
       "whatsapp": "WhatsApp us",
-      "whatsappText": "Hello, I would like to ask about your technical services.",
+      "whatsappText": "Hello, I would like to ask about your furniture services.",
       "whatsappServiceText": "Hello, I would like to ask about {service}.",
       "breadcrumbServices": "Services",
       "requestThis": "Request this service",
@@ -1426,10 +1426,10 @@
       "listTitle": "Explore our services",
       "listText": "Choose a service to see what it includes and request it in a few steps.",
       "hero": {
-        "overline": "Technical services",
+        "overline": "Furniture services",
         "explore": "Explore services",
         "talk": "Talk to our team",
-        "count": "{count, plural, one {# service by our own technicians} other {# services by our own technicians}}"
+        "count": "{count, plural, one {# service by trained fitters} other {# services by trained fitters}}"
       },
       "promo": {
         "overline": "Not sure where to start?",
@@ -1439,7 +1439,7 @@
         "whatsapp": "WhatsApp",
         "call": "Call",
         "email": "Email",
-        "emailSubject": "Technical services enquiry"
+        "emailSubject": "Furniture services enquiry"
       },
       "card": {
         "details": "Details",

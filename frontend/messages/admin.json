@@ -1546,7 +1546,7 @@
   },
   "services": {
     "title": "Services",
-    "description": "The technical services on the store’s Services pages, in their order. Services are not sold online: each one has a request form.",
+    "description": "The furniture services on the store’s Services pages, in their order. Services are not sold online: each one has a request form.",
     "add": "Add service",
     "listLabel": "Services",
     "empty": "No services yet. Add the first one.",

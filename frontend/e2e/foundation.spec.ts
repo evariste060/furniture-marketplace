@@ -35,7 +35,7 @@ test("dialog, drawer and toast open, trap focus and close with Escape", async ({
 test("storefront home in English and Kinyarwanda, and the admin placeholder", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Power Your World With the Latest Tech");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Furniture for Every Room, From Stores You Trust");
   await expectAccessible(page);
 
   await page.goto("/rw");

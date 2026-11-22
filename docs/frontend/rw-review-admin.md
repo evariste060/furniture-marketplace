@@ -1281,7 +1281,7 @@ updates `messages/admin.rw.json`.
 | `titles.sellers` | Sellers | Abacuruzi | |
 | `titles.seller` | Seller | Umucuruzi | |
 | `services.title` | Services | Serivisi | |
-| `services.description` | The technical services on the store’s Services pages, in their order. Services are not sold online: each one has a request form. | Serivisi za tekiniki ziri ku mpapuro za Serivisi z'iduka, uko zikurikirana. Serivisi ntizigurishwa kuri interineti: buri imwe ifite ifishi y'ubusabe. | |
+| `services.description` | The furniture services on the store’s Services pages, in their order. Services are not sold online: each one has a request form. | Serivisi z'ibikoresho byo mu nzu ziri ku mpapuro za Serivisi z'iduka, uko zikurikirana. Serivisi ntizigurishwa kuri interineti: buri imwe ifite ifishi y'ubusabe. | |
 | `services.add` | Add service | Ongeraho serivisi | |
 | `services.listLabel` | Services | Serivisi | |
 | `services.empty` | No services yet. Add the first one. | Nta serivisi irahari. Ongeraho iya mbere. | |

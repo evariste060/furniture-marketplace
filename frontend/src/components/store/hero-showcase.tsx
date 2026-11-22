@@ -307,11 +307,12 @@ function ServicesImage({ big }: { big: boolean }) {
   );
 }
 
-/** The hero's background (owner, 2026-11-18): the owner's photo of an electronics store
- * (public/brand/hero-background.jpg) across the full width, served resized by next/image and
- * loaded first with the hero, with a blurred preview while it comes. A light white wash only where
- * the copy is (the left; on phones the top, where the copy runs the full width), so the store
- * stays clearly visible behind the orbit and the products. */
+/** The hero's background (owner, 2026-11-18): public/brand/hero-background.jpg across the full
+ * width. Since ADR-014 phase 6 it is a drawn living room, a placeholder until a FurniHub photo is
+ * approved (the file name and size stay, so replacing it needs no code change). It is served
+ * resized by next/image and loaded first with the hero, with a blurred preview while it comes. A
+ * light white wash only where the copy is (the left; on phones the top, where the copy runs the
+ * full width), so the room stays clearly visible behind the orbit and the products. */
 function HeroBackdrop() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">

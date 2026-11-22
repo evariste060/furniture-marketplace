@@ -45,7 +45,7 @@ const CATEGORIES: ShowcaseCategory[] = [
 function renderShowcase(categories = CATEGORIES, services: ShowcaseServices | null = null) {
   return render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <HeroShowcase categories={categories} services={services} title="Power Your World With the Latest Tech" />
+      <HeroShowcase categories={categories} services={services} title="Furniture for Every Room, From Stores You Trust" />
     </NextIntlClientProvider>,
   );
 }
@@ -71,7 +71,7 @@ describe("HeroShowcase", () => {
   it("shows the first category's best seller in the spotlight with its price, Shop Now and related products", () => {
     renderShowcase();
     const region = hero();
-    expect(within(region).getByRole("heading", { level: 1 })).toHaveTextContent("Power Your World");
+    expect(within(region).getByRole("heading", { level: 1 })).toHaveTextContent("Furniture for Every Room");
     expect(within(region).getByText("Tecno Spark 20")).toBeInTheDocument();
     expect(within(region).getByText(/RWF\s*295,000/)).toBeInTheDocument();
     expect(within(region).getByRole("link", { name: "Shop Now" })).toHaveAttribute("href", "/product/tecno-spark-20");
@@ -179,8 +179,8 @@ describe("HeroShowcase", () => {
     // One place on the orbit for all the services, as for a category.
     expect(angles()).toHaveLength(2);
     fireEvent.click(within(hero()).getByRole("button", { name: "Show Services" }));
-    expect(within(hero()).getByText("Technical Services")).toBeInTheDocument();
-    expect(within(hero()).getByRole("link", { name: "Our technical services" })).toHaveAttribute("href", "/services");
+    expect(within(hero()).getByText("Furniture Services")).toBeInTheDocument();
+    expect(within(hero()).getByRole("link", { name: "Our furniture services" })).toHaveAttribute("href", "/services");
     expect(within(hero()).getByRole("link", { name: "Explore services" })).toHaveAttribute("href", "/services");
     expect(within(hero()).getByRole("link", { name: "View all (6)" })).toHaveAttribute("href", "/services");
     const tiles = within(hero()).getAllByRole("link", { name: /^(CCTV|Gates|Access|IT|Repair|Training)$/ });

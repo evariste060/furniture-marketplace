@@ -21,14 +21,14 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `ui.page` | Page {n} | Urupapuro {n} | |
 | `ui.openMenu` | Open menu | Fungura menu | |
 | `hero.overline` | Many furniture stores, one marketplace | Amaduka menshi y'ibikoresho byo mu nzu, isoko rimwe | |
-| `hero.title` | Power Your World With the Latest Tech | Ikoranabuhanga rigezweho ku buzima bwawe | |
+| `hero.title` | Furniture for Every Room, From Stores You Trust | Ibikoresho byo mu nzu bya buri cyumba, biva mu maduka wizera | |
 | `hero.subtitle` | Sofas, beds, dining, office and outdoor furniture from Rwanda's trusted furniture stores — delivered across Kigali and all of Rwanda. | Intebe, ibitanda, ameza, ibikoresho byo mu biro n'ibyo hanze biva mu maduka y'ibikoresho byo mu nzu yizewe mu Rwanda — bikugezwaho i Kigali no mu Rwanda hose. | |
 | `hero.shopNow` | Shop Now | Gura ubu | |
 | `hero.viewDeals` | View Deals | Reba poromosiyo | |
 | `hero.fast` | Fast & Reliable | Byihuse kandi byizewe | |
 | `hero.fastSub` | Delivery | Kugeza ibicuruzwa | |
-| `hero.genuine` | Genuine Products | Ibicuruzwa by'umwimerere | |
-| `hero.genuineSub` | With warranty | Bifite garanti | |
+| `hero.genuine` | Approved Stores | Amaduka yemejwe | |
+| `hero.genuineSub` | Checked by our team | Yagenzuwe n'itsinda ryacu | |
 | `hero.support` | Expert Support | Ubufasha bw'inzobere | |
 | `hero.supportSub` | Local team | Itsinda ryo mu gihugu | |
 | `hero.banners` | Banners | Amatangazo | |
@@ -39,15 +39,15 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `hero.explore` | Explore {category} | Reba {category} | |
 | `hero.viewAll` | View all ({count}) | Reba byose ({count}) | |
 | `hero.showCategory` | Show {category} | Erekana {category} | |
-| `hero.ourService` | Our technical services | Serivisi zacu za tekiniki | |
-| `hero.servicesHeadline` | Technical Services | Serivisi za tekiniki | |
+| `hero.ourService` | Our furniture services | Serivisi zacu z'ibikoresho byo mu nzu | |
+| `hero.servicesHeadline` | Furniture Services | Serivisi z'ibikoresho byo mu nzu | |
 | `hero.exploreServices` | Explore services | Reba serivisi | |
 | `store.logoAlt` | {marketplace} | {marketplace} | |
 | `store.homeLink` | {marketplace} — home | {marketplace} — ahabanza | |
 | `store.announcement.freeDelivery` | Free delivery in Kigali on orders above {amount} | Kugezwaho ku buntu i Kigali ku byaguzwe birenze {amount} | |
 | `store.announcement.freeDeliveryShort` | Free delivery in Kigali over {amount} | Kugezwaho ku buntu i Kigali hejuru ya {amount} | |
-| `store.announcement.genuine` | Genuine products | Ibicuruzwa by'umwimerere | |
-| `store.announcement.warranty` | Warranty on all products | Garanti ku bicuruzwa byose | |
+| `store.announcement.genuine` | Approved furniture stores | Amaduka y'ibikoresho byo mu nzu yemejwe | |
+| `store.announcement.warranty` | Pay on delivery in Kigali | Ishyura ubigejejweho i Kigali | |
 | `store.announcement.help` | Need help? Call {phone} | Ukeneye ubufasha? Hamagara {phone} | |
 | `store.header.searchLabel` | Search products | Shakisha ibicuruzwa | |
 | `store.header.searchPlaceholder` | Search for sofas, beds, tables, desks… | Shakisha intebe, ibitanda, ameza, ameza y'akazi… | |
@@ -85,7 +85,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.menu.trackOrder` | Track order | Kurikirana ibyo watumije | |
 | `store.menu.business` | Business & bulk orders | Ibigo n'abagura byinshi | |
 | `store.menu.language` | Language | Ururimi | |
-| `store.menu.services` | Technical services | Serivisi za tekiniki | |
+| `store.menu.services` | Furniture services | Serivisi z'ibikoresho byo mu nzu | |
 | `store.megaMenu.browseAll` | Browse all products | Reba ibicuruzwa byose | |
 | `store.megaMenu.bestSellers` | Best sellers | Ibigurwa cyane | |
 | `store.megaMenu.viewAllCount` | View all ({count}) | Reba byose ({count}) | |
@@ -179,7 +179,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.home.brandsCount` | {count, plural, one {# brand available} other {# brands available}} | {count, plural, one {Ikirango # kirahari} other {Ibirango # birahari}} | |
 | `store.home.brandsCountOver` | {count}+ brands available | Ibirango {count}+ birahari | |
 | `store.brands.title` | Brands | Ibirango | |
-| `store.brands.text` | Genuine products from the brands you trust. | Ibicuruzwa by'umwimerere by'ibirango wizera. | |
+| `store.brands.text` | Makers and brands sold by our stores. | Abakora n'ibirango bicuruzwa n'amaduka yacu. | |
 | `store.brands.products` | {count, plural, one {# product} other {# products}} | {count, plural, one {igicuruzwa #} other {ibicuruzwa #}} | |
 | `store.brands.empty` | No brands to show yet. | Nta birango biraboneka. | |
 | `store.brands.error` | We couldn't load the brands. Please refresh the page. | Ntitwashoboye kuzana ibirango. Ongera ufungure urupapuro. | |
@@ -254,8 +254,8 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.productPage.deliveryFees` | Delivery to {zones}: {min} – {max}. The exact fee is shown at checkout. | Kugeza i {zones}: {min} – {max}. Igiciro nyacyo kigaragara mu kwishyura. | |
 | `store.productPage.deliveryTitle` | Delivery in {zones} | Tugeza ibicuruzwa i {zones} | |
 | `store.productPage.deliveryInfo` | Delivery info | Amakuru yo kugeza | |
-| `store.productPage.warrantyTitle` | Manufacturer warranty | Garanti y'uruganda | |
-| `store.productPage.warrantyText` | Genuine stock. Keep your invoice for warranty claims. | Ibicuruzwa by'umwimerere. Bika fagitire yawe kugira ngo ukoreshe garanti. | |
+| `store.productPage.warrantyTitle` | Warranty | Garanti | |
+| `store.productPage.warrantyText` | Each store sets its own warranty. Keep your invoice for warranty claims. | Buri duka rigena garanti yaryo. Bika fagitire yawe kugira ngo ukoreshe garanti. | |
 | `store.productPage.warrantyLink` | Warranty | Garanti | |
 | `store.productPage.payTitle` | Pay your way | Ishyura uko ubishaka | |
 | `store.productPage.payText` | MTN MoMo · Airtel Money · Cash on delivery | MTN MoMo · Airtel Money · Kwishyura ubigejejweho | |
@@ -1164,9 +1164,9 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.support.errors.emailInvalid` | Enter a valid email address. | Andika imeli nyayo. | |
 | `store.support.errors.contactRequired` | Give a phone number or an email address so we can reply. | Tanga nimero ya telefoni cyangwa imeli kugira ngo tugusubize. | |
 | `store.support.errors.invalid` | Check this field. | Genzura iki gice. | |
-| `store.services.metaTitle` | Our Technical Services | Serivisi zacu za tekiniki | |
+| `store.services.metaTitle` | Our Furniture Services | Serivisi zacu z'ibikoresho byo mu nzu | |
 | `store.services.metaDescription` | Furniture assembly, installation, delivery and setup, upholstery and repair for homes, offices, hotels and schools in Rwanda. | Guteranya ibikoresho byo mu nzu, kubishyiraho, kubigeza no kubitunganya, gusana intebe n'ibindi ku ngo, ibiro, amahoteli n'amashuri mu Rwanda. | |
-| `store.services.title` | Our Technical Services | Serivisi zacu za tekiniki | |
+| `store.services.title` | Our Furniture Services | Serivisi zacu z'ibikoresho byo mu nzu | |
 | `store.services.intro` | Beyond the furniture itself, {marketplace} connects you with trained fitters for assembly, wall mounting, delivery and room setup, upholstery and wood repair — for homes, offices, hotels and schools across Rwanda. | Uretse ibikoresho ubwabyo, {marketplace} ikuhuza n'abatekinisiye babihuguriwe bo guteranya, kumanika ku rukuta, kugeza no gutunganya icyumba, gusana intebe n'ibikoresho by'ibiti — ku ngo, ibiro, amahoteli n'amashuri mu Rwanda hose. | |
 | `store.services.listLabel` | Services | Serivisi | |
 | `store.services.empty` | Our services will be listed here soon. Talk to our team in the meantime. | Serivisi zacu zizagaragara hano vuba. Muri icyo gihe, vugana n'itsinda ryacu. | |
@@ -1175,7 +1175,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.services.ctaText` | Tell us about your home, office or institution and we’ll recommend the right solution. | Tubwire iby'urugo rwawe, ibiro cyangwa ikigo, tukugire inama y'igisubizo gikwiye. | |
 | `store.services.call` | Call us | Duhamagare | |
 | `store.services.whatsapp` | WhatsApp us | Twandikire kuri WhatsApp | |
-| `store.services.whatsappText` | Hello, I would like to ask about your technical services. | Muraho, nifuzaga kubaza ibijyanye na serivisi zanyu za tekiniki. | |
+| `store.services.whatsappText` | Hello, I would like to ask about your furniture services. | Muraho, nifuzaga kubaza ibijyanye na serivisi zanyu z'ibikoresho byo mu nzu. | |
 | `store.services.whatsappServiceText` | Hello, I would like to ask about {service}. | Muraho, nifuzaga kubaza ibijyanye na {service}. | |
 | `store.services.breadcrumbServices` | Services | Serivisi | |
 | `store.services.requestThis` | Request this service | Saba iyi serivisi | |
@@ -1254,10 +1254,10 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.services.wizard.moreServices` | See all services | Reba serivisi zose | |
 | `store.services.listTitle` | Explore our services | Reba serivisi zacu | |
 | `store.services.listText` | Choose a service to see what it includes and request it in a few steps. | Hitamo serivisi urebe ibyo ikubiyemo, uyisabe mu ntambwe nke. | |
-| `store.services.hero.overline` | Technical services | Serivisi tekiniki | |
+| `store.services.hero.overline` | Furniture services | Serivisi z'ibikoresho byo mu nzu | |
 | `store.services.hero.explore` | Explore services | Reba serivisi | |
 | `store.services.hero.talk` | Talk to our team | Vugana n'itsinda ryacu | |
-| `store.services.hero.count` | {count, plural, one {# service by our own technicians} other {# services by our own technicians}} | {count, plural, one {Serivisi # itangwa n'abatekinisiye bacu} other {Serivisi # zitangwa n'abatekinisiye bacu}} | |
+| `store.services.hero.count` | {count, plural, one {# service by trained fitters} other {# services by trained fitters}} | {count, plural, one {Serivisi # itangwa n'abatekinisiye babihuguriwe} other {Serivisi # zitangwa n'abatekinisiye babihuguriwe}} | |
 | `store.services.promo.overline` | Not sure where to start? | Ntuzi aho uhera? | |
 | `store.services.promo.title` | Tell us what you need | Tubwire icyo ukeneye | |
 | `store.services.promo.text` | Describe your home, office or site and our team will recommend the right service. | Tubwire iby'inzu yawe, ibiro cyangwa aho ukorera, itsinda ryacu rikugire inama kuri serivisi ikwiriye. | |
@@ -1265,7 +1265,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.services.promo.whatsapp` | WhatsApp | WhatsApp | |
 | `store.services.promo.call` | Call | Hamagara | |
 | `store.services.promo.email` | Email | Imeyili | |
-| `store.services.promo.emailSubject` | Technical services enquiry | Ikibazo ku serivisi za tekiniki | |
+| `store.services.promo.emailSubject` | Furniture services enquiry | Ikibazo ku serivisi z'ibikoresho byo mu nzu | |
 | `store.services.card.details` | Details | Ibisobanuro | |
 | `store.services.card.book` | Book Now | Saba ubu | |
 | `store.services.card.included` | What’s included | Ibikubiyemo | |

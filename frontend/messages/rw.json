@@ -15,14 +15,14 @@
   },
   "hero": {
     "overline": "Amaduka menshi y'ibikoresho byo mu nzu, isoko rimwe",
-    "title": "Ikoranabuhanga rigezweho ku buzima bwawe",
+    "title": "Ibikoresho byo mu nzu bya buri cyumba, biva mu maduka wizera",
     "subtitle": "Intebe, ibitanda, ameza, ibikoresho byo mu biro n'ibyo hanze biva mu maduka y'ibikoresho byo mu nzu yizewe mu Rwanda — bikugezwaho i Kigali no mu Rwanda hose.",
     "shopNow": "Gura ubu",
     "viewDeals": "Reba poromosiyo",
     "fast": "Byihuse kandi byizewe",
     "fastSub": "Kugeza ibicuruzwa",
-    "genuine": "Ibicuruzwa by'umwimerere",
-    "genuineSub": "Bifite garanti",
+    "genuine": "Amaduka yemejwe",
+    "genuineSub": "Yagenzuwe n'itsinda ryacu",
     "support": "Ubufasha bw'inzobere",
     "supportSub": "Itsinda ryo mu gihugu",
     "banners": "Amatangazo",
@@ -33,8 +33,8 @@
     "explore": "Reba {category}",
     "viewAll": "Reba byose ({count})",
     "showCategory": "Erekana {category}",
-    "ourService": "Serivisi zacu za tekiniki",
-    "servicesHeadline": "Serivisi za tekiniki",
+    "ourService": "Serivisi zacu z'ibikoresho byo mu nzu",
+    "servicesHeadline": "Serivisi z'ibikoresho byo mu nzu",
     "exploreServices": "Reba serivisi"
   },
   "store": {
@@ -43,8 +43,8 @@
     "announcement": {
       "freeDelivery": "Kugezwaho ku buntu i Kigali ku byaguzwe birenze {amount}",
       "freeDeliveryShort": "Kugezwaho ku buntu i Kigali hejuru ya {amount}",
-      "genuine": "Ibicuruzwa by'umwimerere",
-      "warranty": "Garanti ku bicuruzwa byose",
+      "genuine": "Amaduka y'ibikoresho byo mu nzu yemejwe",
+      "warranty": "Ishyura ubigejejweho i Kigali",
       "help": "Ukeneye ubufasha? Hamagara {phone}"
     },
     "header": {
@@ -88,7 +88,7 @@
       "trackOrder": "Kurikirana ibyo watumije",
       "business": "Ibigo n'abagura byinshi",
       "language": "Ururimi",
-      "services": "Serivisi za tekiniki"
+      "services": "Serivisi z'ibikoresho byo mu nzu"
     },
     "megaMenu": {
       "browseAll": "Reba ibicuruzwa byose",
@@ -194,7 +194,7 @@
     },
     "brands": {
       "title": "Ibirango",
-      "text": "Ibicuruzwa by'umwimerere by'ibirango wizera.",
+      "text": "Abakora n'ibirango bicuruzwa n'amaduka yacu.",
       "products": "{count, plural, one {igicuruzwa #} other {ibicuruzwa #}}",
       "empty": "Nta birango biraboneka.",
       "error": "Ntitwashoboye kuzana ibirango. Ongera ufungure urupapuro."
@@ -277,8 +277,8 @@
       "deliveryFees": "Kugeza i {zones}: {min} – {max}. Igiciro nyacyo kigaragara mu kwishyura.",
       "deliveryTitle": "Tugeza ibicuruzwa i {zones}",
       "deliveryInfo": "Amakuru yo kugeza",
-      "warrantyTitle": "Garanti y'uruganda",
-      "warrantyText": "Ibicuruzwa by'umwimerere. Bika fagitire yawe kugira ngo ukoreshe garanti.",
+      "warrantyTitle": "Garanti",
+      "warrantyText": "Buri duka rigena garanti yaryo. Bika fagitire yawe kugira ngo ukoreshe garanti.",
       "warrantyLink": "Garanti",
       "payTitle": "Ishyura uko ubishaka",
       "payText": "MTN MoMo · Airtel Money · Kwishyura ubigejejweho",
@@ -1325,9 +1325,9 @@
       }
     },
     "services": {
-      "metaTitle": "Serivisi zacu za tekiniki",
+      "metaTitle": "Serivisi zacu z'ibikoresho byo mu nzu",
       "metaDescription": "Guteranya ibikoresho byo mu nzu, kubishyiraho, kubigeza no kubitunganya, gusana intebe n'ibindi ku ngo, ibiro, amahoteli n'amashuri mu Rwanda.",
-      "title": "Serivisi zacu za tekiniki",
+      "title": "Serivisi zacu z'ibikoresho byo mu nzu",
       "intro": "Uretse ibikoresho ubwabyo, {marketplace} ikuhuza n'abatekinisiye babihuguriwe bo guteranya, kumanika ku rukuta, kugeza no gutunganya icyumba, gusana intebe n'ibikoresho by'ibiti — ku ngo, ibiro, amahoteli n'amashuri mu Rwanda hose.",
       "listLabel": "Serivisi",
       "empty": "Serivisi zacu zizagaragara hano vuba. Muri icyo gihe, vugana n'itsinda ryacu.",
@@ -1336,7 +1336,7 @@
       "ctaText": "Tubwire iby'urugo rwawe, ibiro cyangwa ikigo, tukugire inama y'igisubizo gikwiye.",
       "call": "Duhamagare",
       "whatsapp": "Twandikire kuri WhatsApp",
-      "whatsappText": "Muraho, nifuzaga kubaza ibijyanye na serivisi zanyu za tekiniki.",
+      "whatsappText": "Muraho, nifuzaga kubaza ibijyanye na serivisi zanyu z'ibikoresho byo mu nzu.",
       "whatsappServiceText": "Muraho, nifuzaga kubaza ibijyanye na {service}.",
       "breadcrumbServices": "Serivisi",
       "requestThis": "Saba iyi serivisi",
@@ -1426,10 +1426,10 @@
       "listTitle": "Reba serivisi zacu",
       "listText": "Hitamo serivisi urebe ibyo ikubiyemo, uyisabe mu ntambwe nke.",
       "hero": {
-        "overline": "Serivisi tekiniki",
+        "overline": "Serivisi z'ibikoresho byo mu nzu",
         "explore": "Reba serivisi",
         "talk": "Vugana n'itsinda ryacu",
-        "count": "{count, plural, one {Serivisi # itangwa n'abatekinisiye bacu} other {Serivisi # zitangwa n'abatekinisiye bacu}}"
+        "count": "{count, plural, one {Serivisi # itangwa n'abatekinisiye babihuguriwe} other {Serivisi # zitangwa n'abatekinisiye babihuguriwe}}"
       },
       "promo": {
         "overline": "Ntuzi aho uhera?",
@@ -1439,7 +1439,7 @@
         "whatsapp": "WhatsApp",
         "call": "Hamagara",
         "email": "Imeyili",
-        "emailSubject": "Ikibazo ku serivisi za tekiniki"
+        "emailSubject": "Ikibazo ku serivisi z'ibikoresho byo mu nzu"
       },
       "card": {
         "details": "Ibisobanuro",
