@@ -33,6 +33,7 @@ from app.core.roles import Permission
 from app.db.session import get_db
 from app.models.identity import User
 from app.schemas.pagination import DEFAULT_PAGE_SIZE, Page
+from app.schemas.seller_orders import SellerEarningsResponse
 from app.schemas.stores import (
     SellerStoreResponse,
     StaffStoreDetail,
@@ -43,6 +44,7 @@ from app.schemas.stores import (
     StoreStatus,
     StoreStatusRequest,
 )
+from app.services.seller_order_service import earnings
 from app.services.store_service import (
     StoreService,
     seller_response,
@@ -212,6 +214,22 @@ def list_sellers(
 )
 def read_seller(store_id: uuid.UUID, _: SellerReader, db: Db) -> StaffStoreDetail:
     return staff_detail(db, StoreService.staff_get(db, store_id))
+
+
+@staff_router.get(
+    "/{store_id}/earnings",
+    response_model=SellerEarningsResponse,
+    summary="A store's earnings and commission",
+    description=(
+        "Requires 'sellers:read' (administrator). The store's pending and earned totals "
+        "(merchandise, platform commission, seller net), computed from its seller orders as the "
+        "seller sees them (ADR-014 phase 3). Payouts are not built. Read-only."
+    ),
+    responses={**GUARDED, **STORE_404, **VALIDATION_422},
+)
+def read_seller_earnings(store_id: uuid.UUID, _: SellerReader, db: Db) -> SellerEarningsResponse:
+    StoreService.staff_get(db, store_id)  # 404 store_not_found
+    return earnings(db, store_id)
 
 
 @staff_router.patch(

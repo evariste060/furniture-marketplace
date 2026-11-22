@@ -122,6 +122,14 @@
       "airtel_money": "Airtel Money",
       "card": "Card",
       "cash_on_delivery": "Cash on delivery"
+    },
+    "sellerOrder": {
+      "pending": "Waiting for the store",
+      "confirmed": "Confirmed by the store",
+      "processing": "Packing",
+      "dispatched": "Out for delivery",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
     }
   },
   "dashboard": {
@@ -261,17 +269,9 @@
     "cancelReason": "Reason",
     "cancelConfirm": "Cancel order",
     "keep": "Keep order",
-    "nextStep": "Next step: mark as {status}",
-    "nextHint": "Only allowed next statuses are shown.",
     "done": "This order is {status}. No further steps.",
-    "mark": "Mark as {status}",
     "statusChanged": "Order marked as {status}",
     "transitionConflict": "The order changed in the meantime, or its stock or payment doesn’t allow this step. Reload and try again.",
-    "assign": "Assign",
-    "assignLabel": "Assigned to",
-    "assignNone": "Not assigned",
-    "assignChoose": "Choose staff…",
-    "assigned": "Order assigned to {name}",
     "items": "Items",
     "columns": {
       "product": "Product",
@@ -306,7 +306,14 @@
     "noPayment": "No payment yet.",
     "notFound": "Order not found",
     "notFoundBody": "This order doesn’t exist or the link is wrong.",
-    "back": "Back to orders"
+    "back": "Back to orders",
+    "soldBy": "Sold by {store}",
+    "sellerOrders": {
+      "title": "Stores in this order ({count})",
+      "hint": "Each store confirms, packs, dispatches and delivers its own part; the order’s status follows the stores.",
+      "merchandise": "Goods",
+      "commission": "Commission {rate}%"
+    }
   },
   "payments": {
     "title": "Payments",

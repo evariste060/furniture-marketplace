@@ -28,6 +28,7 @@ from tests.integration.test_checkout_api import (  # noqa: F401
 from tests.integration.test_reviews_api import admin_link, delivered_item, submit
 from tests.integration.test_settings_content_api import QUOTE, QUOTES
 from tests.support.messages import ScriptedProvider
+from tests.support.seller_orders import step
 
 SITE = "https://shop.example.rw"
 GUEST_EMAIL = "aline@example.rw"
@@ -139,8 +140,7 @@ def test_status_changes_and_cash_on_delivery_payment_are_emailed(
     order, _, _ = guest_order(client, db)
     h = admin_auth["headers"]
     for status in ("confirmed", "processing", "dispatched", "delivered"):
-        res = client.patch(f"{STAFF}/{order['id']}/status", json={"status": status}, headers=h)
-        assert res.status_code == 200, res.text
+        step(client, order["id"], status, h)  # the store moves its order (ADR-014 phase 3)
     customer = [r for r in rows(db) if r.recipient == GUEST_EMAIL]
     assert [r.event for r in customer] == [
         "received",

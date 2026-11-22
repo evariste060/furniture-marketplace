@@ -6,7 +6,7 @@ Every Kinyarwanda string on the storefront is a **draft** until a native speaker
 or "OK" in the last column (or in a review comment) and the developer updates `messages/rw.json`. Banner text comes from
 the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the admin, not here.
 
-1223 strings.
+1224 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -582,6 +582,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.order.loadFailedTitle` | We couldn't load your order | Ntitwashoboye kubona ibyo watumije | |
 | `store.order.loadFailedText` | Check your connection and try again. | Suzuma interineti yawe wongere ugerageze. | |
 | `store.order.retry` | Try again | Ongera ugerageze | |
+| `store.order.soldBy` | Sold by {store} | Bigurishwa na {store} | |
 | `store.auth.loginMeta` | Sign in | Injira | |
 | `store.auth.registerMeta` | Create your account | Fungura konti yawe | |
 | `store.auth.forgotMeta` | Forgot password | Wibagiwe ijambo ry'ibanga | |

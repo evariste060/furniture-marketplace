@@ -122,6 +122,14 @@
       "airtel_money": "Airtel Money",
       "card": "Ikarita",
       "cash_on_delivery": "Kwishyura ubigejejweho"
+    },
+    "sellerOrder": {
+      "pending": "Ritegereje iduka",
+      "confirmed": "Ryemejwe n'iduka",
+      "processing": "Riri gupakirwa",
+      "dispatched": "Riri mu nzira",
+      "delivered": "Ryagejejwe",
+      "cancelled": "Ryahagaritswe"
     }
   },
   "dashboard": {
@@ -261,17 +269,9 @@
     "cancelReason": "Impamvu",
     "cancelConfirm": "Hagarika itumiza",
     "keep": "Gumana itumiza",
-    "nextStep": "Intambwe ikurikira: shyira kuri {status}",
-    "nextHint": "Herekanwa gusa intambwe zemewe zikurikira.",
     "done": "Iri tumiza ni {status}. Nta yindi ntambwe isigaye.",
-    "mark": "Shyira kuri {status}",
     "statusChanged": "Itumiza ryashyizwe kuri {status}",
     "transitionConflict": "Itumiza ryahindutse hagati aho, cyangwa ububiko cyangwa ubwishyu bwaryo ntibwemera iyi ntambwe. Ongera ufungure urupapuro wongere ugerageze.",
-    "assign": "Shinga",
-    "assignLabel": "Ushinzwe",
-    "assignNone": "Nta ushinzwe",
-    "assignChoose": "Hitamo umukozi…",
-    "assigned": "Itumiza ryashinzwe {name}",
     "items": "Ibicuruzwa",
     "columns": {
       "product": "Igicuruzwa",
@@ -306,7 +306,14 @@
     "noPayment": "Nta bwishyu buraba.",
     "notFound": "Itumiza ntiryabonetse",
     "notFoundBody": "Iri tumiza ntiribaho cyangwa ihuza ntiriri byo.",
-    "back": "Subira ku matumiza"
+    "back": "Subira ku matumiza",
+    "soldBy": "Bigurishwa na {store}",
+    "sellerOrders": {
+      "title": "Amaduka ari muri iri tumiza ({count})",
+      "hint": "Buri duka ryemeza, ripakira, ryohereza kandi rigeza igice cyaryo; uko itumiza rihagaze bikurikira amaduka.",
+      "merchandise": "Ibicuruzwa",
+      "commission": "Komisiyo {rate}%"
+    }
   },
   "payments": {
     "title": "Ubwishyu",

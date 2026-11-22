@@ -18,6 +18,7 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import get_settings
+from app.core.dependencies import SellerContext
 from app.core.request_context import RequestContext
 from app.db.transaction import atomic
 from app.integrations.notifications import (
@@ -27,8 +28,7 @@ from app.integrations.notifications import (
     get_notification_provider,
 )
 from app.main import app
-from app.models import NotificationLog, Order
-from app.models.identity import User
+from app.models import NotificationLog, Order, Store
 from app.models.operations import AuditRecord
 from app.services import checkout_service, notification_service
 from app.services.inventory import expire_due_reservations
@@ -41,7 +41,7 @@ from app.services.notification_service import (
     record_order_event,
     sanitise_error,
 )
-from app.services.order_service import OrderService
+from app.services.seller_order_service import SellerOrderService
 from tests.integration.test_cart_api import code
 from tests.integration.test_checkout_api import (  # noqa: F401
     STAFF,
@@ -52,6 +52,7 @@ from tests.integration.test_checkout_api import (  # noqa: F401
 from tests.integration.test_checkout_api import placed as place_order
 from tests.support.commerce import wait_until_due
 from tests.support.messages import ScriptedProvider
+from tests.support.seller_orders import order_move, seller_orders
 
 NOTIFICATIONS = "/api/v1/staff/notifications"
 PHONE = "+250788123456"  # tests.integration.test_checkout_api.INLINE, canonical
@@ -97,7 +98,8 @@ def placed(client, db: Session, admin_auth, **options) -> tuple[dict, str]:
 
 
 def move(client, order_id: str, status: str, headers: dict):
-    return client.patch(f"{STAFF}/{order_id}/status", json={"status": status}, headers=headers)
+    """ADR-014 phase 3: the store moves its order; only `cancelled` is the administrator's."""
+    return order_move(client, order_id, status, headers)
 
 
 def logs(db: Session, order_id: str | uuid.UUID | None = None) -> list[NotificationLog]:
@@ -233,11 +235,12 @@ def test_a_rolled_back_order_change_records_and_sends_nothing(
         return real(*args, **kwargs)
 
     monkeypatch.setattr(order_service.AuditService, "log_event", staticmethod(failing))
-    actor = db.get(User, admin_auth["user"].id)
-    assert actor is not None
-    with pytest.raises(RuntimeError):
-        OrderService.change_status(
-            db, order_id=uuid.UUID(order["id"]), actor=actor, new_status="confirmed", ctx=CTX
+    [row] = seller_orders(db, order["id"])
+    store = db.get(Store, row.store_id)
+    assert store is not None
+    with pytest.raises(RuntimeError):  # the store confirms; the order's confirmation fails
+        SellerOrderService.change_status(
+            db, SellerContext(user=store.owner, store=store), row.id, "confirmed", CTX
         )
     [recorded] = notification_service.take_recorded_ids(db)  # it was inserted, then rolled back
     assert deliver(sessionmaker(bind=db.get_bind()), notify, ids=[recorded]).claimed == 0

@@ -2628,7 +2628,7 @@ export interface paths {
         };
         /**
          * List orders
-         * @description Requires 'orders:read' (every staff role). Newest first, with the customer's name and phone. `from` and `to` bound the creation time (inclusive); `payment_status` and `payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number (any accepted format; matches the order's phone) or part of an order number.
+         * @description Requires 'orders:read' (every staff role). Newest first, with the customer's name and phone. `from` and `to` bound the creation time (inclusive); `payment_status` and `payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number (any accepted format; matches the order's phone) or part of an order number. `store_id` keeps orders with a line from that store (ADR-014 phase 3).
          */
         get: operations["list_staff_orders_api_v1_staff_orders_get"];
         put?: never;
@@ -2693,8 +2693,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Advance an order status
-         * @description Requires 'orders:fulfil' (administrator). A valid transition, status history row and audit event commit atomically; the optional `reason` is kept in both. Dispatch consumes committed inventory; cancellation (allowed only before dispatch) releases active holds and the promotion use and cancels an unpaid payment. Confirming a cash-on-delivery order commits its stock (§7 Q13); delivering it marks the payment succeeded (Q14). Committed stock is never released by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409. A move to confirmed, dispatched, delivered or cancelled records the customer's SMS or email notification with the change and sends it after the response (module 17); a notification failure never fails the change.
+         * Cancel an order
+         * @description Requires 'orders:fulfil' (administrator). ADR-014 phase 3 (owner decision 2): sellers run fulfilment and the order's confirmed, processing, dispatched and delivered follow its stores' seller orders, so the only status staff can set is `cancelled`; any other answers 409 order_status_follows_seller_orders. Cancellation, its status history row and audit event commit atomically; it releases active holds and the promotion use, cancels an unpaid payment and every seller order. Committed stock is never released by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409 inventory_conflict. The customer's notification is recorded with the change and sent after the response (module 17).
          */
         patch: operations["change_order_status_api_v1_staff_orders__order_id__status_patch"];
         trace?: never;
@@ -3039,6 +3039,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/staff/sellers/{store_id}/earnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A store's earnings and commission
+         * @description Requires 'sellers:read' (administrator). The store's pending and earned totals (merchandise, platform commission, seller net), computed from its seller orders as the seller sees them (ADR-014 phase 3). Payouts are not built. Read-only.
+         */
+        get: operations["read_seller_earnings_api_v1_staff_sellers__store_id__earnings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/staff/sellers/{store_id}/status": {
         parameters: {
             query?: never;
@@ -3077,6 +3097,86 @@ export interface paths {
          * @description Requires 'sellers:manage' (administrator). Whole basis points 0-10000 (1000 = 10%), or null to inherit the platform default (setting marketplace.default_commission_bps). Audited as 'store.commission_change'; setting the current value changes nothing.
          */
         patch: operations["change_seller_commission_api_v1_staff_sellers__store_id__commission_patch"];
+        trace?: never;
+    };
+    "/api/v1/seller/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My store's orders
+         * @description Approved sellers only; your own store's part of each order. Newest first. Cash-on-delivery orders appear when placed (yours to confirm); mobile-money orders once paid. `status` filters your order's status; `q` is part of an order number. Each read is audited (seller_order.read).
+         */
+        get: operations["list_my_orders_api_v1_seller_orders_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/orders/{seller_order_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of my store's orders
+         * @description Approved sellers only; your own store's part of each order. Your lines and amounts, the recipient's name and phone, the delivery address, the payment method and status, and your order's history. Never the customer's email or account, other stores' lines, the order total, delivery fee or discount code.
+         */
+        get: operations["get_my_order_api_v1_seller_orders__seller_order_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/seller/orders/{seller_order_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Move my order to its next status
+         * @description Approved sellers only; your own store's part of each order. One step at a time: confirmed, processing, dispatched, delivered. Confirming needs a pending cash-on-delivery payment or a succeeded one; when every store has confirmed, the order is confirmed (for cash on delivery this commits its stock). Processing starts once the order is confirmed. Dispatching issues your SKUs' stock. The order is dispatched when every store has dispatched and delivered when every store has delivered (cash on delivery: the payment is then recorded and the invoice issued). Sellers cannot cancel; the body refuses any other field (422).
+         */
+        patch: operations["change_my_order_status_api_v1_seller_orders__seller_order_id__status_patch"];
+        trace?: never;
+    };
+    "/api/v1/seller/earnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My store's earnings
+         * @description Approved sellers only; your own store's part of each order. Totals of your confirmed orders: pending (not yet delivered and paid) and earned (delivered, order paid), each with merchandise, commission and net amounts. Payouts are not built: earned is owed by the platform, not paid.
+         */
+        get: operations["get_my_earnings_api_v1_seller_earnings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/seller/products": {
@@ -4726,6 +4826,17 @@ export interface components {
              */
             is_active?: boolean | null;
         };
+        /** EarningsBucket */
+        EarningsBucket: {
+            /** Orders */
+            orders: number;
+            /** Merchandise Total */
+            merchandise_total: number;
+            /** Commission Amount */
+            commission_amount: number;
+            /** Seller Net Amount */
+            seller_net_amount: number;
+        };
         /** ErrorBody */
         ErrorBody: {
             /**
@@ -5725,6 +5836,11 @@ export interface components {
              * @description The order item; reviews are requested per item
              */
             id: string;
+            /**
+             * Store Name
+             * @description The selling store's name at checkout (ADR-014)
+             */
+            store_name: string;
             /** Sku */
             sku: string;
             /** Product Name */
@@ -6053,6 +6169,26 @@ export interface components {
         Page_PublicStoreResponse_: {
             /** Items */
             items: components["schemas"]["PublicStoreResponse"][];
+            /**
+             * Total
+             * @description Number of items matching the filters
+             */
+            total: number;
+            /**
+             * Page
+             * @description Page number, starting at 1
+             */
+            page: number;
+            /**
+             * Size
+             * @description Requested page size
+             */
+            size: number;
+        };
+        /** Page[SellerOrderSummary] */
+        Page_SellerOrderSummary_: {
+            /** Items */
+            items: components["schemas"]["SellerOrderSummary"][];
             /**
              * Total
              * @description Number of items matching the filters
@@ -7418,6 +7554,231 @@ export interface components {
             periods: components["schemas"]["SalesPeriod"][];
             totals: components["schemas"]["SalesFigures"];
         };
+        /** SellerDeliveryAddress */
+        SellerDeliveryAddress: {
+            /** Province */
+            province?: string | null;
+            /** District */
+            district?: string | null;
+            /** Sector */
+            sector?: string | null;
+            /** Cell */
+            cell?: string | null;
+            /** Village */
+            village?: string | null;
+            /** Street Address */
+            street_address?: string | null;
+            /** Delivery Instructions */
+            delivery_instructions?: string | null;
+            /** Country Code */
+            country_code?: string | null;
+        };
+        /**
+         * SellerEarningsResponse
+         * @description Computed from seller orders; payouts are not built, so `earned` is owed by the
+         *     platform, not paid.
+         */
+        SellerEarningsResponse: {
+            /**
+             * Store Id
+             * Format: uuid
+             */
+            store_id: string;
+            /**
+             * Currency Code
+             * @default RWF
+             * @constant
+             */
+            currency_code: "RWF";
+            /** @description Seller orders confirmed and not yet earned (not delivered and paid) */
+            pending: components["schemas"]["EarningsBucket"];
+            /** @description Delivered seller orders whose order payment succeeded */
+            earned: components["schemas"]["EarningsBucket"];
+        };
+        /** SellerOrderDetail */
+        SellerOrderDetail: {
+            /** Subtotal */
+            subtotal: number;
+            /**
+             * Discount Total
+             * @description Your share of the order discount
+             */
+            discount_total: number;
+            /**
+             * Merchandise Total
+             * @description subtotal - discount_total; the commission base
+             */
+            merchandise_total: number;
+            /**
+             * Commission Rate Bps
+             * @description Snapshot at checkout, in basis points
+             */
+            commission_rate_bps: number;
+            /** Commission Amount */
+            commission_amount: number;
+            /**
+             * Seller Net Amount
+             * @description merchandise_total - commission_amount
+             */
+            seller_net_amount: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Order Number */
+            order_number: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled";
+            /**
+             * Order Status
+             * @description The whole order's status
+             * @enum {string}
+             */
+            order_status: "received" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled";
+            /** Payment Method */
+            payment_method: ("mtn_momo" | "airtel_money" | "card" | "cash_on_delivery") | null;
+            /** Payment Status */
+            payment_status: ("created" | "pending" | "succeeded" | "failed" | "cancelled" | "expired" | "refunded" | "partially_refunded") | null;
+            /** Units */
+            units: number;
+            /** Recipient Name */
+            recipient_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recipient Phone */
+            recipient_phone: string;
+            /** Delivery Zone */
+            delivery_zone: string | null;
+            delivery_address: components["schemas"]["SellerDeliveryAddress"];
+            /** Lines */
+            lines: components["schemas"]["SellerOrderLine"][];
+            /** Status History */
+            status_history: components["schemas"]["SellerOrderHistoryEntry"][];
+        };
+        /** SellerOrderHistoryEntry */
+        SellerOrderHistoryEntry: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled";
+            /** Reason */
+            reason: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** SellerOrderLine */
+        SellerOrderLine: {
+            /** Sku */
+            sku: string;
+            /** Product Name */
+            product_name: string;
+            /** Variant Name */
+            variant_name: string | null;
+            /** Quantity */
+            quantity: number;
+            /**
+             * Unit Price
+             * @description Whole RWF, VAT-inclusive, at checkout
+             */
+            unit_price: number;
+            /** Line Subtotal */
+            line_subtotal: number;
+            /**
+             * Discount Amount
+             * @description This line's share of the order discount
+             */
+            discount_amount: number;
+            /** Line Total */
+            line_total: number;
+        };
+        /** SellerOrderStatusRequest */
+        SellerOrderStatusRequest: {
+            /**
+             * Status
+             * @description The next step of your order: confirmed, processing, dispatched, delivered
+             * @enum {string}
+             */
+            status: "confirmed" | "processing" | "dispatched" | "delivered";
+            /**
+             * Reason
+             * @description Optional; kept in the history and the audit record
+             */
+            reason?: string | null;
+        };
+        /** SellerOrderSummary */
+        SellerOrderSummary: {
+            /** Subtotal */
+            subtotal: number;
+            /**
+             * Discount Total
+             * @description Your share of the order discount
+             */
+            discount_total: number;
+            /**
+             * Merchandise Total
+             * @description subtotal - discount_total; the commission base
+             */
+            merchandise_total: number;
+            /**
+             * Commission Rate Bps
+             * @description Snapshot at checkout, in basis points
+             */
+            commission_rate_bps: number;
+            /** Commission Amount */
+            commission_amount: number;
+            /**
+             * Seller Net Amount
+             * @description merchandise_total - commission_amount
+             */
+            seller_net_amount: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Order Number */
+            order_number: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled";
+            /**
+             * Order Status
+             * @description The whole order's status
+             * @enum {string}
+             */
+            order_status: "received" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled";
+            /** Payment Method */
+            payment_method: ("mtn_momo" | "airtel_money" | "card" | "cash_on_delivery") | null;
+            /** Payment Status */
+            payment_status: ("created" | "pending" | "succeeded" | "failed" | "cancelled" | "expired" | "refunded" | "partially_refunded") | null;
+            /** Units */
+            units: number;
+            /** Recipient Name */
+            recipient_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /**
          * SellerProductCreateRequest
          * @description A seller's new product (ADR-014 phase 2). The store is always the seller's own, taken
@@ -8207,6 +8568,11 @@ export interface components {
              * @description Every payment attempt, oldest first
              */
             payments: components["schemas"]["StaffPaymentResponse"][];
+            /**
+             * Seller Orders
+             * @description Each store's part of the order (ADR-014 phase 3), read-only for staff
+             */
+            seller_orders: components["schemas"]["StaffSellerOrderResponse"][];
         };
         /**
          * StaffOrderSummaryResponse
@@ -8720,6 +9086,59 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * StaffSellerOrderResponse
+         * @description One store's part of an order, as staff see it: status and the checkout money snapshots.
+         *     Sellers move the status; staff have no fulfilment control over it (owner decision 2).
+         */
+        StaffSellerOrderResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Store Id
+             * Format: uuid
+             */
+            store_id: string;
+            /**
+             * Store Name
+             * @description The store's name at checkout
+             */
+            store_name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled";
+            /** Subtotal */
+            subtotal: number;
+            /**
+             * Discount Total
+             * @description The store's share of the order discount
+             */
+            discount_total: number;
+            /**
+             * Merchandise Total
+             * @description subtotal - discount_total; the commission base
+             */
+            merchandise_total: number;
+            /** Commission Rate Bps */
+            commission_rate_bps: number;
+            /** Commission Amount */
+            commission_amount: number;
+            /** Seller Net Amount */
+            seller_net_amount: number;
+            /** Confirmed At */
+            confirmed_at: string | null;
+            /** Dispatched At */
+            dispatched_at: string | null;
+            /** Delivered At */
+            delivered_at: string | null;
+            /** Cancelled At */
+            cancelled_at: string | null;
         };
         /** StaffService */
         StaffService: {
@@ -18722,6 +19141,7 @@ export interface operations {
                 payment_status?: ("created" | "pending" | "succeeded" | "failed" | "cancelled" | "expired" | "refunded" | "partially_refunded") | null;
                 payment_method?: ("mtn_momo" | "airtel_money" | "card" | "cash_on_delivery") | null;
                 q?: string | null;
+                store_id?: string | null;
             };
             header?: never;
             path?: never;
@@ -20132,6 +20552,64 @@ export interface operations {
             };
         };
     };
+    read_seller_earnings_api_v1_staff_sellers__store_id__earnings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerEarningsResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account inactive, or role lacks the required permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description store_not_found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     change_seller_status_api_v1_staff_sellers__store_id__status_patch: {
         parameters: {
             query?: never;
@@ -20256,6 +20734,227 @@ export interface operations {
             };
             /** @description Request body, path or query failed validation */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_my_orders_api_v1_seller_orders_get: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1 */
+                page?: number;
+                /** @description Items per page (1-100) */
+                size?: number;
+                status?: ("pending" | "confirmed" | "processing" | "dispatched" | "delivered" | "cancelled") | null;
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_SellerOrderSummary_"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_my_order_api_v1_seller_orders__seller_order_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seller_order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOrderDetail"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description seller_order_not_found: no such order for your store */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    change_my_order_status_api_v1_seller_orders__seller_order_id__status_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                seller_order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SellerOrderStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerOrderDetail"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description seller_order_not_found: no such order for your store */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description invalid_transition (not the next step, or the order was cancelled); seller_order_awaiting_payment (mobile money not paid yet); seller_order_awaiting_other_stores (processing before every store confirmed); inventory_conflict (the stock cannot be issued, or a cash-on-delivery hold lapsed) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_my_earnings_api_v1_seller_earnings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SellerEarningsResponse"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description account_inactive, or seller_not_approved (no approved store) */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

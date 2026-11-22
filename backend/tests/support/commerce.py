@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import event, func, select
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -20,9 +20,41 @@ from app.models import (
     ProductVariant,
     StockReservation,
 )
+from app.models.marketplace import Store
 from app.models.operations import AuditRecord
 from app.services import inventory
+from app.services.seller_order_service import build_seller_orders
 from tests.support.sellers import new_store
+
+NEEDS_STORES = "_test_needs_stores"
+
+
+def needs_stores(order: Order) -> Order:
+    """Mark a hand-built test order: on its first flush each line gets its product's store and
+    the order gets its seller orders, as checkout does (ADR-014 phase 3). Unmarked orders, and
+    every order checkout creates, are never touched."""
+    setattr(order, NEEDS_STORES, True)
+    return order
+
+
+@event.listens_for(Session, "before_flush")
+def _attach_seller_orders(session: Session, flush_context, instances) -> None:  # noqa: ANN001
+    for obj in list(session.new):
+        if not isinstance(obj, Order) or not getattr(obj, NEEDS_STORES, False):
+            continue
+        setattr(obj, NEEDS_STORES, False)
+        with session.no_autoflush:
+            for item in obj.items:
+                if item.store_id is None and item.variant_id is not None:
+                    row = session.execute(
+                        select(Store.id, Store.name)
+                        .join(Product, Product.store_id == Store.id)
+                        .join(ProductVariant, ProductVariant.product_id == Product.id)
+                        .where(ProductVariant.id == item.variant_id)
+                    ).one()
+                    item.store_id, item.store_name_snapshot = row
+            if obj.items and not obj.seller_orders:
+                build_seller_orders(session, obj)
 
 
 def seed_sku(session: Session, *, on_hand: int | None = 1, **variant_overrides) -> ProductVariant:
@@ -74,7 +106,7 @@ def new_order(lines: dict[UUID, int], *, key: str | None = None, user_id=None) -
                 line_total=0,
             )
         )
-    return order
+    return needs_stores(order)
 
 
 def soon(seconds: float = 600) -> datetime:

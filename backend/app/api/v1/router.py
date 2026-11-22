@@ -34,6 +34,7 @@ from app.api.v1.endpoints.quotes import public_router as quotes_router
 from app.api.v1.endpoints.quotes import staff_router as staff_quotes_router
 from app.api.v1.endpoints.reports import router as staff_reports_router
 from app.api.v1.endpoints.seller_catalog import router as seller_catalog_router
+from app.api.v1.endpoints.seller_orders import router as seller_orders_router
 from app.api.v1.endpoints.sellers import seller_router
 from app.api.v1.endpoints.sellers import staff_router as staff_sellers_router
 from app.api.v1.endpoints.services import public_router as services_router
@@ -97,5 +98,6 @@ router.include_router(staff_reports_router)  # /staff/reports (module 18)
 router.include_router(seller_router)  # /seller (ADR-014: applications, own store)
 router.include_router(staff_sellers_router)  # /staff/sellers (ADR-014, sellers:read/manage)
 # /seller/products, /seller/images, /seller/inventory, /seller/store/logo|cover (ADR-014 phase 2)
+router.include_router(seller_orders_router)  # /seller/orders, /seller/earnings (phase 3)
 router.include_router(seller_catalog_router)
 router.include_router(stores_router)  # /stores: approved stores (ADR-014 phase 2)

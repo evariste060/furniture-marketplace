@@ -774,12 +774,17 @@ EXPECTED_OPERATIONS = {
     ("delete", "/api/v1/seller/store/logo"),
     ("post", "/api/v1/seller/store/cover"),
     ("delete", "/api/v1/seller/store/cover"),
+    ("get", "/api/v1/seller/orders"),
+    ("get", "/api/v1/seller/orders/{seller_order_id}"),
+    ("patch", "/api/v1/seller/orders/{seller_order_id}/status"),
+    ("get", "/api/v1/seller/earnings"),
     ("get", "/api/v1/stores"),
     ("get", "/api/v1/stores/{slug}"),
     ("get", "/api/v1/staff/sellers"),
     ("get", "/api/v1/staff/sellers/{store_id}"),
     ("patch", "/api/v1/staff/sellers/{store_id}/status"),
     ("patch", "/api/v1/staff/sellers/{store_id}/commission"),
+    ("get", "/api/v1/staff/sellers/{store_id}/earnings"),
 }
 PUBLIC = {
     ("get", "/"),

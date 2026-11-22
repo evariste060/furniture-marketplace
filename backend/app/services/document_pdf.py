@@ -141,9 +141,12 @@ def render_invoice(snapshot: dict[str, Any]) -> bytes:
     head.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
     lines = [["Description", "SKU", "Qty", "Unit price", "Discount", "Amount"]]
     for line in snapshot["lines"]:
+        # Invoices issued before ADR-014 phase 3 have no store in their snapshot.
+        store = line.get("store_name")
+        description = f"{line['description']} (sold by {store})" if store else line["description"]
         lines.append(
             [
-                _p(line["description"]),
+                _p(description),
                 _p(line["sku"], SMALL),
                 str(line["quantity"]),
                 money(line["unit_price"]),

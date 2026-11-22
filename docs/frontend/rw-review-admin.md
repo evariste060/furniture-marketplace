@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1400 strings.
+1403 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -110,6 +110,12 @@ updates `messages/admin.rw.json`.
 | `status.method.airtel_money` | Airtel Money | Airtel Money | |
 | `status.method.card` | Card | Ikarita | |
 | `status.method.cash_on_delivery` | Cash on delivery | Kwishyura ubigejejweho | |
+| `status.sellerOrder.pending` | Waiting for the store | Ritegereje iduka | |
+| `status.sellerOrder.confirmed` | Confirmed by the store | Ryemejwe n'iduka | |
+| `status.sellerOrder.processing` | Packing | Riri gupakirwa | |
+| `status.sellerOrder.dispatched` | Out for delivery | Riri mu nzira | |
+| `status.sellerOrder.delivered` | Delivered | Ryagejejwe | |
+| `status.sellerOrder.cancelled` | Cancelled | Ryahagaritswe | |
 | `dashboard.title` | Dashboard | Imbonerahamwe | |
 | `dashboard.description` | Overview of your store, orders and key performance metrics. | Incamake y'iduka ryawe, amatumiza n'imibare y'ingenzi. | |
 | `dashboard.period` | Period | Igihe | |
@@ -218,17 +224,9 @@ updates `messages/admin.rw.json`.
 | `order.cancelReason` | Reason | Impamvu | |
 | `order.cancelConfirm` | Cancel order | Hagarika itumiza | |
 | `order.keep` | Keep order | Gumana itumiza | |
-| `order.nextStep` | Next step: mark as {status} | Intambwe ikurikira: shyira kuri {status} | |
-| `order.nextHint` | Only allowed next statuses are shown. | Herekanwa gusa intambwe zemewe zikurikira. | |
 | `order.done` | This order is {status}. No further steps. | Iri tumiza ni {status}. Nta yindi ntambwe isigaye. | |
-| `order.mark` | Mark as {status} | Shyira kuri {status} | |
 | `order.statusChanged` | Order marked as {status} | Itumiza ryashyizwe kuri {status} | |
 | `order.transitionConflict` | The order changed in the meantime, or its stock or payment doesn’t allow this step. Reload and try again. | Itumiza ryahindutse hagati aho, cyangwa ububiko cyangwa ubwishyu bwaryo ntibwemera iyi ntambwe. Ongera ufungure urupapuro wongere ugerageze. | |
-| `order.assign` | Assign | Shinga | |
-| `order.assignLabel` | Assigned to | Ushinzwe | |
-| `order.assignNone` | Not assigned | Nta ushinzwe | |
-| `order.assignChoose` | Choose staff… | Hitamo umukozi… | |
-| `order.assigned` | Order assigned to {name} | Itumiza ryashinzwe {name} | |
 | `order.items` | Items | Ibicuruzwa | |
 | `order.columns.product` | Product | Igicuruzwa | |
 | `order.columns.sku` | SKU | SKU | |
@@ -262,6 +260,11 @@ updates `messages/admin.rw.json`.
 | `order.notFound` | Order not found | Itumiza ntiryabonetse | |
 | `order.notFoundBody` | This order doesn’t exist or the link is wrong. | Iri tumiza ntiribaho cyangwa ihuza ntiriri byo. | |
 | `order.back` | Back to orders | Subira ku matumiza | |
+| `order.soldBy` | Sold by {store} | Bigurishwa na {store} | |
+| `order.sellerOrders.title` | Stores in this order ({count}) | Amaduka ari muri iri tumiza ({count}) | |
+| `order.sellerOrders.hint` | Each store confirms, packs, dispatches and delivers its own part; the order’s status follows the stores. | Buri duka ryemeza, ripakira, ryohereza kandi rigeza igice cyaryo; uko itumiza rihagaze bikurikira amaduka. | |
+| `order.sellerOrders.merchandise` | Goods | Ibicuruzwa | |
+| `order.sellerOrders.commission` | Commission {rate}% | Komisiyo {rate}% | |
 | `payments.title` | Payments | Ubwishyu | |
 | `payments.description` | Every payment attempt, newest first. Rows marked for a check need reconciling with the provider. | Igerageza ryose ryo kwishyura, irya vuba mbere. Ibyashyizweho ikimenyetso cyo kugenzura bikeneye guhuzwa n'utanga serivisi. | |
 | `payments.tiles.all` | All payments | Ubwishyu bwose | |

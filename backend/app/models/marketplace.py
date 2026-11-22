@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import (
+    BigInteger,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -31,9 +32,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.common import Entity
+from app.models.common import MAX_MONEY_RWF, Entity
 
 if TYPE_CHECKING:
+    from app.models.commerce import Order
     from app.models.identity import User
     from app.models.media import MediaObject
 
@@ -169,3 +171,96 @@ class StoreStatusHistory(Entity):
 
     store: Mapped[Store] = relationship(back_populates="history")
     actor: Mapped[User | None] = relationship()
+
+
+# ---- seller orders (ADR-014 phase 3, owner decisions 2026-11-21) ---------------------------
+SELLER_ORDER_STATUSES: tuple[str, ...] = (
+    "pending",
+    "confirmed",
+    "processing",
+    "dispatched",
+    "delivered",
+    "cancelled",
+)
+_SELLER_ORDER_STATUS_LIST = ", ".join(f"'{s}'" for s in SELLER_ORDER_STATUSES)
+SELLER_ORDER_REASON_MAX_LENGTH = 500
+
+
+class SellerOrder(Entity):
+    """One store's part of a parent order: its lines (order_items with this order_id and
+    store_id, enforced by a composite foreign key), its own fulfilment status, and the money
+    snapshots taken at checkout. The seller moves the status; the parent order's status is
+    derived from its seller orders (seller_order_service). Amounts are whole RWF:
+    merchandise_total = subtotal - discount_total (the store's share of the order discount,
+    the sum of its lines' existing allocation), commission on merchandise_total at the rate
+    snapshot, seller_net_amount = merchandise_total - commission_amount. Delivery fees are the
+    platform's and never part of a seller order."""
+
+    __tablename__ = "seller_orders"
+    __table_args__ = (
+        UniqueConstraint("order_id", "store_id", name="order_store"),
+        CheckConstraint(f"status IN ({_SELLER_ORDER_STATUS_LIST})", name="valid_status"),
+        CheckConstraint(
+            "subtotal >= 0 AND discount_total >= 0 AND commission_amount >= 0 "
+            "AND seller_net_amount >= 0",
+            name="amounts_nonnegative",
+        ),
+        CheckConstraint(f"subtotal <= {MAX_MONEY_RWF}", name="amounts_within_cap"),
+        CheckConstraint(
+            "merchandise_total = subtotal - discount_total", name="merchandise_is_net_of_discount"
+        ),
+        CheckConstraint(
+            "commission_amount + seller_net_amount = merchandise_total",
+            name="commission_and_net_make_merchandise",
+        ),
+        CheckConstraint("commission_rate_bps BETWEEN 0 AND 10000", name="commission_rate_in_range"),
+        Index("ix_seller_orders_store_status_created", "store_id", "status", "created_at"),
+    )
+
+    order_id: Mapped[UUID] = mapped_column(
+        ForeignKey("orders.id", ondelete="RESTRICT"), nullable=False
+    )
+    store_id: Mapped[UUID] = mapped_column(
+        ForeignKey("stores.id", ondelete="RESTRICT"), nullable=False
+    )
+    store_name_snapshot: Mapped[str] = mapped_column(String(STORE_NAME_MAX_LENGTH), nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="pending", server_default="pending"
+    )
+    subtotal: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    discount_total: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    merchandise_total: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    commission_rate_bps: Mapped[int] = mapped_column(Integer, nullable=False)
+    commission_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    seller_net_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    order: Mapped[Order] = relationship(back_populates="seller_orders")
+    store: Mapped[Store] = relationship()
+    history: Mapped[list[SellerOrderStatusHistory]] = relationship(
+        back_populates="seller_order",
+        cascade="save-update, merge",
+        order_by="SellerOrderStatusHistory.created_at",
+    )
+
+
+class SellerOrderStatusHistory(Entity):
+    """Append-only (the runtime role may only SELECT and INSERT it)."""
+
+    __tablename__ = "seller_order_status_history"
+    __table_args__ = (
+        CheckConstraint(f"status IN ({_SELLER_ORDER_STATUS_LIST})", name="valid_status"),
+        Index("ix_seller_order_status_history_order_created", "seller_order_id", "created_at"),
+    )
+
+    seller_order_id: Mapped[UUID] = mapped_column(
+        ForeignKey("seller_orders.id", ondelete="RESTRICT"), nullable=False
+    )
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    actor_user_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    reason: Mapped[str | None] = mapped_column(String(SELLER_ORDER_REASON_MAX_LENGTH))
+
+    seller_order: Mapped[SellerOrder] = relationship(back_populates="history")

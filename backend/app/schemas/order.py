@@ -65,6 +65,7 @@ class OrderLineResponse(BaseModel):
     """One ordered line, as snapshotted at checkout (never re-read from the catalogue)."""
 
     id: UUID = Field(description="The order item; reviews are requested per item")
+    store_name: str = Field(description="The selling store's name at checkout (ADR-014)")
     sku: str
     product_name: str
     variant_name: str | None
@@ -126,6 +127,31 @@ class OrderDetailResponse(BaseModel):
     status_history: list[OrderHistoryEntry]
 
 
+SellerOrderStatus = Literal[
+    "pending", "confirmed", "processing", "dispatched", "delivered", "cancelled"
+]
+
+
+class StaffSellerOrderResponse(BaseModel):
+    """One store's part of an order, as staff see it: status and the checkout money snapshots.
+    Sellers move the status; staff have no fulfilment control over it (owner decision 2)."""
+
+    id: UUID
+    store_id: UUID
+    store_name: str = Field(description="The store's name at checkout")
+    status: SellerOrderStatus
+    subtotal: int
+    discount_total: int = Field(description="The store's share of the order discount")
+    merchandise_total: int = Field(description="subtotal - discount_total; the commission base")
+    commission_rate_bps: int
+    commission_amount: int
+    seller_net_amount: int
+    confirmed_at: datetime | None
+    dispatched_at: datetime | None
+    delivered_at: datetime | None
+    cancelled_at: datetime | None
+
+
 class StaffPaymentResponse(OrderPaymentResponse):
     provider: str | None
     succeeded_at: datetime | None
@@ -140,6 +166,9 @@ class StaffOrderDetailResponse(OrderDetailResponse):
         default=None, description="The assignee's name, when assigned"
     )
     payments: list[StaffPaymentResponse] = Field(description="Every payment attempt, oldest first")
+    seller_orders: list[StaffSellerOrderResponse] = Field(
+        description="Each store's part of the order (ADR-014 phase 3), read-only for staff",
+    )
 
 
 class OrderSummaryResponse(BaseModel):

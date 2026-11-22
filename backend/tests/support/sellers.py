@@ -162,3 +162,18 @@ def forget_stores(engine: Engine) -> None:
         conn.execute(text("DELETE FROM stores"))
         if owners:  # the owner accounts the store helpers created
             conn.execute(text("DELETE FROM users WHERE id = ANY(:ids)"), {"ids": list(owners)})
+
+
+def forget_seller_orders(engine: Engine) -> None:
+    """Delete every seller order of the disposable per-test schema with its history and the
+    order lines that reference it, so a downgrade below ADR-014 phase 3 (which refuses while
+    seller orders exist) can run; the orders themselves stay. Test schemas only: never point
+    this at a real database."""
+    with engine.begin() as conn:
+        schema: str = conn.execute(text("SELECT current_schema()")).scalar_one()
+        assert schema.startswith("test_"), schema
+        conn.execute(text("DELETE FROM seller_order_status_history"))
+        conn.execute(
+            text("DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM seller_orders)")
+        )
+        conn.execute(text("DELETE FROM seller_orders"))

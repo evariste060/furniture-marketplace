@@ -156,7 +156,8 @@ def lookup_order(
         "Requires 'orders:read' (every staff role). Newest first, with the customer's name and "
         "phone. `from` and `to` bound the creation time (inclusive); `payment_status` and "
         "`payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number "
-        "(any accepted format; matches the order's phone) or part of an order number."
+        "(any accepted format; matches the order's phone) or part of an order number. "
+        "`store_id` keeps orders with a line from that store (ADR-014 phase 3)."
     ),
     responses={**AUTH_ERRORS, **VALIDATION_422},
 )
@@ -171,6 +172,7 @@ def list_staff_orders(
     payment_status: PaymentStatus | None = None,
     payment_method: PaymentMethod | None = None,
     q: Annotated[str | None, Query(min_length=1, max_length=40)] = None,
+    store_id: Annotated[uuid.UUID | None, Query()] = None,
 ) -> Page[StaffOrderSummaryResponse]:
     return OrderService.staff_list(
         db,
@@ -180,6 +182,7 @@ def list_staff_orders(
         payment_status=payment_status,
         payment_method=payment_method,
         q=q,
+        store_id=store_id,
         page=page,
         size=size,
     )
@@ -217,18 +220,17 @@ def get_staff_order(order_id: uuid.UUID, _: OrderReader, db: Db) -> StaffOrderDe
     "/{order_id}/status",
     response_model=OrderFulfilmentResponse,
     status_code=status.HTTP_200_OK,
-    summary="Advance an order status",
+    summary="Cancel an order",
     description=(
-        "Requires 'orders:fulfil' (administrator). A valid transition, status "
-        "history row and audit event commit atomically; the optional `reason` is kept in both. "
-        "Dispatch consumes committed inventory; cancellation (allowed only before dispatch) "
-        "releases active holds and the promotion use and cancels an unpaid payment. Confirming "
-        "a cash-on-delivery order commits its stock (§7 Q13); delivering it marks the payment "
-        "succeeded (Q14). Committed stock is never released by cancellation (ADR-002), so "
-        "cancelling a paid or confirmed cash-on-delivery order returns 409. A move to confirmed, "
-        "dispatched, delivered or cancelled records the customer's SMS or email notification "
-        "with the change and sends it after the response (module 17); a notification failure "
-        "never fails the change."
+        "Requires 'orders:fulfil' (administrator). ADR-014 phase 3 (owner decision 2): sellers "
+        "run fulfilment and the order's confirmed, processing, dispatched and delivered follow "
+        "its stores' seller orders, so the only status staff can set is `cancelled`; any other "
+        "answers 409 order_status_follows_seller_orders. Cancellation, its status history row "
+        "and audit event commit atomically; it releases active holds and the promotion use, "
+        "cancels an unpaid payment and every seller order. Committed stock is never released "
+        "by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order "
+        "returns 409 inventory_conflict. The customer's notification is recorded with the "
+        "change and sent after the response (module 17)."
     ),
     responses={**AUTH_ERRORS, **ORDER_404, **ORDER_409, **VALIDATION_422},
 )

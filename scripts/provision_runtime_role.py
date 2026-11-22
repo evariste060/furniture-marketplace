@@ -36,7 +36,9 @@ customers and answered by staff (support_threads: SELECT, INSERT, UPDATE; suppor
 SELECT, INSERT, as messages are never edited; neither is deleted). Marketplace stores (ADR-014)
 are created by applicants and updated by them and by administrators (stores: SELECT, INSERT,
 UPDATE; never deleted); their status history is append-only (store_status_history: SELECT,
-INSERT). Tables without a built feature
+INSERT). Seller orders (ADR-014 phase 3) are written by checkout and moved by their sellers
+(seller_orders: SELECT, INSERT, UPDATE; never deleted); their history is append-only
+(seller_order_status_history: SELECT, INSERT). Tables without a built feature
 get no privileges; extend TABLE_GRANTS in the same change that needs a privilege.
 It is not a superuser, cannot create roles/databases, and owns no table, so it cannot drop or
 disable the append-only audit trigger. Secrets are never printed.
@@ -184,6 +186,8 @@ TABLE_GRANTS: dict[str, tuple[str, ...]] = {
     # Its status history is append-only: rows are added and read, never edited or deleted.
     "stores": ("SELECT", "INSERT", "UPDATE"),
     "store_status_history": ("SELECT", "INSERT"),
+    "seller_orders": ("SELECT", "INSERT", "UPDATE"),
+    "seller_order_status_history": ("SELECT", "INSERT"),
 }
 
 

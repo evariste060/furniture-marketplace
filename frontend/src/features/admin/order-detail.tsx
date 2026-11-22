@@ -1,14 +1,14 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Check, Download, ExternalLink, History as HistoryIcon, Mail, MapPin, MessageSquareText, Package, Phone, Printer, Truck, UserRound, XCircle } from "lucide-react";
+import { Check, Download, ExternalLink, History as HistoryIcon, Mail, MapPin, MessageSquareText, Phone, Printer, Truck, UserRound, XCircle } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import { Field, Select, Textarea } from "@/components/ui/form";
+import { Field, Textarea } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, Td, Th } from "@/components/ui/table";
 import { useToast } from "@/components/ui/toast";
@@ -27,20 +27,14 @@ import { WhatsAppIcon } from "@/components/ui/whatsapp-icon";
 
 type StaffOrder = components["schemas"]["StaffOrderDetailResponse"];
 
-/** The backend's ORDER_TRANSITIONS (app/services/order_service.py). The backend checks every
- * change again; this only decides which buttons to show. */
-export const ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  received: ["confirmed", "cancelled"],
-  confirmed: ["processing", "cancelled"],
-  processing: ["dispatched", "cancelled"],
-  dispatched: ["delivered"],
-  delivered: [],
-  cancelled: [],
-};
+type SellerOrder = StaffOrder["seller_orders"][number];
 
-/** The forward step of a status, if any (cancelling has its own button). */
-export function nextStatus(status: OrderStatus): OrderStatus | null {
-  return ORDER_TRANSITIONS[status].find((s) => s !== "cancelled") ?? null;
+/** ADR-014 phase 3 (owner decision 2, 2026-11-21): each store's seller moves its own part of the
+ * order and the order's status follows; staff have no fulfilment controls. The only change staff
+ * make is cancelling the whole order, which the backend allows only while its stock is still on
+ * hold (received). The backend checks every change again; this only decides what to show. */
+export function staffCanCancel(status: OrderStatus): boolean {
+  return status === "received";
 }
 
 /** wa.me wants the number in international form without "+". */
@@ -131,12 +125,12 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
                 {t("order.invoice")}
               </a>
             )}
-            {fulfil && ORDER_TRANSITIONS[order.status].includes("cancelled") && <CancelOrder order={order} />}
+            {fulfil && staffCanCancel(order.status) && <CancelOrder order={order} />}
           </>
         }
       />
 
-      {fulfil && <NextStep order={order} />}
+      <SellerOrders order={order} />
 
       <div className="flex flex-wrap items-start gap-5">
         <div className="flex min-w-0 flex-[999_1_520px] flex-col gap-5">
@@ -192,43 +186,45 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
   );
 }
 
-function NextStep({ order }: { order: StaffOrder }) {
+/** Each store's part of the order, read-only (ADR-014 phase 3): the stores move them. */
+function SellerOrders({ order }: { order: StaffOrder }) {
   const t = useTranslations("admin");
-  const next = nextStatus(order.status);
-  const change = useStatusChange(order);
-  const panel = "flex flex-col gap-3 rounded-xl border border-light bg-light p-5";
-  if (!next)
-    return (
-      <section className={panel}>
-        <b className="font-semibold text-navy">
-          {t("order.done", {
-            status: t(`status.order.${order.status}`).toLowerCase(),
-          })}
-        </b>
-      </section>
-    );
-  const label = t(`status.order.${next}`);
+  if (order.seller_orders.length === 0) return null;
   return (
-    <section className={panel}>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-0.5">
-          <b className="font-semibold text-navy">{t("order.nextStep", { status: label })}</b>
-          <span className="text-sm text-tx2">{t("order.nextHint")}</span>
-        </div>
-        <div className="flex flex-wrap gap-2.5">
-          <Button size="sm" className="gap-2" disabled={change.isPending} onClick={() => change.mutate({ status: next, reason: null })}>
-            <Package size={16} aria-hidden="true" />
-            {t("order.mark", { status: label })}
-          </Button>
-          <AssignStaff order={order} />
-        </div>
+    <section className="flex flex-col gap-3 rounded-xl border border-light bg-light p-5" aria-labelledby="seller-orders-title">
+      <div className="flex flex-col gap-0.5">
+        <h2 id="seller-orders-title" className="t-h4 text-navy">
+          {t("order.sellerOrders.title", { count: order.seller_orders.length })}
+        </h2>
+        <span className="text-sm text-tx2">{t("order.sellerOrders.hint")}</span>
       </div>
-      {change.error && (
-        <p role="alert" className="text-sm text-err-tx">
-          {change.error instanceof ApiError && change.error.status === 409 ? t("order.transitionConflict") : t("common.saveError")}
-        </p>
-      )}
+      <ul className="m-0 flex list-none flex-col divide-y divide-bd rounded-xl border border-bd bg-surface p-0">
+        {order.seller_orders.map((group) => (
+          <SellerOrderRow key={group.id} group={group} />
+        ))}
+      </ul>
     </section>
+  );
+}
+
+function SellerOrderRow({ group }: { group: SellerOrder }) {
+  const t = useTranslations("admin");
+  return (
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-1.5 px-4 py-3">
+      <span className="flex min-w-0 flex-[1_1_180px] flex-col">
+        <b className="text-sm font-medium break-words">{group.store_name}</b>
+        <span className="text-cap text-tx2">{t(`status.sellerOrder.${group.status}`)}</span>
+      </span>
+      <span className="flex flex-col text-right text-cap text-tx2 tabular-nums">
+        <span>
+          {t("order.sellerOrders.merchandise")} <b className="font-semibold text-tx">{formatMoney(group.merchandise_total)}</b>
+        </span>
+        <span>
+          {t("order.sellerOrders.commission", { rate: (group.commission_rate_bps / 100).toString() })}{" "}
+          <b className="font-semibold text-tx">{formatMoney(group.commission_amount)}</b>
+        </span>
+      </span>
+    </li>
   );
 }
 
@@ -249,52 +245,6 @@ function useStatusChange(order: StaffOrder) {
       void client.invalidateQueries({ queryKey: ["admin"] });
     },
   });
-}
-
-function AssignStaff({ order, className = "w-56" }: { order: StaffOrder; className?: string }) {
-  const t = useTranslations("admin");
-  const client = useQueryClient();
-  const toast = useToast();
-  const people = useQuery({
-    queryKey: ["admin", "order-assignees"],
-    queryFn: () => must(browserApi.GET("/api/v1/staff/orders/assignees")),
-    staleTime: 60_000,
-  });
-  const assign = useMutation({
-    mutationFn: (staffUserId: string) =>
-      must(
-        browserApi.PATCH("/api/v1/staff/orders/{order_id}/assignment", {
-          params: { path: { order_id: order.id } },
-          body: { staff_user_id: staffUserId },
-        }),
-      ),
-    onSuccess: (_data, staffUserId) => {
-      const person = people.data?.items.find((p) => p.id === staffUserId);
-      toast.show(t("order.assigned", { name: person?.full_name ?? "" }));
-      void client.invalidateQueries({ queryKey: ["admin", "order", order.id] });
-    },
-    onError: () => toast.show(t("common.saveError"), "error"),
-  });
-  return (
-    <div className={className}>
-      <Select
-        aria-label={t("order.assignLabel")}
-        value={order.fulfilment_assignee_user_id ?? ""}
-        disabled={!people.data || assign.isPending}
-        onChange={(e) => e.target.value && assign.mutate(e.target.value)}
-        className="h-9 text-sm"
-      >
-        <option value="" disabled>
-          {order.fulfilment_assignee_user_id ? (order.fulfilment_assignee_name ?? t("order.assignChoose")) : t("order.assignChoose")}
-        </option>
-        {people.data?.items.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.full_name ?? p.id} · {t(`shell.roles.${p.role}`)}
-          </option>
-        ))}
-      </Select>
-    </div>
-  );
 }
 
 function CancelOrder({ order }: { order: StaffOrder }) {
@@ -371,6 +321,7 @@ function Items({ order }: { order: StaffOrder }) {
                   <span className="flex min-w-0 flex-col">
                     <b className="font-medium">{line.product_name}</b>
                     {line.variant_name && <span className="text-cap text-tx2">{line.variant_name}</span>}
+                    <span className="text-cap text-tx2">{t("soldBy", { store: line.store_name })}</span>
                   </span>
                 </span>
               </Td>
@@ -520,9 +471,7 @@ export function OrderPanel({ orderId, now }: { orderId: string; now: number }) {
 
 function OrderPanelBody({ order, fulfil, payments, now }: { order: StaffOrder; fulfil: boolean; payments: boolean; now: number }) {
   const t = useTranslations("admin");
-  const change = useStatusChange(order);
-  const next = nextStatus(order.status);
-  const canCancel = ORDER_TRANSITIONS[order.status].includes("cancelled");
+  const canCancel = staffCanCancel(order.status);
   const paid = order.payment?.status === "succeeded";
   const docBase = `/api/backend/api/v1/staff/orders/${order.id}`;
   const latest = order.payments.at(-1);
@@ -584,30 +533,21 @@ function OrderPanelBody({ order, fulfil, payments, now }: { order: StaffOrder; f
             finished={order.status === "delivered"}
           />
         )}
-        {fulfil && (next || canCancel) && (
+        {fulfil && canCancel && (
           <div className="flex flex-wrap items-center gap-2">
-            {next && (
-              <Button size="sm" disabled={change.isPending} onClick={() => change.mutate({ status: next, reason: null })}>
-                <Package size={16} aria-hidden="true" />
-                {t("order.mark", { status: t(`status.order.${next}`) })}
-                <ArrowRight size={15} aria-hidden="true" />
-              </Button>
-            )}
-            {canCancel && <CancelOrder order={order} />}
+            <CancelOrder order={order} />
           </div>
         )}
-        {fulfil && next && (
-          <div className="flex flex-col gap-1">
-            <span aria-hidden="true" className="text-cap font-semibold text-tx2">
-              {t("order.assignLabel")}
-            </span>
-            <AssignStaff order={order} className="w-full sm:w-72" />
+        {order.seller_orders.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-cap font-semibold text-tx2">{t("order.sellerOrders.title", { count: order.seller_orders.length })}</span>
+            <ul className="m-0 flex list-none flex-col divide-y divide-bd rounded-xl border border-bd p-0">
+              {order.seller_orders.map((group) => (
+                <SellerOrderRow key={group.id} group={group} />
+              ))}
+            </ul>
+            <span className="text-cap text-tx2">{t("order.sellerOrders.hint")}</span>
           </div>
-        )}
-        {change.error && (
-          <p role="alert" className="m-0 text-sm text-err-tx">
-            {change.error instanceof ApiError && change.error.status === 409 ? t("order.transitionConflict") : t("common.saveError")}
-          </p>
         )}
       </DrawerSection>
 
@@ -620,6 +560,7 @@ function OrderPanelBody({ order, fulfil, payments, now }: { order: StaffOrder; f
               <span className="flex min-w-0 flex-1 flex-col">
                 <b className="text-sm font-medium break-words">{line.product_name}</b>
                 {line.variant_name && <span className="text-cap text-tx2">{line.variant_name}</span>}
+                <span className="text-cap text-tx2">{t("order.soldBy", { store: line.store_name })}</span>
                 <span className="text-cap text-tx2">
                   <span className="font-mono">{line.sku}</span> · {line.quantity} × {formatMoney(line.unit_price)}
                 </span>

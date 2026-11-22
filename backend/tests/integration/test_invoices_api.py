@@ -12,7 +12,7 @@ from sqlalchemy import func, select, text
 from app.core.kigali_time import KIGALI
 from app.core.money import vat_component
 from app.core.roles import ROLE_PERMISSIONS, Permission
-from app.models import Invoice, InvoiceCounter, Order, PaymentAttempt
+from app.models import Invoice, InvoiceCounter, Order, OrderItem, PaymentAttempt
 from app.models.operations import AuditRecord
 from app.services import checkout_service
 from app.services.audit_service import AuditService
@@ -30,6 +30,7 @@ from tests.integration.test_payments_api import (  # noqa: F401
 )
 from tests.support.commerce import wait_until_due
 from tests.support.pdf import is_complete_pdf, pdf_text
+from tests.support.seller_orders import step
 
 SETTINGS = "/api/v1/staff/settings"
 CUSTOMER_ORDERS = "/api/v1/customers/me/orders"
@@ -76,9 +77,9 @@ def paid_customer_order(client, db, headers) -> dict:
 
 
 def deliver(client, order: dict, headers: dict, steps=("confirmed", "processing", "dispatched")):
-    for step in steps:
-        res = client.patch(f"{STAFF}/{order['id']}/status", json={"status": step}, headers=headers)
-        assert res.status_code == 200, res.text
+    """The stores move their seller orders; `cancelled` is the administrator's (phase 3)."""
+    for status in steps:
+        step(client, order["id"], status, headers)
 
 
 def audits(db, order_id: str, action: str) -> list[dict]:
@@ -388,7 +389,12 @@ def test_the_invoice_pdf_matches_the_order_and_handles_long_and_accented_text(
     assert stored is not None
     assert money(stored.total) in text_ and money(stored.tax_total) in text_
     assert "Écouteurs sans fil" in text_
-    assert len(invoices(db)[0].snapshot["lines"]) == 3
+    lines = invoices(db)[0].snapshot["lines"]
+    assert len(lines) == 3
+    # ADR-014 phase 3: each line names its selling store; the platform remains the issuer.
+    stores = {i.store_name_snapshot for i in db.scalars(select(OrderItem))}
+    assert {line["store_name"] for line in lines} == stores and len(stores) == 3
+    assert "sold by" in " ".join(text_.split())
 
 
 # ---- delivery notes ----------------------------------------------------------------------------

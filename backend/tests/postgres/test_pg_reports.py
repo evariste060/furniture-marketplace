@@ -11,6 +11,7 @@ import io
 from openpyxl import load_workbook
 
 from tests.postgres.conftest import Stack
+from tests.postgres.seller_orders import advance
 from tests.postgres.test_pg_checkout import ADDRESS, delivery  # noqa: F401
 from tests.postgres.test_pg_http import HTTP, one, register
 from tests.postgres.test_pg_inventory import seed_sku
@@ -40,13 +41,7 @@ def test_a_delivered_cod_order_is_reported_and_exported_on_the_runtime_role(
     )
     assert placed.status_code == 201, placed.text
     order = placed.json()["order"]
-    for status in ("confirmed", "processing", "dispatched", "delivered"):
-        res = HTTP.patch(
-            f"{stack.servers[0]}/staff/orders/{order['id']}/status",
-            json={"status": status},
-            headers=admin,
-        )
-        assert res.status_code == 200, (status, res.text)
+    advance(stack, order["id"], "delivered")  # the store moves its order (ADR-014 phase 3)
     with stack.owner() as conn:
         assert one(
             conn,

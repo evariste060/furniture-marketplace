@@ -42,6 +42,7 @@ from app.services.inventory import (
     expire_due_reservations,
     release_order_reservations,
 )
+from tests.support.commerce import needs_stores
 from tests.support.media import image_row
 from tests.support.sellers import new_store
 
@@ -167,7 +168,7 @@ def _new_order(variant_id, *, order_number: str | None = None) -> Order:
             line_total=125000,
         )
     )
-    return order
+    return needs_stores(order)
 
 
 def test_database_constraints_reject_negative_price_and_duplicate_sku(session_factory):

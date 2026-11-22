@@ -8,7 +8,7 @@ import { reportCsv } from "./import";
 import { availableTone, REASONS } from "./inventory";
 import { activeNav, canOpen } from "./nav";
 import { groupDigits, parseAmount } from "./numbers";
-import { nextStatus, whatsappLink } from "./order-detail";
+import { staffCanCancel, whatsappLink } from "./order-detail";
 import { moveItem, rowsToObject, skuOk } from "./product-editor";
 import { dayFromEnd, endFromDay, promotionPhase } from "./promotions";
 import { roleHas, rolesFor } from "./roles";
@@ -86,11 +86,11 @@ describe("dashboard", () => {
 });
 
 describe("orders", () => {
-  it("knows the forward step and the WhatsApp link", () => {
-    expect(nextStatus("received")).toBe("confirmed");
-    expect(nextStatus("dispatched")).toBe("delivered");
-    expect(nextStatus("delivered")).toBeNull();
-    expect(nextStatus("cancelled")).toBeNull();
+  it("offers staff only cancellation, while the stock is on hold, and the WhatsApp link", () => {
+    // ADR-014 phase 3: the stores fulfil; staff have no confirm, dispatch or deliver step.
+    expect(staffCanCancel("received")).toBe(true);
+    for (const status of ["confirmed", "processing", "dispatched", "delivered", "cancelled"] as const)
+      expect(staffCanCancel(status)).toBe(false);
     expect(whatsappLink("+250 788 123 456")).toBe("https://wa.me/250788123456");
   });
 });

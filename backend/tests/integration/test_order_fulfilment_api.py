@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.core.dependencies import SellerContext
 from app.core.errors import AppError
 from app.core.request_context import RequestContext
 from app.models import (
@@ -18,14 +19,23 @@ from app.models import (
     Order,
     OrderItem,
     OrderStatusHistory,
+    PaymentAttempt,
     Product,
     ProductVariant,
     StockReservation,
+    Store,
 )
-from app.models.identity import User
 from app.repositories.audit_repository import AuditRepository
-from app.services.inventory import commit_order_reservations, create_order_with_reservations
-from app.services.order_service import OrderService
+from app.services import seller_order_service
+from app.services.inventory import (
+    InventoryUnavailable,
+    commit_order_reservations,
+    create_order_with_reservations,
+)
+from app.services.seller_order_service import SellerOrderService
+from tests.conftest import make_staff
+from tests.support.commerce import needs_stores
+from tests.support.seller_orders import move, owner_headers, seller_orders
 from tests.support.sellers import new_store
 
 
@@ -80,7 +90,16 @@ def _new_reserved_order(session_factory, customer_id: UUID | None = None) -> UUI
             )
         )
         create_order_with_reservations(
-            session, order, expires_at=datetime.now(UTC) + timedelta(hours=1)
+            session, needs_stores(order), expires_at=datetime.now(UTC) + timedelta(hours=1)
+        )
+        session.add(
+            PaymentAttempt(
+                order_id=order.id,
+                method="cash_on_delivery",
+                amount=125000,
+                status="pending",
+                idempotency_key=f"checkout:{order.id}",
+            )
         )
         order_id = order.id
         session.commit()
@@ -89,6 +108,31 @@ def _new_reserved_order(session_factory, customer_id: UUID | None = None) -> UUI
 
 def _count(session: Session, model, order_id: UUID) -> int:
     return session.scalar(select(func.count(model.id)).where(model.order_id == order_id)) or 0
+
+
+def _order_audits(session: Session, order_id: UUID) -> list[AuditRecord]:
+    return list(
+        session.scalars(
+            select(AuditRecord).where(
+                AuditRecord.entity_id == str(order_id), AuditRecord.action == "order.status_change"
+            )
+        )
+    )
+
+
+def reservations(session: Session, order_id: UUID) -> list[StockReservation]:
+    return list(
+        session.scalars(select(StockReservation).where(StockReservation.order_id == order_id))
+    )
+
+
+def make_admin(db: Session) -> dict:
+    return make_staff(
+        db,
+        "administrator",
+        f"admin.{uuid4().hex[:8]}@example.com",
+        f"+25078{uuid4().int % 10**7:07d}",
+    )["headers"]
 
 
 def _audit_count(session: Session, order_id: UUID) -> int:
@@ -115,43 +159,28 @@ def test_customer_order_read_is_owned_and_hides_other_customers_orders(
     assert other.status_code == 404
 
 
-def test_order_status_lifecycle_updates_history_audit_and_inventory(
-    client: TestClient, session_factory, customer_auth: dict, admin_auth: dict
+def test_order_status_lifecycle_follows_the_seller_order(
+    client: TestClient, session_factory, db: Session, customer_auth: dict
 ):
+    """ADR-014 phase 3: the store's seller moves its seller order; the order follows, with its
+    history, audit and stock rules (confirming cash on delivery commits, dispatching issues)."""
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
-    headers = admin_auth["headers"]
-    for next_status in ("confirmed", "processing"):
-        response = client.patch(
-            f"/api/v1/staff/orders/{order_id}/status",
-            json={"status": next_status},
-            headers=headers,
-        )
-        assert response.status_code == 200 and response.json()["status"] == next_status
-
-    with session_factory() as session:
-        assert commit_order_reservations(session, order_id).lines_changed == 1
-
-    dispatched = client.patch(
-        f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "dispatched"},
-        headers=headers,
-    )
+    [seller_order] = seller_orders(db, order_id)
+    owner_id = db.scalar(select(Store.owner_user_id).where(Store.id == seller_order.store_id))
+    for step in ("confirmed", "processing", "dispatched"):
+        res = move(client, db, seller_order, step)
+        assert res.status_code == 200 and res.json()["status"] == step
+        assert res.json()["order_status"] == step
     late_cancel = client.patch(
         f"/api/v1/staff/orders/{order_id}/status",
         json={"status": "cancelled"},
-        headers=headers,
+        headers=make_admin(db),
     )
-    delivered = client.patch(
-        f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "delivered"},
-        headers=headers,
-    )
-    assert dispatched.status_code == delivered.status_code == 200
+    delivered = move(client, db, seller_order, "delivered")
     assert late_cancel.status_code == 409
-    assert delivered.json()["status"] == "delivered"
+    assert delivered.status_code == 200 and delivered.json()["order_status"] == "delivered"
 
     with session_factory() as session:
-        session.expire_all()
         order = session.get(Order, order_id)
         assert order is not None and order.status == "delivered"
         assert [entry.status for entry in order.status_history] == [
@@ -161,21 +190,18 @@ def test_order_status_lifecycle_updates_history_audit_and_inventory(
             "dispatched",
             "delivered",
         ]
-        assert all(
-            entry.actor_user_id == admin_auth["user"].id and entry.created_at is not None
-            for entry in order.status_history[1:]
-        )
+        assert all(entry.actor_user_id == owner_id for entry in order.status_history[1:])
         reservation = session.scalar(
             select(StockReservation).where(StockReservation.order_id == order_id)
         )
         assert reservation is not None and reservation.status == "fulfilled"
-        movement_quantity = session.scalar(
+        on_hand = session.scalar(
             select(InventoryBalance.on_hand)
             .join(ProductVariant)
             .join(StockReservation, StockReservation.variant_id == ProductVariant.id)
             .where(StockReservation.order_id == order_id)
         )
-        assert movement_quantity == 1
+        assert on_hand == 1
         records = list(
             session.scalars(
                 select(AuditRecord)
@@ -183,78 +209,103 @@ def test_order_status_lifecycle_updates_history_audit_and_inventory(
                 .order_by(AuditRecord.created_at, AuditRecord.id)
             )
         )
-        order_records = [record for record in records if record.action.startswith("order.")]
-        successes = [r for r in order_records if r.change_summary["status"] == "success"]
-        assert [record.action for record in successes] == ["order.status_change"] * 4
-        assert all(record.actor_user_id == admin_auth["user"].id for record in successes)
-        assert [record.action for record in records if record.action.startswith("inventory.")] == [
+        changes = [
+            r
+            for r in records
+            if r.action == "order.status_change" and r.change_summary["status"] == "success"
+        ]
+        assert len(changes) == 4
+        assert all(r.change_summary["trigger"] == "seller_orders" for r in changes)
+        assert all(r.actor_user_id == owner_id for r in changes)
+        assert [r.action for r in records if r.action.startswith("inventory.")] == [
             "inventory.reserve",
             "inventory.reservation_commit",
             "inventory.dispatch",
         ]
+        attempt = session.scalar(select(PaymentAttempt).where(PaymentAttempt.order_id == order_id))
+        assert attempt is not None and attempt.status == "succeeded"  # cash on delivery (Q14)
 
 
-def test_invalid_repeated_and_skipped_transitions_conflict_without_mutation(
-    client: TestClient, session_factory, customer_auth: dict, admin_auth: dict
+@pytest.mark.parametrize(
+    "requested", ["received", "confirmed", "processing", "dispatched", "delivered"]
+)
+def test_staff_cannot_move_an_order_except_to_cancel_it(
+    client: TestClient, session_factory, db: Session, customer_auth: dict, requested: str
 ):
+    # Owner decision 2: no administrator fulfilment controls; the order follows its stores.
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
-    for next_status in ("received", "processing", "delivered"):
-        result = client.patch(
-            f"/api/v1/staff/orders/{order_id}/status",
-            json={"status": next_status},
-            headers=admin_auth["headers"],
-        )
-        assert result.status_code == 409
+    res = client.patch(
+        f"/api/v1/staff/orders/{order_id}/status",
+        json={"status": requested},
+        headers=make_admin(db),
+    )
+    assert res.status_code == 409
+    assert res.json()["error"]["code"] == "order_status_follows_seller_orders"
     with session_factory() as session:
         order = session.get(Order, order_id)
         assert order is not None and order.status == "received"
         assert _count(session, OrderStatusHistory, order_id) == 1
-        assert _audit_count(session, order_id) == 3
+        assert [r.change_summary["status"] for r in _order_audits(session, order_id)] == [
+            "conflict"
+        ]
+
+
+def test_skipped_and_repeated_seller_moves_conflict_without_mutation(
+    client: TestClient, session_factory, db: Session, customer_auth: dict
+):
+    order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
+    [seller_order] = seller_orders(db, order_id)
+    for step in ("processing", "dispatched", "delivered"):
+        res = move(client, db, seller_order, step)
+        assert res.status_code == 409 and res.json()["error"]["code"] == "invalid_transition"
+    assert move(client, db, seller_order, "confirmed").status_code == 200
+    again = move(client, db, seller_order, "confirmed")
+    assert again.status_code == 409 and again.json()["error"]["code"] == "invalid_transition"
+    with session_factory() as session:
+        order = session.get(Order, order_id)
+        assert order is not None and order.status == "confirmed"
+        assert _count(session, OrderStatusHistory, order_id) == 2
 
 
 def test_unknown_status_is_rejected_by_request_validation(
-    client: TestClient, session_factory, customer_auth: dict, admin_auth: dict
+    client: TestClient, session_factory, db: Session, customer_auth: dict
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
     response = client.patch(
         f"/api/v1/staff/orders/{order_id}/status",
         json={"status": "on_hold"},
-        headers=admin_auth["headers"],
+        headers=make_admin(db),
     )
+    [seller_order] = seller_orders(db, order_id)
+    for refused in ("on_hold", "cancelled", "received", "pending"):
+        res = move(client, db, seller_order, refused)  # sellers cannot cancel (platform only)
+        assert res.status_code == 422, refused
     assert response.status_code == 422
     with session_factory() as session:
         order = session.get(Order, order_id)
         assert order is not None and order.status == "received"
 
 
-@pytest.mark.parametrize("prefix", [(), ("confirmed",), ("confirmed", "processing")])
-def test_cancellation_releases_reservation_and_terminal_status_cannot_change(
-    client: TestClient,
-    session_factory,
-    customer_auth: dict,
-    admin_auth: dict,
-    prefix: tuple[str, ...],
+def test_cancellation_releases_holds_cancels_seller_orders_and_is_terminal(
+    client: TestClient, session_factory, db: Session, customer_auth: dict
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
-    for next_status in prefix:
-        advanced = client.patch(
-            f"/api/v1/staff/orders/{order_id}/status",
-            json={"status": next_status},
-            headers=admin_auth["headers"],
-        )
-        assert advanced.status_code == 200
+    headers = make_admin(db)
     cancelled = client.patch(
         f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "cancelled"},
-        headers=admin_auth["headers"],
+        json={"status": "cancelled", "reason": "Customer asked by phone."},
+        headers=headers,
     )
     repeated = client.patch(
-        f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "received"},
-        headers=admin_auth["headers"],
+        f"/api/v1/staff/orders/{order_id}/status", json={"status": "cancelled"}, headers=headers
     )
     assert cancelled.status_code == 200 and cancelled.json()["status"] == "cancelled"
-    assert repeated.status_code == 409
+    assert repeated.status_code == 409 and repeated.json()["error"]["code"] == "invalid_transition"
+    [seller_order] = seller_orders(db, order_id)
+    assert seller_order.status == "cancelled" and seller_order.cancelled_at is not None
+    assert [h.status for h in seller_order.history] == ["pending", "cancelled"]
+    assert seller_order.history[-1].reason == "Customer asked by phone."
+    assert move(client, db, seller_order, "confirmed").status_code == 409
     with session_factory() as session:
         reservation = session.scalar(
             select(StockReservation).where(StockReservation.order_id == order_id)
@@ -263,7 +314,7 @@ def test_cancellation_releases_reservation_and_terminal_status_cannot_change(
 
 
 def test_cancellation_never_releases_committed_stock(
-    client: TestClient, session_factory, customer_auth: dict, admin_auth: dict
+    client: TestClient, session_factory, db: Session, customer_auth: dict
 ):
     # ADR-002: paid stock needs a separately approved refund/cancellation workflow.
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
@@ -272,7 +323,7 @@ def test_cancellation_never_releases_committed_stock(
     cancelled = client.patch(
         f"/api/v1/staff/orders/{order_id}/status",
         json={"status": "cancelled"},
-        headers=admin_auth["headers"],
+        headers=make_admin(db),
     )
     assert cancelled.status_code == 409
     with session_factory() as session:
@@ -283,9 +334,10 @@ def test_cancellation_never_releases_committed_stock(
             select(StockReservation).where(StockReservation.order_id == order_id)
         )
         assert reservation is not None and reservation.status == "committed"
+    assert [s.status for s in seller_orders(db, order_id)] == ["pending"]
 
 
-def test_only_authorized_staff_can_change_order_status(
+def test_only_authorized_staff_can_cancel_an_order(
     client: TestClient,
     session_factory,
     db: Session,
@@ -293,26 +345,19 @@ def test_only_authorized_staff_can_change_order_status(
     admin_auth: dict,
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
-    for headers in (customer_auth["headers"],):  # SC-05: the administrator is the only staff role
-        response = client.patch(
-            f"/api/v1/staff/orders/{order_id}/status",
-            json={"status": "confirmed"},
-            headers=headers,
-        )
-        assert response.status_code == 403
-        assert response.json()["error"]["code"] == "permission_denied"
+    response = client.patch(
+        f"/api/v1/staff/orders/{order_id}/status",
+        json={"status": "cancelled"},
+        headers=customer_auth["headers"],
+    )
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "permission_denied"
     success = client.patch(
         f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "confirmed"},
+        json={"status": "cancelled"},
         headers=admin_auth["headers"],
     )
     assert success.status_code == 200
-    again = client.patch(
-        f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "processing"},
-        headers=admin_auth["headers"],
-    )
-    assert again.status_code == 200 and again.json()["status"] == "processing"
     assert (
         db.scalar(
             select(func.count(AuditRecord.id)).where(AuditRecord.action == "auth.access_denied")
@@ -383,68 +428,72 @@ def test_assignment_denies_customer_and_reports_missing_order(
     assert response.status_code == 403
     status_path = f"/api/v1/staff/orders/{missing_order_id}/status"
     denied = client.patch(
-        status_path, json={"status": "confirmed"}, headers=customer_auth["headers"]
+        status_path, json={"status": "cancelled"}, headers=customer_auth["headers"]
     )
     assert denied.status_code == 403
-    # The administrator may fulfil orders, so a missing order is reported as such.
-    missing = client.patch(status_path, json={"status": "confirmed"}, headers=admin_auth["headers"])
-    assert missing.status_code == 404
-    assert missing.json()["error"]["code"] == "order_not_found"
+    # The administrator may cancel orders, so a missing order is reported as such.
+    for requested in ("cancelled", "confirmed"):
+        missing = client.patch(
+            status_path, json={"status": requested}, headers=admin_auth["headers"]
+        )
+        assert missing.status_code == 404
+        assert missing.json()["error"]["code"] == "order_not_found"
 
 
 def test_missing_order_is_not_found_for_authorized_staff(client: TestClient, admin_auth: dict):
     missing_order_id = uuid4()
     response = client.patch(
         f"/api/v1/staff/orders/{missing_order_id}/status",
-        json={"status": "confirmed"},
+        json={"status": "cancelled"},
         headers=admin_auth["headers"],
     )
     assert response.status_code == 404
 
 
-def test_dispatch_without_committed_reservation_rolls_back_status(
-    client: TestClient, session_factory, customer_auth: dict, admin_auth: dict
+def test_a_failed_stock_issue_rolls_back_the_seller_dispatch(
+    client: TestClient, session_factory, db: Session, customer_auth: dict, monkeypatch
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
-    for next_status in ("confirmed", "processing"):
-        response = client.patch(
-            f"/api/v1/staff/orders/{order_id}/status",
-            json={"status": next_status},
-            headers=admin_auth["headers"],
-        )
-        assert response.status_code == 200
-    dispatch = client.patch(
-        f"/api/v1/staff/orders/{order_id}/status",
-        json={"status": "dispatched"},
-        headers=admin_auth["headers"],
-    )
+    [seller_order] = seller_orders(db, order_id)
+    for step in ("confirmed", "processing"):
+        assert move(client, db, seller_order, step).status_code == 200
+
+    def unavailable(*args, **kwargs):
+        raise InventoryUnavailable("physical stock no longer covers committed reservation")
+
+    monkeypatch.setattr(seller_order_service, "dispatch_order_inventory", unavailable)
+    dispatch = move(client, db, seller_order, "dispatched")
     assert dispatch.status_code == 409
+    assert dispatch.json()["error"]["code"] == "inventory_conflict"
+    [seller_order] = seller_orders(db, order_id)
+    assert seller_order.status == "processing" and seller_order.dispatched_at is None
     with session_factory() as session:
         order = session.get(Order, order_id)
         assert order is not None and order.status == "processing"
         assert _count(session, OrderStatusHistory, order_id) == 3
-        assert _audit_count(session, order_id) == 3
+        reservation = session.scalar(
+            select(StockReservation).where(StockReservation.order_id == order_id)
+        )
+        assert reservation is not None and reservation.status == "committed"
 
 
-def test_concurrent_status_requests_serialize_on_order_row(
-    session_factory, customer_auth: dict, admin_auth: dict
+def test_concurrent_seller_moves_serialize_on_the_order(
+    session_factory, db: Session, customer_auth: dict
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
+    [row] = seller_orders(db, order_id)
+    seller_order_id, store_id = row.id, row.store_id
     barrier = Barrier(2)
-    actor_id = admin_auth["user"].id
 
     def attempt() -> int:
         barrier.wait()
         with session_factory() as session:
-            actor = session.get(User, actor_id)
-            assert actor is not None
+            store = session.get(Store, store_id)
+            assert store is not None
+            seller = SellerContext(user=store.owner, store=store)
             try:
-                OrderService.change_status(
-                    session,
-                    order_id=order_id,
-                    actor=actor,
-                    new_status="confirmed",
-                    ctx=RequestContext(None, None),
+                SellerOrderService.change_status(
+                    session, seller, seller_order_id, "confirmed", RequestContext(None, None)
                 )
                 return 200
             except AppError as exc:
@@ -457,16 +506,19 @@ def test_concurrent_status_requests_serialize_on_order_row(
         order = session.get(Order, order_id)
         assert order is not None and order.status == "confirmed"
         assert _count(session, OrderStatusHistory, order_id) == 2
+        assert [r.status for r in reservations(session, order_id)] == ["committed"]
 
 
-def test_audit_failure_rolls_back_status_and_history(
+def test_audit_failure_rolls_back_the_seller_move_and_the_order(
     client: TestClient,
     session_factory,
+    db: Session,
     customer_auth: dict,
-    admin_auth: dict,
     monkeypatch,
 ):
     order_id = _new_reserved_order(session_factory, UUID(customer_auth["user"]["id"]))
+    [seller_order] = seller_orders(db, order_id)
+    headers = owner_headers(db, seller_order.store_id)
 
     def fail(*args, **kwargs):
         raise RuntimeError("simulated audit persistence failure")
@@ -474,9 +526,9 @@ def test_audit_failure_rolls_back_status_and_history(
     monkeypatch.setattr(AuditRepository, "create", staticmethod(fail))
     try:
         client.patch(
-            f"/api/v1/staff/orders/{order_id}/status",
+            f"/api/v1/seller/orders/{seller_order.id}/status",
             json={"status": "confirmed"},
-            headers=admin_auth["headers"],
+            headers=headers,
         )
     except RuntimeError:
         pass
@@ -488,6 +540,8 @@ def test_audit_failure_rolls_back_status_and_history(
         assert order is not None and order.status == "received"
         assert _count(session, OrderStatusHistory, order_id) == 1
         assert _audit_count(session, order_id) == 0
+        assert [r.status for r in reservations(session, order_id)] == ["active"]
+    assert [s.status for s in seller_orders(db, order_id)] == ["pending"]
 
 
 def test_audit_failure_rolls_back_assignment(

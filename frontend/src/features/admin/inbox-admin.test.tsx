@@ -56,7 +56,25 @@ const DETAIL = {
   recipient_name: "Jean Mugabo",
   recipient_phone: "+250788111222",
   delivery_address: { street_address: "KN 5 Rd", district: "Gasabo", delivery_instructions: "Blue gate" },
-  lines: [{ id: "l1", product_name: "Galaxy A15", variant_name: null, sku: "SM-A15", quantity: 2, unit_price: 122500, line_total: 245000, image: null }],
+  lines: [{ id: "l1", store_name: "Kigali Home", product_name: "Galaxy A15", variant_name: null, sku: "SM-A15", quantity: 2, unit_price: 122500, line_total: 245000, image: null }],
+  seller_orders: [
+    {
+      id: "so1",
+      store_id: "s1",
+      store_name: "Kigali Home",
+      status: "pending",
+      subtotal: 245000,
+      discount_total: 0,
+      merchandise_total: 245000,
+      commission_rate_bps: 1000,
+      commission_amount: 24500,
+      seller_net_amount: 220500,
+      confirmed_at: null,
+      dispatched_at: null,
+      delivered_at: null,
+      cancelled_at: null,
+    },
+  ],
   payment: null,
   payments: [],
   status_history: [{ status: "received", created_at: "2026-11-17T08:00:00Z", reason: null }],
@@ -168,7 +186,7 @@ describe("orders", () => {
     expect(nav.replace).toHaveBeenCalledWith("/admin/orders?status=received", { scroll: false });
   });
 
-  it("opens an order in the drawer with its items and next step", async () => {
+  it("opens an order in the drawer with its items and stores, and offers staff only cancellation", async () => {
     const user = userEvent.setup();
     renderView(<OrdersView />);
     const row = (await screen.findByText("Jean Mugabo")).closest("tr")!;
@@ -180,8 +198,14 @@ describe("orders", () => {
     expect(within(drawer).getByText(/KN 5 Rd, Gasabo/)).toBeInTheDocument();
     expect(within(drawer).getByRole("link", { name: /Open full page/ })).toHaveAttribute("href", "/admin/orders/o1");
     expect(row.className).toContain("bg-light");
-    await user.click(within(drawer).getByRole("button", { name: /Mark as Confirmed/ }));
-    expect(api.PATCH).toHaveBeenCalledWith("/api/v1/staff/orders/{order_id}/status", { params: { path: { order_id: "o1" } }, body: { status: "confirmed", reason: null } });
+    // ADR-014 phase 3: the store fulfils its part; staff see it and can only cancel the order.
+    expect(within(drawer).getAllByText("Sold by Kigali Home").length).toBeGreaterThan(0);
+    expect(within(drawer).getByText("Waiting for the store")).toBeInTheDocument();
+    expect(within(drawer).getByText("Commission 10%")).toBeInTheDocument();
+    expect(within(drawer).queryByRole("button", { name: /Mark as/ })).not.toBeInTheDocument();
+    expect(within(drawer).queryByRole("combobox", { name: "Assigned to" })).not.toBeInTheDocument();
+    expect(within(drawer).getByRole("button", { name: "Cancel order" })).toBeInTheDocument();
+    expect(api.PATCH).not.toHaveBeenCalled();
   });
 
   it("shows no status actions without orders:fulfil", async () => {
@@ -191,8 +215,8 @@ describe("orders", () => {
     await user.click(await screen.findByRole("button", { name: "Open order 3S-1001" }));
     const drawer = await screen.findByRole("dialog");
     await within(drawer).findByText("Galaxy A15", undefined, { timeout: 5000 });
-    expect(within(drawer).queryByRole("button", { name: /Mark as/ })).not.toBeInTheDocument();
     expect(within(drawer).queryByRole("button", { name: "Cancel order" })).not.toBeInTheDocument();
+    expect(within(drawer).getByText("Waiting for the store")).toBeInTheDocument(); // read-only
   });
 });
 

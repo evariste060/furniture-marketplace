@@ -646,7 +646,8 @@
       "notFoundText": "Suzuma nimero y'ibyo watumije na telefoni wakoresheje wishyura.",
       "loadFailedTitle": "Ntitwashoboye kubona ibyo watumije",
       "loadFailedText": "Suzuma interineti yawe wongere ugerageze.",
-      "retry": "Ongera ugerageze"
+      "retry": "Ongera ugerageze",
+      "soldBy": "Bigurishwa na {store}"
     },
     "auth": {
       "loginMeta": "Injira",

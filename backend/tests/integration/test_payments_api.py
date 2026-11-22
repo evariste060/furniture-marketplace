@@ -26,6 +26,7 @@ from tests.integration.test_checkout_api import INLINE, STAFF, checkout, guest_c
 from tests.integration.test_delivery_api import create_zone, set_threshold
 from tests.integration.test_promotions_api import apply, create_promotion
 from tests.support.commerce import hold_expiry, stock_clock_at, wait_until_due
+from tests.support.seller_orders import advance
 
 SECRET = os.environ["PAYMENT_MOCK_WEBHOOK_SECRET"]
 PAY = "/api/v1/payments"
@@ -437,12 +438,7 @@ def test_cash_on_delivery_stays_pending_until_delivery(client, db, delivery, adm
     confirm = f"{STAFF_PAYMENTS}/{attempt.id}/confirm-cod"
     early = client.post(confirm, headers=admin_auth["headers"])
     assert early.status_code == 409 and code(early) == "order_not_delivered"
-    url = f"{STAFF}/{order['id']}/status"
-    for step in ("confirmed", "processing", "dispatched", "delivered"):
-        assert (
-            client.patch(url, json={"status": step}, headers=admin_auth["headers"]).status_code
-            == 200
-        )
+    advance(client, db, order["id"], "delivered")  # the store delivers (ADR-014 phase 3)
     done = client.post(confirm, headers=admin_auth["headers"])
     assert done.status_code == 200 and done.json()["status"] == "succeeded"  # Q14 already did it
 

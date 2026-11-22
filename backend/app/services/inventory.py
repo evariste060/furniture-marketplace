@@ -59,6 +59,7 @@ from app.repositories.category_tree import category_visible
 from app.services.audit_service import AuditService
 from app.services.notification_service import record_order_event
 from app.services.promotion_service import release_for_order
+from app.services.seller_order_status import cancel_seller_orders
 
 ALLOCATING_STATES = ("active", "committed")
 RELEASE_REASONS = frozenset({"cancelled", "payment_failed"})
@@ -667,6 +668,7 @@ def _cancel_unpaid_order(session: Session, order_id: UUID) -> None:
     previous = order.status
     order.status = "cancelled"
     session.add(OrderStatusHistory(order_id=order_id, status="cancelled", reason="payment_timeout"))
+    cancel_seller_orders(session, order_id, actor_user_id=None, reason="payment_timeout")
     # Module 17: the customer's notification, recorded in this transaction, sent after commit.
     record_order_event(session, order, "cancelled")
     session.execute(
@@ -694,11 +696,22 @@ def dispatch_order_inventory(
     *,
     actor: User | None = None,
     ctx: RequestContext | None = None,
+    variant_ids: Iterable[UUID] | None = None,
 ) -> int:
-    """Issue committed stock: ledger movement, lower on_hand and fulfil holds, atomically."""
+    """Issue committed stock: ledger movement, lower on_hand and fulfil holds, atomically.
+
+    ADR-014 phase 3 (owner decision 1): `variant_ids` limits the issue to one store's SKUs of
+    the order, when that store dispatches its seller order; the other stores' stock stays
+    committed. Without it, every SKU of the order. Either way it is idempotent: SKUs already
+    issued (fulfilled, with their movement, keyed per order and SKU) are not issued again."""
     with _atomic(session):
         _lock_order(session, order_id)
         reservations = _order_reservations(session, order_id)
+        if variant_ids is not None:
+            wanted = set(variant_ids)
+            reservations = [row for row in reservations if row.variant_id in wanted]
+            if not wanted or len(reservations) != len(wanted):
+                raise InvalidReservationState("a dispatched SKU has no reservation on the order")
         if reservations and all(row.status == "fulfilled" for row in reservations):
             source_keys = [f"dispatch:{order_id}:{row.variant_id}" for row in reservations]
             movement_count = session.scalar(

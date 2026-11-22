@@ -127,9 +127,12 @@ function TrackResult({ order }: { order: Order }) {
         {order.lines.map((line) => (
           <div key={line.id} className="flex items-center gap-3">
             <ProductImage image={line.image ?? null} alt="" sizes={IMAGE_SIZES.thumb} className="size-12 flex-none" iconSize={20} />
-            <span className="flex-1 text-sm">
-              {line.product_name}
-              {line.quantity > 1 && <span className="text-tx2"> × {line.quantity}</span>}
+            <span className="flex flex-1 flex-col text-sm">
+              <span>
+                {line.product_name}
+                {line.quantity > 1 && <span className="text-tx2"> × {line.quantity}</span>}
+              </span>
+              <span className="text-cap text-tx2">{to("soldBy", { store: line.store_name })}</span>
             </span>
           </div>
         ))}

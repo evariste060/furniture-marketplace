@@ -177,6 +177,7 @@ function Confirmed({ orderNumber, proof, signedIn, onDenied }: { orderNumber: st
               <ProductImage image={line.image ?? null} alt="" sizes={IMAGE_SIZES.thumb} className="size-16" iconSize={24} />
               <span className="flex min-w-0 flex-1 flex-col">
                 <b className="text-sm font-semibold">{line.product_name}</b>
+                <span className="text-cap text-mut">{t("soldBy", { store: line.store_name })}</span>
                 <span className="text-cap text-mut">
                   {line.variant_name ? `${line.variant_name} · ` : ""}
                   {t("qty", { count: line.quantity })}

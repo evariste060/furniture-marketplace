@@ -57,6 +57,7 @@ from app.models import (
     PaymentAttempt,
     Product,
     ProductVariant,
+    Store,
 )
 from app.models.common import MAX_MONEY_RWF
 from app.repositories import cart_repository as carts
@@ -81,6 +82,7 @@ from app.services.inventory import (
 )
 from app.services.notification_service import record_order_placed
 from app.services.order_service import order_detail, reservation_expiry
+from app.services.seller_order_service import build_seller_orders
 
 logger = logging.getLogger("app.checkout")
 
@@ -223,14 +225,17 @@ def _not_applicable(reason: str | None) -> ValidationFailed:
 
 def _snapshots(db: Session, variant_ids: list[uuid.UUID]) -> dict[uuid.UUID, dict[str, Any]]:
     rows = db.execute(
-        select(ProductVariant, Product, Brand.name)
+        select(ProductVariant, Product, Brand.name, Store.name)
         .join(Product, Product.id == ProductVariant.product_id)
+        .join(Store, Store.id == Product.store_id)
         .outerjoin(Brand, Brand.id == Product.brand_id)
         .where(ProductVariant.id.in_(variant_ids))
     ).all()
     return {
         variant.id: {
             "product_id": product.id,
+            "store_id": product.store_id,
+            "store_name": store_name,
             "sku": variant.sku,
             "product_name": product.name,
             "brand_model": " ".join(p for p in (brand_name, product.model) if p) or None,
@@ -238,7 +243,7 @@ def _snapshots(db: Session, variant_ids: list[uuid.UUID]) -> dict[uuid.UUID, dic
             "specifications": product.specifications,
             "warranty": product.warranty_text,
         }
-        for variant, product, brand_name in rows
+        for variant, product, brand_name, store_name in rows
     }
 
 
@@ -369,6 +374,8 @@ class CheckoutService:
                         OrderItem(
                             product_id=fact["product_id"],
                             variant_id=row.variant_id,
+                            store_id=fact["store_id"],
+                            store_name_snapshot=fact["store_name"],
                             sku_snapshot=fact["sku"],
                             product_name_snapshot=fact["product_name"],
                             brand_model_snapshot=fact["brand_model"],
@@ -383,6 +390,9 @@ class CheckoutService:
                             line_total=line_subtotal - share,
                         )
                     )
+                # ADR-014 phase 3: one seller order per store, with its commission snapshot,
+                # in this transaction; one parent order and one payment for the checkout.
+                build_seller_orders(db, order)
                 try:
                     create_order_with_reservations(
                         db,

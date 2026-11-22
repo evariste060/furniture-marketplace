@@ -24,7 +24,7 @@ from app.services.report_xlsx import (
     XLSX_CONTENT_TYPE,
 )
 from tests.integration.test_cart_api import add, code, guest, sku
-from tests.integration.test_checkout_api import INLINE, STAFF, checkout
+from tests.integration.test_checkout_api import INLINE, checkout
 from tests.integration.test_payments_api import (  # noqa: F401
     delivery,
     event,
@@ -32,6 +32,7 @@ from tests.integration.test_payments_api import (  # noqa: F401
     webhook,
 )
 from tests.support.commerce import hold_expiry, stock_clock_at
+from tests.support.seller_orders import step
 
 REPORTS = "/api/v1/staff/reports"
 INVENTORY = "/api/v1/inventory"
@@ -76,10 +77,7 @@ def paid(client, db: Session, lines) -> dict:
 
 def move(client, order: dict, statuses: list[str], headers: dict) -> None:
     for status in statuses:
-        res = client.patch(
-            f"{STAFF}/{order['id']}/status", json={"status": status}, headers=headers
-        )
-        assert res.status_code == 200, (status, res.text)
+        step(client, order["id"], status, headers)  # stores move, staff cancel (phase 3)
 
 
 def cod(client, db: Session, lines, headers: dict, statuses: list[str]) -> dict:

@@ -34,7 +34,7 @@ from app.core.identifiers import validate_rwanda_phone
 from app.core.rate_limit import LoginRateLimiter, RateLimitStoreUnavailable
 from app.core.request_context import RequestContext
 from app.db.transaction import atomic
-from app.models import StockReservation
+from app.models import SellerOrder, StockReservation
 from app.models.commerce import (
     NOTIFICATION_EVENTS,
     Order,
@@ -73,6 +73,8 @@ from app.services.invoice_service import issue_for_order
 from app.services.line_images import line_images
 from app.services.notification_service import record_order_event
 from app.services.promotion_service import release_for_order
+from app.services.seller_order_service import staff_seller_orders
+from app.services.seller_order_status import cancel_seller_orders
 
 CASH_ON_DELIVERY = "cash_on_delivery"
 UNPAID = ("created", "pending")
@@ -155,6 +157,7 @@ def _detail_fields(db: Session, order: Order) -> dict:
         "lines": [
             OrderLineResponse(
                 id=item.id,
+                store_name=item.store_name_snapshot,
                 sku=item.sku_snapshot,
                 product_name=item.product_name_snapshot,
                 variant_name=(item.variant_snapshot or {}).get("name"),
@@ -222,6 +225,7 @@ def staff_order_detail(db: Session, order: Order) -> StaffOrderDetailResponse:
             )
             for p in payments
         ],
+        seller_orders=staff_seller_orders(db, order.id),
     )
 
 
@@ -311,6 +315,12 @@ ORDER_TRANSITIONS: Mapping[str, frozenset[str]] = {
     "cancelled": frozenset(),
 }
 
+# ADR-014 phase 3: the only whole-order change staff make; the rest follows the seller orders.
+STAFF_ORDER_MOVES = frozenset({"cancelled"})
+FOLLOWS_SELLER_ORDERS = (
+    "Sellers move their own orders; this order's status follows its stores' orders. Staff can "
+    "only cancel an order."
+)
 ORDER_NOT_FOUND = "Order not found."
 INVALID_TRANSITION = "The requested order status transition is not allowed."
 INVALID_ASSIGNMENT = "Assignment target must be an active staff account."
@@ -324,6 +334,57 @@ class InvalidOrderTransition(Exception):
 
 class InvalidAssignmentTarget(Exception):
     pass
+
+
+def move_order(
+    db: Session,
+    order: Order,
+    new_status: str,
+    *,
+    actor: User,
+    ctx: RequestContext,
+    reason: str | None,
+    trigger: str | None = None,
+) -> None:
+    """Apply one parent transition with its stock, payment, notification and audit rules. The
+    caller holds the order's advisory lock and row lock. Used for a staff cancellation and for
+    the seller-order rollup (trigger="seller_orders"); raises InvalidOrderTransition."""
+    previous = order.status
+    if new_status not in ORDER_TRANSITIONS.get(previous, frozenset()):
+        raise InvalidOrderTransition(previous, new_status)
+    if new_status == "cancelled":
+        release_order_reservations(db, order.id, reason="cancelled", actor=actor, ctx=ctx)
+        # RE-026 B3: a cancellation before dispatch releases the promotion use, in the same
+        # transaction as the stock release.
+        release_for_order(db, order.id, reason="cancelled", actor=actor, ctx=ctx)
+        cancel_seller_orders(db, order.id, actor_user_id=actor.id, reason=reason)
+    elif new_status == "dispatched":
+        # Each store issued its own SKUs when it dispatched (owner decision 1); this is the
+        # idempotent check that every SKU of the order has been issued exactly once.
+        dispatch_order_inventory(db, order.id, actor=actor, ctx=ctx)
+    _apply_payment_rules(db, order, new_status, actor, ctx)
+
+    order.status = new_status
+    db.add(
+        OrderStatusHistory(
+            order_id=order.id, status=new_status, actor_user_id=actor.id, reason=reason
+        )
+    )
+    if new_status in NOTIFICATION_EVENTS:
+        record_order_event(db, order, new_status)  # type: ignore[arg-type]
+    details: dict[str, Any] = {"from_status": previous, "to_status": new_status, "reason": reason}
+    if trigger is not None:
+        details["trigger"] = trigger
+    AuditService.log_event(
+        db,
+        action="order.status_change",
+        status="success",
+        actor=actor,
+        entity_type="order",
+        entity_id=order.id,
+        context=ctx,
+        details=details,
+    )
 
 
 class OrderService:
@@ -423,6 +484,7 @@ class OrderService:
         size: int,
         payment_method: str | None = None,
         q: str | None = None,
+        store_id: UUID | None = None,
     ) -> Page[StaffOrderSummaryResponse]:
         if created_from and created_to and created_from > created_to:
             raise field_error(("query", "from"), "`from` must not be after `to`.")
@@ -439,6 +501,12 @@ class OrderService:
             conditions.append(_latest_payment(PaymentAttempt.method) == payment_method)
         if q:
             conditions.append(_search_condition(q))
+        if store_id is not None:
+            conditions.append(
+                select(SellerOrder.id)
+                .where(SellerOrder.order_id == Order.id, SellerOrder.store_id == store_id)
+                .exists()
+            )
         total = db.scalar(select(func.count(Order.id)).where(*conditions)) or 0
         orders = list(
             db.scalars(
@@ -490,51 +558,34 @@ class OrderService:
         ctx: RequestContext,
         reason: str | None = None,
     ) -> Order:
+        """Staff change of a whole order. ADR-014 phase 3 (owner decision 2, 2026-11-21): sellers
+        run fulfilment and the parent's confirmed, processing, dispatched and delivered follow
+        the seller orders (seller_order_service); staff may only cancel, which stays with the
+        platform. Any other status answers 409 order_status_follows_seller_orders."""
+        if new_status not in STAFF_ORDER_MOVES:
+            if OrderRepository.get(db, order_id) is None:
+                raise NotFound(ORDER_NOT_FOUND, code="order_not_found")
+            AuditService.record_standalone(
+                db,
+                action="order.status_change",
+                status="conflict",
+                actor=actor,
+                entity_type="order",
+                entity_id=order_id,
+                context=ctx,
+                details={"requested_status": new_status, "reason": "follows_seller_orders"},
+            )
+            raise Conflict(FOLLOWS_SELLER_ORDERS, code="order_status_follows_seller_orders")
         try:
             with atomic(db):
                 # The common lock order (inventory.lock_order): the order's advisory lock, then
-                # its row. Release, commit and dispatch take the same advisory lock again
-                # (re-entrant), so nothing here can wait on the expiry job while holding the row.
+                # its row. Release takes the same advisory lock again (re-entrant), so nothing
+                # here can wait on the expiry job while holding the row.
                 lock_order(db, order_id)
                 order = OrderRepository.get(db, order_id, for_update=True)
                 if order is None:
                     raise NotFound(ORDER_NOT_FOUND, code="order_not_found")
-                previous = order.status
-                if new_status not in ORDER_TRANSITIONS.get(previous, frozenset()):
-                    raise InvalidOrderTransition(previous, new_status)
-
-                if new_status == "cancelled":
-                    release_order_reservations(
-                        db, order.id, reason="cancelled", actor=actor, ctx=ctx
-                    )
-                    # RE-026 B3: a cancellation before dispatch releases the promotion use, in
-                    # the same transaction as the stock release.
-                    release_for_order(db, order.id, reason="cancelled", actor=actor, ctx=ctx)
-                elif new_status == "dispatched":
-                    dispatch_order_inventory(db, order.id, actor=actor, ctx=ctx)
-                _apply_payment_rules(db, order, new_status, actor, ctx)
-
-                order.status = new_status
-                db.add(
-                    OrderStatusHistory(
-                        order_id=order.id,
-                        status=new_status,
-                        actor_user_id=actor.id,
-                        reason=reason,
-                    )
-                )
-                if new_status in NOTIFICATION_EVENTS:
-                    record_order_event(db, order, new_status)  # type: ignore[arg-type]
-                AuditService.log_event(
-                    db,
-                    action="order.status_change",
-                    status="success",
-                    actor=actor,
-                    entity_type="order",
-                    entity_id=order.id,
-                    context=ctx,
-                    details={"from_status": previous, "to_status": new_status, "reason": reason},
-                )
+                move_order(db, order, new_status, actor=actor, ctx=ctx, reason=reason)
         except InvalidOrderTransition as exc:
             AuditService.record_standalone(
                 db,

@@ -24,9 +24,10 @@ def delivered_order(stack: Stack, variant_id: uuid.UUID) -> tuple[str, uuid.UUID
     order_id, item_id = uuid.uuid4(), uuid.uuid4()
     number = f"ORD-PG-{secrets.token_hex(4).upper()}"
     with stack.owner() as conn:
-        (product_id, name) = one(
+        (product_id, name, store_id, store_name) = one(
             conn,
-            "SELECT p.id, p.name FROM product_variants v JOIN products p ON p.id = v.product_id "
+            "SELECT p.id, p.name, s.id, s.name FROM product_variants v "
+            "JOIN products p ON p.id = v.product_id JOIN stores s ON s.id = p.store_id "
             "WHERE v.id = %s",
             variant_id,
         )
@@ -36,11 +37,20 @@ def delivered_order(stack: Stack, variant_id: uuid.UUID) -> tuple[str, uuid.UUID
             "VALUES (%s, %s, %s, 'delivered', 1000, 1000, 'Aline Uwase', %s, '{}')",
             (order_id, number, f"pg-{order_id}", PHONE),
         )
+        # ADR-014 phase 3: the line belongs to its store's (delivered) seller order.
         conn.execute(
-            "INSERT INTO order_items (id, order_id, product_id, variant_id, sku_snapshot, "
-            "product_name_snapshot, quantity, unit_price, line_subtotal, line_total) "
-            "VALUES (%s, %s, %s, %s, 'PG', %s, 1, 1000, 1000, 1000)",
-            (item_id, order_id, product_id, variant_id, name),
+            "INSERT INTO seller_orders (id, order_id, store_id, store_name_snapshot, status, "
+            "subtotal, discount_total, merchandise_total, commission_rate_bps, commission_amount, "
+            "seller_net_amount) "
+            "VALUES (%s, %s, %s, %s, 'delivered', 1000, 0, 1000, 1000, 100, 900)",
+            (uuid.uuid4(), order_id, store_id, store_name),
+        )
+        conn.execute(
+            "INSERT INTO order_items (id, order_id, product_id, variant_id, store_id, "
+            "store_name_snapshot, sku_snapshot, product_name_snapshot, quantity, unit_price, "
+            "line_subtotal, line_total) "
+            "VALUES (%s, %s, %s, %s, %s, %s, 'PG', %s, 1, 1000, 1000, 1000)",
+            (item_id, order_id, product_id, variant_id, store_id, store_name, name),
         )
         conn.execute(
             "INSERT INTO order_status_history (id, order_id, status) VALUES (%s, %s, 'delivered')",

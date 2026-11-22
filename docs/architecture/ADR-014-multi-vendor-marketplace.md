@@ -18,7 +18,7 @@ The codebase is a working single-vendor store: every product belongs to "the sho
 6. **Staff role in the catalogue.** Staff manage and moderate: review, hide, archive and otherwise manage products according to their permissions. Sellers create and own products. Staff product creation on a seller's behalf is not built in V1; any existing workflow that depends on it (for example the staff catalogue import) is reported to the owner before it is changed.
 7. **Public catalogue.** Only products of `approved` stores are listed or shown (suspending a store hides its products). New public `GET /stores` and `GET /stores/{slug}`, a `store` filter on product listing and search, and a store summary ("Sold by") in product responses.
 8. **Orders: one parent order, one group per seller (option A).** Checkout stays one transaction and one payment. It additionally writes `order_items.store_id` with a store-name snapshot, and one `seller_orders` row per store in the order with that store's subtotal, discount (the sum of the existing per-line allocation), a commission-rate snapshot, the commission amount and the seller's net amount. Checkout, payment, idempotency, stock reservation and cancellation logic are kept as they are.
-9. **Parent order lifecycle.** The parent `orders.status` keeps its existing machine and remains what the customer sees. Payment, the `received → confirmed` step (which commits stock and applies the cash-on-delivery rules) and whole-order cancellation stay at the parent. Each seller moves its own group through processing, dispatched and delivered; the parent becomes `dispatched` when every group is dispatched and `delivered` when every group is delivered, which keeps the existing cash-on-delivery "delivered marks the payment succeeded" and invoice rules on the parent. Exact rollup rules and their edge cases are specified and approved in phase 3 before they are built.
+9. **Parent order lifecycle.** The parent `orders.status` keeps its existing machine and remains what the customer sees. Payment, the `received → confirmed` step (which commits stock and applies the cash-on-delivery rules) and whole-order cancellation stay at the parent. Each seller moves its own group through processing, dispatched and delivered; the parent becomes `dispatched` when every group is dispatched and `delivered` when every group is delivered, which keeps the existing cash-on-delivery "delivered marks the payment succeeded" and invoice rules on the parent. Exact rollup rules and their edge cases are specified and approved in phase 3 before they are built. *Amended by the owner on 2026-11-21 (see "Phase 3 as built"): sellers also confirm their own seller orders, so `received → confirmed` follows the stores and staff keep only whole-order cancellation.*
 10. **Customer data shown to sellers.** For its own group only: the lines, the recipient's name, phone and delivery address, and the statuses. Not the customer's email, other sellers' lines or the order's total. Seller reads of order data are audited.
 11. **Commission and earnings.** A rate in basis points (platform setting, optionally overridden per store) is snapshotted on each seller group at checkout and never taken from the client. Earnings summaries are computed from groups; **payouts are not built**.
 12. **Invoices (configurable; not a verified legal or tax decision).** For the class-project V1 the platform remains the invoice issuer, using the issuer details already held in admin settings (`settings_service.seller_details`), and each line shows its store. The issuer choice is kept configurable so per-seller invoicing can replace it; this ADR does not claim the arrangement is legally or fiscally correct.
@@ -41,7 +41,7 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 0 | Baseline commit `03bb5cc`; this ADR, SC-04, AGENTS.md and README updates | Done (2026-11-21); approved |
 | 1 | `stores`, seller application and admin review APIs, `require_approved_seller`, `sellers:*` permissions, runtime-role grants | Implemented (2026-11-21); see "Phase 1 as built" |
 | 2 | `products.store_id`, store-scoped seller product, image and inventory APIs, approved-store catalogue filter, public store endpoints, cross-store isolation tests | Implemented (2026-11-21); see "Phase 2 as built" |
-| 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Not started |
+| 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Built (2026-11-22, owner decisions 2026-11-21); see "Phase 3 as built" |
 | 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Not started |
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Not started |
 | 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
@@ -73,6 +73,78 @@ Owner decisions for phase 1 (2026-11-21): a verified account email is required t
 - **Development data.** `scripts/seed_development_catalogue.py` creates three approved demo stores whose owners are verified seed customers, and shares the seed products out over them; each owner creates their products, variants and opening stock through the seller scope, and the administrator only features and activates them. Cleanup removes the seed stores and their history after their products. Furniture data replaces the electronics demo in phase 6.
 - **Tests:** `tests/integration/test_seller_catalog_api.py` (both directions of the cross-store matrix for every seller catalogue route, refused fields, staff moderation and the 409, approved-store visibility, store images), the seller route guard test (every new `/seller/*` route is guarded), the import and product tests updated for moderation only, and `tests/postgres` for the migration and live OpenAPI.
 - **Limits recorded for the owner:** a seller can re-activate a product an administrator hid (no moderation lock exists; it would be a new feature); a slug or SKU taken by another store answers 409 `slug_taken` or `sku_taken`, as before, which reveals only that the value is used.
+
+## Phase 3 as built (owner decisions 2026-11-21)
+
+The proposed design was put to the owner, who decided on 2026-11-21. Where the owner's decisions differ from the proposal or from decision 9 above, the owner's decisions apply. Requirement: PR-07 (order statuses). No Trello card exists for this work, so none is referenced.
+
+### Owner decisions
+
+1. **Stock leaves inventory when each store ships.** Checkout reserves stock as before. When a store dispatches its seller order, only that store's SKUs are issued: the ledger movement is written, `on_hand` drops and the holds become fulfilled. The other stores' stock stays held or committed until they dispatch, or until a valid cancellation or expiry. `dispatch_order_inventory(..., variant_ids=...)` issues one store's SKUs. It runs under the order's locks and is idempotent, keyed per order and SKU, so stock is never issued twice. The parent's move to `dispatched` repeats the check that every SKU was issued exactly once; it never issues anything itself.
+2. **Seller-managed fulfilment. The Marketplace Administrator has no fulfilment controls.** Each store's seller moves only their own seller order, one step at a time: `pending → confirmed → processing → dispatched → delivered`. The parent's status is derived from its seller orders. `PATCH /staff/orders/{id}/status` now accepts only `cancelled` (whole-order cancellation stays with the platform); any other status answers 409 `order_status_follows_seller_orders`. This amends decision 9: `received → confirmed` is no longer an administrator step. The admin order page and drawer no longer offer "Mark as …" or the fulfilment assignment control; they show the stores' parts read-only.
+3. **Cash on delivery is allowed for several stores.** There is one parent order and one payment attempt per checkout, and its method stays cash on delivery. A seller order never has a payment of its own. The payment is marked succeeded, and the invoice issued, only when the last store delivers (the existing Q14/Q19 rules on the parent). No store is assumed to have collected the whole amount. Payout and settlement are not built.
+4. **Commission is calculated after discounts.** Each store's discount is the sum of its lines' existing allocation (`promotion_service.allocate`: whole RWF, deterministic, shares sum exactly to the order discount). Checkout verifies that the stores' discounts add up to the order's. Commission is `merchandise_total × rate / 10000`, rounded half up to whole RWF. The rate is the store's override, otherwise `marketplace.default_commission_bps`, read at checkout and stored on the seller order. Delivery fees are the platform's and never part of a seller order.
+
+### Data (migration `c6e8a0b2d4f7`)
+
+- **`seller_orders`**, one row per (order, store):
+  - columns: status, `store_name_snapshot`, `subtotal`, `discount_total`, `merchandise_total`, `commission_rate_bps`, `commission_amount`, `seller_net_amount`, and `confirmed_at`, `dispatched_at`, `delivered_at`, `cancelled_at`;
+  - unique `(order_id, store_id)`;
+  - checks: valid status; amounts not negative and within the money cap; `merchandise_total = subtotal - discount_total`; `commission_amount + seller_net_amount = merchandise_total`; rate between 0 and 10000.
+- **`seller_order_status_history`** is append-only.
+- **`order_items`** gains `store_id` (FK RESTRICT) and `store_name_snapshot`, plus a deferred composite FK `(order_id, store_id) → seller_orders (order_id, store_id)`, so every line belongs to its store's seller order.
+- **Migration refusals:**
+  - the upgrade refuses while any order exists, because it never guesses a store or a commission for existing lines;
+  - the downgrade refuses while any seller order exists.
+- **Grants:** `seller_orders` SELECT, INSERT, UPDATE; history SELECT, INSERT; no DELETE.
+
+### Seller moves and the derived parent status
+
+Every move runs in one transaction under the order's locks, taken in the common order: advisory lock, order row, seller order row.
+
+| Seller move | Precondition | Effect on the parent |
+| --- | --- | --- |
+| `pending → confirmed` | the order is `received`, and its payment is a pending cash-on-delivery attempt or a succeeded one | when **every** store has confirmed, the parent becomes `confirmed`. For cash on delivery this commits the whole order's stock, as an administrator's confirmation did. A hold that lapsed first is refused (409 `inventory_conflict`) and the change rolls back. |
+| `confirmed → processing` | the parent is `confirmed` or `processing`; otherwise 409 `seller_order_awaiting_other_stores` | the first store to start processing moves the parent to `processing` |
+| `processing → dispatched` | none | this store's SKUs are issued. When every store has dispatched, the parent becomes `dispatched` and the customer is told. |
+| `dispatched → delivered` | none | when every store has delivered, the parent becomes `delivered`, with the cash-on-delivery payment, invoice and customer message rules unchanged |
+
+- A failed parent step (inventory, payment rules, audit) rolls the seller's change back with it.
+- A repeated or skipped step is 409 `invalid_transition`, and nothing changes.
+- Sellers cannot cancel.
+- When the parent is cancelled, every open seller order is cancelled in the same transaction, with the same reason. This happens on a staff cancellation, and on the expiry job's `payment_timeout`, which now covers a cash-on-delivery order where only some stores confirmed within the hold.
+- The parent can still be cancelled only while its stock is on hold (ADR-002). Once it is confirmed, its stock is committed and cancellation stays 409.
+
+### Who sees what
+
+- **Seller** (`require_approved_seller`, own store only; another store's seller order is the same 404 as a missing one):
+  - visibility: cash-on-delivery orders appear when placed (they are the store's to confirm); mobile-money orders appear only once paid;
+  - shown: the store's own lines and amounts, the recipient's name and phone, the delivery address fields, the payment method and status, the store's history and the parent status;
+  - never shown: the customer's email or account, other stores' lines, the order total, the delivery fee or zone fee, or the discount code;
+  - every list and detail read is audited as `seller_order.read`.
+- **Staff:** the order detail lists its seller orders (status, money, commission) read-only. The order list takes a `store_id` filter. `GET /staff/sellers/{store_id}/earnings` requires `sellers:read`.
+- **Customer:** sees the parent status only, as before; each line now names its store ("Sold by").
+- **Invoice:** each line names its store. The platform remains the issuer (decision 12).
+
+### Earnings
+
+`GET /seller/earnings` and the staff view are computed from seller orders and never stored:
+
+- **pending:** confirmed, processing, dispatched, and delivered while the order's payment has not yet succeeded;
+- **earned:** delivered, and the order's payment succeeded.
+
+Unconfirmed and cancelled seller orders are in neither. Payouts are not built, so "earned" means owed by the platform, not paid.
+
+### Not in this phase, and points for the owner
+
+- **Not built:**
+  - seller notifications of new orders: sellers must check `GET /seller/orders`, and a cash-on-delivery order not confirmed by every store within its 24-hour hold is cancelled;
+  - seller order screens (phase 4);
+  - per-store customer messages;
+  - partial cancellation, refunds, payouts and per-store delivery fees.
+- **Points for the owner:**
+  - **Paid mobile-money orders that are never confirmed.** A paid mobile-money order whose store never confirms stays `received` with its stock committed. It cannot be cancelled, because no refund workflow is approved. This was already true when staff had to confirm it.
+  - **Staff delivery note and fulfilment assignment.** `GET /staff/orders/{id}/delivery-note` and `PATCH /staff/orders/{id}/assignment` still exist in the API. They are platform-side fulfilment tools from the single-store design. Only the assignment control was removed from the admin page. Removing both, or moving the delivery note to sellers, needs the owner's decision.
 
 ## Consequences
 

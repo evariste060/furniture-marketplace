@@ -316,6 +316,7 @@ function OrderItems({ order }: { order: OrderDetail }) {
               ) : (
                 <b className="font-semibold">{line.product_name}</b>
               )}
+              <span className="text-cap text-tx2">{to("soldBy", { store: line.store_name })}</span>
               <span className="text-sm text-tx2">
                 {line.variant_name ? `${line.variant_name} · ` : ""}
                 {to("qty", { count: line.quantity })}

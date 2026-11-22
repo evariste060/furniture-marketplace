@@ -197,6 +197,8 @@ def issue_for_order(
             {
                 "sku": i.sku_snapshot,
                 "description": _description(i),
+                # ADR-014 phase 3: the selling store; the platform remains the issuer.
+                "store_name": i.store_name_snapshot,
                 "quantity": i.quantity,
                 "unit_price": i.unit_price,
                 "line_subtotal": i.line_subtotal,

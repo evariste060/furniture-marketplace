@@ -19,13 +19,23 @@ from sqlalchemy import select, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.core.dependencies import SellerContext
 from app.core.errors import Conflict
 from app.core.request_context import RequestContext
-from app.models import Discount, DiscountRedemption, Order, PaymentAttempt, StockReservation
+from app.models import (
+    Discount,
+    DiscountRedemption,
+    Order,
+    PaymentAttempt,
+    SellerOrder,
+    StockReservation,
+    Store,
+)
 from app.models.identity import User
-from app.services import inventory, order_service, promotion_service
+from app.services import inventory, order_service, promotion_service, seller_order_service
 from app.services.inventory import create_order_with_reservations, expire_due_reservations
 from app.services.order_service import OrderService
+from app.services.seller_order_service import SellerOrderService
 from tests.conftest import make_staff
 from tests.support.commerce import new_order, seed_sku, soon, wait_until_due
 
@@ -122,8 +132,10 @@ def setup(pg_engine: Engine, db: Session):
             customer_phone="0788123456",
             amount=100,
         )
-        if status != "received":
+        if status != "received":  # a test state; its seller order is at the same step
             order.status = status
+            for row in order.seller_orders:
+                row.status = status
         db.commit()
         return order.id
 
@@ -131,12 +143,22 @@ def setup(pg_engine: Engine, db: Session):
 
 
 def change(staff_id: UUID, order_id: UUID, status: str) -> Callable[[Session], Any]:
+    """`cancelled` is the administrator's; any other status is the store's own move of its
+    seller order (ADR-014 phase 3), which takes the same locks in the same order."""
+
     def run(session: Session) -> Any:
-        actor = session.get(User, staff_id)
-        assert actor is not None
-        return OrderService.change_status(
-            session, order_id=order_id, actor=actor, new_status=status, ctx=CTX
-        )
+        if status == "cancelled":
+            actor = session.get(User, staff_id)
+            assert actor is not None
+            return OrderService.change_status(
+                session, order_id=order_id, actor=actor, new_status=status, ctx=CTX
+            )
+        row = session.scalar(select(SellerOrder).where(SellerOrder.order_id == order_id))
+        assert row is not None
+        store = session.get(Store, row.store_id)
+        assert store is not None
+        seller = SellerContext(user=store.owner, store=store)
+        return SellerOrderService.change_status(session, seller, row.id, status, CTX)
 
     return run
 
@@ -170,7 +192,7 @@ def expiry_holding_its_locks(pg_engine, monkeypatch) -> tuple[Worker, Pause]:
     [
         ("mtn_momo", "received", "cancelled"),
         ("cash_on_delivery", "received", "confirmed"),
-        ("mtn_momo", "processing", "dispatched"),
+        ("cash_on_delivery", "received", "cancelled"),
     ],
 )
 def test_a_status_change_waits_for_the_expiry_job_without_deadlock(
@@ -269,7 +291,7 @@ def test_the_expiry_job_skips_an_order_being_dispatched(pg_engine, db, setup, mo
     staff_id, place = setup
     order_id = place("mtn_momo", "processing")
     wait_until_due()
-    pause = Pause(monkeypatch, order_service, "dispatch_order_inventory")
+    pause = Pause(monkeypatch, seller_order_service, "dispatch_order_inventory")
     staff = Worker(pg_engine, change(staff_id, order_id, "dispatched"))
     staff.start()
     assert pause.entered.wait(TIMEOUT)
@@ -280,8 +302,11 @@ def test_the_expiry_job_skips_an_order_being_dispatched(pg_engine, db, setup, mo
     assert (expiry.result.orders, expiry.result.skipped) == (0, 1)
     pause.release.set()
     finish(staff)
-    # An unpaid mobile-money order has no committed stock: dispatch is refused and rolled back.
+    # A test state (an unpaid order cannot reach processing): no committed stock, so the
+    # store's dispatch is refused and rolled back, its seller order still processing.
     assert isinstance(staff.error, Conflict) and staff.error.code == "inventory_conflict"
     assert state(db, order_id) == ("processing", {"active"}, "active", "created")
-    assert expire_due_reservations(db).orders == 1
-    assert state(db, order_id) == ("cancelled", {"expired"}, "released", "expired")
+    db.expire_all()
+    assert db.scalar(select(SellerOrder.status).where(SellerOrder.order_id == order_id)) == (
+        "processing"
+    )

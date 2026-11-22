@@ -16,6 +16,7 @@ from tests.integration.test_image_media_migration import _alembic
 
 PHASE2 = "b2d4f6a8c0e1"
 BEFORE = "a9d3f5b7c1e2"
+HEAD = "c6e8a0b2d4f7"  # ADR-014 phase 3 (seller orders)
 
 
 def _revision(engine: Engine) -> str:
@@ -74,7 +75,7 @@ def _product(engine: Engine, category_id: str, store_id: str | None) -> None:
 
 
 def test_products_need_a_store_at_head(pg_engine: Engine):
-    assert _revision(pg_engine) == PHASE2
+    assert _revision(pg_engine) == HEAD
     columns = {c["name"]: c for c in inspect(pg_engine).get_columns("products")}
     assert columns["store_id"]["nullable"] is False
     category, store = _category(pg_engine), _store(pg_engine)
@@ -105,6 +106,7 @@ def test_the_upgrade_refuses_and_changes_nothing_while_products_exist(pg_engine:
         conn.execute(text("DELETE FROM products"))
     _alembic(pg_engine, "upgrade", PHASE2)
     assert _revision(pg_engine) == PHASE2
+    _alembic(pg_engine, "upgrade", "head")
     _alembic(pg_engine, "check")  # the models match the migrated schema
 
 

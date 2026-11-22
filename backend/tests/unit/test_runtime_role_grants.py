@@ -191,3 +191,9 @@ def test_stores_are_never_deleted_and_their_history_is_append_only():
     # ADR-014 phase 1: applicants insert and edit their store, administrators decide on it.
     assert sorted(GRANTS["stores"]) == ["INSERT", "SELECT", "UPDATE"]
     assert sorted(GRANTS["store_status_history"]) == ["INSERT", "SELECT"]
+
+
+def test_seller_orders_are_never_deleted_and_their_history_is_append_only():
+    # ADR-014 phase 3: checkout inserts seller orders, their sellers move them.
+    assert sorted(GRANTS["seller_orders"]) == ["INSERT", "SELECT", "UPDATE"]
+    assert sorted(GRANTS["seller_order_status_history"]) == ["INSERT", "SELECT"]

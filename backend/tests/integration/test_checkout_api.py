@@ -27,6 +27,7 @@ from tests.integration.test_cart_api import add, code, guest, sku
 from tests.integration.test_delivery_api import create_zone, set_threshold
 from tests.integration.test_promotions_api import apply, create_promotion
 from tests.support.commerce import wait_until_due
+from tests.support.seller_orders import advance, move, seller_orders
 
 CHECKOUT = "/api/v1/checkout"
 HISTORY = "/api/v1/customers/me/orders"
@@ -483,7 +484,7 @@ def test_q13_confirming_cod_commits_stock_so_it_can_no_longer_be_cancelled(
     order, variant = placed(client, db, admin_auth, with_code=False)
     h = admin_auth["headers"]
     url = f"{STAFF}/{order['id']}/status"
-    assert client.patch(url, json={"status": "confirmed"}, headers=h).status_code == 200
+    advance(client, db, order["id"], "confirmed")  # the store confirms (ADR-014 phase 3)
     db.expire_all()
     assert db.scalar(select(StockReservation.status)) == "committed"
     res = client.patch(url, json={"status": "cancelled"}, headers=h)
@@ -496,10 +497,10 @@ def test_q14_delivering_cod_marks_the_payment_succeeded(client, db, admin_auth, 
     h = admin_auth["headers"]
     url = f"{STAFF}/{order['id']}/status"
     for status in ("confirmed", "processing", "dispatched"):
-        assert client.patch(url, json={"status": status}, headers=h).status_code == 200, status
+        advance(client, db, order["id"], status)
         db.expire_all()
         assert db.scalar(select(PaymentAttempt.status)) == "pending"  # not paid before delivery
-    assert client.patch(url, json={"status": "delivered"}, headers=h).status_code == 200
+    advance(client, db, order["id"], "delivered")
     db.expire_all()
     attempt = db.scalar(select(PaymentAttempt))
     assert attempt is not None and attempt.status == "succeeded" and attempt.succeeded_at
@@ -616,12 +617,15 @@ def test_mobile_money_orders_stay_unpaid_and_cannot_be_dispatched(client, db, ad
     )
     order = res.json()["order"]
     assert order["payment"]["status"] == "created"  # not started: no provider exists yet
-    h = admin_auth["headers"]
-    url = f"{STAFF}/{order['id']}/status"
-    assert client.patch(url, json={"status": "confirmed"}, headers=h).status_code == 200
-    assert client.patch(url, json={"status": "processing"}, headers=h).status_code == 200
-    blocked = client.patch(url, json={"status": "dispatched"}, headers=h)
-    assert blocked.status_code == 409  # no committed (paid) stock to dispatch
+    # ADR-014 phase 3: the store cannot even confirm an unpaid mobile-money order, and does not
+    # see it; staff cannot move it either.
+    [seller_order] = seller_orders(db, order["id"])
+    refused = move(client, db, seller_order, "confirmed")
+    assert refused.status_code == 404  # not shown to the seller until paid
+    blocked = client.patch(
+        f"{STAFF}/{order['id']}/status", json={"status": "confirmed"}, headers=admin_auth["headers"]
+    )
+    assert blocked.json()["error"]["code"] == "order_status_follows_seller_orders"
     detail = client.get(f"{STAFF}/{order['id']}", headers=admin_auth["headers"]).json()
     assert [p["status"] for p in detail["payments"]] == ["created"]
     assert detail["payments"][0]["succeeded_at"] is None

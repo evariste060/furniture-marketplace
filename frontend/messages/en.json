@@ -646,7 +646,8 @@
       "notFoundText": "Check the order number and the phone number you used at checkout.",
       "loadFailedTitle": "We couldn't load your order",
       "loadFailedText": "Check your connection and try again.",
-      "retry": "Try again"
+      "retry": "Try again",
+      "soldBy": "Sold by {store}"
     },
     "auth": {
       "loginMeta": "Sign in",

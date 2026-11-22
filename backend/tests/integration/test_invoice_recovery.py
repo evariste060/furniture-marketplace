@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.request_context import RequestContext
 from app.core.roles import ROLE_PERMISSIONS, Permission
-from app.models import Order, PaymentAttempt
+from app.models import Order, PaymentAttempt, Store
 from app.models.identity import User
 from app.models.operations import AuditRecord
 from app.services import invoice_service
@@ -29,6 +29,7 @@ from tests.integration.test_invoices_api import (
     paid_customer_order,
 )
 from tests.integration.test_payments_api import delivery, momo_order, started  # noqa: F401
+from tests.support.seller_orders import move, seller_orders
 
 STAFF_PAYMENTS = "/api/v1/staff/payments"
 CTX = RequestContext(ip_address="127.0.0.1", user_agent="invoice-recovery-test")
@@ -253,11 +254,8 @@ def test_a_cod_delivery_without_seller_details_is_refused_then_recovered_unchang
     later recovers the invoice without changing the order or its payment."""
     order = checkout(client, guest_cart(client, db)).json()["order"]
     deliver(client, order, admin_auth["headers"])  # confirmed, processing, dispatched
-    res = client.patch(
-        f"{STAFF}/{order['id']}/status",
-        json={"status": "delivered"},
-        headers=admin_auth["headers"],
-    )
+    [seller_order] = seller_orders(db, order["id"])
+    res = move(client, db, seller_order, "delivered")  # the store delivers (ADR-014 phase 3)
     assert res.status_code == 200, res.text  # the refusal never blocks the delivery
     db.expire_all()
     stored = db.get(Order, uuid.UUID(order["id"]))
@@ -272,7 +270,10 @@ def test_a_cod_delivery_without_seller_details_is_refused_then_recovered_unchang
     ).all()
     assert refused.change_summary["status"] == "failure"
     assert refused.change_summary["reason"] == "seller_details_missing"
-    assert refused.actor_user_id == admin_auth["user"].id  # the delivering staff member
+    # the store owner whose delivery completed the order (ADR-014 phase 3)
+    assert refused.actor_user_id == db.scalar(
+        select(Store.owner_user_id).where(Store.id == seller_order.store_id)
+    )
     before = (stored.status, stored.total, stored.tax_total, stored.updated_at)
     paid = (attempt.status, attempt.amount, attempt.succeeded_at, attempt.updated_at)
     # Recovery is refused while the details are unset, then issues once they are.
@@ -350,11 +351,11 @@ def test_delivery_note_eligibility_for_every_reachable_state(
         assert note(client, cod["id"], ops) == 200, step
     # Cancelled -> no. Only orders whose stock is still on hold can be cancelled (committed
     # stock cannot be released: 409 inventory_conflict), so: a received COD order, and an unpaid
-    # mobile-money order from received, confirmed or processing.
+    # mobile-money order (ADR-014 phase 3: its store cannot confirm it before it is paid).
     cod_cancelled = checkout(client, guest_cart(client, db)).json()["order"]
     deliver(client, cod_cancelled, ops, steps=("cancelled",))
     assert note(client, cod_cancelled["id"], ops) == 409
-    for steps in ((), ("confirmed",), ("confirmed", "processing")):
+    for steps in ((),):
         order = momo_order(client, db)
         assert note(client, order["id"], ops) == 409, steps  # on hold before cancelling too
         deliver(client, order, ops, steps=(*steps, "cancelled"))

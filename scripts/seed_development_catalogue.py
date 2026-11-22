@@ -87,6 +87,7 @@ from sqlalchemy.exc import IntegrityError  # noqa: E402
 from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 
 from app.core.config import get_settings  # noqa: E402
+from app.core.dependencies import SellerContext  # noqa: E402
 from app.core.errors import AppError  # noqa: E402
 from app.core.rate_limit import CartRateLimiter, get_cart_rate_limiter  # noqa: E402
 from app.core.request_context import RequestContext  # noqa: E402
@@ -127,7 +128,12 @@ from app.models import (  # noqa: E402
     User,
     WishlistItem,
 )
-from app.models.marketplace import Store, StoreStatusHistory  # noqa: E402
+from app.models.marketplace import (  # noqa: E402
+    SellerOrder,
+    SellerOrderStatusHistory,
+    Store,
+    StoreStatusHistory,
+)
 from app.repositories.staff_repository import StaffRepository  # noqa: E402
 from app.repositories.store_repository import StoreRepository  # noqa: E402
 from app.repositories.user_repository import UserRepository  # noqa: E402
@@ -162,6 +168,7 @@ from app.services.pages import PageService  # noqa: E402
 from app.services.product_admin import ProductAdminService, bulk_activate  # noqa: E402
 from app.services.review_service import ReviewService  # noqa: E402
 from app.services.review_service import author_name as review_author  # noqa: E402
+from app.services.seller_order_service import SellerOrderService  # noqa: E402
 from app.services.settings_service import SettingsService  # noqa: E402
 from app.services.staff_service import StaffService  # noqa: E402
 from app.services.store_service import StoreService  # noqa: E402
@@ -958,14 +965,30 @@ def _advance(db: Session, admin: User, order: Order, target: str, report: Report
     else:
         steps = list(ORDER_PATH[ORDER_PATH.index(order.status) + 1 : ORDER_PATH.index(target) + 1])
     for status in steps:
-        OrderService.change_status(
-            db,
-            order_id=order.id,
-            actor=admin,
-            new_status=status,
-            ctx=CTX,
-            reason="Development seed" if status == "cancelled" else None,
-        )
+        if status == "cancelled":  # whole-order cancellation stays with the platform
+            OrderService.change_status(
+                db,
+                order_id=order.id,
+                actor=admin,
+                new_status=status,
+                ctx=CTX,
+                reason="Development seed",
+            )
+        else:
+            # ADR-014 phase 3: each store moves its own seller order and the order follows.
+            for row in db.scalars(
+                select(SellerOrder)
+                .where(SellerOrder.order_id == order.id)
+                .order_by(SellerOrder.store_name_snapshot, SellerOrder.id)
+            ).all():
+                if row.status == status:
+                    continue
+                store = db.get(Store, row.store_id)
+                assert store is not None
+                SellerOrderService.change_status(
+                    db, SellerContext(user=store.owner, store=store), row.id, status, CTX
+                )
+            db.refresh(order)
         report.add("order statuses", "updated")
 
 
@@ -1137,6 +1160,16 @@ def cleanup(db: Session, data: Catalogue = CATALOGUE) -> dict[str, int]:
             "payment attempts", delete(PaymentAttempt).where(PaymentAttempt.order_id.in_(order_ids))
         )
         run("order lines", delete(OrderItem).where(OrderItem.order_id.in_(order_ids)))
+        # ADR-014 phase 3: the seed orders' seller orders and their history (after the lines,
+        # which reference them, and before the orders).
+        seller_orders = select(SellerOrder.id).where(SellerOrder.order_id.in_(order_ids))
+        run(
+            "seller order history",
+            delete(SellerOrderStatusHistory).where(
+                SellerOrderStatusHistory.seller_order_id.in_(seller_orders)
+            ),
+        )
+        run("seller orders", delete(SellerOrder).where(SellerOrder.order_id.in_(order_ids)))
         run("orders", delete(Order).where(Order.id.in_(order_ids)))
 
         # Stock, images (files retired to the worker), variants, products.

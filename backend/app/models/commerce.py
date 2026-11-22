@@ -9,6 +9,7 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    ForeignKeyConstraint,
     Index,
     Integer,
     SmallInteger,
@@ -25,6 +26,7 @@ from app.models.operations import CANONICAL_PHONE_PATTERN
 
 if TYPE_CHECKING:
     from app.models.identity import User
+    from app.models.marketplace import SellerOrder
 
 
 class Cart(Entity):
@@ -181,6 +183,9 @@ class Order(Entity):
         order_by="OrderStatusHistory.created_at",
     )
     payment_attempts: Mapped[list[PaymentAttempt]] = relationship(back_populates="order")
+    seller_orders: Mapped[list[SellerOrder]] = relationship(
+        back_populates="order", cascade="save-update, merge", order_by="SellerOrder.created_at"
+    )
 
 
 class OrderItem(Entity):
@@ -199,6 +204,16 @@ class OrderItem(Entity):
             name="amounts_within_cap",
         ),
         Index("ix_order_items_variant", "variant_id"),
+        # ADR-014 phase 3: every line belongs to its store's seller order. Deferred, so a parent
+        # order, its seller orders and its lines can be written in one flush in any order.
+        ForeignKeyConstraint(
+            ["order_id", "store_id"],
+            ["seller_orders.order_id", "seller_orders.store_id"],
+            name="fk_order_items_seller_order",
+            ondelete="RESTRICT",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
     )
 
     order_id: Mapped[UUID] = mapped_column(
@@ -208,6 +223,11 @@ class OrderItem(Entity):
     variant_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("product_variants.id", ondelete="SET NULL")
     )
+    # The selling store (ADR-014 phase 3) and its name when the order was placed ("Sold by").
+    store_id: Mapped[UUID] = mapped_column(
+        ForeignKey("stores.id", ondelete="RESTRICT"), nullable=False
+    )
+    store_name_snapshot: Mapped[str] = mapped_column(String(120), nullable=False)
     sku_snapshot: Mapped[str] = mapped_column(String(80), nullable=False)
     product_name_snapshot: Mapped[str] = mapped_column(String(240), nullable=False)
     brand_model_snapshot: Mapped[str | None] = mapped_column(String(320))

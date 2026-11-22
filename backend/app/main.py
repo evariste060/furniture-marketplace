@@ -162,6 +162,12 @@ tags_metadata = [
         "and is_featured are never accepted.",
     },
     {
+        "name": "Seller Orders",
+        "description": "An approved seller's own part of each order (ADR-014 phase 3): list, "
+        "read and move it one step at a time; the order's status follows its stores. Earnings "
+        "are computed from these orders; payouts are not built. Another store's order is 404.",
+    },
+    {
         "name": "Stores",
         "description": "Approved stores on the public storefront, with their public product "
         "counts (ADR-014 phase 2). Contact details, owner and commission are never shown.",
