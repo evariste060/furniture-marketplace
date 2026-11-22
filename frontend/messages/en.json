@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "3 Sixty Technologies",
-    "description": "Smartphones, laptops, TVs, home appliances and accessories from trusted brands — delivered fast across Kigali and all of Rwanda."
+    "title": "{marketplace}",
+    "description": "Sofas, beds, dining, office and outdoor furniture from Rwanda's trusted furniture stores — delivered across Kigali and all of Rwanda."
   },
   "ui": {
     "skipToContent": "Skip to content",
@@ -14,9 +14,9 @@
     "openMenu": "Open menu"
   },
   "hero": {
-    "overline": "Latest electronics, better everyday life",
+    "overline": "Many furniture stores, one marketplace",
     "title": "Power Your World With the Latest Tech",
-    "subtitle": "Smartphones, laptops, TVs, home appliances and accessories from trusted brands — delivered fast across Kigali and all of Rwanda.",
+    "subtitle": "Sofas, beds, dining, office and outdoor furniture from Rwanda's trusted furniture stores — delivered across Kigali and all of Rwanda.",
     "shopNow": "Shop Now",
     "viewDeals": "View Deals",
     "fast": "Fast & Reliable",
@@ -38,8 +38,8 @@
     "exploreServices": "Explore services"
   },
   "store": {
-    "logoAlt": "3 Sixty Technologies",
-    "homeLink": "3 Sixty Technologies — home",
+    "logoAlt": "{marketplace}",
+    "homeLink": "{marketplace} — home",
     "announcement": {
       "freeDelivery": "Free delivery in Kigali on orders above {amount}",
       "freeDeliveryShort": "Free delivery in Kigali over {amount}",
@@ -49,8 +49,8 @@
     },
     "header": {
       "searchLabel": "Search products",
-      "searchPlaceholder": "Search for phones, laptops, TVs, accessories…",
-      "searchPlaceholderShort": "Search phones, laptops, TVs…",
+      "searchPlaceholder": "Search for sofas, beds, tables, desks…",
+      "searchPlaceholderShort": "Search sofas, beds, tables…",
       "search": "Search",
       "language": "Language: {name}",
       "myAccount": "My Account",
@@ -114,7 +114,7 @@
       "account": "Account"
     },
     "footer": {
-      "tagline": "Your trusted electronics store in Rwanda. Genuine products, fair prices and local support.",
+      "tagline": "Rwanda's furniture marketplace. Approved local stores, fair prices and delivery to your door.",
       "shop": "Shop",
       "customerService": "Customer Service",
       "trackOrder": "Track Order",
@@ -167,19 +167,19 @@
     "home": {
       "seeAll": "See all",
       "featuredTitle": "Featured Products",
-      "featuredText": "Handpicked electronics for the best experience.",
+      "featuredText": "Handpicked pieces from our stores.",
       "bestTitle": "Bestselling Products",
       "bestText": "Most popular choices from our customers.",
       "newTitle": "New Arrivals",
-      "newText": "Be the first to get the latest electronics.",
+      "newText": "The newest pieces from our stores.",
       "spotlightTitle": "Explore {category}",
-      "spotlightText": "Best sellers in {category}: genuine products with warranty, delivered across Rwanda.",
-      "businessTitle": "Need Electronics for Your Business?",
-      "businessText": "Special pricing for bulk orders, corporate purchases and institutional supplies. Our team will prepare a quote within one working day.",
+      "spotlightText": "Best sellers in {category}, from approved stores and delivered across Rwanda.",
+      "businessTitle": "Furnishing an Office, Hotel or School?",
+      "businessText": "Special pricing for bulk orders from offices, hotels, schools and institutions. Our team will prepare a quote within one working day.",
       "contactUs": "Contact Us",
       "requestQuote": "Request a Quote",
       "businessShortTitle": "Buying for your business?",
-      "businessShortText": "Bulk pricing for companies, schools and institutions.",
+      "businessShortText": "Bulk pricing for offices, hotels, schools and institutions.",
       "requestQuoteShort": "Request a quote",
       "sectionError": "We couldn't load these products. Please refresh the page.",
       "callUs": "Call us",
@@ -187,7 +187,7 @@
       "visitUs": "Visit us",
       "spotlightPhoto": "Show photo {n} of {count}",
       "servicesTitle": "Our Services",
-      "servicesText": "Installation, repair and training by our technical team.",
+      "servicesText": "Assembly, installation, delivery and repair by trained fitters.",
       "brandsTitle": "Trusted Brands",
       "brandsCount": "{count, plural, one {# brand available} other {# brands available}}",
       "brandsCountOver": "{count}+ brands available"
@@ -201,7 +201,7 @@
     },
     "deals": {
       "title": "Deals",
-      "text": "Discounted electronics from trusted brands, while stock lasts."
+      "text": "Discounted furniture from our stores, while stock lasts."
     },
     "allProducts": {
       "title": "All Products"
@@ -325,7 +325,7 @@
       "emptyText": "We couldn’t find a match in stock. We may still be able to get it for you — ask our team.",
       "contact": "Contact us",
       "tipSpelling": "Check the spelling of your search",
-      "tipGeneral": "Try a more general word, like “iPhone” or “laptop”",
+      "tipGeneral": "Try a more general word, like “sofa” or “bed”",
       "tipBrowse": "Browse a popular category below",
       "popular": "Popular right now",
       "error": "We couldn't search right now. Please try again.",
@@ -389,7 +389,7 @@
       "haveAccountText": "Sign in for saved addresses and faster checkout. Guests can check out too.",
       "signIn": "Sign in",
       "emptyTitle": "Your cart is empty",
-      "emptyText": "Browse our phones, laptops and appliances and add what you like.",
+      "emptyText": "Browse our sofas, beds and tables and add what you like.",
       "startShopping": "Start shopping",
       "loadFailed": "We couldn't load your cart. Please try again.",
       "retry": "Try again",
@@ -415,7 +415,7 @@
       "secure": "Secure checkout",
       "secureShort": "Secure",
       "back": "Back",
-      "copyright": "© {year} 3 Sixty Technologies",
+      "copyright": "© {year} {marketplace}",
       "deliveryPolicy": "Delivery",
       "returnsPolicy": "Returns",
       "haveAccount": "Already have an account?",
@@ -663,7 +663,7 @@
       "perkTrack": "Track every delivery",
       "staffNote": "Staff members sign in here too with their email and password — you’ll be taken to the admin panel.",
       "loginTitle": "Sign in",
-      "newHere": "New to 3 Sixty? <link>Create an account</link>",
+      "newHere": "New to {marketplace}? <link>Create an account</link>",
       "passwordUpdated": "Password updated. Sign in with your new password.",
       "identifier": "Email or phone number",
       "password": "Password",
@@ -779,7 +779,7 @@
         "notVerifiedText": "We sent you a verification link when you registered. Open it, then sign in again.",
         "verifiedNotice": "Your email is confirmed. Sign in to continue.",
         "registerUnavailable": "We can’t send the verification email right now, so your account wasn’t created. Please try again shortly, or register with your phone number only.",
-        "tagline": "Electronics & home appliances · Rwanda",
+        "tagline": "Furniture marketplace · Rwanda",
         "spamNote": "It can take a minute to arrive. Not there? Check your spam or junk folder.",
         "resendLink": "Resend confirmation email",
         "resendIn": "Resend confirmation email in {time}",
@@ -1065,7 +1065,7 @@
       "title": "We can’t find that page",
       "text": "The link may be old, or the product is no longer sold. Try searching, or head back to the homepage.",
       "searchLabel": "Search products",
-      "searchPlaceholder": "Search for phones, laptops, TVs…",
+      "searchPlaceholder": "Search for sofas, beds, tables…",
       "search": "Search",
       "home": "Back to home",
       "contact": "Contact us"
@@ -1113,7 +1113,7 @@
       "emailTitle": "Email",
       "visit": "Visit our store",
       "quoteTitle": "Request a business quote",
-      "quoteText": "For 10+ units, corporate purchases, schools and institutions.",
+      "quoteText": "For offices, hotels, schools and institutions buying 10 or more pieces.",
       "company": "Company / institution",
       "companyPlaceholder": "e.g. Green Hills Academy",
       "contactName": "Contact person",
@@ -1242,10 +1242,10 @@
       "subject": "Subject",
       "subjectPlaceholders": {
         "order": "e.g. When will my order arrive?",
-        "product": "e.g. Does this laptop have a backlit keyboard?",
+        "product": "e.g. What are the exact dimensions of this sofa?",
         "payment": "e.g. My MoMo payment did not go through",
-        "warranty": "e.g. My phone screen stopped working",
-        "returns": "e.g. I want to return my headphones",
+        "warranty": "e.g. A drawer on my dresser broke",
+        "returns": "e.g. I want to return my dining chairs",
         "other": "e.g. Do you have a shop in Musanze?"
       },
       "orderNumber": "Order number (optional)",
@@ -1303,7 +1303,7 @@
       "latestReply": "New reply",
       "conversation": "Conversation",
       "you": "You",
-      "supportName": "3 Sixty support",
+      "supportName": "{marketplace} support",
       "closedNote": "This conversation is closed. Write below if you still need help and we'll reopen it.",
       "replyLabel": "Your reply",
       "replyPlaceholder": "Write your reply…",
@@ -1326,9 +1326,9 @@
     },
     "services": {
       "metaTitle": "Our Technical Services",
-      "metaDescription": "CCTV, gate automation, access control, networking, electronics repair and technical training for homes, businesses and institutions in Rwanda.",
+      "metaDescription": "Furniture assembly, installation, delivery and setup, upholstery and repair for homes, offices, hotels and schools in Rwanda.",
       "title": "Our Technical Services",
-      "intro": "At 3Sixty Technologies Ltd, we deliver innovative technology solutions designed to make homes, businesses and institutions smarter, safer and more efficient. From advanced security systems and smart automation to IT infrastructure, electronics repair and technical training, we provide reliable solutions backed by professional expertise.",
+      "intro": "Beyond the furniture itself, {marketplace} connects you with trained fitters for assembly, wall mounting, delivery and room setup, upholstery and wood repair — for homes, offices, hotels and schools across Rwanda.",
       "listLabel": "Services",
       "empty": "Our services will be listed here soon. Talk to our team in the meantime.",
       "error": "We couldn’t load our services. Please try again.",
@@ -1456,6 +1456,80 @@
     },
     "storePage": {
       "location": "Location:"
+    }
+  },
+  "furniture": {
+    "names": {
+      "width_cm": "Width",
+      "depth_cm": "Depth",
+      "height_cm": "Height",
+      "seat_height_cm": "Seat height",
+      "weight_kg": "Weight",
+      "material": "Material",
+      "color": "Colour",
+      "style": "Style",
+      "finish": "Finish",
+      "condition": "Condition",
+      "assembly_required": "Assembly required"
+    },
+    "cm": "{value} cm",
+    "kg": "{value} kg",
+    "yes": "Yes",
+    "no": "No",
+    "material": {
+      "solid_wood": "Solid wood",
+      "engineered_wood": "Engineered wood",
+      "bamboo": "Bamboo",
+      "rattan": "Rattan",
+      "metal": "Metal",
+      "glass": "Glass",
+      "marble": "Marble",
+      "stone": "Stone",
+      "fabric": "Fabric",
+      "leather": "Leather",
+      "faux_leather": "Faux leather",
+      "plastic": "Plastic",
+      "foam": "Foam"
+    },
+    "color": {
+      "natural": "Natural",
+      "oak": "Oak",
+      "walnut": "Walnut",
+      "white": "White",
+      "black": "Black",
+      "grey": "Grey",
+      "beige": "Beige",
+      "brown": "Brown",
+      "blue": "Blue",
+      "green": "Green",
+      "red": "Red",
+      "yellow": "Yellow",
+      "multicolour": "Multicolour"
+    },
+    "style": {
+      "modern": "Modern",
+      "contemporary": "Contemporary",
+      "classic": "Classic",
+      "rustic": "Rustic",
+      "industrial": "Industrial",
+      "scandinavian": "Scandinavian",
+      "mid_century": "Mid-century",
+      "african": "African"
+    },
+    "finish": {
+      "natural": "Natural",
+      "matte": "Matte",
+      "satin": "Satin",
+      "gloss": "Gloss",
+      "lacquered": "Lacquered",
+      "painted": "Painted",
+      "polished": "Polished",
+      "upholstered": "Upholstered"
+    },
+    "condition": {
+      "new": "New",
+      "refurbished": "Refurbished",
+      "used": "Used"
     }
   }
 }

@@ -66,7 +66,7 @@ These templates exist in `backend/app/services/email_templates.py` and are teste
 
 3. `SMTP_FROM_NAME` (optional, one line, at most 64 characters) is the sender name inboxes show, as in `3 Sixty Technologies <the.account@gmail.com>`. A bare address looks less trustworthy to spam filters.
 4. `SMTP_USE_TLS=true` is required with credentials. The connection uses STARTTLS with a verified certificate and never falls back to plain text.
-5. **Development safety:** with `APP_ENV=development` and `NOTIFICATION_PROVIDER=smtp`, the API refuses to start unless `EMAIL_ALLOWED_RECIPIENTS` is set. Email to any other address is recorded as `failed` with `recipient_not_allowed` and is never handed to Gmail. A seeded database full of `@seed.3sixty.local` customers therefore cannot email anyone by mistake.
+5. **Development safety:** with `APP_ENV=development` and `NOTIFICATION_PROVIDER=smtp`, the API refuses to start unless `EMAIL_ALLOWED_RECIPIENTS` is set. Email to any other address is recorded as `failed` with `recipient_not_allowed` and is never handed to Gmail. A seeded database full of `@seed.furnihub.local` customers therefore cannot email anyone by mistake.
 6. Gmail limits daily sending (about 500 messages a day for a personal account). It is for testing, not for launch.
 
 On the Render test deployment (`APP_ENV=production`), Gmail also needs `TEMPORARY_GMAIL_SMTP_ENABLED=true` (see [README.md](README.md)). There:

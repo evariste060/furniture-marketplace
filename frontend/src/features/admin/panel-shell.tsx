@@ -130,8 +130,8 @@ function Sidebar({
     <div className="flex min-h-full w-full flex-col">
       <div className="flex items-start justify-between gap-2 px-5 pt-[18px] pb-4">
         <div className="flex flex-col gap-1.5">
-          <NextLink href={home} aria-label={homeLabel} className="block w-[150px] rounded-lg bg-white px-2 py-1">
-            <Logo height={50} alt="" eager className="h-auto! w-full" />
+          <NextLink href={home} aria-label={homeLabel} className="block w-fit rounded-lg bg-white px-2.5 py-1.5">
+            <Logo height={34} alt="" />
           </NextLink>
           <span className="text-cap text-odm">{panelLabel}</span>
         </div>

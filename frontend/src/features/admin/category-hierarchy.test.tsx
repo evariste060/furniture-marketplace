@@ -57,6 +57,7 @@ function respond(product?: Record<string, unknown>) {
     if (path === "/api/v1/staff/categories") return ok({ items: CATEGORIES });
     if (path === "/api/v1/staff/brands") return ok({ items: BRANDS });
     if (path === "/api/v1/staff/products/{product_id}") return ok(product);
+    if (path === "/api/v1/catalog/attributes") return ok({ attributes: [], default_set: [], sets: {} });
     return ok({ items: [], total: 0, page: 1, size: 20 });
   });
 }

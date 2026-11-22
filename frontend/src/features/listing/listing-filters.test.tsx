@@ -91,3 +91,28 @@ describe("Subcategory filter", () => {
     expect(within(group).getByRole("link", { name: "Gaming Laptops" })).toHaveAttribute("href", "/category/gaming-laptops");
   });
 });
+
+describe("furniture attribute filters (ADR-014 phase 6)", () => {
+  const withAttributes = {
+    ...FACETS,
+    attributes: [
+      { key: "material", values: [{ value: "solid_wood", count: 2 }, { value: "fabric", count: 0 }] },
+      { key: "color", values: [{ value: "oak", count: 0 }] },
+      { key: "style", values: [{ value: "modern", count: 1 }] },
+    ],
+  } as unknown as CatalogFacets;
+
+  it("lists codes with matches, translated, and leaves empty groups out", () => {
+    renderPanel(<FilterPanel state={parseListingState({})} facets={withAttributes} basePath="/category/sofas" base={{ category: "sofas" }} />);
+    const material = screen.getByRole("group", { name: "Material" });
+    expect(within(material).getByRole("checkbox", { name: /Solid wood/ })).not.toBeChecked();
+    expect(within(material).queryByRole("checkbox", { name: /Fabric/ })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Colour" })).toBeNull();
+    expect(screen.getByRole("group", { name: "Style" })).toBeInTheDocument();
+  });
+
+  it("keeps a chosen code without matches, ticked, so it can be unticked", () => {
+    renderPanel(<FilterPanel state={parseListingState({ color: "oak" })} facets={withAttributes} basePath="/category/sofas" base={{ category: "sofas" }} />);
+    expect(within(screen.getByRole("group", { name: "Colour" })).getByRole("checkbox", { name: /Oak/ })).toBeChecked();
+  });
+});

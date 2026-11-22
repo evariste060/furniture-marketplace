@@ -3,8 +3,9 @@ alternative and a short SMS text for every message the outbox sends, plus the pa
 code, the email verification link, and one template whose business workflow does not exist yet
 (refund acknowledgement; see PENDING_TEMPLATES).
 
-Pure functions of plain data: no database, settings or network, so every template is rendered
-the same way in tests. Every value is HTML-escaped. The HTML is table-based with inline styles
+Pure functions of plain data: no database or network, so every template is rendered the same
+way in tests. The brand is the MARKETPLACE_NAME setting (ADR-014 decision 16), read once.
+Every value is HTML-escaped. The HTML is table-based with inline styles
 (email clients ignore stylesheets) and reads as one column on a phone. Links are built by the
 caller from SITE_URL; without it (None) a message carries no button and no link.
 """
@@ -13,7 +14,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from html import escape
 
-BRAND = "3 Sixty Technologies"
+from app.core.config import get_settings
+
+BRAND = get_settings().marketplace_name
 NAVY = "#0d2d52"
 PRIMARY = "#0866f5"
 TEXT = "#1b2b3a"

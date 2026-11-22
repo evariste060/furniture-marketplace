@@ -1,5 +1,6 @@
-"""Seed the six technical services (ADR-013, SC-02; texts from the Services module brief,
-approved 2026-11-17).
+"""Seed the furniture services (ADR-014 decision 15, phase 6: the technical services of ADR-013
+become furniture services, with the same tables, endpoints and UI), and hide the six technical
+services of the electronics shop.
 
 Run from backend/, with the API database migrated and the seed administrator present
 (scripts/seed_development_catalogue.py):
@@ -13,12 +14,13 @@ database host is local. Nothing runs this on startup, deploy or migration.
 Every change goes through the application service as the seed administrator, so it is validated
 and audited like a change made in the admin. Re-runnable: a service whose slug already exists is
 left exactly as staff keep it (texts, items, order, visibility), and items are added only to a
-service this run creates. It never deletes anything. Services are created without an image: the
+service this run creates. A technical service is only hidden (is_active false), never deleted,
+so its past requests stay readable in the admin. Services are created without an image: the
 storefront shows its placeholder until staff upload a photo. Kinyarwanda texts are left empty
 (the storefront falls back to English) until reviewed translations are written in the admin.
 
-Services 4 (IT infrastructure) and 6 (technical training) and every intro are DRAFTS for the
-business owner to confirm (docs/frontend/rw-review-admin.md lists them).
+Every text here is a DEVELOPMENT DRAFT for the project owner to confirm. Prices are never shown:
+a service is requested through its form and quoted by the store, as before.
 """
 
 from __future__ import annotations
@@ -42,7 +44,11 @@ from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 from app.core.errors import AppError  # noqa: E402
 from app.core.request_context import RequestContext  # noqa: E402
 from app.models import ServiceCategory, User  # noqa: E402
-from app.schemas.services import ServiceCreateRequest, ServiceItemCreateRequest  # noqa: E402
+from app.schemas.services import (  # noqa: E402
+    ServiceCreateRequest,
+    ServiceItemCreateRequest,
+    ServiceUpdateRequest,
+)
 from app.services.technical_services import ServiceAdmin  # noqa: E402
 
 CTX = RequestContext(ip_address=None, user_agent="seed_services")
@@ -60,133 +66,108 @@ class SeedService:
 
 SERVICES: tuple[SeedService, ...] = (
     SeedService(
-        "cctv-security",
-        "CCTV & Security Surveillance",
-        "cctv",
-        "Professional CCTV supply, installation and monitoring for homes, offices, shops and "
-        "institutions.",
-        "We supply, install and maintain CCTV systems that protect homes, offices, shops and "
-        "institutions, and let you watch over them from your smartphone.\n\n"
-        "Our technicians plan the cameras, cabling and recording equipment for your site, set "
-        "everything up and stay available for inspection, maintenance and repair.",
+        "furniture-assembly",
+        "Furniture Assembly",
+        "hammer",
+        "Flat-pack and large furniture put together at your home or office by trained fitters.",
+        "Our fitters assemble beds, wardrobes, desks, shelving and kitchen units, from any store "
+        "on the marketplace or bought elsewhere.\n\n"
+        "They bring their own tools, check every part before they start, and take the packaging "
+        "away when they finish.",
         (
-            "CCTV camera supply and installation",
-            "IP, HD analogue and wireless camera systems",
-            "Indoor and outdoor surveillance solutions",
-            "DVR and NVR installation and configuration",
-            "Remote monitoring through smartphones",
-            "Night vision, motion detection and security alerts",
-            "CCTV cabling, networking and system upgrades",
-            "Inspection, maintenance, troubleshooting and repair",
-            "Security surveillance for homes, offices, shops and institutions",
+            "Beds, bunk beds and cots",
+            "Wardrobes, dressers and chests of drawers",
+            "Desks, office chairs and meeting tables",
+            "Shelving, bookcases and TV units",
+            "Garden and outdoor sets",
+            "Packaging removed after assembly",
         ),
     ),
     SeedService(
-        "gate-automation",
-        "Smart Gates & Gate Automation",
-        "gate",
-        "Automatic sliding and swing gates you can open by remote or smartphone, installed and "
-        "maintained by our team.",
-        "We automate sliding and swing gates so you can open them by remote control or from "
-        "your smartphone, safely and reliably.\n\n"
-        "From the motor and controller to safety sensors and backup power, our team installs "
-        "the complete system and keeps it running with diagnostics, repair and preventive "
-        "maintenance.",
+        "installation-wall-mounting",
+        "Installation & Wall Mounting",
+        "ruler",
+        "Shelves, cabinets, TV units and mirrors fixed safely to your walls.",
+        "We measure, drill and mount wall cabinets, floating shelves, mirrors and TV units, with "
+        "the right fixings for brick, block or plasterboard walls.\n\n"
+        "Large pieces such as wardrobes and bookcases are anchored to the wall so they cannot "
+        "tip over, which matters most in children's rooms.",
         (
-            "Automatic sliding gate systems",
-            "Automatic swing gate systems",
-            "Electric gate motor supply and installation",
-            "Remote-controlled gate systems",
-            "GSM, Wi-Fi and smartphone-controlled gate access",
-            "Gate automation controllers and accessories",
-            "Safety sensors and vehicle detection",
-            "Backup battery and power solutions",
-            "Gate motor diagnostics, repair and preventive maintenance",
+            "Wall cabinets and floating shelves",
+            "Mirrors and wall art",
+            "TV units and wall brackets",
+            "Anti-tip anchoring for tall furniture",
+            "Curtain rails and blinds",
         ),
     ),
     SeedService(
-        "automation-access-control",
-        "Smart Automation & Access Control",
-        "fingerprint",
-        "Smart home and office automation, biometric and card access, smart locks and intercoms.",
-        "We make homes and offices smarter and more secure with automation, access control and "
-        "intercom systems.\n\n"
-        "Choose biometric, card or keypad access, smart locks, video door phones, automatic "
-        "doors or parking barriers, and we integrate them into one system that is easy to "
-        "manage.",
+        "delivery-and-setup",
+        "Delivery & Room Setup",
+        "truck",
+        "Heavy pieces carried in, placed where you want them and set up, across Kigali.",
+        "For large orders and heavy pieces, our team carries the furniture up stairs and through "
+        "narrow doors, places it in the right room and sets it up.\n\n"
+        "Offices, hotels and schools can book a whole room or floor at once.",
         (
-            "Smart home and office automation",
-            "Biometric access control systems",
-            "RFID and card access systems",
-            "Keypad access control",
-            "Electronic and smart door locks",
-            "Video door phones and intercom systems",
-            "Automatic doors and parking barriers",
-            "Access management and system integration",
-        ),
-    ),
-    SeedService(  # DRAFT: business owner to confirm
-        "it-networking",
-        "IT Infrastructure & Networking",
-        "network",
-        "Reliable networks for offices and institutions, from cabling and Wi-Fi to servers and "
-        "ongoing IT support.",
-        "We design, install and support the networks that offices and institutions depend on "
-        "every day.\n\n"
-        "From structured cabling and Wi-Fi to servers, firewalls and bandwidth management, we "
-        "build a reliable infrastructure and keep it running with IT support and maintenance "
-        "contracts.",
-        (
-            "Structured cabling (Cat6 and fibre)",
-            "LAN and Wi-Fi network design and installation",
-            "Router, switch and access point configuration",
-            "Server installation and setup",
-            "Network security and firewall setup",
-            "Internet sharing and bandwidth management",
-            "IT support and maintenance contracts",
+            "Carrying up stairs and through narrow doors",
+            "Placing furniture in the room of your choice",
+            "Setting up beds, tables and seating",
+            "Whole-room setup for offices, hotels and schools",
         ),
     ),
     SeedService(
-        "electronics-repair",
-        "Phone, Computer & Electronics Repair",
-        "wrench",
-        "Fast, reliable repair for phones, tablets, laptops, desktops, printers and other "
-        "electronics.",
-        "Our technicians diagnose and repair phones, tablets, laptops, desktops, printers and "
-        "other electronics quickly and reliably.\n\n"
-        "We replace screens, batteries and charging ports, repair motherboards, upgrade memory "
-        "and storage, install software and help recover data where feasible.",
+        "upholstery-repair",
+        "Upholstery & Furniture Repair",
+        "sofa",
+        "Sofas and chairs reupholstered, and broken joints, legs and drawers repaired.",
+        "Give a favourite sofa or set of dining chairs a new life: we replace worn foam and "
+        "fabric, and repair loose joints, broken legs and sticking drawers.\n\n"
+        "We collect the piece in Kigali, or work at your home when it is too large to move.",
         (
-            "Smartphone and tablet repair",
-            "Laptop and desktop computer repair",
-            "Screen, battery and charging-port replacement",
-            "Motherboard and PCB diagnostics and repair",
-            "Operating system and software installation",
-            "RAM and SSD upgrades",
-            "Printer repair and maintenance",
-            "Data backup and recovery assistance, where feasible",
-            "General electronics diagnostics and troubleshooting",
+            "Sofa and chair reupholstery",
+            "Foam and cushion replacement",
+            "Loose joints, legs and frames",
+            "Drawer runners and door hinges",
+            "Collection and return in Kigali",
         ),
     ),
-    SeedService(  # DRAFT: business owner to confirm
-        "technical-training",
-        "Technical Training",
-        "graduation-cap",
-        "Hands-on practical training in security systems, networking and electronics repair.",
-        "We train individuals and company teams in the practical skills our own technicians use "
-        "every day.\n\n"
-        "Sessions are hands-on, with real equipment, and cover security systems, gate "
-        "automation and access control, networking, and phone and computer repair.",
+    SeedService(
+        "refinishing",
+        "Wood Refinishing & Polishing",
+        "paintbrush",
+        "Scratched or faded wooden furniture sanded, stained and polished.",
+        "We restore wooden tables, cabinets and doors: sanding out scratches and stains, "
+        "matching the colour and finishing with oil, lacquer or polish.",
         (
-            "CCTV installation and maintenance training",
-            "Gate automation and access control installation",
-            "Networking fundamentals",
-            "Phone and computer repair training",
-            "Hands-on practical sessions with real equipment",
-            "Training for individuals and company teams",
+            "Sanding and scratch removal",
+            "Staining and colour matching",
+            "Oil, lacquer and polish finishes",
+            "Antique and family pieces",
         ),
     ),
 )
+
+# The electronics shop's technical services (ADR-013): hidden, never deleted.
+RETIRED = (
+    "cctv-security",
+    "gate-automation",
+    "automation-access-control",
+    "it-networking",
+    "electronics-repair",
+    "technical-training",
+)
+
+
+def retire(db: Session, admin: User, apply: bool) -> list[str]:
+    """The technical services still shown, hidden (only read in a dry run)."""
+    hidden: list[str] = []
+    for service in db.scalars(
+        select(ServiceCategory).where(ServiceCategory.slug.in_(RETIRED), ServiceCategory.is_active)
+    ):
+        hidden.append(service.slug)
+        if apply:
+            ServiceAdmin.update(db, admin, service.id, ServiceUpdateRequest(is_active=False), CTX)
+    return hidden
 
 
 def seed(db: Session, admin: User, apply: bool) -> tuple[list[str], list[str]]:
@@ -233,15 +214,19 @@ def main(argv: list[str] | None = None) -> int:
     try:
         with sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)() as db:
             try:
-                created, kept = seed(db, _admin(db), args.confirm)
+                admin = _admin(db)
+                created, kept = seed(db, admin, args.confirm)
+                hidden = retire(db, admin, args.confirm)
             except AppError as exc:
                 print(f"Stopped: {exc.code}: {exc.message}", file=sys.stderr)
                 return 1
             suffix = "" if args.confirm else " (dry run, nothing written)"
-            print(f"Technical services{suffix}:")
+            print(f"Furniture services{suffix}:")
             verb = "created" if args.confirm else "to create"
             print(f"  {verb}: {len(created)} {', '.join(created)}".rstrip())
             print(f"  already present, left as they are: {len(kept)} {', '.join(kept)}".rstrip())
+            verb = "hidden" if args.confirm else "to hide"
+            print(f"  technical services {verb}: {len(hidden)} {', '.join(hidden)}".rstrip())
     finally:
         engine.dispose()
     return 0

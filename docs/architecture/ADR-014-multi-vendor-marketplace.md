@@ -44,7 +44,7 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Built (2026-11-22, owner decisions 2026-11-21); see "Phase 3 as built" |
 | 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Built (2026-11-22); see "Phase 4 as built" |
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Built (2026-11-22); see "Phase 5 as built" |
-| 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
+| 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Built (2026-11-22); see "Phase 6 as built" |
 
 ## Staff roles: SC-05 (2026-11-21)
 
@@ -243,6 +243,49 @@ English and Kinyarwanda together: `store.soldBy`, `store.storePage`, `admin.sell
 - **Order screens:** the customer's order pages and the admin order detail do not show "Sold by" per line or the stores' parts. Only the cart was in this phase's scope.
 - **The Sellers page** has no owner contact action beyond email and phone links, and no bulk decisions.
 - **Branding:** the store page uses the current storefront frame; furniture taxonomy and FurniHub branding are phase 6.
+
+## Phase 6 as built (2026-11-22)
+
+Furniture domain, services, branding and development data (decisions 14 to 17). One migration (`f2a4c6e8b0d1`, service icons); no table or column changes.
+
+### Taxonomy and attributes (decision 14)
+
+- **One definition:** `backend/app/core/furniture.py` holds the taxonomy (six main categories, 25 subcategories: Living Room, Bedroom, Dining, Office, Outdoor, Kids) and the attributes: `width_cm`, `depth_cm`, `height_cm`, `seat_height_cm`, `weight_kg` (positive numbers up to 100,000), `material`, `color`, `style`, `finish`, `condition` (fixed codes) and `assembly_required` (true or false). An attribute set per category says which ones the editor offers (seating adds the seat height; mattresses have dimensions, weight, material and condition); any other category gets the default set. **The category names, choice lists and sets are development drafts for the owner to confirm.**
+- **Stored in `products.specifications`**, beside the free specifications. Product create and update (staff and seller) check only the known keys: a wrong code, a non-number measurement or a non-boolean is 422; any other key stays free text. Products saved before this phase are not rewritten.
+- **`GET /api/v1/catalog/attributes`** (public) lists the definitions and sets. **`material`, `color`, `style`** filters on `/catalog/products` and `/catalog/facets` (each repeatable; any code of a key matches, every key applies; an unknown code is 422), and `facets.attributes` counts each code with the other filters applied, listing a chosen code with 0.
+- **Categories are data:** `scripts/apply_category_taxonomy.py` (development only, dry run by default) creates the taxonomy categories through the admin service and hides, never deletes, the categories and brands that are not furniture once nothing uses them.
+
+### Storefront and editor
+
+- Listing pages have Material, Colour and Style groups (desktop panel and mobile sheet), in the URL as `?material=…&color=…&style=…`. The frontend mirrors the codes in `frontend/src/lib/furniture.ts` so the URL is read before any request; a test checks every code has English and Kinyarwanda labels (`messages/*.json` → `furniture`).
+- The product page shows the attributes first, named and valued in the reader's language with units; free specifications follow as written.
+- The product editor (admin and seller) has a "Furniture details" card with the category's set from `/catalog/attributes`: number inputs (decimal comma accepted), choice and yes/no selects. Values are sent typed; the free rows are unchanged. An attribute outside the set that a product already has stays visible, so a category change loses nothing.
+- Nav icons follow the furniture words of the category's slug and name.
+
+### Services and quotes (decision 15)
+
+- `scripts/seed_services.py` creates five furniture services (assembly, installation and wall mounting, delivery and room setup, upholstery and repair, wood refinishing; English drafts, Kinyarwanda left to staff) with the new icons `hammer`, `truck`, `ruler`, `sofa`, `paintbrush`, and hides the six technical services (never deleted, so their requests stay readable).
+- Quotes: copy only (offices, hotels, schools and institutions); no change to the form, API or data.
+
+### Branding (decision 16)
+
+- Backend: `MARKETPLACE_NAME` (default `FurniHub`) in settings; the API root name and the email templates read it.
+- Frontend: `NEXT_PUBLIC_MARKETPLACE_NAME` (default `FurniHub`) in `src/lib/marketplace.ts`. Messages write `{marketplace}` and the name is filled in once when they are loaded (`i18n/request.ts`), so no component holds it. The logo is a drawn wordmark (sofa mark and name) until FurniHub artwork is approved; the 404 illustration is an armchair. The electronics copy in English and Kinyarwanda was rewritten together; the Kinyarwanda texts are drafts listed in `docs/frontend/rw-review*.md`.
+
+### Development data (decision 17)
+
+- `scripts/seed_catalogue_data.py` now seeds the taxonomy (with parents), five invented manufacturers (most products have none), 30 furniture products in subcategories with typed attributes and variants, furniture banners, and the same people and history as before (15 orders, 12 reviews) over the three demo stores. Seed e-mail domain: `seed.furnihub.local`. Placeholder photos are drawn per main category.
+
+### Tests
+
+`test_furniture_attributes.py` (definitions, checks on create and update by staff and seller, filters, facets, order), `test_service_icons_migration.py`, the migration head in the earlier migration tests, `test_seed_development_catalogue.py` for the furniture data; frontend `lib/furniture.test.ts`, `lib/marketplace.test.ts`, `features/admin/furniture-fields.test.ts`, filter-group render tests, the furniture nav icons.
+
+### Not in this phase, and points for the owner
+
+- **To confirm:** the taxonomy, the choice lists and sets, the service texts, the Kinyarwanda drafts and the wordmark (no FurniHub logo file exists yet).
+- **Local development database not reseeded.** It is still at phase 2 (`b2d4f6a8c0e1`). Moving it to this phase deletes its demo data (seed cleanup with the phase-2 code, `alembic upgrade head`, runtime-role provisioning, the seed, the taxonomy and services scripts) and waits for the owner's go-ahead.
+- **Not filtered:** dimensions, weight, finish and condition are shown and edited but not offered as filters.
+- **Quote form** still asks for "product name or model" lines; widening it (rooms, delivery dates per item) was out of scope.
 
 ## Consequences
 

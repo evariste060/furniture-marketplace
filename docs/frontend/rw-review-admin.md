@@ -7,12 +7,12 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1633 strings.
+1642 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
 | `shell.panel` | Admin Panel | Ubuyobozi | |
-| `shell.home` | 3 Sixty Technologies admin — dashboard | 3 Sixty Technologies ubuyobozi — imbonerahamwe | |
+| `shell.home` | {marketplace} admin — dashboard | {marketplace} ubuyobozi — imbonerahamwe | |
 | `shell.navLabel` | Admin | Ubuyobozi | |
 | `shell.groups.overview` | Overview | Incamake | |
 | `shell.groups.orders` | Orders | Amatumiza | |
@@ -126,7 +126,7 @@ updates `messages/admin.rw.json`.
 | `dashboard.greeting.morning` | Good morning, {name} | Mwaramutse, {name} | |
 | `dashboard.greeting.afternoon` | Good afternoon, {name} | Mwiriwe, {name} | |
 | `dashboard.greeting.evening` | Good evening, {name} | Mwiriwe, {name} | |
-| `dashboard.subtitle` | Here’s what’s happening at 3 Sixty Technologies today. | Dore ibiri kubera muri 3 Sixty Technologies uyu munsi. | |
+| `dashboard.subtitle` | Here’s what’s happening at {marketplace} today. | Dore ibiri kubera kuri {marketplace} uyu munsi. | |
 | `dashboard.totalOrders` | Total Orders | Amatumiza yose | |
 | `dashboard.totalRevenue` | Total Revenue | Amafaranga yose yinjiye | |
 | `dashboard.products` | Products | Ibicuruzwa | |
@@ -426,6 +426,7 @@ updates `messages/admin.rw.json`.
 | `editor.errors.variantName` | Enter the variant name. | Andika izina ry'ubwoko. | |
 | `editor.errors.sku` | Enter a SKU without spaces, “/” or “__”. | Andika SKU idafite imyanya, “/” cyangwa “__”. | |
 | `editor.errors.skuTaken` | Another variant uses this SKU. | Ubundi bwoko bukoresha iyi SKU. | |
+| `editor.errors.measure` | Enter a number above 0, like 92 or 92.5. | Andika umubare urenze 0, nka 92 cyangwa 92.5. | |
 | `editor.altOf` | Edit the description of photo {n} | Hindura igisobanuro cy'ifoto {n} | |
 | `editor.mainCategory` | Main category | Icyiciro gikuru | |
 | `editor.subcategory` | Subcategory | Icyiciro gito | |
@@ -437,6 +438,9 @@ updates `messages/admin.rw.json`.
 | `editor.hiddenOption` | {name} (hidden) | {name} (byahishwe) | |
 | `editor.brandsIn` | Brands in {name} | Ibirango bya {name} | |
 | `editor.otherBrands` | Other brands | Ibindi birango | |
+| `editor.furniture` | Furniture details | Ibiranga igikoresho | |
+| `editor.furnitureHelp` | Measurements in centimetres and kilograms. Material, colour and style are the storefront's filters. | Ibipimo muri santimetero na kilogarama. Icyo gikozwemo, ibara n'imiterere ni byo bishakishwa mu iduka. | |
+| `editor.notSet` | Not set | Ntibyashyizweho | |
 | `bulk.title` | Product photos | Amafoto y'ibicuruzwa | |
 | `bulk.backToProducts` | Back to products | Subira ku bicuruzwa | |
 | `bulk.description` | Upload many product photos at once. Each file’s name says which product it belongs to and where it goes. | Ohereza amafoto menshi y'ibicuruzwa icyarimwe. Izina rya buri dosiye rivuga igicuruzwa ifoto ari iyacyo n'aho ijya. | |
@@ -675,7 +679,7 @@ updates `messages/admin.rw.json`.
 | `catalogue.menuShort.subcategories` | Subcategories | Ibyiciro bito | |
 | `catalogue.menuShort.productBrands` | Brands of its products | Ibirango by’ibicuruzwa byayo | |
 | `catalogue.hiddenCount` | {count} hidden | {count} bihishe | |
-| `catalogue.noSubcategoriesHelp` | Subcategories group its products, like “Refrigerators” under Home Appliances. Customers browse them on the store. | Ibyiciro bito bitondekanya ibicuruzwa byayo, nka “Firigo” muri Ibikoresho byo mu rugo. Abakiriya babireba mu iduka. | |
+| `catalogue.noSubcategoriesHelp` | Subcategories group its products, like “Sofas” under Living Room. Customers browse them on the store. | Ibyiciro bito bitondekanya ibicuruzwa byayo, nka “Intebe” muri Icyumba cy'uruganiriro. Abakiriya babireba mu iduka. | |
 | `catalogue.quickAdd.title` | Add subcategories | Ongeraho ibyiciro bito | |
 | `catalogue.quickAdd.firstTitle` | Add the first subcategories of {name} | Ongeraho ibyiciro bito bya mbere bya {name} | |
 | `catalogue.quickAdd.placeholder` | Type a name, e.g. Smart Watches | Andika izina, urugero: Amasaha y’ubwenge | |
@@ -1109,7 +1113,7 @@ updates `messages/admin.rw.json`.
 | `quotes.status.contacted` | Contacted | Twavuganye | |
 | `quotes.status.closed` | Closed | Bwafunzwe | |
 | `quotes.whatsapp` | WhatsApp | WhatsApp | |
-| `quotes.whatsappMessage` | Hello {name}, this is 3 Sixty Technologies about your quote request {reference}. | Muraho {name}, ni 3 Sixty Technologies ku bijyanye n'ubusabe bwanyu bw'igiciro {reference}. | |
+| `quotes.whatsappMessage` | Hello {name}, this is {marketplace} about your quote request {reference}. | Muraho {name}, ni {marketplace} ku bijyanye n'ubusabe bwanyu bw'igiciro {reference}. | |
 | `quotes.newTab` | (opens in a new tab) | (bifungukira mu idirishya rishya) | |
 | `quotes.location` | Delivery location | Aho bizagezwa | |
 | `quotes.neededBy` | Needed by | Bikenewe bitarenze | |
@@ -1218,7 +1222,7 @@ updates `messages/admin.rw.json`.
 | `messages.messageCount` | {count, plural, one {# message} other {# messages}} | {count, plural, one {Ubutumwa #} other {Ubutumwa #}} | |
 | `messages.open` | Open the conversation with {name} | Fungura ikiganiro na {name} | |
 | `messages.whatsappName` | WhatsApp {name} | Andikira {name} kuri WhatsApp | |
-| `messages.whatsappMessage` | Hello {name}, this is 3 Sixty Technologies about your message {reference}. | Muraho {name}, ni 3 Sixty Technologies ku butumwa bwanyu {reference}. | |
+| `messages.whatsappMessage` | Hello {name}, this is {marketplace} about your message {reference}. | Muraho {name}, ni {marketplace} ku butumwa bwanyu {reference}. | |
 | `messages.copyReference` | Copy reference {reference} | Koporora nimero {reference} | |
 | `messages.startedAgo` | Started {ago} · {date} | Cyatangiye {ago} · {date} | |
 | `messages.subjectTitle` | Subject | Icyo kivugaho | |
@@ -1312,6 +1316,11 @@ updates `messages/admin.rw.json`.
 | `services.icons.graduation-cap` | Graduation cap (training) | Ingofero y'abarangije (amahugurwa) | |
 | `services.icons.shield` | Shield (security) | Ingabo (umutekano) | |
 | `services.icons.cpu` | Chip (IT) | Chip (IT) | |
+| `services.icons.hammer` | Hammer | Inyundo | |
+| `services.icons.truck` | Delivery truck | Imodoka itwara ibintu | |
+| `services.icons.ruler` | Measuring ruler | Igipimo | |
+| `services.icons.sofa` | Sofa | Intebe | |
+| `services.icons.paintbrush` | Paintbrush | Uburoso bwo gusiga irangi | |
 | `services.activeService` | Show this service in the store | Erekana iyi serivisi mu iduka | |
 | `services.deleteHint` | {count, plural, one {This service has # request,} other {This service has # requests,}} so it can’t be deleted. Hide it instead. | {count, plural, one {Iyi serivisi ifite ubusabe #,} other {Iyi serivisi ifite ubusabe #,}} ntishobora gusibwa. Yihishe aho kuyisiba. | |
 | `services.image` | Image | Ifoto | |
@@ -1361,7 +1370,7 @@ updates `messages/admin.rw.json`.
 | `serviceRequests.call` | Call | Hamagara | |
 | `serviceRequests.whatsapp` | WhatsApp | WhatsApp | |
 | `serviceRequests.newTab` | (opens in a new tab) | (bifungukira mu idirishya rishya) | |
-| `serviceRequests.whatsappMessage` | Hello {name}, this is 3 Sixty Technologies about your request {reference} for {service}. | Muraho {name}, ni 3 Sixty Technologies ku bijyanye n'ubusabe bwanyu {reference} bwa {service}. | |
+| `serviceRequests.whatsappMessage` | Hello {name}, this is {marketplace} about your request {reference} for {service}. | Muraho {name}, ni {marketplace} ku bijyanye n'ubusabe bwanyu {reference} bwa {service}. | |
 | `serviceRequests.location` | Location | Aho aherereye | |
 | `serviceRequests.preferredDate` | Preferred date | Itariki yifuza | |
 | `serviceRequests.language` | Language | Ururimi | |

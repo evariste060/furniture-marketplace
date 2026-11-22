@@ -8,6 +8,7 @@ from uuid import UUID
 from sqlalchemy import Integer, Text, cast, func, or_, select, type_coerce
 from sqlalchemy.orm import Session, aliased, joinedload, selectinload
 
+from app.core.furniture import ATTRIBUTES, FILTER_ATTRIBUTES
 from app.models import (
     Brand,
     Category,
@@ -234,12 +235,16 @@ class ProductFilters:
     on_sale: bool | None = None
     min_rating: int | None = None
     store_slug: str | None = None  # ADR-014 phase 2: one approved store's products
+    # ADR-014 phase 6: (attribute key, codes) pairs; any code of a key matches, all keys apply.
+    attributes: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
 
 def _filtered_products(f: ProductFilters):
     query = _base_public_products()
     if f.store_slug:
         query = query.where(Store.slug == f.store_slug)
+    for key, codes in f.attributes:
+        query = query.where(Product.specifications[key].astext.in_(codes))
     if f.min_rating is not None:
         query = query.where(Product.rating_average >= f.min_rating)
     if f.featured is not None:
@@ -396,6 +401,25 @@ def _counts_within(session: Session, filters: ProductFilters, conditions: list[A
     return [int(value) for value in row]
 
 
+def _attribute_counts(session: Session, filters: ProductFilters, key: str) -> list[dict[str, Any]]:
+    """A furniture attribute's codes with matches, in the attribute's own order, ignoring that
+    attribute's own filter (multi-select, like brands). A chosen code without matches stays
+    listed with count 0, so it can be unticked."""
+    without = replace(filters, attributes=tuple(p for p in filters.attributes if p[0] != key))
+    value = Product.specifications[key].astext
+    rows = session.execute(
+        _filtered_products(without)
+        .with_only_columns(value, type_coerce(func.count(Product.id), Integer))
+        .where(value.in_(ATTRIBUTES[key].choices))
+        .group_by(value)
+    ).all()
+    counts: dict[str, int] = {code: n for code, n in rows}
+    for _, codes in (p for p in filters.attributes if p[0] == key):
+        for code in codes:
+            counts.setdefault(code, 0)
+    return [{"value": c, "count": counts[c]} for c in ATTRIBUTES[key].choices if c in counts]
+
+
 def catalogue_facets(session: Session, filters: ProductFilters) -> dict[str, Any]:
     """Counts for each filter option. Each group ignores its own filter and applies the others,
     so a count is what the list would show with that option picked (multi-select brands)."""
@@ -472,7 +496,12 @@ def catalogue_facets(session: Session, filters: ProductFilters) -> dict[str, Any
         replace(filters, min_rating=None),
         [Product.rating_average >= stars for stars in RATING_THRESHOLDS],
     )
+    attributes = [
+        {"key": key, "values": _attribute_counts(session, filters, key)}
+        for key in FILTER_ATTRIBUTES
+    ]
     return {
+        "attributes": attributes,
         "total": _count(session, _filtered_products(filters)),
         "brands": sorted(brands.values(), key=lambda b: (str(b["name"]).lower(), b["slug"])),
         "categories": [

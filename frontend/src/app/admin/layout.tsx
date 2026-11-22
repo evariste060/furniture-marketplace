@@ -7,12 +7,13 @@ import { ToastProvider } from "@/components/ui/toast";
 import { AdminShell } from "@/features/admin/shell";
 import { NotStaff } from "@/features/admin/not-staff";
 import { QueryProvider } from "@/lib/query/provider";
+import { MARKETPLACE_NAME } from "@/lib/marketplace";
 import { getAdminVisitor } from "@/lib/staff";
 import { inter } from "../fonts";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Admin · 3 Sixty Technologies", template: "%s · Admin · 3 Sixty Technologies" },
+  title: { default: `Admin · ${MARKETPLACE_NAME}`, template: `%s · Admin · ${MARKETPLACE_NAME}` },
   robots: { index: false, follow: false },
 };
 

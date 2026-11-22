@@ -4,9 +4,12 @@ import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 import { StrictMode, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import en from "../../../messages/en.json";
+import raw from "../../../messages/en.json";
+import { MARKETPLACE_NAME, withMarketplace } from "@/lib/marketplace";
 import { LoginView, RegisterView } from "./auth-forms";
 import { VerifyEmailView } from "./email-verification";
+
+const en = withMarketplace(raw);
 
 /** Email verification on the storefront (backend 2026-11-12): registration's "check your email",
  * the /verify-email page, asking for a new link, and sign-in refused until verified. This app's
@@ -109,7 +112,7 @@ describe("Registration", () => {
     const heading = screen.getByRole("heading", { name: v.checkTitle });
     await waitFor(() => expect(heading).toHaveFocus()); // announced to screen readers
     // The owner's Screen 1: the brand band, the address in bold, the spam reminder, one action.
-    expect(within(dialog).getByText("3 Sixty Technologies")).toBeInTheDocument();
+    expect(within(dialog).getByText(MARKETPLACE_NAME)).toBeInTheDocument();
     expect(within(dialog).getByText(v.tagline)).toBeInTheDocument();
     expect(within(dialog).getByText("aline@example.rw").tagName).toBe("B");
     expect(within(dialog).getByText(v.spamNote)).toBeInTheDocument();
@@ -238,7 +241,7 @@ describe("The verification page", () => {
     await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByRole("link", { name: v.goToLogin })).toHaveAttribute("href", "/login?verified=1");
     expect(screen.getByText(v.verifiedText)).toBeInTheDocument();
-    expect(screen.getByText("3 Sixty Technologies")).toBeInTheDocument();
+    expect(screen.getByText(MARKETPLACE_NAME)).toBeInTheDocument();
     expect(api.POST).toHaveBeenCalledTimes(1);
     expect(window.localStorage.length + window.sessionStorage.length).toBe(0);
   });

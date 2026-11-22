@@ -86,6 +86,7 @@ describe("the seller's catalogue", () => {
       if (path === "/api/v1/catalog/categories")
         return ok([{ id: "living", name: "Living room", slug: "living", sort_order: 1, parent_id: null, children: [{ id: "sofas", name: "Sofas", slug: "sofas", sort_order: 1, parent_id: "living", children: [] }] }]);
       if (path === "/api/v1/catalog/brands") return ok([]);
+      if (path === "/api/v1/catalog/attributes") return ok({ attributes: [], default_set: [], sets: {} });
       return ok(PAGE);
     });
     api.POST.mockImplementation(() => ok({ id: "p1" }, 201));

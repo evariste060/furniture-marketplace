@@ -14,7 +14,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import IntegrityError
 
 from tests.integration.test_image_media_migration import _alembic
-from tests.integration.test_products_store_migration import _revision
+from tests.integration.test_products_store_migration import HEAD, _revision
 
 PHASE3 = "c6e8a0b2d4f7"
 BEFORE = "b2d4f6a8c0e1"
@@ -86,7 +86,7 @@ def _line(conn, order_id: str, store_id: str) -> None:
 
 
 def test_every_line_belongs_to_its_store_seller_order(pg_engine: Engine):
-    assert _revision(pg_engine) == PHASE3
+    assert _revision(pg_engine) == HEAD
     order, store = _order(pg_engine), _store(pg_engine)
     with pytest.raises(IntegrityError, match="fk_order_items_seller_order"):
         with pg_engine.begin() as conn:
@@ -137,6 +137,7 @@ def test_the_upgrade_refuses_and_changes_nothing_while_orders_exist(pg_engine: E
         conn.execute(text("DELETE FROM orders"))
     _alembic(pg_engine, "upgrade", PHASE3)
     assert _revision(pg_engine) == PHASE3
+    _alembic(pg_engine, "upgrade", HEAD)
     _alembic(pg_engine, "check")  # the models match the migrated schema
 
 
@@ -146,7 +147,7 @@ def test_the_downgrade_refuses_while_seller_orders_exist(pg_engine: Engine):
         _seller_order(conn, order, store)
     with pytest.raises(RuntimeError, match="1 seller orders exist"):
         _alembic(pg_engine, "downgrade", BEFORE)
-    assert _revision(pg_engine) == PHASE3
+    assert _revision(pg_engine) == HEAD  # the refused downgrade rolled back as a whole
     with pg_engine.begin() as conn:
         assert conn.execute(text("SELECT count(*) FROM seller_orders")).scalar_one() == 1
         conn.execute(text("DELETE FROM seller_orders"))

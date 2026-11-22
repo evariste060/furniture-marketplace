@@ -1271,6 +1271,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/catalog/attributes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Attributes
+         * @description The furniture attributes (dimensions, material, color, style, finish, weight, condition,
+         *     assembly required) and each category's attribute set (ADR-014 phase 6). Defined in code
+         *     (app/core/furniture.py), not in the database.
+         */
+        get: operations["get_attributes_api_v1_catalog_attributes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/catalog/products": {
         parameters: {
             query?: never;
@@ -3645,6 +3667,29 @@ export interface components {
              */
             reason?: string | null;
         };
+        /** AttributeFacet */
+        AttributeFacet: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "material" | "color" | "style";
+            /**
+             * Values
+             * @description Codes with matches, in the attribute's order; a chosen code without matches is listed with count 0
+             */
+            values: components["schemas"]["AttributeValueFacet"][];
+        };
+        /** AttributeValueFacet */
+        AttributeValueFacet: {
+            /**
+             * Value
+             * @description The attribute code (app/core/furniture.py)
+             */
+            value: string;
+            /** Count */
+            count: number;
+        };
         /**
          * AuditRecordResponse
          * @description One row of audit_records. change_summary carries status, ip_address, user_agent and
@@ -4225,6 +4270,50 @@ export interface components {
              */
             cart_token?: string | null;
         };
+        /**
+         * CatalogAttribute
+         * @description A furniture attribute (ADR-014 phase 6). Labels are the frontend's (English and
+         *     Kinyarwanda messages), keyed by `key` and by each choice code.
+         */
+        CatalogAttribute: {
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "choice" | "number" | "boolean";
+            /** Unit */
+            unit?: ("cm" | "kg") | null;
+            /**
+             * Choices
+             * @description Choice codes, in display order
+             */
+            choices?: string[];
+            /**
+             * Filterable
+             * @description Offered as a storefront filter
+             */
+            filterable: boolean;
+        };
+        /**
+         * CatalogAttributes
+         * @description The attributes and the attribute set of each category. A category without its own set
+         *     uses its main category's, else `default_set`. Sets guide the editor; nothing is required.
+         */
+        CatalogAttributes: {
+            /** Attributes */
+            attributes: components["schemas"]["CatalogAttribute"][];
+            /** Default Set */
+            default_set: string[];
+            /**
+             * Sets
+             * @description Category slug -> attribute keys, in order
+             */
+            sets: {
+                [key: string]: string[];
+            };
+        };
         /** CatalogBrand */
         CatalogBrand: {
             /**
@@ -4312,6 +4401,11 @@ export interface components {
              * @description 4 stars and up, 3 and up, 2 and up, 1 and up
              */
             ratings: components["schemas"]["RatingFacet"][];
+            /**
+             * Attributes
+             * @description The furniture filters (ADR-014 phase 6): material, color and style, each ignoring its own filter
+             */
+            attributes?: components["schemas"]["AttributeFacet"][];
         };
         /** CatalogProduct */
         CatalogProduct: {
@@ -7070,7 +7164,7 @@ export interface components {
              * Icon
              * @enum {string}
              */
-            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu";
+            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu" | "hammer" | "truck" | "ruler" | "sofa" | "paintbrush";
             image: components["schemas"]["PublicImage"] | null;
             /** Intro */
             intro: string;
@@ -7099,7 +7193,7 @@ export interface components {
              * Icon
              * @enum {string}
              */
-            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu";
+            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu" | "hammer" | "truck" | "ruler" | "sofa" | "paintbrush";
             image: components["schemas"]["PublicImage"] | null;
             /** Items */
             items: components["schemas"]["PublicServiceItem"][];
@@ -7921,7 +8015,7 @@ export interface components {
              * Icon
              * @enum {string}
              */
-            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu";
+            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu" | "hammer" | "truck" | "ruler" | "sofa" | "paintbrush";
             /**
              * Is Active
              * @default true
@@ -8062,7 +8156,7 @@ export interface components {
             /** Intro Rw */
             intro_rw?: string | null;
             /** Icon */
-            icon?: ("cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu") | null;
+            icon?: ("cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu" | "hammer" | "truck" | "ruler" | "sofa" | "paintbrush") | null;
             /** Is Active */
             is_active?: boolean | null;
         };
@@ -9167,7 +9261,7 @@ export interface components {
              * Icon
              * @enum {string}
              */
-            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu";
+            icon: "cctv" | "gate" | "fingerprint" | "network" | "wrench" | "graduation-cap" | "shield" | "cpu" | "hammer" | "truck" | "ruler" | "sofa" | "paintbrush";
             image: components["schemas"]["PublicImage"] | null;
             /** Sort Order */
             sort_order: number;
@@ -14574,6 +14668,26 @@ export interface operations {
             };
         };
     };
+    get_attributes_api_v1_catalog_attributes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogAttributes"];
+                };
+            };
+        };
+    };
     get_products_api_v1_catalog_products_get: {
         parameters: {
             query?: {
@@ -14603,6 +14717,12 @@ export interface operations {
                 min_rating?: number | null;
                 /** @description Store slug: only that approved store's products (ADR-014). A store that is not approved, or does not exist, matches nothing */
                 store?: string | null;
+                /** @description Furniture material code (app/core/furniture.py); repeat it for several (any of them matches). Matches products whose specifications hold that code. */
+                material?: string[] | null;
+                /** @description Furniture color code (app/core/furniture.py); repeat it for several (any of them matches). Matches products whose specifications hold that code. */
+                color?: string[] | null;
+                /** @description Furniture style code (app/core/furniture.py); repeat it for several (any of them matches). Matches products whose specifications hold that code. */
+                style?: string[] | null;
             };
             header?: never;
             path?: never;
@@ -14651,6 +14771,12 @@ export interface operations {
                 min_rating?: number | null;
                 /** @description Store slug: only that approved store's products (ADR-014). A store that is not approved, or does not exist, matches nothing */
                 store?: string | null;
+                /** @description Furniture material code (app/core/furniture.py); repeat it for several (any of them matches). Matches products whose specifications hold that code. */
+                material?: string[] | null;
+                /** @description Furniture color code (app/core/furniture.py); repeat it for several (any of them matches). Matches products whose specifications hold that code. */
+                color?: string[] | null;
+                /** @description Furniture style code (app/core/furniture.py); repeat it for several (any of them matches). Matches products whose specifications hold that code. */
+                style?: string[] | null;
             };
             header?: never;
             path?: never;

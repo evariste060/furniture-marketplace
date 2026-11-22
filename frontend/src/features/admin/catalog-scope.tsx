@@ -66,7 +66,7 @@ export type CatalogScope = {
 type PublicCategory = components["schemas"]["CatalogCategory"] & { children?: PublicCategory[] };
 export function flattenCategories(tree: readonly PublicCategory[], parentId: string | null = null): CategoryNode[] {
   return tree.flatMap((c) => [
-    { id: c.id, name: c.name, parent_id: c.parent_id ?? parentId, is_active: true, sort_order: c.sort_order },
+    { id: c.id, name: c.name, parent_id: c.parent_id ?? parentId, is_active: true, sort_order: c.sort_order, slug: c.slug },
     ...flattenCategories(c.children ?? [], c.id),
   ]);
 }

@@ -16,7 +16,7 @@ from tests.integration.test_image_media_migration import _alembic
 
 PHASE2 = "b2d4f6a8c0e1"
 BEFORE = "a9d3f5b7c1e2"
-HEAD = "c6e8a0b2d4f7"  # ADR-014 phase 3 (seller orders)
+HEAD = "f2a4c6e8b0d1"  # ADR-014 phase 6 (furniture service icons)
 
 
 def _revision(engine: Engine) -> str:

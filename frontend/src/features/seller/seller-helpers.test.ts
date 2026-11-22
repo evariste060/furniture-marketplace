@@ -111,8 +111,8 @@ describe("catalogue scope", () => {
       { id: "living", name: "Living room", slug: "living", sort_order: 1, parent_id: null, children: [{ id: "sofas", name: "Sofas", slug: "sofas", sort_order: 1, parent_id: "living", children: [] }] },
     ];
     expect(flattenCategories(tree as never)).toEqual([
-      { id: "living", name: "Living room", parent_id: null, is_active: true, sort_order: 1 },
-      { id: "sofas", name: "Sofas", parent_id: "living", is_active: true, sort_order: 1 },
+      { id: "living", name: "Living room", parent_id: null, is_active: true, sort_order: 1, slug: "living" },
+      { id: "sofas", name: "Sofas", parent_id: "living", is_active: true, sort_order: 1, slug: "sofas" },
     ]);
   });
 });

@@ -1,7 +1,7 @@
 {
   "shell": {
     "panel": "Admin Panel",
-    "home": "3 Sixty Technologies admin — dashboard",
+    "home": "{marketplace} admin — dashboard",
     "navLabel": "Admin",
     "groups": {
       "overview": "Overview",
@@ -147,7 +147,7 @@
       "afternoon": "Good afternoon, {name}",
       "evening": "Good evening, {name}"
     },
-    "subtitle": "Here’s what’s happening at 3 Sixty Technologies today.",
+    "subtitle": "Here’s what’s happening at {marketplace} today.",
     "totalOrders": "Total Orders",
     "totalRevenue": "Total Revenue",
     "products": "Products",
@@ -497,7 +497,8 @@
       "noImages": "Add at least one photo before publishing.",
       "variantName": "Enter the variant name.",
       "sku": "Enter a SKU without spaces, “/” or “__”.",
-      "skuTaken": "Another variant uses this SKU."
+      "skuTaken": "Another variant uses this SKU.",
+      "measure": "Enter a number above 0, like 92 or 92.5."
     },
     "altOf": "Edit the description of photo {n}",
     "mainCategory": "Main category",
@@ -509,7 +510,10 @@
     "loadingCategories": "Loading categories…",
     "hiddenOption": "{name} (hidden)",
     "brandsIn": "Brands in {name}",
-    "otherBrands": "Other brands"
+    "otherBrands": "Other brands",
+    "furniture": "Furniture details",
+    "furnitureHelp": "Measurements in centimetres and kilograms. Material, colour and style are the storefront's filters.",
+    "notSet": "Not set"
   },
   "bulk": {
     "title": "Product photos",
@@ -802,7 +806,7 @@
       "productBrands": "Brands of its products"
     },
     "hiddenCount": "{count} hidden",
-    "noSubcategoriesHelp": "Subcategories group its products, like “Refrigerators” under Home Appliances. Customers browse them on the store.",
+    "noSubcategoriesHelp": "Subcategories group its products, like “Sofas” under Living Room. Customers browse them on the store.",
     "quickAdd": {
       "title": "Add subcategories",
       "firstTitle": "Add the first subcategories of {name}",
@@ -1334,7 +1338,7 @@
       "closed": "Closed"
     },
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Hello {name}, this is 3 Sixty Technologies about your quote request {reference}.",
+    "whatsappMessage": "Hello {name}, this is {marketplace} about your quote request {reference}.",
     "newTab": "(opens in a new tab)",
     "location": "Delivery location",
     "neededBy": "Needed by",
@@ -1471,7 +1475,7 @@
     "messageCount": "{count, plural, one {# message} other {# messages}}",
     "open": "Open the conversation with {name}",
     "whatsappName": "WhatsApp {name}",
-    "whatsappMessage": "Hello {name}, this is 3 Sixty Technologies about your message {reference}.",
+    "whatsappMessage": "Hello {name}, this is {marketplace} about your message {reference}.",
     "copyReference": "Copy reference {reference}",
     "startedAgo": "Started {ago} · {date}",
     "subjectTitle": "Subject",
@@ -1579,7 +1583,12 @@
       "wrench": "Wrench (repair)",
       "graduation-cap": "Graduation cap (training)",
       "shield": "Shield (security)",
-      "cpu": "Chip (IT)"
+      "cpu": "Chip (IT)",
+      "hammer": "Hammer",
+      "truck": "Delivery truck",
+      "ruler": "Measuring ruler",
+      "sofa": "Sofa",
+      "paintbrush": "Paintbrush"
     },
     "activeService": "Show this service in the store",
     "deleteHint": "{count, plural, one {This service has # request,} other {This service has # requests,}} so it can’t be deleted. Hide it instead.",
@@ -1640,7 +1649,7 @@
     "call": "Call",
     "whatsapp": "WhatsApp",
     "newTab": "(opens in a new tab)",
-    "whatsappMessage": "Hello {name}, this is 3 Sixty Technologies about your request {reference} for {service}.",
+    "whatsappMessage": "Hello {name}, this is {marketplace} about your request {reference} for {service}.",
     "location": "Location",
     "preferredDate": "Preferred date",
     "language": "Language",

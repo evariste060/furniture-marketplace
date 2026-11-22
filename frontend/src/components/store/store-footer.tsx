@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { MARKETPLACE_NAME } from "@/lib/marketplace";
 import { Suspense } from "react";
 import { SOCIAL_NAMES, SOCIAL_NETWORKS, SocialIcon, type SocialNetwork } from "@/components/ui/social-icons";
 import { getCategories, getServices, getStoreContact } from "@/lib/api/catalogue";
@@ -19,7 +20,7 @@ const SOCIAL_HOVER: Record<SocialNetwork, string> = {
   linkedin: "hover:bg-[#0A66C2] focus-visible:bg-[#0A66C2]",
 };
 /** The name in the copyright line until the store name setting is read. */
-const STORE_NAME = "3 Sixty Technologies";
+const STORE_NAME = MARKETPLACE_NAME;
 
 /** Footer.dc.html, rearranged (owner, 2026-11-18): one row with the logo, tagline and social
  * icons, then Shop (the API's categories), Services (ADR-013), Customer Service and Company; "We
@@ -32,8 +33,8 @@ export async function StoreFooter() {
     <footer className="bg-navy text-white">
       <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 pt-14 pb-10 sm:grid-cols-4 lg:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))] lg:gap-x-8">
         <div className="col-span-2 flex max-w-[320px] flex-col gap-4 sm:col-span-4 lg:col-span-1">
-          <div className="w-[168px] rounded-[10px] bg-white px-2.5 py-1.5">
-            <Logo height={58} alt={th("logoAlt")} className="h-auto! w-full" />
+          <div className="w-fit rounded-[10px] bg-white px-3 py-2">
+            <Logo height={40} alt={th("logoAlt")} />
           </div>
           <p className="text-sm text-odm">{t("tagline")}</p>
           <Suspense fallback={null}>

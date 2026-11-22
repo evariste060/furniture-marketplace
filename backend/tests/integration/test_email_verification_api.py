@@ -129,7 +129,7 @@ def test_registration_with_an_email_creates_an_unverified_customer_and_sends_one
 
     [message] = verification_mail.messages
     assert message.recipient == EMAIL and message.channel == "email"
-    assert "3 Sixty Technologies" in message.subject
+    assert get_settings().marketplace_name in message.subject
     assert f"{VERIFY_PAGE}#token=" in message.text and message.html and VERIFY_PAGE in message.html
     assert "24 hours" in message.text
     assert "because this address was used to register" in message.text

@@ -17,7 +17,9 @@ import { Toggle } from "@/components/ui/toggle";
 import { useToast } from "@/components/ui/toast";
 import { ApiError } from "@/lib/api/errors";
 import type { components } from "@/lib/api/schema";
+import { browserApi } from "@/lib/api/client";
 import { cx } from "@/lib/cx";
+import { ATTRIBUTE_KEYS, BOOLEAN_KEYS, CHOICES, isAttributeKey, NUMBER_KEYS, type AttributeKey, type ChoiceKey } from "@/lib/furniture";
 import { useCatalogScope } from "./catalog-scope";
 import { brandOptions, groupBrandOptions, mainOptions, splitCategory, subOptions, type CategoryNode, type Option } from "./category-options";
 import { PRODUCT_TONE, type ProductStatus } from "./products";
@@ -45,7 +47,53 @@ export function rowsToObject(rows: Row[]): Record<string, string> {
   return out;
 }
 function objectToRows(value: Record<string, unknown>): Row[] {
-  return Object.entries(value).map(([key, v]) => ({ key, value: String(v ?? "") }));
+  return Object.entries(value)
+    .filter(([key]) => !isAttributeKey(key))
+    .map(([key, v]) => ({ key, value: String(v ?? "") }));
+}
+
+/** Furniture attributes (ADR-014 phase 6) as the form holds them: text per key, "" when unset.
+ * A boolean is "true" or "false". */
+export type AttributeValues = Partial<Record<AttributeKey, string>>;
+const NUMBER_MAX = 100_000; // app/core/furniture.py NUMBER_MAX
+
+export function attributeValues(specifications: Record<string, unknown>): AttributeValues {
+  const out: AttributeValues = {};
+  for (const [key, value] of Object.entries(specifications)) if (isAttributeKey(key) && value !== null && value !== undefined) out[key] = String(value);
+  return out;
+}
+
+function isNumberKey(key: AttributeKey): boolean {
+  return (NUMBER_KEYS as readonly string[]).includes(key);
+}
+
+/** A measurement as typed ("92.5" or "92,5"), or null when it is not a positive number up to
+ * the backend's limit. */
+export function parseMeasure(text: string): number | null {
+  const value = text.trim().replace(",", ".");
+  if (!/^\d+(\.\d+)?$/.test(value)) return null;
+  const n = Number(value);
+  return n > 0 && n <= NUMBER_MAX ? n : null;
+}
+
+/** The attributes as the API stores them: numbers, booleans and choice codes; unset ones left out. */
+export function attributesToObject(values: AttributeValues): Record<string, string | number | boolean> {
+  const out: Record<string, string | number | boolean> = {};
+  for (const key of ATTRIBUTE_KEYS) {
+    const value = values[key]?.trim();
+    if (!value) continue;
+    if (isNumberKey(key)) {
+      const n = parseMeasure(value);
+      if (n !== null) out[key] = n;
+    } else if ((BOOLEAN_KEYS as readonly string[]).includes(key)) out[key] = value === "true";
+    else out[key] = value;
+  }
+  return out;
+}
+
+/** The product's specifications: the attributes first, then the free rows. */
+function specificationsOf(form: Pick<FormState, "attrs" | "specs">): Record<string, unknown> {
+  return { ...attributesToObject(form.attrs), ...rowsToObject(form.specs) };
 }
 
 /** Moves one item of a list to another index (the image drag and the move buttons). */
@@ -94,6 +142,7 @@ type FormState = {
   slug: string;
   status: ProductStatus;
   featured: boolean;
+  attrs: AttributeValues;
   specs: Row[];
 };
 
@@ -110,6 +159,7 @@ function initialForm(product: Product | null): FormState {
     slug: product?.slug ?? "",
     status: product?.status ?? "draft",
     featured: product?.is_featured ?? false,
+    attrs: product ? attributeValues(product.specifications) : {},
     specs: product ? objectToRows(product.specifications) : [{ key: "", value: "" }],
   };
 }
@@ -142,6 +192,10 @@ function EditorForm({ product }: { product: Product | null }) {
       if (v.compare.trim() && parseAmount(v.compare) === null) found[`compare-${id}`] = t("editor.errors.price");
       if (parseAmount(v.threshold) === null) found[`threshold-${id}`] = t("editor.errors.threshold");
     }
+    for (const key of NUMBER_KEYS) {
+      const value = form.attrs[key]?.trim();
+      if (value && parseMeasure(value) === null) found[`attr-${key}`] = t("editor.errors.measure");
+    }
     return found;
   };
 
@@ -154,7 +208,7 @@ function EditorForm({ product }: { product: Product | null }) {
         category_id: form.categoryId,
         model: form.model.trim() || null,
         warranty_text: form.warranty.trim() || null,
-        specifications: rowsToObject(form.specs),
+        specifications: specificationsOf(form),
         status: form.status,
         // Platform merchandising only; the seller routes never receive it.
         ...(scope.merchandising ? { is_featured: form.featured } : {}),
@@ -172,7 +226,7 @@ function EditorForm({ product }: { product: Product | null }) {
       if (form.categoryId !== before.categoryId) changes.category_id = body.category_id;
       if (form.model !== before.model) changes.model = body.model;
       if (form.warranty !== before.warranty) changes.warranty_text = body.warranty_text;
-      if (JSON.stringify(body.specifications) !== JSON.stringify(rowsToObject(before.specs))) changes.specifications = body.specifications;
+      if (JSON.stringify(body.specifications) !== JSON.stringify(specificationsOf(before))) changes.specifications = body.specifications;
       if (scope.merchandising && form.featured !== before.featured) changes.is_featured = form.featured;
       if (slug && slug !== product.slug) changes.slug = slug;
       // Variant prices first: publishing checks the product as it will be.
@@ -293,6 +347,8 @@ function EditorForm({ product }: { product: Product | null }) {
 
           {product && <Variants product={product} edits={variants} setEdits={setVariants} errors={errors} manage={manage} />}
 
+          <FurnitureFields categories={categories.data} categoryId={form.categoryId} values={form.attrs} errors={errors} onChange={(attrs) => update("attrs", attrs)} />
+
           <Card padding={24} className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="t-h3">{t("editor.specs")}</h2>
@@ -338,6 +394,100 @@ function EditorForm({ product }: { product: Product | null }) {
         </div>
       </fieldset>
     </form>
+  );
+}
+
+/** The attribute set for a category: its own, else its main category's, else the default. */
+export function attributeSetFor(
+  definitions: { default_set: string[]; sets: Record<string, string[]> },
+  categories: readonly CategoryNode[],
+  categoryId: string,
+): string[] {
+  const category = categories.find((c) => c.id === categoryId);
+  const parent = category?.parent_id ? categories.find((c) => c.id === category.parent_id) : undefined;
+  for (const slug of [category?.slug, parent?.slug]) if (slug && definitions.sets[slug]) return definitions.sets[slug];
+  return definitions.default_set;
+}
+
+/** Furniture details (ADR-014 decision 14): the attributes of the category's set (from GET
+ * /catalog/attributes, never hard-coded per category), plus any other attribute the product
+ * already has, so a change of category loses nothing. The backend checks every value again. */
+function FurnitureFields({
+  categories,
+  categoryId,
+  values,
+  errors,
+  onChange,
+}: {
+  categories: CategoryNode[] | undefined;
+  categoryId: string;
+  values: AttributeValues;
+  errors: Record<string, string>;
+  onChange: (values: AttributeValues) => void;
+}) {
+  const t = useTranslations("admin");
+  const tf = useTranslations("furniture");
+  const definitions = useQuery({
+    queryKey: ["catalog-attributes"],
+    staleTime: Infinity,
+    queryFn: async () => {
+      const { data, error, response } = await browserApi.GET("/api/v1/catalog/attributes");
+      if (!data) throw ApiError.from(response.status, error);
+      return data;
+    },
+  });
+  if (!definitions.data || !categoryId) return null;
+  const set = attributeSetFor(definitions.data, categories ?? [], categoryId);
+  const keys = ATTRIBUTE_KEYS.filter((key) => set.includes(key) || values[key]);
+  if (keys.length === 0) return null;
+  const put = (key: AttributeKey, value: string) => onChange({ ...values, [key]: value });
+  return (
+    <Card padding={24} className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <h2 className="t-h3">{t("editor.furniture")}</h2>
+        <p className="text-sm text-tx2">{t("editor.furnitureHelp")}</p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {keys.map((key) => {
+          const label = tf(`names.${key}`);
+          const value = values[key] ?? "";
+          if (isNumberKey(key))
+            return (
+              <Field key={key} label={`${label} (${key.endsWith("_kg") ? "kg" : "cm"})`} error={errors[`attr-${key}`]}>
+                {(c) => <Input {...c} inputMode="decimal" maxLength={12} value={value} onChange={(e) => put(key, e.target.value)} />}
+              </Field>
+            );
+          if ((BOOLEAN_KEYS as readonly string[]).includes(key))
+            return (
+              <Field key={key} label={label}>
+                {(c) => (
+                  <Select {...c} value={value} onChange={(e) => put(key, e.target.value)}>
+                    <option value="">{t("editor.notSet")}</option>
+                    <option value="true">{tf("yes")}</option>
+                    <option value="false">{tf("no")}</option>
+                  </Select>
+                )}
+              </Field>
+            );
+          const codes: readonly string[] = CHOICES[key as ChoiceKey];
+          return (
+            <Field key={key} label={label}>
+              {(c) => (
+                <Select {...c} value={value} onChange={(e) => put(key, e.target.value)}>
+                  <option value="">{t("editor.notSet")}</option>
+                  {codes.map((code) => (
+                    <option key={code} value={code}>
+                      {tf(`${key}.${code}`)}
+                    </option>
+                  ))}
+                  {value && !codes.includes(value) && <option value={value}>{value}</option>}
+                </Select>
+              )}
+            </Field>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
 

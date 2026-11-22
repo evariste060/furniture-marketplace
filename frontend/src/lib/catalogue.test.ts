@@ -74,6 +74,7 @@ describe("listing state", () => {
       maxPrice: null,
       stock: [],
       minRating: null,
+      attributes: { material: [], color: [], style: [] },
       sort: "popular",
       view: "grid",
       page: 1,

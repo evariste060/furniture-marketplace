@@ -1,4 +1,5 @@
 import { ArrowRight, Building2, ChevronDown, ChevronRight, CreditCard, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { ATTRIBUTE_KEYS, isAttributeKey, specificationRow } from "@/lib/furniture";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -203,18 +204,26 @@ function specText(value: unknown): string | null {
 
 async function Specs({ product }: { product: Product }) {
   const t = await getTranslations("store.productPage");
-  const rows = Object.entries(product.specifications)
-    .map(([key, value]) => [key, specText(value)] as const)
-    .filter((row): row is readonly [string, string] => row[1] !== null);
+  const tf = await getTranslations("furniture");
+  // Furniture attributes (ADR-014 phase 6) first, in their own order, named and valued in the
+  // reader's language; free specifications after them, as the seller wrote them.
+  const entries = Object.entries(product.specifications);
+  const known = ATTRIBUTE_KEYS.flatMap((key) => entries.filter(([k]) => k === key));
+  const rows = [...known, ...entries.filter(([k]) => !isAttributeKey(k))]
+    .filter(([, value]) => specText(value) !== null)
+    .map(([key, value]) => {
+      const row = isAttributeKey(key) ? specificationRow(key, value, tf as never) : { label: key, value: specText(value)! };
+      return [key, row.label, row.value] as const;
+    });
   if (!rows.length) return <p className="text-tx2">{t("noSpecs")}</p>;
   return (
     <div className="overflow-x-auto rounded-xl border border-bd max-sm:rounded-none max-sm:border-0">
       <table className="w-full border-collapse text-sm">
         <tbody>
-          {rows.map(([key, value]) => (
+          {rows.map(([key, label, value]) => (
             <tr key={key} className="border-b border-bd last:border-b-0">
               <th scope="row" className="w-[240px] bg-page px-4 py-3 text-left align-top text-[13px] font-medium text-tx2 max-sm:w-[40%] max-sm:bg-transparent max-sm:px-0 max-sm:py-2">
-                {key}
+                {label}
               </th>
               <td className="px-4 py-3 max-sm:px-0 max-sm:py-2">{value}</td>
             </tr>

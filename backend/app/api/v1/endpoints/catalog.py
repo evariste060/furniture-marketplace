@@ -7,10 +7,13 @@ from sqlalchemy.orm import Session
 from app.api.v1.pagination import PageNumber, PageSize
 from app.api.v1.responses import ERR
 from app.core.errors import NotFound, field_error
+from app.core.furniture import ATTRIBUTE_SETS, ATTRIBUTES, DEFAULT_SET
 from app.db.session import get_db
 from app.models.common import MAX_MONEY_RWF
 from app.repositories.catalog import ProductFilters
 from app.schemas.catalog import (
+    CatalogAttribute,
+    CatalogAttributes,
     CatalogBrand,
     CatalogCategory,
     CatalogFacets,
@@ -38,7 +41,47 @@ def get_brands(session: DbSession) -> list[CatalogBrand]:
     return catalog_service.brands_with_product_counts(session)
 
 
+@router.get("/attributes", response_model=CatalogAttributes)
+def get_attributes() -> CatalogAttributes:
+    """The furniture attributes (dimensions, material, color, style, finish, weight, condition,
+    assembly required) and each category's attribute set (ADR-014 phase 6). Defined in code
+    (app/core/furniture.py), not in the database."""
+    return CatalogAttributes(
+        attributes=[
+            CatalogAttribute(
+                key=a.key,
+                kind=a.kind,
+                unit=a.unit,
+                choices=list(a.choices),
+                filterable=a.filterable,
+            )
+            for a in ATTRIBUTES.values()
+        ],
+        default_set=list(DEFAULT_SET),
+        sets={slug: list(keys) for slug, keys in ATTRIBUTE_SETS.items()},
+    )
+
+
 BrandSlug = Annotated[str, StringConstraints(min_length=1, max_length=180)]
+AttributeCode = Annotated[str, StringConstraints(min_length=1, max_length=40)]
+
+
+def _codes(name: str, values: list[str] | None) -> tuple[str, ...]:
+    """A furniture attribute filter's codes (ADR-014 phase 6); an unknown code is 422."""
+    codes = tuple(dict.fromkeys(values or ()))
+    allowed = ATTRIBUTES[name].choices
+    unknown = [c for c in codes if c not in allowed]
+    if unknown:
+        raise field_error(("query", name), f"{name} must be one of: {', '.join(allowed)}")
+    return codes
+
+
+def _attribute_query(name: str):
+    return Query(
+        max_length=20,
+        description=f"Furniture {name} code (app/core/furniture.py); repeat it for several (any "
+        "of them matches). Matches products whose specifications hold that code.",
+    )
 
 
 def product_filters(
@@ -98,6 +141,9 @@ def product_filters(
             "is not approved, or does not exist, matches nothing",
         ),
     ] = None,
+    material: Annotated[list[AttributeCode] | None, _attribute_query("material")] = None,
+    color: Annotated[list[AttributeCode] | None, _attribute_query("color")] = None,
+    style: Annotated[list[AttributeCode] | None, _attribute_query("style")] = None,
 ) -> ProductFilters:
     """The product list's filters, shared with /facets."""
     if min_price is not None and max_price is not None and min_price > max_price:
@@ -119,6 +165,15 @@ def product_filters(
         on_sale=on_sale,
         min_rating=min_rating,
         store_slug=store,
+        attributes=tuple(
+            (name, codes)
+            for name, codes in (
+                ("material", _codes("material", material)),
+                ("color", _codes("color", color)),
+                ("style", _codes("style", style)),
+            )
+            if codes
+        ),
     )
 
 

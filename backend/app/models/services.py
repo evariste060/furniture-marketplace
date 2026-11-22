@@ -36,6 +36,12 @@ SERVICE_ICONS = (
     "graduation-cap",
     "shield",
     "cpu",
+    # ADR-014 phase 6: furniture services (migration f2a4c6e8b0d1).
+    "hammer",
+    "truck",
+    "ruler",
+    "sofa",
+    "paintbrush",
 )
 
 REQUEST_NAME_MAX_LENGTH = 120

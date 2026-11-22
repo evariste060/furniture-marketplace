@@ -1,5 +1,4 @@
-import { House, Search } from "lucide-react";
-import Image from "next/image";
+import { Armchair, House, Search } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { SearchInput } from "@/components/store/header-actions";
 import { buttonClasses } from "@/components/ui/button";
@@ -14,7 +13,7 @@ export async function NotFoundView() {
       <div className="wrap flex flex-col items-center gap-4 pt-12 pb-16 text-center sm:pt-[72px] sm:pb-20">
         <div className="relative h-[150px] w-[220px]" aria-hidden="true">
           <span className="absolute inset-x-0 top-0 text-[120px] leading-[140px] font-extrabold tracking-[-0.04em] text-light">404</span>
-          <Image src="/brand/not-found-phone.svg" alt="" width={120} height={120} unoptimized className="absolute top-2.5 left-[60px] -rotate-12" />
+          <Armchair size={110} strokeWidth={1.5} className="absolute top-4 left-[55px] -rotate-12 text-pri" />
         </div>
         <h1 className="t-h1">{t("title")}</h1>
         <p className="text-lg max-w-[520px] text-tx2">{t("text")}</p>

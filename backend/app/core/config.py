@@ -142,6 +142,10 @@ class Settings(BaseSettings):
     # - "smtp": real email through the SMTP_* settings (Gmail-compatible), for development and
     #   staging tests. Email only: no SMS. Refused in production until ADR-005 is decided,
     #   except the temporary Gmail test route (TEMPORARY_GMAIL_SMTP_ENABLED below).
+    # The marketplace's name (ADR-014 decision 16): the API's name and the emails' brand. FurniHub
+    # is provisional; a rename is this setting (MARKETPLACE_NAME) and the frontend's
+    # NEXT_PUBLIC_MARKETPLACE_NAME, never a code change.
+    marketplace_name: str = Field(default="FurniHub", min_length=1, max_length=60)
     notification_provider: Literal["none", "console", "mock", "smtp"] = "none"
     smtp_host: str | None = None
     smtp_port: int = Field(default=587, ge=1, le=65535)
@@ -149,7 +153,7 @@ class Settings(BaseSettings):
     smtp_username: str | None = None
     smtp_password: SecretStr | None = None
     smtp_from_email: str | None = None
-    # The sender name inboxes show beside SMTP_FROM_EMAIL, e.g. "3 Sixty Technologies". Unset:
+    # The sender name inboxes show beside SMTP_FROM_EMAIL, e.g. "FurniHub". Unset:
     # the bare address.
     smtp_from_name: str | None = None
     smtp_timeout_seconds: float = Field(default=10, gt=0, le=60)  # each network operation

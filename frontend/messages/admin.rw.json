@@ -1,7 +1,7 @@
 {
   "shell": {
     "panel": "Ubuyobozi",
-    "home": "3 Sixty Technologies ubuyobozi — imbonerahamwe",
+    "home": "{marketplace} ubuyobozi — imbonerahamwe",
     "navLabel": "Ubuyobozi",
     "groups": {
       "overview": "Incamake",
@@ -147,7 +147,7 @@
       "afternoon": "Mwiriwe, {name}",
       "evening": "Mwiriwe, {name}"
     },
-    "subtitle": "Dore ibiri kubera muri 3 Sixty Technologies uyu munsi.",
+    "subtitle": "Dore ibiri kubera kuri {marketplace} uyu munsi.",
     "totalOrders": "Amatumiza yose",
     "totalRevenue": "Amafaranga yose yinjiye",
     "products": "Ibicuruzwa",
@@ -497,7 +497,8 @@
       "noImages": "Ongeramo nibura ifoto imwe mbere yo gushyira ahagaragara.",
       "variantName": "Andika izina ry'ubwoko.",
       "sku": "Andika SKU idafite imyanya, “/” cyangwa “__”.",
-      "skuTaken": "Ubundi bwoko bukoresha iyi SKU."
+      "skuTaken": "Ubundi bwoko bukoresha iyi SKU.",
+      "measure": "Andika umubare urenze 0, nka 92 cyangwa 92.5."
     },
     "altOf": "Hindura igisobanuro cy'ifoto {n}",
     "mainCategory": "Icyiciro gikuru",
@@ -509,7 +510,10 @@
     "loadingCategories": "Ibyiciro biraza…",
     "hiddenOption": "{name} (byahishwe)",
     "brandsIn": "Ibirango bya {name}",
-    "otherBrands": "Ibindi birango"
+    "otherBrands": "Ibindi birango",
+    "furniture": "Ibiranga igikoresho",
+    "furnitureHelp": "Ibipimo muri santimetero na kilogarama. Icyo gikozwemo, ibara n'imiterere ni byo bishakishwa mu iduka.",
+    "notSet": "Ntibyashyizweho"
   },
   "bulk": {
     "title": "Amafoto y'ibicuruzwa",
@@ -802,7 +806,7 @@
       "productBrands": "Ibirango by’ibicuruzwa byayo"
     },
     "hiddenCount": "{count} bihishe",
-    "noSubcategoriesHelp": "Ibyiciro bito bitondekanya ibicuruzwa byayo, nka “Firigo” muri Ibikoresho byo mu rugo. Abakiriya babireba mu iduka.",
+    "noSubcategoriesHelp": "Ibyiciro bito bitondekanya ibicuruzwa byayo, nka “Intebe” muri Icyumba cy'uruganiriro. Abakiriya babireba mu iduka.",
     "quickAdd": {
       "title": "Ongeraho ibyiciro bito",
       "firstTitle": "Ongeraho ibyiciro bito bya mbere bya {name}",
@@ -1334,7 +1338,7 @@
       "closed": "Bwafunzwe"
     },
     "whatsapp": "WhatsApp",
-    "whatsappMessage": "Muraho {name}, ni 3 Sixty Technologies ku bijyanye n'ubusabe bwanyu bw'igiciro {reference}.",
+    "whatsappMessage": "Muraho {name}, ni {marketplace} ku bijyanye n'ubusabe bwanyu bw'igiciro {reference}.",
     "newTab": "(bifungukira mu idirishya rishya)",
     "location": "Aho bizagezwa",
     "neededBy": "Bikenewe bitarenze",
@@ -1471,7 +1475,7 @@
     "messageCount": "{count, plural, one {Ubutumwa #} other {Ubutumwa #}}",
     "open": "Fungura ikiganiro na {name}",
     "whatsappName": "Andikira {name} kuri WhatsApp",
-    "whatsappMessage": "Muraho {name}, ni 3 Sixty Technologies ku butumwa bwanyu {reference}.",
+    "whatsappMessage": "Muraho {name}, ni {marketplace} ku butumwa bwanyu {reference}.",
     "copyReference": "Koporora nimero {reference}",
     "startedAgo": "Cyatangiye {ago} · {date}",
     "subjectTitle": "Icyo kivugaho",
@@ -1579,7 +1583,12 @@
       "wrench": "Urufunguzo (gukora ibyangiritse)",
       "graduation-cap": "Ingofero y'abarangije (amahugurwa)",
       "shield": "Ingabo (umutekano)",
-      "cpu": "Chip (IT)"
+      "cpu": "Chip (IT)",
+      "hammer": "Inyundo",
+      "truck": "Imodoka itwara ibintu",
+      "ruler": "Igipimo",
+      "sofa": "Intebe",
+      "paintbrush": "Uburoso bwo gusiga irangi"
     },
     "activeService": "Erekana iyi serivisi mu iduka",
     "deleteHint": "{count, plural, one {Iyi serivisi ifite ubusabe #,} other {Iyi serivisi ifite ubusabe #,}} ntishobora gusibwa. Yihishe aho kuyisiba.",
@@ -1640,7 +1649,7 @@
     "call": "Hamagara",
     "whatsapp": "WhatsApp",
     "newTab": "(bifungukira mu idirishya rishya)",
-    "whatsappMessage": "Muraho {name}, ni 3 Sixty Technologies ku bijyanye n'ubusabe bwanyu {reference} bwa {service}.",
+    "whatsappMessage": "Muraho {name}, ni {marketplace} ku bijyanye n'ubusabe bwanyu {reference} bwa {service}.",
     "location": "Aho aherereye",
     "preferredDate": "Itariki yifuza",
     "language": "Ururimi",

@@ -140,6 +140,39 @@ class RatingFacet(BaseModel):
     count: int = Field(ge=0)
 
 
+class CatalogAttribute(BaseModel):
+    """A furniture attribute (ADR-014 phase 6). Labels are the frontend's (English and
+    Kinyarwanda messages), keyed by `key` and by each choice code."""
+
+    key: str
+    kind: Literal["choice", "number", "boolean"]
+    unit: Literal["cm", "kg"] | None = None
+    choices: list[str] = Field(default_factory=list, description="Choice codes, in display order")
+    filterable: bool = Field(description="Offered as a storefront filter")
+
+
+class CatalogAttributes(BaseModel):
+    """The attributes and the attribute set of each category. A category without its own set
+    uses its main category's, else `default_set`. Sets guide the editor; nothing is required."""
+
+    attributes: list[CatalogAttribute]
+    default_set: list[str]
+    sets: dict[str, list[str]] = Field(description="Category slug -> attribute keys, in order")
+
+
+class AttributeValueFacet(BaseModel):
+    value: str = Field(description="The attribute code (app/core/furniture.py)")
+    count: int = Field(ge=0)
+
+
+class AttributeFacet(BaseModel):
+    key: Literal["material", "color", "style"]
+    values: list[AttributeValueFacet] = Field(
+        description="Codes with matches, in the attribute's order; a chosen code without matches "
+        "is listed with count 0"
+    )
+
+
 class CatalogFacets(BaseModel):
     """Option counts for the listing's filter panel. Each group ignores its own filter and
     applies the others: a count is what the list would show with that option picked."""
@@ -158,3 +191,8 @@ class CatalogFacets(BaseModel):
     )
     availability: AvailabilityFacet
     ratings: list[RatingFacet] = Field(description="4 stars and up, 3 and up, 2 and up, 1 and up")
+    attributes: list[AttributeFacet] = Field(
+        default_factory=list,
+        description="The furniture filters (ADR-014 phase 6): material, color and style, each "
+        "ignoring its own filter",
+    )

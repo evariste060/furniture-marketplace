@@ -1,4 +1,5 @@
 import type { components } from "@/lib/api/schema";
+import { attributeCodes, EMPTY_ATTRIBUTES, FILTER_KEYS, type AttributeFilters } from "@/lib/furniture";
 import { primaryImage, type ApiImage } from "@/lib/images";
 
 /** Pure catalogue helpers shared by the cards and the listing pages. Prices are whole RWF from the
@@ -119,7 +120,8 @@ export function menuProductQuery(slug: string) {
 
 // ---------------------------------------------------------------------------------------------
 // Listing state in the URL: /deals?brand=a&brand=b&category=c&min_price=…&max_price=…&stock=in
-// &rating=4&sort=price_asc&view=list&page=2 (and q=… on /search)
+// &rating=4&material=solid_wood&color=oak&style=modern&sort=price_asc&view=list&page=2 (and q=…
+// on /search)
 
 /** "relevance" (best match) exists only with a search and is then the default. */
 export const SORTS = ["relevance", "popular", "price_asc", "price_desc", "newest", "top_rated"] as const;
@@ -144,12 +146,14 @@ export type ListingState = {
   /** Both or neither ticked means no availability filter. */
   stock: StockChoice[];
   minRating: number | null;
+  /** Furniture attribute filters (ADR-014 phase 6): known codes per key, any of them matches. */
+  attributes: AttributeFilters;
   sort: ListingSort;
   view: ListingView;
   page: number;
 };
 
-export type ListingFilters = Pick<ListingState, "category" | "brands" | "minPrice" | "maxPrice" | "stock" | "minRating">;
+export type ListingFilters = Pick<ListingState, "category" | "brands" | "minPrice" | "maxPrice" | "stock" | "minRating" | "attributes">;
 
 export const EMPTY_FILTERS: ListingFilters = {
   category: null,
@@ -158,6 +162,7 @@ export const EMPTY_FILTERS: ListingFilters = {
   maxPrice: null,
   stock: [],
   minRating: null,
+  attributes: EMPTY_ATTRIBUTES,
 };
 
 type Params = Record<string, string | string[] | undefined>;
@@ -212,6 +217,7 @@ export function parseListingState(params: Params, { search = false }: { search?:
     maxPrice,
     stock: stock.length === STOCK.length ? [] : stock,
     minRating: rating && rating >= 1 ? rating : null,
+    attributes: Object.fromEntries(FILTER_KEYS.map((key) => [key, attributeCodes(key, all(params[key]))])) as AttributeFilters,
     sort,
     view,
     page: Math.max(1, page),
@@ -228,6 +234,7 @@ export function listingSearch(state: ListingState): string {
   if (state.maxPrice !== null) query.set("max_price", String(state.maxPrice));
   for (const s of state.stock.length === STOCK.length ? [] : state.stock) query.append("stock", s);
   if (state.minRating !== null) query.set("rating", String(state.minRating));
+  for (const key of FILTER_KEYS) for (const code of state.attributes[key]) query.append(key, code);
   if (state.sort !== defaultSort(state)) query.set("sort", state.sort);
   if (state.view !== "grid") query.set("view", state.view);
   if (state.page > 1) query.set("page", String(state.page));
@@ -257,6 +264,7 @@ export function filterQuery(state: ListingFilters & { q?: string | null }) {
     ...(state.maxPrice !== null ? { max_price: state.maxPrice } : {}),
     ...(state.stock.length === 1 ? { in_stock: state.stock[0] === "in" } : {}),
     ...(state.minRating !== null ? { min_rating: state.minRating } : {}),
+    ...Object.fromEntries(FILTER_KEYS.filter((key) => state.attributes[key].length).map((key) => [key, state.attributes[key]])),
   };
 }
 
@@ -271,6 +279,7 @@ export function activeFilterCount(state: ListingFilters): number {
     state.brands.length +
     (state.minPrice !== null || state.maxPrice !== null ? 1 : 0) +
     (state.stock.length === 1 ? 1 : 0) +
-    (state.minRating !== null ? 1 : 0)
+    (state.minRating !== null ? 1 : 0) +
+    FILTER_KEYS.reduce((n, key) => n + state.attributes[key].length, 0)
   );
 }

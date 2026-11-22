@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
   Bell,
   Box,
@@ -24,6 +23,8 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { Logo } from "@/components/store/logo";
+import { MARKETPLACE_NAME } from "@/lib/marketplace";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -72,7 +73,7 @@ export default function StyleGuidePage() {
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div className="flex flex-col gap-1.5">
           <span className="t-over text-pri">Design system</span>
-          <h1 className="t-display text-navy">3 Sixty Technologies UI</h1>
+          <h1 className="t-display text-navy">{MARKETPLACE_NAME} UI</h1>
           <p className="max-w-[640px] text-lg text-tx2">
             One set of tokens and components for the storefront and the admin panel. Font: Inter. Every screen on this
             canvas is built from these parts.
@@ -80,11 +81,11 @@ export default function StyleGuidePage() {
         </div>
         <div className="flex items-center gap-4">
           <Card padding={16}>
-            <Image src="/brand/3sixty-logo.jpeg" alt="3 Sixty Technologies logo on light" width={164} height={64} className="block h-16 w-auto mix-blend-multiply" />
+            <Logo height={56} alt={`${MARKETPLACE_NAME} logo on light`} />
           </Card>
           <div className="rounded-xl bg-navy p-4">
             <div className="rounded-lg bg-white px-2.5 py-1.5">
-              <Image src="/brand/3sixty-logo.jpeg" alt="Logo on dark, in a white plate" width={123} height={48} className="block h-12 w-auto mix-blend-multiply" />
+              <Logo height={40} alt="Logo on dark, in a white plate" />
             </div>
           </div>
         </div>

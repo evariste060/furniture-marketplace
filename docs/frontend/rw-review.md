@@ -6,12 +6,12 @@ Every Kinyarwanda string on the storefront is a **draft** until a native speaker
 or "OK" in the last column (or in a review comment) and the developer updates `messages/rw.json`. Banner text comes from
 the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the admin, not here.
 
-1265 strings.
+1325 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
-| `meta.title` | 3 Sixty Technologies | 3 Sixty Technologies | |
-| `meta.description` | Smartphones, laptops, TVs, home appliances and accessories from trusted brands — delivered fast across Kigali and all of Rwanda. | Telefoni, mudasobwa, televiziyo, ibikoresho byo mu rugo n'ibindi biva mu bakora bizewe — bikugezwaho vuba i Kigali no mu Rwanda hose. | |
+| `meta.title` | {marketplace} | {marketplace} | |
+| `meta.description` | Sofas, beds, dining, office and outdoor furniture from Rwanda's trusted furniture stores — delivered across Kigali and all of Rwanda. | Intebe, ibitanda, ameza, ibikoresho byo mu biro n'ibyo hanze biva mu maduka y'ibikoresho byo mu nzu yizewe mu Rwanda — bikugezwaho i Kigali no mu Rwanda hose. | |
 | `ui.skipToContent` | Skip to content | Jya ku bikubiyemo | |
 | `ui.close` | Close | Funga | |
 | `ui.breadcrumb` | Breadcrumb | Inzira | |
@@ -20,9 +20,9 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `ui.next` | Next | Ibikurikira | |
 | `ui.page` | Page {n} | Urupapuro {n} | |
 | `ui.openMenu` | Open menu | Fungura menu | |
-| `hero.overline` | Latest electronics, better everyday life | Ikoranabuhanga rigezweho, ubuzima bwiza buri munsi | |
+| `hero.overline` | Many furniture stores, one marketplace | Amaduka menshi y'ibikoresho byo mu nzu, isoko rimwe | |
 | `hero.title` | Power Your World With the Latest Tech | Ikoranabuhanga rigezweho ku buzima bwawe | |
-| `hero.subtitle` | Smartphones, laptops, TVs, home appliances and accessories from trusted brands — delivered fast across Kigali and all of Rwanda. | Telefoni, mudasobwa, televiziyo, ibikoresho byo mu rugo n'ibindi biva mu bakora bizewe — bikugezwaho vuba i Kigali no mu Rwanda hose. | |
+| `hero.subtitle` | Sofas, beds, dining, office and outdoor furniture from Rwanda's trusted furniture stores — delivered across Kigali and all of Rwanda. | Intebe, ibitanda, ameza, ibikoresho byo mu biro n'ibyo hanze biva mu maduka y'ibikoresho byo mu nzu yizewe mu Rwanda — bikugezwaho i Kigali no mu Rwanda hose. | |
 | `hero.shopNow` | Shop Now | Gura ubu | |
 | `hero.viewDeals` | View Deals | Reba poromosiyo | |
 | `hero.fast` | Fast & Reliable | Byihuse kandi byizewe | |
@@ -42,16 +42,16 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `hero.ourService` | Our technical services | Serivisi zacu za tekiniki | |
 | `hero.servicesHeadline` | Technical Services | Serivisi za tekiniki | |
 | `hero.exploreServices` | Explore services | Reba serivisi | |
-| `store.logoAlt` | 3 Sixty Technologies | 3 Sixty Technologies | |
-| `store.homeLink` | 3 Sixty Technologies — home | 3 Sixty Technologies — ahabanza | |
+| `store.logoAlt` | {marketplace} | {marketplace} | |
+| `store.homeLink` | {marketplace} — home | {marketplace} — ahabanza | |
 | `store.announcement.freeDelivery` | Free delivery in Kigali on orders above {amount} | Kugezwaho ku buntu i Kigali ku byaguzwe birenze {amount} | |
 | `store.announcement.freeDeliveryShort` | Free delivery in Kigali over {amount} | Kugezwaho ku buntu i Kigali hejuru ya {amount} | |
 | `store.announcement.genuine` | Genuine products | Ibicuruzwa by'umwimerere | |
 | `store.announcement.warranty` | Warranty on all products | Garanti ku bicuruzwa byose | |
 | `store.announcement.help` | Need help? Call {phone} | Ukeneye ubufasha? Hamagara {phone} | |
 | `store.header.searchLabel` | Search products | Shakisha ibicuruzwa | |
-| `store.header.searchPlaceholder` | Search for phones, laptops, TVs, accessories… | Shakisha telefoni, mudasobwa, televiziyo, ibikoresho… | |
-| `store.header.searchPlaceholderShort` | Search phones, laptops, TVs… | Shakisha telefoni, mudasobwa, televiziyo… | |
+| `store.header.searchPlaceholder` | Search for sofas, beds, tables, desks… | Shakisha intebe, ibitanda, ameza, ameza y'akazi… | |
+| `store.header.searchPlaceholderShort` | Search sofas, beds, tables… | Shakisha intebe, ibitanda, ameza… | |
 | `store.header.search` | Search | Shakisha | |
 | `store.header.language` | Language: {name} | Ururimi: {name} | |
 | `store.header.myAccount` | My Account | Konti yanjye | |
@@ -105,7 +105,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.tabs.search` | Search | Shakisha | |
 | `store.tabs.cart` | Cart | Igitebo | |
 | `store.tabs.account` | Account | Konti | |
-| `store.footer.tagline` | Your trusted electronics store in Rwanda. Genuine products, fair prices and local support. | Iduka ryawe ryizewe ry'ikoranabuhanga mu Rwanda. Ibicuruzwa by'umwimerere, ibiciro bikwiye n'ubufasha bwo mu gihugu. | |
+| `store.footer.tagline` | Rwanda's furniture marketplace. Approved local stores, fair prices and delivery to your door. | Isoko ry'ibikoresho byo mu nzu mu Rwanda. Amaduka yemewe yo mu gihugu, ibiciro bikwiye no kukugezaho iwawe. | |
 | `store.footer.shop` | Shop | Hahira | |
 | `store.footer.customerService` | Customer Service | Serivisi ku bakiriya | |
 | `store.footer.trackOrder` | Track Order | Kurikirana ibyo watumije | |
@@ -154,19 +154,19 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.product.was` | Was | Cyari | |
 | `store.home.seeAll` | See all | Reba byose | |
 | `store.home.featuredTitle` | Featured Products | Ibicuruzwa byatoranyijwe | |
-| `store.home.featuredText` | Handpicked electronics for the best experience. | Ibikoresho byatoranyijwe neza kugira ngo ubone ibyiza. | |
+| `store.home.featuredText` | Handpicked pieces from our stores. | Ibikoresho byatoranyijwe mu maduka yacu. | |
 | `store.home.bestTitle` | Bestselling Products | Ibigurwa cyane | |
 | `store.home.bestText` | Most popular choices from our customers. | Ibyo abakiriya bacu bakunda cyane. | |
 | `store.home.newTitle` | New Arrivals | Ibishya byageze | |
-| `store.home.newText` | Be the first to get the latest electronics. | Ba uwa mbere ubona ikoranabuhanga rigezweho. | |
+| `store.home.newText` | The newest pieces from our stores. | Ibikoresho bishya biva mu maduka yacu. | |
 | `store.home.spotlightTitle` | Explore {category} | Reba {category} | |
-| `store.home.spotlightText` | Best sellers in {category}: genuine products with warranty, delivered across Rwanda. | Ibigurwa cyane muri {category}: ibicuruzwa by'umwimerere bifite garanti, bigezwa hose mu Rwanda. | |
-| `store.home.businessTitle` | Need Electronics for Your Business? | Ukeneye ibikoresho by'ikigo cyawe? | |
-| `store.home.businessText` | Special pricing for bulk orders, corporate purchases and institutional supplies. Our team will prepare a quote within one working day. | Ibiciro byihariye ku bagura byinshi, ibigo n'inzego. Itsinda ryacu rizagutegurira igiciro mu munsi umwe w'akazi. | |
+| `store.home.spotlightText` | Best sellers in {category}, from approved stores and delivered across Rwanda. | Ibigurwa cyane muri {category}, biva mu maduka yemewe kandi bigezwa hose mu Rwanda. | |
+| `store.home.businessTitle` | Furnishing an Office, Hotel or School? | Uratunganya ibiro, hoteli cyangwa ishuri? | |
+| `store.home.businessText` | Special pricing for bulk orders from offices, hotels, schools and institutions. Our team will prepare a quote within one working day. | Ibiciro byihariye ku byo ibiro, amahoteli, amashuri n'ibigo bitumiza ari byinshi. Itsinda ryacu rizagutegurira igiciro mu munsi umwe w'akazi. | |
 | `store.home.contactUs` | Contact Us | Twandikire | |
 | `store.home.requestQuote` | Request a Quote | Saba igiciro | |
 | `store.home.businessShortTitle` | Buying for your business? | Uragurira ikigo cyawe? | |
-| `store.home.businessShortText` | Bulk pricing for companies, schools and institutions. | Ibiciro byihariye ku bigo, amashuri n'inzego. | |
+| `store.home.businessShortText` | Bulk pricing for offices, hotels, schools and institutions. | Ibiciro byihariye ku biro, amahoteli, amashuri n'ibigo. | |
 | `store.home.requestQuoteShort` | Request a quote | Saba igiciro | |
 | `store.home.sectionError` | We couldn't load these products. Please refresh the page. | Ntitwashoboye kuzana ibi bicuruzwa. Ongera ufungure urupapuro. | |
 | `store.home.callUs` | Call us | Duhamagare | |
@@ -174,7 +174,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.home.visitUs` | Visit us | Dusure | |
 | `store.home.spotlightPhoto` | Show photo {n} of {count} | Erekana ifoto ya {n} kuri {count} | |
 | `store.home.servicesTitle` | Our Services | Serivisi zacu | |
-| `store.home.servicesText` | Installation, repair and training by our technical team. | Gushyiraho, gukora ibyangiritse n'amahugurwa bitangwa n'itsinda ryacu rya tekiniki. | |
+| `store.home.servicesText` | Assembly, installation, delivery and repair by trained fitters. | Guteranya, gushyiraho, kugeza no gusana bikorwa n'abatekinisiye babihuguriwe. | |
 | `store.home.brandsTitle` | Trusted Brands | Ibirango byizewe | |
 | `store.home.brandsCount` | {count, plural, one {# brand available} other {# brands available}} | {count, plural, one {Ikirango # kirahari} other {Ibirango # birahari}} | |
 | `store.home.brandsCountOver` | {count}+ brands available | Ibirango {count}+ birahari | |
@@ -184,7 +184,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.brands.empty` | No brands to show yet. | Nta birango biraboneka. | |
 | `store.brands.error` | We couldn't load the brands. Please refresh the page. | Ntitwashoboye kuzana ibirango. Ongera ufungure urupapuro. | |
 | `store.deals.title` | Deals | Poromosiyo | |
-| `store.deals.text` | Discounted electronics from trusted brands, while stock lasts. | Ibikoresho by'ikoranabuhanga bigabanyirijwe ibiciro, mu gihe bikiri mu bubiko. | |
+| `store.deals.text` | Discounted furniture from our stores, while stock lasts. | Ibikoresho byo mu nzu bigabanyirijwe ibiciro, mu gihe bikiri mu bubiko. | |
 | `store.allProducts.title` | All Products | Ibicuruzwa byose | |
 | `store.listing.showing` | Showing {count, plural, one {# product} other {# products}} | Herekanwa {count, plural, one {igicuruzwa #} other {ibicuruzwa #}} | |
 | `store.listing.found` | {count, plural, one {# product found} other {# products found}} | {count, plural, one {Habonetse igicuruzwa #} other {Habonetse ibicuruzwa #}} | |
@@ -300,7 +300,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.search.emptyText` | We couldn’t find a match in stock. We may still be able to get it for you — ask our team. | Ntitwabonye igihuye mu bihari. Dushobora kukikuzanira — baza itsinda ryacu. | |
 | `store.search.contact` | Contact us | Twandikire | |
 | `store.search.tipSpelling` | Check the spelling of your search | Reba niba wanditse neza | |
-| `store.search.tipGeneral` | Try a more general word, like “iPhone” or “laptop” | Gerageza ijambo rusange, nka “iPhone” cyangwa “laptop” | |
+| `store.search.tipGeneral` | Try a more general word, like “sofa” or “bed” | Gerageza ijambo rusange, nka “intebe” cyangwa “igitanda” | |
 | `store.search.tipBrowse` | Browse a popular category below | Sura icyiciro gikunzwe kiri hasi | |
 | `store.search.popular` | Popular right now | Ibikunzwe ubu | |
 | `store.search.error` | We couldn't search right now. Please try again. | Ntitwashoboye gushakisha ubu. Ongera ugerageze. | |
@@ -360,7 +360,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.cart.haveAccountText` | Sign in for saved addresses and faster checkout. Guests can check out too. | Injira ukoreshe aderesi wabitse kandi wishyure vuba. N'abatagira konti bashobora kwishyura. | |
 | `store.cart.signIn` | Sign in | Injira | |
 | `store.cart.emptyTitle` | Your cart is empty | Igitebo cyawe kirimo ubusa | |
-| `store.cart.emptyText` | Browse our phones, laptops and appliances and add what you like. | Reba telefoni, mudasobwa n'ibikoresho byo mu rugo, ushyiremo ibyo ukunze. | |
+| `store.cart.emptyText` | Browse our sofas, beds and tables and add what you like. | Reba intebe, ibitanda n'ameza, ushyiremo ibyo ukunze. | |
 | `store.cart.startShopping` | Start shopping | Tangira guhaha | |
 | `store.cart.loadFailed` | We couldn't load your cart. Please try again. | Ntitwashoboye gufungura igitebo cyawe. Ongera ugerageze. | |
 | `store.cart.retry` | Try again | Ongera ugerageze | |
@@ -382,7 +382,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.checkout.secure` | Secure checkout | Kwishyura kwizewe | |
 | `store.checkout.secureShort` | Secure | Byizewe | |
 | `store.checkout.back` | Back | Subira inyuma | |
-| `store.checkout.copyright` | © {year} 3 Sixty Technologies | © {year} 3 Sixty Technologies | |
+| `store.checkout.copyright` | © {year} {marketplace} | © {year} {marketplace} | |
 | `store.checkout.deliveryPolicy` | Delivery | Kugezwaho | |
 | `store.checkout.returnsPolicy` | Returns | Gusubiza | |
 | `store.checkout.haveAccount` | Already have an account? | Usanzwe ufite konti? | |
@@ -596,7 +596,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.auth.perkTrack` | Track every delivery | Kurikirana buri kugezwaho | |
 | `store.auth.staffNote` | Staff members sign in here too with their email and password — you’ll be taken to the admin panel. | Abakozi na bo binjirira hano bakoresheje imeri n'ijambo ry'ibanga — uzajyanwa ku rubuga rw'ubuyobozi. | |
 | `store.auth.loginTitle` | Sign in | Injira | |
-| `store.auth.newHere` | New to 3 Sixty? <link>Create an account</link> | Uri mushya kuri 3 Sixty? <link>Fungura konti</link> | |
+| `store.auth.newHere` | New to {marketplace}? <link>Create an account</link> | Uri mushya kuri {marketplace}? <link>Fungura konti</link> | |
 | `store.auth.passwordUpdated` | Password updated. Sign in with your new password. | Ijambo ry'ibanga ryahinduwe. Injira ukoresheje irishya. | |
 | `store.auth.identifier` | Email or phone number | Imeri cyangwa nimero ya telefoni | |
 | `store.auth.password` | Password | Ijambo ry'ibanga | |
@@ -709,7 +709,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.auth.verify.notVerifiedText` | We sent you a verification link when you registered. Open it, then sign in again. | Twakoherereje umurongo wo kwemeza igihe wiyandikishaga. Wufungure, hanyuma wongere winjire. | |
 | `store.auth.verify.verifiedNotice` | Your email is confirmed. Sign in to continue. | Imeri yawe yemejwe. Injira ukomeze. | |
 | `store.auth.verify.registerUnavailable` | We can’t send the verification email right now, so your account wasn’t created. Please try again shortly, or register with your phone number only. | Ubu ntidushobora kohereza imeri yo kwemeza, bityo konti yawe ntiyafunguwe. Ongera ugerageze mu kanya, cyangwa wiyandikishe ukoresheje nimero ya telefoni gusa. | |
-| `store.auth.verify.tagline` | Electronics & home appliances · Rwanda | Ibikoresho by'ikoranabuhanga n'ibyo mu rugo · Rwanda | |
+| `store.auth.verify.tagline` | Furniture marketplace · Rwanda | Isoko ry'ibikoresho byo mu nzu · Rwanda | |
 | `store.auth.verify.spamNote` | It can take a minute to arrive. Not there? Check your spam or junk folder. | Bishobora gufata umunota ngo uhagere. Nturawubona? Reba no mu bubiko bwa spam. | |
 | `store.auth.verify.resendLink` | Resend confirmation email | Ongera wohereze imeri yo kwemeza | |
 | `store.auth.verify.resendIn` | Resend confirmation email in {time} | Ongera wohereze imeri yo kwemeza mu {time} | |
@@ -954,7 +954,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.notFound.title` | We can’t find that page | Ntitubonye iyi paji | |
 | `store.notFound.text` | The link may be old, or the product is no longer sold. Try searching, or head back to the homepage. | Ihuza rishobora kuba rishaje, cyangwa igicuruzwa ntikikigurishwa. Gerageza gushakisha, cyangwa usubire ku rupapuro rw’ibanze. | |
 | `store.notFound.searchLabel` | Search products | Shakisha ibicuruzwa | |
-| `store.notFound.searchPlaceholder` | Search for phones, laptops, TVs… | Shakisha telefoni, mudasobwa, televiziyo… | |
+| `store.notFound.searchPlaceholder` | Search for sofas, beds, tables… | Shakisha intebe, ibitanda, ameza… | |
 | `store.notFound.search` | Search | Shakisha | |
 | `store.notFound.home` | Back to home | Subira ahabanza | |
 | `store.notFound.contact` | Contact us | Twandikire | |
@@ -992,7 +992,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.contact.emailTitle` | Email | Imeli | |
 | `store.contact.visit` | Visit our store | Sura iduka ryacu | |
 | `store.contact.quoteTitle` | Request a business quote | Saba igiciro cy'ubucuruzi | |
-| `store.contact.quoteText` | For 10+ units, corporate purchases, schools and institutions. | Ku bicuruzwa 10 kuzamura, ibigo, amashuri n'inzego. | |
+| `store.contact.quoteText` | For offices, hotels, schools and institutions buying 10 or more pieces. | Ku biro, amahoteli, amashuri n'ibigo bigura ibikoresho 10 cyangwa birenga. | |
 | `store.contact.company` | Company / institution | Ikigo / urwego | |
 | `store.contact.companyPlaceholder` | e.g. Green Hills Academy | urugero: Green Hills Academy | |
 | `store.contact.contactName` | Contact person | Uhagarariye | |
@@ -1090,10 +1090,10 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.support.topics.other.hint` | Any other question | Ikindi kibazo icyo ari cyo cyose | |
 | `store.support.subject` | Subject | Impamvu | |
 | `store.support.subjectPlaceholders.order` | e.g. When will my order arrive? | urugero: Ibyo natumije bizagera ryari? | |
-| `store.support.subjectPlaceholders.product` | e.g. Does this laptop have a backlit keyboard? | urugero: Iyi mudasobwa ifite clavier imurika? | |
+| `store.support.subjectPlaceholders.product` | e.g. What are the exact dimensions of this sofa? | urugero: Iyi ntebe ifite ingano ingana iki neza? | |
 | `store.support.subjectPlaceholders.payment` | e.g. My MoMo payment did not go through | urugero: Kwishyura na MoMo ntibyakunze | |
-| `store.support.subjectPlaceholders.warranty` | e.g. My phone screen stopped working | urugero: Ecran ya telefoni yanjye yahagaze | |
-| `store.support.subjectPlaceholders.returns` | e.g. I want to return my headphones | urugero: Ndashaka gusubiza ecouteurs zanjye | |
+| `store.support.subjectPlaceholders.warranty` | e.g. A drawer on my dresser broke | urugero: Akabati k'imyenda kanjye kacitse igikurura | |
+| `store.support.subjectPlaceholders.returns` | e.g. I want to return my dining chairs | urugero: Ndashaka gusubiza intebe zanjye zo ku meza | |
 | `store.support.subjectPlaceholders.other` | e.g. Do you have a shop in Musanze? | urugero: Mufite iduka i Musanze? | |
 | `store.support.orderNumber` | Order number (optional) | Nimero y'ibyo watumije (si ngombwa) | |
 | `store.support.orderNumberPlaceholder` | e.g. ORD-261102-ABCDEF | urugero: ORD-261102-ABCDEF | |
@@ -1148,7 +1148,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.support.latestReply` | New reply | Igisubizo gishya | |
 | `store.support.conversation` | Conversation | Ikiganiro | |
 | `store.support.you` | You | Wowe | |
-| `store.support.supportName` | 3 Sixty support | Ubufasha bwa 3 Sixty | |
+| `store.support.supportName` | {marketplace} support | Ubufasha bwa {marketplace} | |
 | `store.support.closedNote` | This conversation is closed. Write below if you still need help and we'll reopen it. | Iki kiganiro cyafunzwe. Niba ugikeneye ubufasha, andika hano hasi tukongere tugifungure. | |
 | `store.support.replyLabel` | Your reply | Igisubizo cyawe | |
 | `store.support.replyPlaceholder` | Write your reply… | Andika igisubizo cyawe… | |
@@ -1165,9 +1165,9 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.support.errors.contactRequired` | Give a phone number or an email address so we can reply. | Tanga nimero ya telefoni cyangwa imeli kugira ngo tugusubize. | |
 | `store.support.errors.invalid` | Check this field. | Genzura iki gice. | |
 | `store.services.metaTitle` | Our Technical Services | Serivisi zacu za tekiniki | |
-| `store.services.metaDescription` | CCTV, gate automation, access control, networking, electronics repair and technical training for homes, businesses and institutions in Rwanda. | Kamera z'umutekano, amarembo yikoresha, kugenzura kwinjira, imiyoboro ya interineti, gukora ibikoresho by'ikoranabuhanga n'amahugurwa ya tekiniki ku ngo, ubucuruzi n'ibigo mu Rwanda. | |
+| `store.services.metaDescription` | Furniture assembly, installation, delivery and setup, upholstery and repair for homes, offices, hotels and schools in Rwanda. | Guteranya ibikoresho byo mu nzu, kubishyiraho, kubigeza no kubitunganya, gusana intebe n'ibindi ku ngo, ibiro, amahoteli n'amashuri mu Rwanda. | |
 | `store.services.title` | Our Technical Services | Serivisi zacu za tekiniki | |
-| `store.services.intro` | At 3Sixty Technologies Ltd, we deliver innovative technology solutions designed to make homes, businesses and institutions smarter, safer and more efficient. From advanced security systems and smart automation to IT infrastructure, electronics repair and technical training, we provide reliable solutions backed by professional expertise. | Muri 3Sixty Technologies Ltd, dutanga ibisubizo bishya by'ikoranabuhanga bigenewe gutuma ingo, ubucuruzi n'ibigo birushaho kugira ubwenge, umutekano no gukora neza. Kuva ku buryo bugezweho bw'umutekano n'ikoranabuhanga ryikoresha kugeza ku bikorwa remezo bya IT, gukora ibikoresho by'ikoranabuhanga n'amahugurwa ya tekiniki, dutanga ibisubizo byizewe bishyigikiwe n'ubuhanga bw'umwuga. | |
+| `store.services.intro` | Beyond the furniture itself, {marketplace} connects you with trained fitters for assembly, wall mounting, delivery and room setup, upholstery and wood repair — for homes, offices, hotels and schools across Rwanda. | Uretse ibikoresho ubwabyo, {marketplace} ikuhuza n'abatekinisiye babihuguriwe bo guteranya, kumanika ku rukuta, kugeza no gutunganya icyumba, gusana intebe n'ibikoresho by'ibiti — ku ngo, ibiro, amahoteli n'amashuri mu Rwanda hose. | |
 | `store.services.listLabel` | Services | Serivisi | |
 | `store.services.empty` | Our services will be listed here soon. Talk to our team in the meantime. | Serivisi zacu zizagaragara hano vuba. Muri icyo gihe, vugana n'itsinda ryacu. | |
 | `store.services.error` | We couldn’t load our services. Please try again. | Ntibishobotse kwerekana serivisi zacu. Ongera ugerageze. | |
@@ -1275,3 +1275,63 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.services.card.noItems` | See the details page or ask our team what this service includes. | Reba urupapuro rw'ibisobanuro cyangwa ubaze itsinda ryacu ibyo iyi serivisi ikubiyemo. | |
 | `store.soldBy.label` | Sold by <store></store> | Bigurishwa na <store></store> | |
 | `store.storePage.location` | Location: | Aho iherereye: | |
+| `furniture.names.width_cm` | Width | Ubugari | |
+| `furniture.names.depth_cm` | Depth | Ubujyakuzimu | |
+| `furniture.names.height_cm` | Height | Uburebure | |
+| `furniture.names.seat_height_cm` | Seat height | Uburebure bw'aho bicara | |
+| `furniture.names.weight_kg` | Weight | Uburemere | |
+| `furniture.names.material` | Material | Icyo gikozwemo | |
+| `furniture.names.color` | Colour | Ibara | |
+| `furniture.names.style` | Style | Imiterere | |
+| `furniture.names.finish` | Finish | Uko gisize | |
+| `furniture.names.condition` | Condition | Uko kimeze | |
+| `furniture.names.assembly_required` | Assembly required | Gisaba guteranywa | |
+| `furniture.cm` | {value} cm | {value} cm | |
+| `furniture.kg` | {value} kg | {value} kg | |
+| `furniture.yes` | Yes | Yego | |
+| `furniture.no` | No | Oya | |
+| `furniture.material.solid_wood` | Solid wood | Igiti gikomeye | |
+| `furniture.material.engineered_wood` | Engineered wood | Igiti gikoranye (MDF) | |
+| `furniture.material.bamboo` | Bamboo | Imigano | |
+| `furniture.material.rattan` | Rattan | Rattan | |
+| `furniture.material.metal` | Metal | Icyuma | |
+| `furniture.material.glass` | Glass | Ikirahure | |
+| `furniture.material.marble` | Marble | Marimari | |
+| `furniture.material.stone` | Stone | Ibuye | |
+| `furniture.material.fabric` | Fabric | Igitambaro | |
+| `furniture.material.leather` | Leather | Uruhu | |
+| `furniture.material.faux_leather` | Faux leather | Uruhu rw'ubukorano | |
+| `furniture.material.plastic` | Plastic | Pulasitiki | |
+| `furniture.material.foam` | Foam | Mousse | |
+| `furniture.color.natural` | Natural | Ibara ry'umwimerere | |
+| `furniture.color.oak` | Oak | Ibara ry'igiti cya oak | |
+| `furniture.color.walnut` | Walnut | Ibara ry'igiti cya walnut | |
+| `furniture.color.white` | White | Umweru | |
+| `furniture.color.black` | Black | Umukara | |
+| `furniture.color.grey` | Grey | Ikijuju | |
+| `furniture.color.beige` | Beige | Beige | |
+| `furniture.color.brown` | Brown | Ikigina | |
+| `furniture.color.blue` | Blue | Ubururu | |
+| `furniture.color.green` | Green | Icyatsi | |
+| `furniture.color.red` | Red | Umutuku | |
+| `furniture.color.yellow` | Yellow | Umuhondo | |
+| `furniture.color.multicolour` | Multicolour | Amabara menshi | |
+| `furniture.style.modern` | Modern | Igezweho | |
+| `furniture.style.contemporary` | Contemporary | Iy'iki gihe | |
+| `furniture.style.classic` | Classic | Iya kera | |
+| `furniture.style.rustic` | Rustic | Iy'icyaro | |
+| `furniture.style.industrial` | Industrial | Iy'inganda | |
+| `furniture.style.scandinavian` | Scandinavian | Iya Scandinavia | |
+| `furniture.style.mid_century` | Mid-century | Iyo hagati y'ikinyejana | |
+| `furniture.style.african` | African | Nyafurika | |
+| `furniture.finish.natural` | Natural | Umwimerere | |
+| `furniture.finish.matte` | Matte | Itarabagirana | |
+| `furniture.finish.satin` | Satin | Satin | |
+| `furniture.finish.gloss` | Gloss | Irabagirana | |
+| `furniture.finish.lacquered` | Lacquered | Isize vernis | |
+| `furniture.finish.painted` | Painted | Isize irangi | |
+| `furniture.finish.polished` | Polished | Isenwe | |
+| `furniture.finish.upholstered` | Upholstered | Itwikiriwe igitambaro | |
+| `furniture.condition.new` | New | Gishya | |
+| `furniture.condition.refurbished` | Refurbished | Cyavuguruwe | |
+| `furniture.condition.used` | Used | Cyakoreshejwe | |

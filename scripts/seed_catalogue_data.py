@@ -1,21 +1,30 @@
 """Content of the development catalogue seed (scripts/seed_development_catalogue.py).
 
 Everything here is development sample data, not approved business content: names, prices, stock
-levels, specifications and the Kinyarwanda banner text are placeholders for building and testing
-the frontend. Categories follow the category nav of frontend/design/screens/Header.dc.html; the
-category subtitles and the first banner come from frontend/design/screens/Main.dc.html.
+levels, specifications, manufacturers and the Kinyarwanda banner text are placeholders for
+building and testing the furniture marketplace (ADR-014 phase 6). The categories are the
+furniture taxonomy of backend/app/core/furniture.py; product specifications use its attribute
+codes (material, color, style, finish, condition, dimensions in cm, weight in kg, assembly), so
+the storefront's filters and labels have data.
 
 Seed keys (no is_seed column): a product is the seed's when its slug is listed here and it has a
 variant whose SKU starts with DEV-. Categories and brands are matched by slug, banners by English
-title, staff and customers by e-mail (domain seed.3sixty.local).
+title, staff and customers by e-mail (domain seed.furnihub.local).
 """
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
+
+from app.core.furniture import TAXONOMY  # noqa: E402
 
 SKU_PREFIX = "DEV-"
-EMAIL_DOMAIN = "seed.3sixty.local"
+EMAIL_DOMAIN = "seed.furnihub.local"
 
 # Stock levels: opening stock and low-stock threshold per variant.
 LOW_STOCK_THRESHOLD = 3
@@ -28,6 +37,7 @@ class SeedCategory:
     name: str
     description: str
     sort_order: int
+    parent: str | None = None  # the main category's slug; None for a main category
 
 
 @dataclass(frozen=True)
@@ -54,14 +64,14 @@ class SeedVariant:
 class SeedProduct:
     slug: str
     name: str
-    category: str
-    brand: str
-    model: str
+    category: str  # a subcategory slug of the taxonomy
+    brand: str | None  # the manufacturer, optional (ADR-014 decision 14)
+    model: str | None
     description: str
-    specifications: dict[str, str]
+    specifications: dict[str, Any]
     variants: tuple[SeedVariant, ...]
     featured: bool = False
-    warranty: str = "12-month warranty from 3 Sixty Technologies."
+    warranty: str = "12-month warranty from the seller against manufacturing defects."
 
 
 @dataclass(frozen=True)
@@ -155,29 +165,26 @@ class Catalogue:
     stores: tuple[SeedStore, ...] = field(default=())
 
 
-# Header.dc.html nav: Phones, Laptops, TVs & Audio, Home Appliances, Accessories, then "Brands"
-# and "Deals" (not categories). Subtitles from the "Shop by Category" tiles of Main.dc.html.
-CATEGORIES = (
-    SeedCategory("phones", "Phones", "Smartphones & accessories", 1),
-    SeedCategory("laptops", "Laptops", "For work, study & gaming", 2),
-    SeedCategory("tvs-audio", "TVs & Audio", "TVs, soundbars & more", 3),
-    SeedCategory("home-appliances", "Home Appliances", "For a smarter home", 4),
-    SeedCategory("accessories", "Accessories", "Audio, chargers & more", 5),
+# The furniture taxonomy (ADR-014 phase 6): each main category, then its subcategories.
+CATEGORIES = tuple(
+    category
+    for position, main in enumerate(TAXONOMY, start=1)
+    for category in (
+        SeedCategory(main.slug, main.name, main.description, position),
+        *(
+            SeedCategory(child.slug, child.name, child.description, order, parent=main.slug)
+            for order, child in enumerate(main.children, start=1)
+        ),
+    )
 )
 
+# Development manufacturers (invented names, not real companies). Most products have none.
 BRANDS = (
-    SeedBrand("samsung", "Samsung"),
-    SeedBrand("apple", "Apple"),
-    SeedBrand("tecno", "Tecno"),
-    SeedBrand("infinix", "Infinix"),
-    SeedBrand("xiaomi", "Xiaomi"),
-    SeedBrand("hp", "HP"),
-    SeedBrand("dell", "Dell"),
-    SeedBrand("lenovo", "Lenovo"),
-    SeedBrand("lg", "LG"),
-    SeedBrand("hisense", "Hisense"),
-    SeedBrand("jbl", "JBL"),
-    SeedBrand("anker", "Anker"),
+    SeedBrand("imigongo-craft", "Imigongo Craft"),
+    SeedBrand("akagera-living", "Akagera Living"),
+    SeedBrand("nyungwe-timber", "Nyungwe Timber"),
+    SeedBrand("umucyo-office", "Umucyo Office"),
+    SeedBrand("kivu-outdoor", "Kivu Outdoor"),
 )
 
 
@@ -192,755 +199,574 @@ def _v(
     return SeedVariant(code, name, attributes, price, stock, compare)
 
 
-def _phone(screen: str, camera: str, battery: str, os: str) -> dict[str, str]:
-    return {"Display": screen, "Main camera": camera, "Battery": battery, "Operating system": os}
-
-
-def _laptop(cpu: str, screen: str, graphics: str, os: str = "Windows 11 Home") -> dict[str, str]:
-    return {"Processor": cpu, "Display": screen, "Graphics": graphics, "Operating system": os}
+def _specs(
+    width: float,
+    depth: float,
+    height: float,
+    material: str,
+    color: str,
+    style: str,
+    *,
+    weight: float | None = None,
+    finish: str | None = None,
+    assembly: bool = False,
+    seat: float | None = None,
+    **free: str,
+) -> dict[str, Any]:
+    """Furniture attributes by their codes (app/core/furniture.py), then free specifications."""
+    specs: dict[str, Any] = {"width_cm": width, "depth_cm": depth, "height_cm": height}
+    if seat is not None:
+        specs["seat_height_cm"] = seat
+    if weight is not None:
+        specs["weight_kg"] = weight
+    specs.update(material=material, color=color, style=style)
+    if finish is not None:
+        specs["finish"] = finish
+    specs.update(condition="new", assembly_required=assembly)
+    specs.update({name.replace("_", " ").capitalize(): value for name, value in free.items()})
+    return specs
 
 
 PRODUCTS = (
-    # Phones
+    # Living room
     SeedProduct(
-        "samsung-galaxy-a55-5g",
-        "Samsung Galaxy A55 5G",
-        "phones",
-        "samsung",
-        "SM-A556E",
-        "A premium mid-range 5G phone with a bright Super AMOLED display, a 50 MP camera with "
-        "night mode and an all-day battery.",
-        _phone('6.6" Super AMOLED, 120 Hz', "50 MP + 12 MP + 5 MP", "5,000 mAh", "Android 14"),
+        "kivu-three-seater-sofa",
+        "Kivu Three-Seater Sofa",
+        "sofas",
+        "akagera-living",
+        "KV-3S",
+        "A deep, comfortable three-seater with a solid eucalyptus frame, high-density foam "
+        "cushions and removable, washable covers.",
+        _specs(
+            210,
+            92,
+            85,
+            "fabric",
+            "grey",
+            "modern",
+            weight=58,
+            finish="upholstered",
+            seat=45,
+            cushions="Removable, washable covers",
+        ),
         (
-            _v(
-                "SAM-A55-128-NVY",
-                "8GB · 128GB · Awesome Navy",
-                495_000,
-                "best",
-                storage="128 GB",
-                ram="8 GB",
-                colour="Awesome Navy",
-            ),
-            _v(
-                "SAM-A55-256-ICE",
-                "8GB · 256GB · Awesome Iceblue",
-                560_000,
-                "low",
-                storage="256 GB",
-                ram="8 GB",
-                colour="Awesome Iceblue",
-            ),
+            _v("KIV-SOFA3-GRY", "Grey linen", 685_000, "best", colour="Grey"),
+            _v("KIV-SOFA3-BLU", "Navy blue", 685_000, "low", colour="Navy blue"),
+            _v("KIV-SOFA3-BEI", "Sand beige", 720_000, "in", 790_000, colour="Sand beige"),
         ),
         featured=True,
     ),
     SeedProduct(
-        "samsung-galaxy-a35-5g",
-        "Samsung Galaxy A35 5G",
-        "phones",
-        "samsung",
-        "SM-A356E",
-        "Smooth 5G performance, a 50 MP OIS camera and a durable glass design.",
-        _phone('6.6" Super AMOLED, 120 Hz', "50 MP + 8 MP + 5 MP", "5,000 mAh", "Android 14"),
+        "inyange-l-shaped-sofa",
+        "Inyange L-Shaped Corner Sofa",
+        "sofas",
+        "akagera-living",
+        "IN-L5",
+        "A five-seat corner sofa for family living rooms, with a reversible chaise that fits "
+        "either side.",
+        _specs(
+            280,
+            180,
+            88,
+            "fabric",
+            "beige",
+            "contemporary",
+            weight=96,
+            finish="upholstered",
+            seat=44,
+            assembly=True,
+        ),
+        (_v("INY-LSOFA-BEI", "Sand beige", 1_250_000, "in", colour="Sand beige"),),
+        featured=True,
+    ),
+    SeedProduct(
+        "ubumwe-leather-armchair",
+        "Ubumwe Leather Armchair",
+        "armchairs",
+        None,
+        None,
+        "A wide armchair in full-grain leather on solid wood legs: the reading corner's "
+        "favourite seat.",
+        _specs(82, 86, 92, "leather", "brown", "mid_century", weight=24, seat=43),
         (
-            _v(
-                "SAM-A35-128-LIL",
-                "8GB · 128GB · Awesome Lilac",
-                450_000,
-                compare=500_000,
-                storage="128 GB",
-                ram="8 GB",
-                colour="Awesome Lilac",
-            ),
+            _v("UBU-ARM-BRN", "Cognac brown", 495_000, "in", colour="Cognac brown"),
+            _v("UBU-ARM-BLK", "Black", 495_000, "out", colour="Black"),
         ),
     ),
     SeedProduct(
-        "samsung-galaxy-s24",
-        "Samsung Galaxy S24",
-        "phones",
-        "samsung",
-        "SM-S921B",
-        "Samsung's compact flagship with Galaxy AI, a ProVisual camera and seven years of updates.",
-        _phone(
-            '6.2" Dynamic AMOLED 2X, 120 Hz', "50 MP + 12 MP + 10 MP", "4,000 mAh", "Android 14"
+        "rattan-accent-chair",
+        "Rattan Accent Chair",
+        "armchairs",
+        "imigongo-craft",
+        None,
+        "Hand-woven rattan on a light frame, made by a Huye cooperative. Cushion included.",
+        _specs(70, 72, 80, "rattan", "natural", "african", weight=7, finish="natural", seat=42),
+        (_v("RAT-ACC-NAT", "Natural", 185_000, "best"),),
+        featured=True,
+    ),
+    SeedProduct(
+        "imigongo-coffee-table",
+        "Imigongo Coffee Table",
+        "coffee-tables",
+        "imigongo-craft",
+        None,
+        "A low coffee table with a hand-painted imigongo pattern top in black and terracotta.",
+        _specs(110, 60, 42, "solid_wood", "black", "african", weight=18, finish="painted"),
+        (_v("IMI-COF-BLK", "Black & terracotta", 240_000, "in", 275_000),),
+        featured=True,
+    ),
+    SeedProduct(
+        "glass-top-coffee-table",
+        "Glass-Top Coffee Table",
+        "coffee-tables",
+        None,
+        None,
+        "Tempered glass on a black powder-coated steel frame, with a lower shelf for books.",
+        _specs(120, 60, 45, "glass", "black", "industrial", weight=21, assembly=True),
+        (_v("GLS-COF-BLK", "Black frame", 165_000, "in"),),
+    ),
+    SeedProduct(
+        "oak-tv-stand-180",
+        "Oak TV Stand 180 cm",
+        "tv-stands",
+        "nyungwe-timber",
+        "NT-TV180",
+        "A long, low TV stand in oak veneer with two soft-close doors and open shelves for "
+        "speakers and consoles.",
+        _specs(
+            180,
+            40,
+            50,
+            "engineered_wood",
+            "oak",
+            "scandinavian",
+            weight=38,
+            finish="matte",
+            assembly=True,
+            max_screen='Up to 75"',
+        ),
+        (_v("OAK-TV180-OAK", "Oak", 310_000, "in"),),
+    ),
+    SeedProduct(
+        "ladder-bookshelf",
+        "Ladder Bookshelf",
+        "shelves-bookcases",
+        None,
+        None,
+        "Five leaning shelves in pine: books, plants and photos without taking floor space.",
+        _specs(
+            60,
+            35,
+            180,
+            "solid_wood",
+            "natural",
+            "rustic",
+            weight=12,
+            finish="natural",
+            assembly=True,
+        ),
+        (_v("LAD-SHELF-NAT", "Natural pine", 95_000, "low"),),
+    ),
+    # Bedroom
+    SeedProduct(
+        "muhabura-queen-bed",
+        "Muhabura Queen Bed",
+        "beds",
+        "nyungwe-timber",
+        "MH-Q",
+        "A solid mahogany bed frame with a slatted base and a tall headboard. Mattress not "
+        "included.",
+        _specs(
+            170,
+            215,
+            120,
+            "solid_wood",
+            "walnut",
+            "classic",
+            weight=75,
+            finish="lacquered",
+            assembly=True,
+            mattress_size="160 × 200 cm",
         ),
         (
-            _v(
-                "SAM-S24-256-BLK",
-                "8GB · 256GB · Onyx Black",
-                1_220_000,
-                storage="256 GB",
-                ram="8 GB",
-                colour="Onyx Black",
-            ),
-            _v(
-                "SAM-S24-512-VIO",
-                "8GB · 512GB · Cobalt Violet",
-                1_380_000,
-                "out",
-                storage="512 GB",
-                ram="8 GB",
-                colour="Cobalt Violet",
-            ),
+            _v("MUH-BED-Q", "Queen, 160 × 200", 890_000, "best", size="Queen"),
+            _v("MUH-BED-K", "King, 180 × 200", 1_050_000, "in", size="King"),
         ),
         featured=True,
     ),
     SeedProduct(
-        "samsung-galaxy-a15",
-        "Samsung Galaxy A15",
-        "phones",
-        "samsung",
-        "SM-A155F",
-        "An affordable everyday phone with a large display and long battery life.",
-        _phone('6.5" Super AMOLED, 90 Hz', "50 MP + 5 MP + 2 MP", "5,000 mAh", "Android 14"),
-        (
-            _v(
-                "SAM-A15-128-BLU",
-                "6GB · 128GB · Blue Black",
-                320_000,
-                storage="128 GB",
-                ram="6 GB",
-                colour="Blue Black",
-            ),
+        "storage-double-bed",
+        "Storage Double Bed",
+        "beds",
+        None,
+        None,
+        "An upholstered double bed whose base lifts on gas struts to reveal deep storage.",
+        _specs(
+            150,
+            205,
+            105,
+            "fabric",
+            "grey",
+            "contemporary",
+            weight=68,
+            finish="upholstered",
+            assembly=True,
         ),
+        (_v("STO-BED-D", "Double, 140 × 190", 620_000, "in", 690_000),),
     ),
     SeedProduct(
-        "apple-iphone-15",
-        "iPhone 15",
-        "phones",
-        "apple",
-        "A3090",
-        "Dynamic Island, a 48 MP main camera and USB-C in a colour-infused glass design.",
-        _phone('6.1" Super Retina XDR', "48 MP + 12 MP", "Up to 20 h video", "iOS 17"),
-        (
-            _v(
-                "APL-IP15-128-BLK",
-                "128GB · Black",
-                1_450_000,
-                "best",
-                storage="128 GB",
-                colour="Black",
-            ),
-            _v(
-                "APL-IP15-256-BLU",
-                "256GB · Blue",
-                1_650_000,
-                "low",
-                storage="256 GB",
-                colour="Blue",
-            ),
-        ),
-        featured=True,
-    ),
-    SeedProduct(
-        "apple-iphone-13",
-        "iPhone 13",
-        "phones",
-        "apple",
-        "A2633",
-        "A dependable iPhone with the A15 Bionic chip and a dual-camera system.",
-        _phone('6.1" Super Retina XDR', "12 MP + 12 MP", "Up to 19 h video", "iOS 17"),
-        (
-            _v(
-                "APL-IP13-128-MID",
-                "128GB · Midnight",
-                950_000,
-                "low",
-                storage="128 GB",
-                colour="Midnight",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "tecno-spark-20",
-        "Tecno Spark 20",
-        "phones",
-        "tecno",
-        "KJ5",
-        "A stylish budget phone with a 50 MP camera, dual speakers and fast charging.",
-        _phone('6.56" IPS LCD, 90 Hz', "50 MP", "5,000 mAh", "Android 13"),
-        (
-            _v(
-                "TEC-SPK20-128-BLK",
-                "8GB · 128GB · Gravity Black",
-                295_000,
-                "best",
-                storage="128 GB",
-                ram="8 GB",
-                colour="Gravity Black",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "tecno-camon-30",
-        "Tecno Camon 30",
-        "phones",
-        "tecno",
-        "CL6",
-        "Portrait-focused cameras and a 120 Hz AMOLED display.",
-        _phone('6.78" AMOLED, 120 Hz', "50 MP + 2 MP", "5,000 mAh", "Android 14"),
-        (
-            _v(
-                "TEC-CAM30-256-WHT",
-                "8GB · 256GB · Serenity White",
-                340_000,
-                storage="256 GB",
-                ram="8 GB",
-                colour="Serenity White",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "infinix-hot-40i",
-        "Infinix Hot 40i",
-        "phones",
-        "infinix",
-        "X6528B",
-        "Big screen, big battery and a 50 MP camera at an entry-level price.",
-        _phone('6.56" IPS LCD, 90 Hz', "50 MP", "5,000 mAh", "Android 13"),
-        (
-            _v(
-                "INF-HOT40I-128-BLK",
-                "4GB · 128GB · Starlit Black",
-                185_000,
-                compare=199_000,
-                storage="128 GB",
-                ram="4 GB",
-                colour="Starlit Black",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "infinix-zero-30-5g",
-        "Infinix Zero 30 5G",
-        "phones",
-        "infinix",
-        "X6731",
-        "A 4K selfie camera and a curved AMOLED display.",
-        _phone('6.78" AMOLED, 144 Hz', "108 MP + 13 MP + 2 MP", "5,000 mAh", "Android 13"),
-        (
-            _v(
-                "INF-ZERO30-256-GLD",
-                "12GB · 256GB · Golden Hour",
-                480_000,
-                "out",
-                storage="256 GB",
-                ram="12 GB",
-                colour="Golden Hour",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "xiaomi-redmi-note-13-pro",
-        "Xiaomi Redmi Note 13 Pro",
-        "phones",
-        "xiaomi",
-        "2312DRA50G",
-        "A 200 MP camera and a 1.5K AMOLED display with 67 W fast charging.",
-        _phone('6.67" AMOLED, 120 Hz', "200 MP + 8 MP + 2 MP", "5,100 mAh", "Android 13"),
-        (
-            _v(
-                "XIA-RN13P-256-BLK",
-                "8GB · 256GB · Midnight Black",
-                420_000,
-                compare=450_000,
-                storage="256 GB",
-                ram="8 GB",
-                colour="Midnight Black",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "xiaomi-redmi-13c",
-        "Xiaomi Redmi 13C",
-        "phones",
-        "xiaomi",
-        "23100RN82L",
-        "An easy first smartphone with a large display and a 50 MP camera.",
-        _phone('6.74" IPS LCD, 90 Hz', "50 MP + 2 MP", "5,000 mAh", "Android 13"),
-        (
-            _v(
-                "XIA-R13C-128-GRN",
-                "4GB · 128GB · Clover Green",
-                165_000,
-                storage="128 GB",
-                ram="4 GB",
-                colour="Clover Green",
-            ),
-        ),
-    ),
-    # Laptops
-    SeedProduct(
-        "hp-pavilion-15",
-        "HP Pavilion 15 Laptop",
-        "laptops",
-        "hp",
-        "15-eg3000",
-        "A thin and light laptop for work and study with a Full HD display and fast SSD.",
-        _laptop("Intel Core i5-1335U", '15.6" Full HD IPS', "Intel Iris Xe"),
-        (
-            _v(
-                "HP-PAV15-I5-512",
-                "Intel i5 · 8GB · 512GB SSD",
-                820_000,
-                processor="Core i5",
-                ram="8 GB",
-                storage="512 GB SSD",
-            ),
-            _v(
-                "HP-PAV15-I7-1TB",
-                "Intel i7 · 16GB · 1TB SSD",
-                1_090_000,
-                "low",
-                processor="Core i7",
-                ram="16 GB",
-                storage="1 TB SSD",
-            ),
-        ),
-        featured=True,
-    ),
-    SeedProduct(
-        "hp-250-g9",
-        "HP 250 G9 Laptop",
-        "laptops",
-        "hp",
-        "250 G9",
-        "A reliable business laptop for everyday office work.",
-        _laptop("Intel Core i3-1215U", '15.6" Full HD', "Intel UHD"),
-        (
-            _v(
-                "HP-250G9-I3-256",
-                "Intel i3 · 8GB · 256GB SSD",
-                520_000,
-                processor="Core i3",
-                ram="8 GB",
-                storage="256 GB SSD",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "dell-inspiron-15",
-        "Dell Inspiron 15",
-        "laptops",
-        "dell",
-        "3530",
-        "Everyday performance with a narrow-border Full HD display.",
-        _laptop("Intel Core i5-1335U", '15.6" Full HD, 120 Hz', "Intel Iris Xe"),
-        (
-            _v(
-                "DEL-INS15-I5-512",
-                "Intel i5 · 8GB · 512GB SSD",
-                780_000,
-                processor="Core i5",
-                ram="8 GB",
-                storage="512 GB SSD",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "dell-latitude-5440",
-        "Dell Latitude 5440",
-        "laptops",
-        "dell",
-        "5440",
-        "A secure, durable business laptop with all-day battery life.",
-        _laptop("Intel Core i7-1355U", '14" Full HD', "Intel Iris Xe", "Windows 11 Pro"),
-        (
-            _v(
-                "DEL-LAT5440-I7-512",
-                "Intel i7 · 16GB · 512GB SSD",
-                1_350_000,
-                processor="Core i7",
-                ram="16 GB",
-                storage="512 GB SSD",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "lenovo-ideapad-slim-3",
-        "Lenovo IdeaPad Slim 3",
-        "laptops",
-        "lenovo",
-        "15ABR8",
-        "A slim laptop with AMD Ryzen performance for study and entertainment.",
-        _laptop("AMD Ryzen 5 7530U", '15.6" Full HD IPS', "AMD Radeon"),
-        (
-            _v(
-                "LEN-IPS3-R5-512",
-                "Ryzen 5 · 8GB · 512GB SSD",
-                650_000,
-                compare=699_000,
-                processor="Ryzen 5",
-                ram="8 GB",
-                storage="512 GB SSD",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "lenovo-thinkpad-e14",
-        "Lenovo ThinkPad E14",
-        "laptops",
-        "lenovo",
-        "E14 Gen 5",
-        "The ThinkPad keyboard and build quality for small businesses.",
-        _laptop("Intel Core i5-1335U", '14" WUXGA IPS', "Intel Iris Xe", "Windows 11 Pro"),
-        (
-            _v(
-                "LEN-TPE14-I5-512",
-                "Intel i5 · 16GB · 512GB SSD",
-                1_050_000,
-                "low",
-                processor="Core i5",
-                ram="16 GB",
-                storage="512 GB SSD",
-            ),
-        ),
-    ),
-    SeedProduct(
-        "apple-macbook-air-13-m2",
-        'MacBook Air 13" M2',
-        "laptops",
-        "apple",
-        "MLY33",
-        "Strikingly thin and fast, with the M2 chip and up to 18 hours of battery life.",
-        _laptop("Apple M2", '13.6" Liquid Retina', "8-core GPU", "macOS"),
-        (
-            _v(
-                "APL-MBA13-M2-256",
-                "M2 · 8GB · 256GB SSD",
-                1_550_000,
-                processor="Apple M2",
-                ram="8 GB",
-                storage="256 GB SSD",
-            ),
-        ),
-        featured=True,
-    ),
-    SeedProduct(
-        "hp-victus-15",
-        "HP Victus 15 Gaming Laptop",
-        "laptops",
-        "hp",
-        "15-fa1000",
-        "A gaming laptop with NVIDIA GeForce RTX graphics and a 144 Hz display.",
-        _laptop("Intel Core i5-12450H", '15.6" Full HD, 144 Hz', "NVIDIA GeForce RTX 3050"),
-        (
-            _v(
-                "HP-VIC15-I5-512",
-                "Intel i5 · 16GB · 512GB SSD",
-                1_250_000,
-                "out",
-                processor="Core i5",
-                ram="16 GB",
-                storage="512 GB SSD",
-            ),
-        ),
-    ),
-    # TVs & Audio
-    SeedProduct(
-        "lg-55-4k-smart-tv",
-        'LG 55" 4K Smart TV',
-        "tvs-audio",
-        "lg",
-        "55UR78006LK",
-        "UHD picture with ThinQ AI, webOS apps and HDR10 Pro.",
+        "orthopaedic-foam-mattress",
+        "Orthopaedic Foam Mattress",
+        "mattresses",
+        "akagera-living",
+        "AK-ORTHO",
+        "Medium-firm high-density foam with a breathable quilted cover, made in Kigali.",
         {
-            "Screen size": '55"',
-            "Resolution": "4K UHD",
-            "Smart platform": "webOS",
-            "HDMI ports": "3",
+            "width_cm": 160,
+            "depth_cm": 200,
+            "height_cm": 25,
+            "weight_kg": 22,
+            "material": "foam",
+            "condition": "new",
+            "Firmness": "Medium-firm",
         },
-        (_v("LG-55UR78-55", '55"', 890_000, screen_size='55"'),),
+        (
+            _v("ORT-MAT-140", "140 × 190 cm", 245_000, "in", size="140 × 190"),
+            _v("ORT-MAT-160", "160 × 200 cm", 295_000, "best", size="160 × 200"),
+        ),
+    ),
+    SeedProduct(
+        "three-door-wardrobe",
+        "Three-Door Wardrobe",
+        "wardrobes",
+        None,
+        None,
+        "A three-door wardrobe with a hanging rail, shelves and a mirrored centre door.",
+        _specs(
+            135,
+            58,
+            200,
+            "engineered_wood",
+            "white",
+            "modern",
+            weight=85,
+            finish="matte",
+            assembly=True,
+        ),
+        (_v("WAR-3D-WHT", "White", 540_000, "in"),),
+    ),
+    SeedProduct(
+        "six-drawer-dresser",
+        "Six-Drawer Dresser",
+        "dressers",
+        "nyungwe-timber",
+        None,
+        "Six deep drawers on metal runners in solid wood, with a wide top for a mirror.",
+        _specs(
+            140,
+            45,
+            80,
+            "solid_wood",
+            "walnut",
+            "mid_century",
+            weight=48,
+            finish="satin",
+            assembly=False,
+        ),
+        (_v("SIX-DRS-WAL", "Walnut", 410_000, "low"),),
+    ),
+    SeedProduct(
+        "bedside-table-pair",
+        "Bedside Tables (Pair)",
+        "bedside-tables",
+        None,
+        None,
+        "Two compact bedside tables, each with a drawer and an open shelf.",
+        _specs(45, 35, 55, "engineered_wood", "oak", "scandinavian", weight=9, assembly=True),
+        (_v("BED-TBL-OAK", "Oak, pair", 120_000, "in"),),
+    ),
+    # Dining
+    SeedProduct(
+        "gisenyi-dining-table-6",
+        "Gisenyi Six-Seat Dining Table",
+        "dining-tables",
+        "nyungwe-timber",
+        "GS-6",
+        "A solid wood dining table for six with rounded corners and a natural oil finish.",
+        _specs(
+            180,
+            90,
+            76,
+            "solid_wood",
+            "natural",
+            "rustic",
+            weight=55,
+            finish="natural",
+            assembly=True,
+            seats="6",
+        ),
+        (_v("GIS-DTBL-6", "180 × 90 cm", 580_000, "best"),),
         featured=True,
     ),
     SeedProduct(
-        "hisense-43-smart-tv",
-        'Hisense 43" Smart TV',
-        "tvs-audio",
-        "hisense",
-        "43A4K",
-        "A Full HD smart TV with built-in apps and Dolby Audio.",
-        {
-            "Screen size": '43"',
-            "Resolution": "Full HD",
-            "Smart platform": "VIDAA",
-            "HDMI ports": "2",
-        },
-        (_v("HIS-43A4K-43", '43"', 520_000, "best", screen_size='43"'),),
-    ),
-    SeedProduct(
-        "samsung-65-crystal-uhd-tv",
-        'Samsung 65" Crystal UHD TV',
-        "tvs-audio",
-        "samsung",
-        "UA65CU7000",
-        "Crystal Processor 4K for vivid colour on a big screen.",
-        {
-            "Screen size": '65"',
-            "Resolution": "4K UHD",
-            "Smart platform": "Tizen",
-            "HDMI ports": "3",
-        },
-        (_v("SAM-CU7000-65", '65"', 1_150_000, compare=1_250_000, screen_size='65"'),),
-    ),
-    SeedProduct(
-        "lg-32-hd-smart-tv",
-        'LG 32" HD Smart TV',
-        "tvs-audio",
-        "lg",
-        "32LQ630B6LA",
-        "A compact smart TV for bedrooms and small living rooms.",
-        {"Screen size": '32"', "Resolution": "HD", "Smart platform": "webOS", "HDMI ports": "2"},
-        (_v("LG-32LQ63-32", '32"', 280_000, screen_size='32"'),),
-    ),
-    SeedProduct(
-        "hisense-hs218-soundbar",
-        "Hisense HS218 Soundbar",
-        "tvs-audio",
-        "hisense",
-        "HS218",
-        "A 2.1-channel soundbar with a built-in subwoofer and Bluetooth.",
-        {"Channels": "2.1", "Power": "200 W", "Connectivity": "Bluetooth, HDMI ARC, optical"},
-        (_v("HIS-HS218", "Black", 145_000, colour="Black"),),
-    ),
-    SeedProduct(
-        "jbl-flip-6",
-        "JBL Flip 6 Bluetooth Speaker",
-        "tvs-audio",
-        "jbl",
-        "Flip 6",
-        "Bold JBL Pro Sound in a waterproof, dustproof portable speaker.",
-        {"Battery": "Up to 12 h", "Water resistance": "IP67", "Connectivity": "Bluetooth 5.1"},
-        (
-            _v("JBL-FLIP6-BLK", "Black", 180_000, compare=200_000, colour="Black"),
-            _v("JBL-FLIP6-BLU", "Blue", 180_000, "low", compare=200_000, colour="Blue"),
+        "marble-round-dining-table",
+        "Marble Round Dining Table",
+        "dining-tables",
+        None,
+        None,
+        "A round white marble top on a black steel pedestal, seating four.",
+        _specs(
+            110,
+            110,
+            75,
+            "marble",
+            "white",
+            "contemporary",
+            weight=62,
+            finish="polished",
+            assembly=True,
+            seats="4",
         ),
+        (_v("MAR-RTBL-WHT", "White marble", 760_000, "in", 840_000),),
+    ),
+    SeedProduct(
+        "upholstered-dining-chair",
+        "Upholstered Dining Chair",
+        "dining-chairs",
+        None,
+        None,
+        "A padded dining chair with a curved back on solid wood legs. Sold individually.",
+        _specs(48, 55, 88, "fabric", "beige", "classic", weight=6, finish="upholstered", seat=47),
+        (
+            _v("UPH-DCH-BEI", "Beige", 68_000, "best", colour="Beige"),
+            _v("UPH-DCH-GRY", "Grey", 68_000, "in", colour="Grey"),
+        ),
+    ),
+    SeedProduct(
+        "sheesham-sideboard",
+        "Sheesham Sideboard",
+        "sideboards",
+        None,
+        None,
+        "Four doors and two drawers for dinnerware, in solid sheesham with brass handles.",
+        _specs(160, 45, 85, "solid_wood", "brown", "classic", weight=52, finish="lacquered"),
+        (_v("SHE-SIDE-BRN", "Honey brown", 470_000, "in"),),
+    ),
+    SeedProduct(
+        "industrial-bar-stool",
+        "Industrial Bar Stool",
+        "bar-stools",
+        None,
+        None,
+        "A steel bar stool with a wooden seat and a footrest, for kitchen islands and counters.",
+        _specs(40, 40, 75, "metal", "black", "industrial", weight=5, seat=75),
+        (_v("IND-STOOL-BLK", "Black", 45_000, "in"),),
+    ),
+    # Office
+    SeedProduct(
+        "umucyo-executive-desk",
+        "Umucyo Executive Desk",
+        "desks",
+        "umucyo-office",
+        "UM-EX160",
+        "A large executive desk with a lockable drawer unit and a cable tray.",
+        _specs(
+            160,
+            80,
+            75,
+            "engineered_wood",
+            "walnut",
+            "contemporary",
+            weight=64,
+            finish="matte",
+            assembly=True,
+        ),
+        (_v("UMU-DESK-160", "160 × 80 cm", 520_000, "in"),),
         featured=True,
     ),
     SeedProduct(
-        "jbl-charge-5",
-        "JBL Charge 5 Bluetooth Speaker",
-        "tvs-audio",
-        "jbl",
-        "Charge 5",
-        "Powerful sound and a built-in power bank to charge your phone.",
-        {"Battery": "Up to 20 h", "Water resistance": "IP67", "Connectivity": "Bluetooth 5.1"},
-        (_v("JBL-CHG5-BLK", "Black", 245_000, colour="Black"),),
+        "compact-study-desk",
+        "Compact Study Desk",
+        "desks",
+        None,
+        None,
+        "A small desk with one drawer that fits a bedroom corner: for homework or a laptop.",
+        _specs(100, 50, 75, "engineered_wood", "white", "scandinavian", weight=17, assembly=True),
+        (_v("CMP-DESK-WHT", "White", 115_000, "best", 135_000),),
     ),
     SeedProduct(
-        "samsung-hw-b550-soundbar",
-        "Samsung HW-B550 Soundbar",
-        "tvs-audio",
-        "samsung",
-        "HW-B550",
-        "Dolby Audio and DTS Virtual:X with a wireless subwoofer.",
-        {"Channels": "2.1", "Power": "410 W", "Connectivity": "Bluetooth, HDMI, optical"},
-        (_v("SAM-HWB550", "Black", 310_000, "out", colour="Black"),),
-    ),
-    # Home Appliances
-    SeedProduct(
-        "hisense-205l-refrigerator",
-        "Hisense 205 L Refrigerator",
-        "home-appliances",
-        "hisense",
-        "RD-27DR4SA",
-        "A double-door refrigerator with low energy use for small families.",
-        {"Capacity": "205 L", "Type": "Double door", "Energy rating": "A+"},
-        (_v("HIS-RD27-205", "Silver", 395_000, colour="Silver"),),
-    ),
-    SeedProduct(
-        "lg-8kg-front-load-washer",
-        "LG 8 kg Front Load Washing Machine",
-        "home-appliances",
-        "lg",
-        "F4R3TYG6P",
-        "AI Direct Drive washing with steam and an inverter motor.",
-        {"Capacity": "8 kg", "Type": "Front load", "Spin speed": "1,400 rpm"},
-        (_v("LG-F4R3-8KG", "White", 690_000, colour="White"),),
-    ),
-    SeedProduct(
-        "samsung-20l-microwave",
-        "Samsung 20 L Solo Microwave",
-        "home-appliances",
-        "samsung",
-        "MS20A3010AL",
-        "A compact microwave with a ceramic enamel interior that is easy to clean.",
-        {"Capacity": "20 L", "Power": "700 W", "Type": "Solo"},
-        (_v("SAM-MS20-20L", "Black", 135_000, compare=150_000, colour="Black"),),
-    ),
-    SeedProduct(
-        "hisense-1-5hp-split-ac",
-        "Hisense 1.5 HP Split Air Conditioner",
-        "home-appliances",
-        "hisense",
-        "AS-12TR4",
-        "Quiet inverter cooling for bedrooms and offices.",
-        {"Capacity": "12,000 BTU", "Type": "Split, inverter", "Energy rating": "A++"},
-        (_v("HIS-AS12-15HP", "White", 620_000, "low", colour="White"),),
-    ),
-    SeedProduct(
-        "lg-inverter-refrigerator-420l",
-        "LG 420 L Inverter Refrigerator",
-        "home-appliances",
-        "lg",
-        "GN-B422SQCL",
-        "Linear cooling and DoorCooling+ keep food fresh for longer.",
-        {"Capacity": "420 L", "Type": "Top freezer", "Energy rating": "A++"},
-        (_v("LG-GNB422-420L", "Platinum Silver", 1_180_000, colour="Platinum Silver"),),
-    ),
-    SeedProduct(
-        "hisense-5l-air-fryer",
-        "Hisense 5 L Air Fryer",
-        "home-appliances",
-        "hisense",
-        "HAF1500D",
-        "Crispy results with little or no oil, with a digital touch panel.",
-        {"Capacity": "5 L", "Power": "1,500 W", "Controls": "Digital touch"},
-        (_v("HIS-HAF1500-5L", "Black", 95_000, colour="Black"),),
-    ),
-    # Accessories
-    SeedProduct(
-        "anker-powercore-20000",
-        "Anker Power Bank 20,000mAh",
-        "accessories",
-        "anker",
-        "A1384",
-        "High-capacity portable charger with USB-C Power Delivery.",
-        {"Capacity": "20,000 mAh", "Output": "20 W USB-C PD", "Ports": "USB-C, USB-A"},
-        (_v("ANK-PC20K-BLK", "Black", 85_000, "best", colour="Black"),),
-    ),
-    SeedProduct(
-        "anker-nano-20w-charger",
-        "Anker Nano 20W USB-C Charger",
-        "accessories",
-        "anker",
-        "A2633",
-        "A compact fast charger for phones and earbuds.",
-        {"Output": "20 W", "Port": "USB-C", "Plug": "UK type G"},
-        (_v("ANK-NANO20-WHT", "White", 28_000, colour="White"),),
-    ),
-    SeedProduct(
-        "apple-airpods-pro-2",
-        "AirPods Pro (2nd generation)",
-        "accessories",
-        "apple",
-        "MTJV3",
-        "Active noise cancellation, Adaptive Audio and a USB-C MagSafe case.",
-        {
-            "Battery": "Up to 6 h (30 h with case)",
-            "Noise cancellation": "Active",
-            "Charging": "USB-C, MagSafe",
-        },
-        (_v("APL-APP2-WHT", "White", 395_000, colour="White"),),
-    ),
-    SeedProduct(
-        "samsung-galaxy-buds-fe",
-        "Samsung Galaxy Buds FE",
-        "accessories",
-        "samsung",
-        "SM-R400N",
-        "Comfortable earbuds with active noise cancelling and rich bass.",
-        {
-            "Battery": "Up to 6 h (21 h with case)",
-            "Noise cancellation": "Active",
-            "Connectivity": "Bluetooth 5.2",
-        },
-        (_v("SAM-BUDSFE-GRY", "Graphite", 115_000, colour="Graphite"),),
-    ),
-    SeedProduct(
-        "jbl-tune-520bt",
-        "JBL Tune 520BT Headphones",
-        "accessories",
-        "jbl",
-        "Tune 520BT",
-        "Lightweight wireless on-ear headphones with JBL Pure Bass.",
-        {"Battery": "Up to 57 h", "Connectivity": "Bluetooth 5.3", "Weight": "157 g"},
-        (_v("JBL-T520-BLK", "Black", 65_000, compare=75_000, colour="Black"),),
-    ),
-    SeedProduct(
-        "xiaomi-redmi-buds-5",
-        "Xiaomi Redmi Buds 5",
-        "accessories",
-        "xiaomi",
-        "M2316E1",
-        "Affordable earbuds with 46 dB noise cancellation.",
-        {
-            "Battery": "Up to 10 h (40 h with case)",
-            "Noise cancellation": "Active",
-            "Connectivity": "Bluetooth 5.3",
-        },
-        (_v("XIA-RBUDS5-WHT", "Fantasy White", 45_000, colour="Fantasy White"),),
-    ),
-    SeedProduct(
-        "anker-usb-c-cable-2m",
-        "Anker USB-C to USB-C Cable 2 m",
-        "accessories",
-        "anker",
-        "A81F6",
-        "A braided, durable cable for fast charging and data transfer.",
-        {"Length": "2 m", "Power": "100 W", "Connectors": "USB-C to USB-C"},
-        (_v("ANK-USBC-2M", "Black", 15_000, colour="Black"),),
-    ),
-    SeedProduct(
-        "samsung-galaxy-watch-6",
-        "Samsung Galaxy Watch 6",
-        "accessories",
-        "samsung",
-        "SM-R930",
-        "Advanced health tracking and sleep coaching on a sapphire crystal display.",
-        {"Display": '1.3" Super AMOLED', "Battery": "Up to 40 h", "Water resistance": "5ATM"},
+        "ergonomic-mesh-office-chair",
+        "Ergonomic Mesh Office Chair",
+        "office-chairs",
+        "umucyo-office",
+        "UM-ERGO",
+        "Breathable mesh, adjustable lumbar support, 3D armrests and a reclining back.",
+        _specs(65, 65, 120, "fabric", "black", "modern", weight=16, seat=48, assembly=True),
         (
-            _v(
-                "SAM-GW6-40-GRA",
-                "40 mm · Graphite",
-                480_000,
-                "low",
-                case_size="40 mm",
-                colour="Graphite",
-            ),
+            _v("ERG-CHR-BLK", "Black", 195_000, "best", colour="Black"),
+            _v("ERG-CHR-GRY", "Grey", 195_000, "low", colour="Grey"),
         ),
+    ),
+    SeedProduct(
+        "steel-filing-cabinet",
+        "Four-Drawer Steel Filing Cabinet",
+        "office-storage",
+        "umucyo-office",
+        None,
+        "A lockable steel cabinet with four full-extension drawers for A4 and foolscap files.",
+        _specs(47, 62, 132, "metal", "grey", "industrial", weight=45, finish="painted"),
+        (_v("STL-FILE-GRY", "Light grey", 260_000, "in"),),
+    ),
+    SeedProduct(
+        "boardroom-table-10",
+        "Boardroom Table for Ten",
+        "meeting-tables",
+        "umucyo-office",
+        None,
+        "A 3-metre meeting table with a central cable box, delivered and assembled on site.",
+        _specs(
+            300,
+            120,
+            75,
+            "engineered_wood",
+            "oak",
+            "contemporary",
+            weight=120,
+            assembly=True,
+            seats="10",
+        ),
+        (_v("BRD-TBL-10", "300 × 120 cm", 980_000, "low"),),
+    ),
+    # Outdoor
+    SeedProduct(
+        "kivu-garden-lounge-set",
+        "Kivu Garden Lounge Set",
+        "garden-sets",
+        "kivu-outdoor",
+        "KO-LOUNGE",
+        "A weatherproof rattan-effect sofa, two chairs and a glass-top table, with "
+        "water-repellent cushions.",
+        _specs(
+            190,
+            75,
+            80,
+            "plastic",
+            "brown",
+            "contemporary",
+            weight=42,
+            seat=40,
+            assembly=True,
+            pieces="4",
+        ),
+        (_v("KIV-LNG-BRN", "Brown", 890_000, "in", 990_000),),
+        featured=True,
+    ),
+    SeedProduct(
+        "teak-folding-chair",
+        "Teak Folding Garden Chair",
+        "outdoor-seating",
+        "kivu-outdoor",
+        None,
+        "A folding chair in oiled teak for balconies and gardens. Folds flat to store.",
+        _specs(55, 60, 90, "solid_wood", "natural", "classic", weight=6, finish="natural", seat=45),
+        (_v("TEK-FCH-NAT", "Natural teak", 75_000, "best"),),
+    ),
+    SeedProduct(
+        "aluminium-outdoor-table",
+        "Aluminium Outdoor Table",
+        "outdoor-tables",
+        "kivu-outdoor",
+        None,
+        "A rust-free aluminium table with a slatted top that drains rain, seating four.",
+        _specs(120, 80, 74, "metal", "grey", "modern", weight=14, assembly=True),
+        (_v("ALU-OTBL-GRY", "Grey", 210_000, "out"),),
+    ),
+    # Kids
+    SeedProduct(
+        "bunk-bed-with-ladder",
+        "Bunk Bed with Ladder",
+        "kids-beds",
+        None,
+        None,
+        "A sturdy pine bunk bed with guard rails and a fixed ladder; splits into two single beds.",
+        _specs(
+            98,
+            200,
+            160,
+            "solid_wood",
+            "white",
+            "scandinavian",
+            weight=70,
+            finish="painted",
+            assembly=True,
+            mattress_size="90 × 190 cm (two)",
+        ),
+        (_v("BNK-BED-WHT", "White", 430_000, "in"),),
+    ),
+    SeedProduct(
+        "kids-desk-and-chair-set",
+        "Kids' Desk and Chair Set",
+        "kids-desks",
+        None,
+        None,
+        "A height-adjustable desk and chair for ages 4 to 10, with rounded corners.",
+        _specs(
+            80, 50, 60, "engineered_wood", "blue", "modern", weight=15, assembly=True, ages="4–10"
+        ),
+        (_v("KID-DESK-BLU", "Blue", 98_000, "in"),),
+    ),
+    SeedProduct(
+        "toy-storage-unit",
+        "Toy Storage Unit",
+        "kids-storage",
+        None,
+        None,
+        "Nine open cubes with fabric bins for toys and books.",
+        _specs(
+            90, 30, 90, "engineered_wood", "multicolour", "contemporary", weight=20, assembly=True
+        ),
+        (_v("TOY-STOR-MLT", "White with coloured bins", 85_000, "low"),),
     ),
 )
 
-# The first banner is the Main.dc.html hero. The other two reuse the hero's trust points; the
-# design has a single hero; only the first has an overline. Kinyarwanda text is draft test data,
-# not approved copy.
+# The first banner is the home hero. Kinyarwanda text is draft test data, not approved copy.
 BANNERS = (
     SeedBanner(
-        title_en="Power Your World With the Latest Tech",
-        title_rw="Ikoranabuhanga rigezweho ku buzima bwawe",
+        title_en="Furniture From Rwanda's Best Makers",
+        title_rw="Ibikoresho byo mu nzu by'abanyabukorikori beza bo mu Rwanda",
         subtitle_en=(
-            "Smartphones, laptops, TVs, home appliances and accessories from trusted brands — "
-            "delivered fast across Kigali and all of Rwanda."
+            "Sofas, beds, dining and office furniture from trusted local stores — delivered "
+            "across Kigali and all of Rwanda."
         ),
         subtitle_rw=(
-            "Telefoni, mudasobwa, televiziyo, ibikoresho byo mu rugo n'ibindi biva mu bakora "
-            "bizewe, bikugezwaho vuba i Kigali no mu Rwanda hose."
+            "Intebe, ibitanda, ameza n'ibikoresho byo mu biro biva mu maduka yizewe — "
+            "bikugezwaho i Kigali no mu Rwanda hose."
         ),
         cta_label_en="Shop Now",
         cta_label_rw="Gura ubu",
-        cta_url="/category/phones",
+        cta_url="/category/living-room",
         position=0,
-        overline_en="Latest electronics, better everyday life",
-        overline_rw="Ikoranabuhanga rigezweho, ubuzima bwiza",
+        overline_en="Many stores, one marketplace",
+        overline_rw="Amaduka menshi, isoko rimwe",
     ),
     SeedBanner(
-        title_en="Genuine Products With Warranty",
-        title_rw="Ibicuruzwa by'umwimerere bifite garanti",
-        subtitle_en="Laptops for work, study and gaming from HP, Dell, Lenovo and Apple.",
-        subtitle_rw="Mudasobwa zo gukoresha mu kazi, kwiga no gukina za HP, Dell, Lenovo na Apple.",
-        cta_label_en="Shop Laptops",
-        cta_label_rw="Reba mudasobwa",
-        cta_url="/category/laptops",
+        title_en="Sleep Better",
+        title_rw="Siinzira neza",
+        subtitle_en="Solid wood beds, mattresses and wardrobes for every bedroom.",
+        subtitle_rw="Ibitanda by'ibiti bikomeye, matela n'utubati tw'imyenda ku cyumba cyose.",
+        cta_label_en="Shop Bedroom",
+        cta_label_rw="Reba ibyo mu cyumba",
+        cta_url="/category/bedroom",
         position=1,
     ),
     SeedBanner(
-        title_en="Fast & Reliable Delivery",
-        title_rw="Kugeza ibicuruzwa vuba kandi neza",
-        subtitle_en="TVs, soundbars and speakers delivered to your door in Kigali.",
-        subtitle_rw="Televiziyo n'indangururamajwi bikugezwaho mu rugo i Kigali.",
-        cta_label_en="Shop TVs & Audio",
-        cta_label_rw="Reba televiziyo",
-        cta_url="/category/tvs-audio",
+        title_en="Furnish Your Office",
+        title_rw="Tegura ibiro byawe",
+        subtitle_en="Desks, ergonomic chairs and storage, delivered and assembled.",
+        subtitle_rw="Ameza, intebe zinogeye umubiri n'ububiko, bikugezwaho bigateranywa.",
+        cta_label_en="Shop Office",
+        cta_label_rw="Reba ibyo mu biro",
+        cta_url="/category/office",
         position=2,
     ),
 )
@@ -993,25 +819,26 @@ CUSTOMERS = (
     ),
 )
 
-# Cash on delivery throughout. Delivered orders give `sort_by=bestselling` its data.
+# Cash on delivery throughout. Delivered orders give `sort_by=bestselling` its data. Several
+# orders hold products of more than one store, so they split into several seller orders.
 ORDERS = (
-    SeedOrder("aline.uwase", (("APL-IP15-128-BLK", 1), ("ANK-PC20K-BLK", 1)), "delivered"),
-    SeedOrder("jean.habimana", (("TEC-SPK20-128-BLK", 2),), "delivered"),
-    SeedOrder("grace.mukamana", (("HIS-43A4K-43", 1),), "delivered"),
-    SeedOrder("eric.niyonzima", (("SAM-A55-128-NVY", 1), ("ANK-PC20K-BLK", 1)), "delivered"),
-    SeedOrder("diane.ingabire", (("TEC-SPK20-128-BLK", 1), ("ANK-NANO20-WHT", 2)), "delivered"),
-    SeedOrder("aline.uwase", (("HIS-43A4K-43", 1),), "delivered"),
-    SeedOrder("jean.habimana", (("APL-IP15-128-BLK", 1),), "delivered"),
-    SeedOrder("grace.mukamana", (("ANK-PC20K-BLK", 2), ("XIA-RBUDS5-WHT", 1)), "delivered"),
-    SeedOrder("eric.niyonzima", (("JBL-FLIP6-BLK", 1),), "dispatched"),
-    SeedOrder("diane.ingabire", (("HP-PAV15-I5-512", 1),), "dispatched"),
-    SeedOrder("aline.uwase", (("SAM-MS20-20L", 1),), "processing"),
-    SeedOrder("jean.habimana", (("DEL-INS15-I5-512", 1),), "confirmed"),
-    SeedOrder("grace.mukamana", (("SAM-A15-128-BLU", 1),), "received"),
-    SeedOrder("eric.niyonzima", (("APL-APP2-WHT", 1),), "received"),
+    SeedOrder("aline.uwase", (("KIV-SOFA3-GRY", 1), ("IMI-COF-BLK", 1)), "delivered"),
+    SeedOrder("jean.habimana", (("ERG-CHR-BLK", 1),), "delivered"),
+    SeedOrder("grace.mukamana", (("MUH-BED-Q", 1),), "delivered"),
+    SeedOrder("eric.niyonzima", (("RAT-ACC-NAT", 1), ("IMI-COF-BLK", 1)), "delivered"),
+    SeedOrder("diane.ingabire", (("ERG-CHR-BLK", 1), ("UPH-DCH-BEI", 4)), "delivered"),
+    SeedOrder("aline.uwase", (("MUH-BED-Q", 1),), "delivered"),
+    SeedOrder("jean.habimana", (("KIV-SOFA3-GRY", 1),), "delivered"),
+    SeedOrder("grace.mukamana", (("IMI-COF-BLK", 1), ("TEK-FCH-NAT", 2)), "delivered"),
+    SeedOrder("eric.niyonzima", (("GIS-DTBL-6", 1),), "dispatched"),
+    SeedOrder("diane.ingabire", (("UMU-DESK-160", 1),), "dispatched"),
+    SeedOrder("aline.uwase", (("ORT-MAT-160", 1),), "processing"),
+    SeedOrder("jean.habimana", (("WAR-3D-WHT", 1),), "confirmed"),
+    SeedOrder("grace.mukamana", (("CMP-DESK-WHT", 1),), "received"),
+    SeedOrder("eric.niyonzima", (("BED-TBL-OAK", 1),), "received"),
     SeedOrder(
         "diane.ingabire",
-        (("JBL-T520-BLK", 1),),
+        (("GLS-COF-BLK", 1),),
         "cancelled",
         note="Seed order: cancelled by the customer before confirmation.",
     ),
@@ -1023,40 +850,40 @@ ORDERS = (
 REVIEWS = (
     SeedReview(
         1,
-        "APL-IP15-128-BLK",
+        "KIV-SOFA3-GRY",
         5,
         "approved",
-        "Fast and the camera is excellent",
-        "Delivered in Kicukiro the next morning. Battery lasts a full day.",
+        "Comfortable and well made",
+        "Delivered to Kimironko and carried upstairs. The covers wash well.",
     ),
-    SeedReview(1, "ANK-PC20K-BLK", 4, "approved", "Charges my phone four times"),
+    SeedReview(1, "IMI-COF-BLK", 4, "approved", "Beautiful pattern"),
     SeedReview(
         2,
-        "TEC-SPK20-128-BLK",
+        "ERG-CHR-BLK",
         4,
         "approved",
-        "Good value",
-        "Big screen and good battery for the price. The camera is average in low light.",
+        "Good for long days",
+        "My back is better. The armrests could be a little softer.",
     ),
-    SeedReview(3, "HIS-43A4K-43", 5, "approved", "Sharp picture", "Easy to set up with Netflix."),
-    SeedReview(4, "SAM-A55-128-NVY", 4, "approved", None, "Smooth screen, a little heavy."),
-    SeedReview(4, "ANK-PC20K-BLK", 5, "approved", "Reliable"),
-    SeedReview(5, "TEC-SPK20-128-BLK", 3, "approved", "Fine for everyday use"),
+    SeedReview(3, "MUH-BED-Q", 5, "approved", "Solid wood", "Heavy and very stable."),
+    SeedReview(4, "RAT-ACC-NAT", 4, "approved", None, "Lovely chair, the cushion is thin."),
+    SeedReview(4, "IMI-COF-BLK", 5, "approved", "Everyone asks about it"),
+    SeedReview(5, "ERG-CHR-BLK", 3, "approved", "Fine for the price"),
     SeedReview(
-        5, "ANK-NANO20-WHT", 5, "pending", "Small and quick", "Charges my iPhone to half fast."
+        5, "UPH-DCH-BEI", 5, "pending", "Elegant chairs", "Four chairs, all arrived in one week."
     ),
-    SeedReview(6, "HIS-43A4K-43", 4, "approved", "Good TV for the bedroom"),
-    SeedReview(7, "APL-IP15-128-BLK", 5, "approved", "Worth it", "Original, sealed box."),
+    SeedReview(6, "MUH-BED-Q", 4, "approved", "Good bed for the guest room"),
+    SeedReview(7, "KIV-SOFA3-GRY", 5, "approved", "Worth it", "The grey matches everything."),
     SeedReview(
         8,
-        "ANK-PC20K-BLK",
+        "IMI-COF-BLK",
         2,
         "rejected",
-        "Call me for cheaper prices",
+        "Call me for cheaper tables",
         "WhatsApp 0780000000 for a better deal.",
         reason="Advertising and a phone number",
     ),
-    SeedReview(8, "XIA-RBUDS5-WHT", 4, "pending", "Good sound", None),
+    SeedReview(8, "TEK-FCH-NAT", 4, "pending", "Nice on the balcony", None),
 )
 
 # Policy pages (module 19, owner decision 2026-10-29): short drafts in both languages so the
@@ -1071,14 +898,14 @@ PAGES = (
         "About us",
         f"""{DRAFT_EN}
 
-3 Sixty Technologies sells original phones, laptops, TVs and accessories in Rwanda, with
-warranty and delivery to every district.
+FurniHub is a marketplace of furniture stores in Rwanda: sofas, beds, dining, office and
+outdoor furniture from approved local sellers, delivered to every district.
 
 ## What we promise
 
-- Genuine products from authorised suppliers.
+- Every store is reviewed and approved before it sells.
 - Clear prices in Rwandan francs, with VAT included.
-- Help before and after you buy, on WhatsApp, by phone or in our store.""",
+- Help before and after you buy, on WhatsApp or by phone.""",
     ),
     SeedPage(
         "about-us",
@@ -1086,14 +913,14 @@ warranty and delivery to every district.
         "Abo turi bo",
         f"""{DRAFT_RW}
 
-3 Sixty Technologies icuruza telefoni, mudasobwa, televiziyo n'ibikoresho by'umwimerere mu
-Rwanda, bifite garanti kandi tukabigeza mu turere twose.
+FurniHub ni isoko ry'amaduka y'ibikoresho byo mu nzu mu Rwanda: intebe, ibitanda, ameza,
+ibikoresho byo mu biro n'ibyo hanze biva ku bacuruzi bemewe, bikagezwa mu turere twose.
 
 ## Ibyo tubasezeranya
 
-- Ibicuruzwa by'umwimerere biva ku batanga bemewe.
+- Buri iduka risuzumwa kandi rikemezwa mbere yo gucuruza.
 - Ibiciro bigaragara neza mu mafaranga y'u Rwanda, TVA irimo.
-- Ubufasha mbere na nyuma yo kugura, kuri WhatsApp, kuri telefoni cyangwa mu iduka.""",
+- Ubufasha mbere na nyuma yo kugura, kuri WhatsApp cyangwa kuri telefoni.""",
     ),
     SeedPage(
         "delivery-information",
@@ -1244,7 +1071,7 @@ Ntitugurisha amakuru yawe bwite.""",
         "Terms & conditions",
         f"""{DRAFT_EN}
 
-By ordering from 3 Sixty Technologies you agree to these terms.
+By ordering on FurniHub you agree to these terms.
 
 ## Orders and prices
 
@@ -1258,7 +1085,7 @@ By ordering from 3 Sixty Technologies you agree to these terms.
         "Amategeko n'amabwiriza",
         f"""{DRAFT_RW}
 
-Iyo utumije kuri 3 Sixty Technologies uba wemeye aya mabwiriza.
+Iyo utumije kuri FurniHub uba wemeye aya mabwiriza.
 
 ## Amatumiza n'ibiciro
 
@@ -1271,10 +1098,10 @@ Iyo utumije kuri 3 Sixty Technologies uba wemeye aya mabwiriza.
 # Store contact for development (module 19): sample values, set only while the setting is unset;
 # the cleanup removes them only while they still hold these values.
 CONTACT = (
-    ("store.name", "3 Sixty Technologies"),
+    ("store.name", "FurniHub"),
     ("contact.phone", "+250 788 123 456"),
     ("contact.whatsapp", "+250 788 123 456"),
-    ("contact.email", "info@3sixtytech.rw"),
+    ("contact.email", "hello@furnihub.example"),
     ("contact.address", "KN 5 Ave, Kigali, Rwanda"),
     ("contact.hours", "Mon – Sat: 8:00 AM – 6:00 PM"),
 )

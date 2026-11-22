@@ -8,7 +8,7 @@ import { expectAccessible, screenshot } from "./helpers";
 
 const PASSWORD = process.env.E2E_STAFF_PASSWORD;
 const ACCOUNTS = {
-  administrator: process.env.E2E_ADMIN_EMAIL ?? "admin@seed.3sixty.local",
+  administrator: process.env.E2E_ADMIN_EMAIL ?? "admin@seed.furnihub.local",
 } as const;
 
 test.skip(!PASSWORD, "Set E2E_STAFF_PASSWORD to the seed staff password to run the admin tests.");

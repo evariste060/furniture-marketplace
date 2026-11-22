@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
+from app.core.config import get_settings
 from app.schemas.root import RootLinks, RootResponse
 
 router = APIRouter()
 
-SERVICE_NAME = "3 Sixty Technologies API"
 LINKS = RootLinks(
     health="/api/v1/health",
     docs="/docs",
@@ -22,8 +22,9 @@ LINKS = RootLinks(
 def root() -> RootResponse:
     """Identifies the service and links to its health check and documentation. Checks no
     dependency: use the health link for that."""
+    service_name = f"{get_settings().marketplace_name} API"
     return RootResponse(
-        service=SERVICE_NAME,
-        message=f"Welcome to the {SERVICE_NAME}.",
+        service=service_name,
+        message=f"Welcome to the {service_name}.",
         links=LINKS,
     )

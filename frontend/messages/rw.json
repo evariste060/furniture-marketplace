@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "3 Sixty Technologies",
-    "description": "Telefoni, mudasobwa, televiziyo, ibikoresho byo mu rugo n'ibindi biva mu bakora bizewe — bikugezwaho vuba i Kigali no mu Rwanda hose."
+    "title": "{marketplace}",
+    "description": "Intebe, ibitanda, ameza, ibikoresho byo mu biro n'ibyo hanze biva mu maduka y'ibikoresho byo mu nzu yizewe mu Rwanda — bikugezwaho i Kigali no mu Rwanda hose."
   },
   "ui": {
     "skipToContent": "Jya ku bikubiyemo",
@@ -14,9 +14,9 @@
     "openMenu": "Fungura menu"
   },
   "hero": {
-    "overline": "Ikoranabuhanga rigezweho, ubuzima bwiza buri munsi",
+    "overline": "Amaduka menshi y'ibikoresho byo mu nzu, isoko rimwe",
     "title": "Ikoranabuhanga rigezweho ku buzima bwawe",
-    "subtitle": "Telefoni, mudasobwa, televiziyo, ibikoresho byo mu rugo n'ibindi biva mu bakora bizewe — bikugezwaho vuba i Kigali no mu Rwanda hose.",
+    "subtitle": "Intebe, ibitanda, ameza, ibikoresho byo mu biro n'ibyo hanze biva mu maduka y'ibikoresho byo mu nzu yizewe mu Rwanda — bikugezwaho i Kigali no mu Rwanda hose.",
     "shopNow": "Gura ubu",
     "viewDeals": "Reba poromosiyo",
     "fast": "Byihuse kandi byizewe",
@@ -38,8 +38,8 @@
     "exploreServices": "Reba serivisi"
   },
   "store": {
-    "logoAlt": "3 Sixty Technologies",
-    "homeLink": "3 Sixty Technologies — ahabanza",
+    "logoAlt": "{marketplace}",
+    "homeLink": "{marketplace} — ahabanza",
     "announcement": {
       "freeDelivery": "Kugezwaho ku buntu i Kigali ku byaguzwe birenze {amount}",
       "freeDeliveryShort": "Kugezwaho ku buntu i Kigali hejuru ya {amount}",
@@ -49,8 +49,8 @@
     },
     "header": {
       "searchLabel": "Shakisha ibicuruzwa",
-      "searchPlaceholder": "Shakisha telefoni, mudasobwa, televiziyo, ibikoresho…",
-      "searchPlaceholderShort": "Shakisha telefoni, mudasobwa, televiziyo…",
+      "searchPlaceholder": "Shakisha intebe, ibitanda, ameza, ameza y'akazi…",
+      "searchPlaceholderShort": "Shakisha intebe, ibitanda, ameza…",
       "search": "Shakisha",
       "language": "Ururimi: {name}",
       "myAccount": "Konti yanjye",
@@ -114,7 +114,7 @@
       "account": "Konti"
     },
     "footer": {
-      "tagline": "Iduka ryawe ryizewe ry'ikoranabuhanga mu Rwanda. Ibicuruzwa by'umwimerere, ibiciro bikwiye n'ubufasha bwo mu gihugu.",
+      "tagline": "Isoko ry'ibikoresho byo mu nzu mu Rwanda. Amaduka yemewe yo mu gihugu, ibiciro bikwiye no kukugezaho iwawe.",
       "shop": "Hahira",
       "customerService": "Serivisi ku bakiriya",
       "trackOrder": "Kurikirana ibyo watumije",
@@ -167,19 +167,19 @@
     "home": {
       "seeAll": "Reba byose",
       "featuredTitle": "Ibicuruzwa byatoranyijwe",
-      "featuredText": "Ibikoresho byatoranyijwe neza kugira ngo ubone ibyiza.",
+      "featuredText": "Ibikoresho byatoranyijwe mu maduka yacu.",
       "bestTitle": "Ibigurwa cyane",
       "bestText": "Ibyo abakiriya bacu bakunda cyane.",
       "newTitle": "Ibishya byageze",
-      "newText": "Ba uwa mbere ubona ikoranabuhanga rigezweho.",
+      "newText": "Ibikoresho bishya biva mu maduka yacu.",
       "spotlightTitle": "Reba {category}",
-      "spotlightText": "Ibigurwa cyane muri {category}: ibicuruzwa by'umwimerere bifite garanti, bigezwa hose mu Rwanda.",
-      "businessTitle": "Ukeneye ibikoresho by'ikigo cyawe?",
-      "businessText": "Ibiciro byihariye ku bagura byinshi, ibigo n'inzego. Itsinda ryacu rizagutegurira igiciro mu munsi umwe w'akazi.",
+      "spotlightText": "Ibigurwa cyane muri {category}, biva mu maduka yemewe kandi bigezwa hose mu Rwanda.",
+      "businessTitle": "Uratunganya ibiro, hoteli cyangwa ishuri?",
+      "businessText": "Ibiciro byihariye ku byo ibiro, amahoteli, amashuri n'ibigo bitumiza ari byinshi. Itsinda ryacu rizagutegurira igiciro mu munsi umwe w'akazi.",
       "contactUs": "Twandikire",
       "requestQuote": "Saba igiciro",
       "businessShortTitle": "Uragurira ikigo cyawe?",
-      "businessShortText": "Ibiciro byihariye ku bigo, amashuri n'inzego.",
+      "businessShortText": "Ibiciro byihariye ku biro, amahoteli, amashuri n'ibigo.",
       "requestQuoteShort": "Saba igiciro",
       "sectionError": "Ntitwashoboye kuzana ibi bicuruzwa. Ongera ufungure urupapuro.",
       "callUs": "Duhamagare",
@@ -187,7 +187,7 @@
       "visitUs": "Dusure",
       "spotlightPhoto": "Erekana ifoto ya {n} kuri {count}",
       "servicesTitle": "Serivisi zacu",
-      "servicesText": "Gushyiraho, gukora ibyangiritse n'amahugurwa bitangwa n'itsinda ryacu rya tekiniki.",
+      "servicesText": "Guteranya, gushyiraho, kugeza no gusana bikorwa n'abatekinisiye babihuguriwe.",
       "brandsTitle": "Ibirango byizewe",
       "brandsCount": "{count, plural, one {Ikirango # kirahari} other {Ibirango # birahari}}",
       "brandsCountOver": "Ibirango {count}+ birahari"
@@ -201,7 +201,7 @@
     },
     "deals": {
       "title": "Poromosiyo",
-      "text": "Ibikoresho by'ikoranabuhanga bigabanyirijwe ibiciro, mu gihe bikiri mu bubiko."
+      "text": "Ibikoresho byo mu nzu bigabanyirijwe ibiciro, mu gihe bikiri mu bubiko."
     },
     "allProducts": {
       "title": "Ibicuruzwa byose"
@@ -325,7 +325,7 @@
       "emptyText": "Ntitwabonye igihuye mu bihari. Dushobora kukikuzanira — baza itsinda ryacu.",
       "contact": "Twandikire",
       "tipSpelling": "Reba niba wanditse neza",
-      "tipGeneral": "Gerageza ijambo rusange, nka “iPhone” cyangwa “laptop”",
+      "tipGeneral": "Gerageza ijambo rusange, nka “intebe” cyangwa “igitanda”",
       "tipBrowse": "Sura icyiciro gikunzwe kiri hasi",
       "popular": "Ibikunzwe ubu",
       "error": "Ntitwashoboye gushakisha ubu. Ongera ugerageze.",
@@ -389,7 +389,7 @@
       "haveAccountText": "Injira ukoreshe aderesi wabitse kandi wishyure vuba. N'abatagira konti bashobora kwishyura.",
       "signIn": "Injira",
       "emptyTitle": "Igitebo cyawe kirimo ubusa",
-      "emptyText": "Reba telefoni, mudasobwa n'ibikoresho byo mu rugo, ushyiremo ibyo ukunze.",
+      "emptyText": "Reba intebe, ibitanda n'ameza, ushyiremo ibyo ukunze.",
       "startShopping": "Tangira guhaha",
       "loadFailed": "Ntitwashoboye gufungura igitebo cyawe. Ongera ugerageze.",
       "retry": "Ongera ugerageze",
@@ -415,7 +415,7 @@
       "secure": "Kwishyura kwizewe",
       "secureShort": "Byizewe",
       "back": "Subira inyuma",
-      "copyright": "© {year} 3 Sixty Technologies",
+      "copyright": "© {year} {marketplace}",
       "deliveryPolicy": "Kugezwaho",
       "returnsPolicy": "Gusubiza",
       "haveAccount": "Usanzwe ufite konti?",
@@ -663,7 +663,7 @@
       "perkTrack": "Kurikirana buri kugezwaho",
       "staffNote": "Abakozi na bo binjirira hano bakoresheje imeri n'ijambo ry'ibanga — uzajyanwa ku rubuga rw'ubuyobozi.",
       "loginTitle": "Injira",
-      "newHere": "Uri mushya kuri 3 Sixty? <link>Fungura konti</link>",
+      "newHere": "Uri mushya kuri {marketplace}? <link>Fungura konti</link>",
       "passwordUpdated": "Ijambo ry'ibanga ryahinduwe. Injira ukoresheje irishya.",
       "identifier": "Imeri cyangwa nimero ya telefoni",
       "password": "Ijambo ry'ibanga",
@@ -779,7 +779,7 @@
         "notVerifiedText": "Twakoherereje umurongo wo kwemeza igihe wiyandikishaga. Wufungure, hanyuma wongere winjire.",
         "verifiedNotice": "Imeri yawe yemejwe. Injira ukomeze.",
         "registerUnavailable": "Ubu ntidushobora kohereza imeri yo kwemeza, bityo konti yawe ntiyafunguwe. Ongera ugerageze mu kanya, cyangwa wiyandikishe ukoresheje nimero ya telefoni gusa.",
-        "tagline": "Ibikoresho by'ikoranabuhanga n'ibyo mu rugo · Rwanda",
+        "tagline": "Isoko ry'ibikoresho byo mu nzu · Rwanda",
         "spamNote": "Bishobora gufata umunota ngo uhagere. Nturawubona? Reba no mu bubiko bwa spam.",
         "resendLink": "Ongera wohereze imeri yo kwemeza",
         "resendIn": "Ongera wohereze imeri yo kwemeza mu {time}",
@@ -1065,7 +1065,7 @@
       "title": "Ntitubonye iyi paji",
       "text": "Ihuza rishobora kuba rishaje, cyangwa igicuruzwa ntikikigurishwa. Gerageza gushakisha, cyangwa usubire ku rupapuro rw’ibanze.",
       "searchLabel": "Shakisha ibicuruzwa",
-      "searchPlaceholder": "Shakisha telefoni, mudasobwa, televiziyo…",
+      "searchPlaceholder": "Shakisha intebe, ibitanda, ameza…",
       "search": "Shakisha",
       "home": "Subira ahabanza",
       "contact": "Twandikire"
@@ -1113,7 +1113,7 @@
       "emailTitle": "Imeli",
       "visit": "Sura iduka ryacu",
       "quoteTitle": "Saba igiciro cy'ubucuruzi",
-      "quoteText": "Ku bicuruzwa 10 kuzamura, ibigo, amashuri n'inzego.",
+      "quoteText": "Ku biro, amahoteli, amashuri n'ibigo bigura ibikoresho 10 cyangwa birenga.",
       "company": "Ikigo / urwego",
       "companyPlaceholder": "urugero: Green Hills Academy",
       "contactName": "Uhagarariye",
@@ -1242,10 +1242,10 @@
       "subject": "Impamvu",
       "subjectPlaceholders": {
         "order": "urugero: Ibyo natumije bizagera ryari?",
-        "product": "urugero: Iyi mudasobwa ifite clavier imurika?",
+        "product": "urugero: Iyi ntebe ifite ingano ingana iki neza?",
         "payment": "urugero: Kwishyura na MoMo ntibyakunze",
-        "warranty": "urugero: Ecran ya telefoni yanjye yahagaze",
-        "returns": "urugero: Ndashaka gusubiza ecouteurs zanjye",
+        "warranty": "urugero: Akabati k'imyenda kanjye kacitse igikurura",
+        "returns": "urugero: Ndashaka gusubiza intebe zanjye zo ku meza",
         "other": "urugero: Mufite iduka i Musanze?"
       },
       "orderNumber": "Nimero y'ibyo watumije (si ngombwa)",
@@ -1303,7 +1303,7 @@
       "latestReply": "Igisubizo gishya",
       "conversation": "Ikiganiro",
       "you": "Wowe",
-      "supportName": "Ubufasha bwa 3 Sixty",
+      "supportName": "Ubufasha bwa {marketplace}",
       "closedNote": "Iki kiganiro cyafunzwe. Niba ugikeneye ubufasha, andika hano hasi tukongere tugifungure.",
       "replyLabel": "Igisubizo cyawe",
       "replyPlaceholder": "Andika igisubizo cyawe…",
@@ -1326,9 +1326,9 @@
     },
     "services": {
       "metaTitle": "Serivisi zacu za tekiniki",
-      "metaDescription": "Kamera z'umutekano, amarembo yikoresha, kugenzura kwinjira, imiyoboro ya interineti, gukora ibikoresho by'ikoranabuhanga n'amahugurwa ya tekiniki ku ngo, ubucuruzi n'ibigo mu Rwanda.",
+      "metaDescription": "Guteranya ibikoresho byo mu nzu, kubishyiraho, kubigeza no kubitunganya, gusana intebe n'ibindi ku ngo, ibiro, amahoteli n'amashuri mu Rwanda.",
       "title": "Serivisi zacu za tekiniki",
-      "intro": "Muri 3Sixty Technologies Ltd, dutanga ibisubizo bishya by'ikoranabuhanga bigenewe gutuma ingo, ubucuruzi n'ibigo birushaho kugira ubwenge, umutekano no gukora neza. Kuva ku buryo bugezweho bw'umutekano n'ikoranabuhanga ryikoresha kugeza ku bikorwa remezo bya IT, gukora ibikoresho by'ikoranabuhanga n'amahugurwa ya tekiniki, dutanga ibisubizo byizewe bishyigikiwe n'ubuhanga bw'umwuga.",
+      "intro": "Uretse ibikoresho ubwabyo, {marketplace} ikuhuza n'abatekinisiye babihuguriwe bo guteranya, kumanika ku rukuta, kugeza no gutunganya icyumba, gusana intebe n'ibikoresho by'ibiti — ku ngo, ibiro, amahoteli n'amashuri mu Rwanda hose.",
       "listLabel": "Serivisi",
       "empty": "Serivisi zacu zizagaragara hano vuba. Muri icyo gihe, vugana n'itsinda ryacu.",
       "error": "Ntibishobotse kwerekana serivisi zacu. Ongera ugerageze.",
@@ -1456,6 +1456,80 @@
     },
     "storePage": {
       "location": "Aho iherereye:"
+    }
+  },
+  "furniture": {
+    "names": {
+      "width_cm": "Ubugari",
+      "depth_cm": "Ubujyakuzimu",
+      "height_cm": "Uburebure",
+      "seat_height_cm": "Uburebure bw'aho bicara",
+      "weight_kg": "Uburemere",
+      "material": "Icyo gikozwemo",
+      "color": "Ibara",
+      "style": "Imiterere",
+      "finish": "Uko gisize",
+      "condition": "Uko kimeze",
+      "assembly_required": "Gisaba guteranywa"
+    },
+    "cm": "{value} cm",
+    "kg": "{value} kg",
+    "yes": "Yego",
+    "no": "Oya",
+    "material": {
+      "solid_wood": "Igiti gikomeye",
+      "engineered_wood": "Igiti gikoranye (MDF)",
+      "bamboo": "Imigano",
+      "rattan": "Rattan",
+      "metal": "Icyuma",
+      "glass": "Ikirahure",
+      "marble": "Marimari",
+      "stone": "Ibuye",
+      "fabric": "Igitambaro",
+      "leather": "Uruhu",
+      "faux_leather": "Uruhu rw'ubukorano",
+      "plastic": "Pulasitiki",
+      "foam": "Mousse"
+    },
+    "color": {
+      "natural": "Ibara ry'umwimerere",
+      "oak": "Ibara ry'igiti cya oak",
+      "walnut": "Ibara ry'igiti cya walnut",
+      "white": "Umweru",
+      "black": "Umukara",
+      "grey": "Ikijuju",
+      "beige": "Beige",
+      "brown": "Ikigina",
+      "blue": "Ubururu",
+      "green": "Icyatsi",
+      "red": "Umutuku",
+      "yellow": "Umuhondo",
+      "multicolour": "Amabara menshi"
+    },
+    "style": {
+      "modern": "Igezweho",
+      "contemporary": "Iy'iki gihe",
+      "classic": "Iya kera",
+      "rustic": "Iy'icyaro",
+      "industrial": "Iy'inganda",
+      "scandinavian": "Iya Scandinavia",
+      "mid_century": "Iyo hagati y'ikinyejana",
+      "african": "Nyafurika"
+    },
+    "finish": {
+      "natural": "Umwimerere",
+      "matte": "Itarabagirana",
+      "satin": "Satin",
+      "gloss": "Irabagirana",
+      "lacquered": "Isize vernis",
+      "painted": "Isize irangi",
+      "polished": "Isenwe",
+      "upholstered": "Itwikiriwe igitambaro"
+    },
+    "condition": {
+      "new": "Gishya",
+      "refurbished": "Cyavuguruwe",
+      "used": "Cyakoreshejwe"
     }
   }
 }

@@ -6,7 +6,7 @@
  * ones). A product's current category or brand stays listed even when it was hidden later,
  * marked `hidden`, so editing other fields keeps it. */
 
-export type CategoryNode = { id: string; name: string; parent_id: string | null; is_active: boolean; sort_order: number };
+export type CategoryNode = { id: string; name: string; parent_id: string | null; is_active: boolean; sort_order: number; slug?: string };
 export type Option = { id: string; name: string; hidden: boolean };
 
 function byId(all: readonly CategoryNode[]): Map<string, CategoryNode> {

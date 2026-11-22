@@ -178,7 +178,7 @@ class SmtpProvider:
 
     def _build(self, message: OutboundMessage) -> EmailMessage:
         email = EmailMessage()
-        # "3 Sixty Technologies <orders@...>"; formataddr quotes and encodes the name.
+        # "FurniHub <orders@...>"; formataddr quotes and encodes the name.
         email["From"] = (
             formataddr((self._from_name, self._from_email)) if self._from_name else self._from_email
         )

@@ -18,6 +18,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.core.furniture import TAXONOMY
 from app.core.rate_limit import CartRateLimiter
 from app.integrations.media import LocalMediaStorage, get_media_storage
 from app.main import app
@@ -108,8 +109,9 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     assert got["customers"] == {"created": 5}
     assert got["stores"] == {"created": len(data.stores)}
     assert got["store approvals"] == {"updated": len(data.stores)}
-    assert got["categories"] == {"created": 5, "updated": 5}  # created, then the image
-    assert got["brands"] == {"created": 12, "updated": 12}
+    n_categories, n_brands = len(data.categories), len(data.brands)
+    assert got["categories"] == {"created": n_categories, "updated": n_categories}  # image
+    assert got["brands"] == {"created": n_brands, "updated": n_brands}
     assert got["products"] == {"created": len(data.products)}
     assert got["variants"] == {"created": sum(len(p.variants) for p in data.products)}
     assert got["product images"] == {"created": len(data.products)}
@@ -118,12 +120,17 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     assert got["reviews"] == {"created": 12}
     assert report.passwords == []  # passwords came from the environment
 
-    # The categories are exactly the Header.dc.html nav; every product is active with an image.
-    names = db.scalars(select(Category.name).order_by(Category.sort_order)).all()
-    assert names == ["Phones", "Laptops", "TVs & Audio", "Home Appliances", "Accessories"]
+    # The main categories are the furniture taxonomy's, in order; every product is active.
+    names = db.scalars(
+        select(Category.name).where(Category.parent_id.is_(None)).order_by(Category.sort_order)
+    ).all()
+    assert names == [main.name for main in TAXONOMY]
     assert count(db, Product, Product.status == "active") == len(data.products)
     assert count(db, Banner, Banner.is_active) == 3
-    assert count(db, Brand, Brand.logo_media_id.is_not(None)) == 12
+    assert count(db, Brand, Brand.logo_media_id.is_not(None)) == n_brands
+    # ADR-014 phase 6: the furniture taxonomy, subcategories under their main category.
+    sofas = db.scalar(select(Category).where(Category.slug == "sofas"))
+    assert sofas is not None and sofas.parent_id is not None
     statuses = dict(db.execute(select(Order.status, func.count()).group_by(Order.status)).all())
     assert statuses == {
         "delivered": 8,
@@ -143,20 +150,19 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
         db.execute(select(ProductReview.status, func.count()).group_by(ProductReview.status)).all()
     )
     assert review_statuses == {"approved": 9, "pending": 2, "rejected": 1}
-    power_bank = client.get("/api/v1/catalog/products/anker-powercore-20000").json()["rating"]
-    assert power_bank["count"] == 2 and power_bank["average"] == 4.5  # the 2-star was rejected
+    table = client.get("/api/v1/catalog/products/imigongo-coffee-table").json()["rating"]
+    assert table["count"] == 2 and table["average"] == 4.5  # the 2-star was rejected
     assert count(db, AuditRecord, AuditRecord.action == "catalog.review_approve") == 9
 
     # The storefront reads them: featured, bestselling (delivered units), and loadable images.
     featured = client.get("/api/v1/catalog/products", params={"featured": "true"}).json()
     assert featured["total"] == sum(p.featured for p in data.products)
     best = client.get(
-        "/api/v1/catalog/products", params={"sort_by": "bestselling", "size": 3}
+        "/api/v1/catalog/products", params={"sort_by": "bestselling", "size": 2}
     ).json()
     assert [p["slug"] for p in best["items"]] == [
-        "anker-powercore-20000",
-        "tecno-spark-20",
-        "apple-iphone-15",
+        "upholstered-dining-chair",  # 4 delivered
+        "imigongo-coffee-table",  # 3 delivered
     ]
     image = best["items"][0]["images"][0]
     assert image["width"] == 1200 and image["url"].startswith("http")
@@ -170,10 +176,10 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
 
     # Saved products (module 21): a seed customer's, and a seed product in someone else's list.
     seed_customer = db.scalar(
-        select(User.id).where(User.email.endswith("@seed.3sixty.local"), User.is_staff.is_(False))
+        select(User.id).where(User.email.endswith("@seed.furnihub.local"), User.is_staff.is_(False))
     )
     seed_product = db.scalar(select(Product.id).limit(1))
-    outsider = db.scalar(select(User.id).where(User.email.not_like("%@seed.3sixty.local")))
+    outsider = db.scalar(select(User.id).where(User.email.not_like("%@seed.furnihub.local")))
     if outsider is None:
         outsider_user = User(email="outsider@example.com", full_name="Outsider")
         db.add(outsider_user)
@@ -199,8 +205,8 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
     assert removed["stores"] == 3 and removed["store history"] == 6
     for model in (Order, Product, ProductVariant, StockReservation, Banner):
         assert count(db, model) == 0, model
-    assert count(db, User, User.email.endswith("@seed.3sixty.local")) == 0
-    assert count(db, Category) == 5 and count(db, Brand) == 12
+    assert count(db, User, User.email.endswith("@seed.furnihub.local")) == 0
+    assert count(db, Category) == n_categories and count(db, Brand) == n_brands
     assert count(db, MediaObject, MediaObject.state == "deleting") > 0  # files go to the worker
     enabled: object = db.execute(
         text(
@@ -216,9 +222,9 @@ def test_seed_creates_the_catalogue_once_and_cleanup_removes_it(
 
 def _small(products=1):
     return seeder.Catalogue(
-        data.categories[:1],
-        tuple(b for b in data.brands if b.slug == "samsung"),
-        tuple(p for p in data.products if p.category == "phones" and p.brand == "samsung")[
+        tuple(c for c in data.categories if c.slug in ("living-room", "sofas")),
+        tuple(b for b in data.brands if b.slug == "akagera-living"),
+        tuple(p for p in data.products if p.category == "sofas" and p.brand == "akagera-living")[
             :products
         ],
         (),

@@ -1,20 +1,42 @@
-import { Cable, Laptop, Refrigerator, Smartphone, Tag, Tv } from "lucide-react";
+import { Archive, Baby, BedDouble, Briefcase, Sofa, Tag, TreePalm, Tv, UtensilsCrossed } from "lucide-react";
 import { describe, expect, it } from "vitest";
 import { categoryIcon } from "./category-icon";
 import { menuProduct, menuProductQuery, type CatalogProduct } from "./catalogue";
 
+/** The main categories of the furniture taxonomy (backend/app/core/furniture.py). */
+const TAXONOMY_ICONS = [
+  { slug: "living-room", name: "Living Room" },
+  { slug: "bedroom", name: "Bedroom" },
+  { slug: "dining", name: "Dining" },
+  { slug: "office", name: "Office" },
+  { slug: "outdoor", name: "Outdoor" },
+  { slug: "kids", name: "Kids" },
+];
+
 describe("categoryIcon", () => {
   it("picks an icon from the category's slug and name", () => {
-    expect(categoryIcon({ slug: "phones", name: "Phones" })).toBe(Smartphone);
-    expect(categoryIcon({ slug: "laptops", name: "Laptops" })).toBe(Laptop);
-    expect(categoryIcon({ slug: "tvs-audio", name: "TVs & Audio" })).toBe(Tv);
-    expect(categoryIcon({ slug: "home-appliances", name: "Home Appliances" })).toBe(Refrigerator);
-    expect(categoryIcon({ slug: "accessories", name: "Accessories" })).toBe(Cable);
+    expect(categoryIcon({ slug: "living-room", name: "Living Room" })).toBe(Sofa);
+    expect(categoryIcon({ slug: "bedroom", name: "Bedroom" })).toBe(BedDouble);
+    expect(categoryIcon({ slug: "dining", name: "Dining" })).toBe(UtensilsCrossed);
+    expect(categoryIcon({ slug: "office", name: "Office" })).toBe(Briefcase);
+    expect(categoryIcon({ slug: "outdoor", name: "Outdoor" })).toBe(TreePalm);
+    expect(categoryIcon({ slug: "kids", name: "Kids" })).toBe(Baby);
+  });
+
+  it("lets the earlier rule win for subcategories", () => {
+    expect(categoryIcon({ slug: "kids-beds", name: "Kids' Beds" })).toBe(Baby);
+    expect(categoryIcon({ slug: "office-storage", name: "Office Storage" })).toBe(Briefcase);
+    expect(categoryIcon({ slug: "tv-stands", name: "TV Stands" })).toBe(Tv);
+    expect(categoryIcon({ slug: "wardrobes", name: "Wardrobes" })).toBe(Archive);
+  });
+
+  it("gives every main category of the taxonomy its own icon", () => {
+    for (const main of TAXONOMY_ICONS) expect(categoryIcon(main)).not.toBe(Tag);
   });
 
   it("matches whole words only, and falls back to the tag", () => {
-    expect(categoryIcon({ slug: "earphones-x", name: "Xylophones" })).not.toBe(Smartphone);
-    expect(categoryIcon({ slug: "furniture", name: "Furniture" })).toBe(Tag);
+    expect(categoryIcon({ slug: "bedazzled", name: "Bedazzled" })).toBe(Tag);
+    expect(categoryIcon({ slug: "phones", name: "Phones" })).toBe(Tag);
   });
 });
 

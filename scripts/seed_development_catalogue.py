@@ -89,6 +89,7 @@ from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
 from app.core.config import get_settings  # noqa: E402
 from app.core.dependencies import SellerContext  # noqa: E402
 from app.core.errors import AppError  # noqa: E402
+from app.core.furniture import TAXONOMY  # noqa: E402
 from app.core.rate_limit import CartRateLimiter, get_cart_rate_limiter  # noqa: E402
 from app.core.request_context import RequestContext  # noqa: E402
 from app.core.roles import Role, staff_role  # noqa: E402
@@ -244,42 +245,77 @@ def _wrap(draw: ImageDraw.ImageDraw, text_value: str, font, width: int) -> list[
 
 
 def _device(draw: ImageDraw.ImageDraw, kind: str, cx: int, cy: int, s: float) -> None:
-    """A simple outline of the product type, centred on (cx, cy), scaled by s."""
+    """A simple outline of the furniture type (the main category), centred on (cx, cy), scaled
+    by s."""
 
-    def box(w: float, h: float, dy: float = 0, r: float = 24) -> tuple[float, ...]:
-        return (cx - w * s / 2, cy - h * s / 2 + dy * s, cx + w * s / 2, cy + h * s / 2 + dy * s)
+    def box(w: float, h: float, dx: float = 0, dy: float = 0) -> tuple[float, ...]:
+        return (
+            cx - w * s / 2 + dx * s,
+            cy - h * s / 2 + dy * s,
+            cx + w * s / 2 + dx * s,
+            cy + h * s / 2 + dy * s,
+        )
 
     line = max(4, int(6 * s))
-    if kind == "phones":
+    r = int(18 * s)
+    if kind == "living-room":  # a sofa
         draw.rounded_rectangle(
-            box(220, 440), radius=int(36 * s), fill="white", outline=NAVY, width=line
+            box(520, 150, 0, -70), radius=r, fill="white", outline=NAVY, width=line
         )
-        draw.rounded_rectangle(box(184, 380), radius=int(18 * s), fill=LIGHT)
-        draw.rounded_rectangle(box(56, 10, -200), radius=int(5 * s), fill=NAVY)
-    elif kind == "laptops":
+        draw.rounded_rectangle(box(560, 120, 0, 50), radius=r, fill=LIGHT, outline=NAVY, width=line)
+        for dx in (-250, 250):
+            draw.rounded_rectangle(
+                box(70, 200, dx, 10), radius=r, fill="white", outline=NAVY, width=line
+            )
+        for dx in (-230, 230):
+            draw.rectangle(box(20, 50, dx, 135), fill=NAVY)
+    elif kind == "bedroom":  # a bed
         draw.rounded_rectangle(
-            box(420, 270, -40), radius=int(18 * s), fill="white", outline=NAVY, width=line
+            box(80, 300, -250, -40), radius=r, fill="white", outline=NAVY, width=line
         )
-        draw.rounded_rectangle(box(376, 226, -40), radius=int(8 * s), fill=LIGHT)
-        draw.rounded_rectangle(box(500, 28, 110), radius=int(12 * s), fill=NAVY)
-    elif kind == "tvs-audio":
         draw.rounded_rectangle(
-            box(520, 310, -30), radius=int(14 * s), fill="white", outline=NAVY, width=line
+            box(500, 110, 20, 40), radius=r, fill=LIGHT, outline=NAVY, width=line
         )
-        draw.rectangle(box(482, 272, -30), fill=LIGHT)
-        draw.rectangle(box(24, 60, 155), fill=NAVY)
-        draw.rounded_rectangle(box(180, 16, 190), radius=int(8 * s), fill=NAVY)
-    elif kind == "home-appliances":
         draw.rounded_rectangle(
-            box(300, 460), radius=int(22 * s), fill="white", outline=NAVY, width=line
+            box(130, 60, -150, -40), radius=r, fill="white", outline=NAVY, width=line
         )
-        draw.line((cx - 150 * s, cy - 70 * s, cx + 150 * s, cy - 70 * s), fill=NAVY, width=line)
-        draw.rounded_rectangle(box(14, 70, -150), radius=int(7 * s), fill=PRI)
-        draw.rounded_rectangle(box(14, 110, 30), radius=int(7 * s), fill=PRI)
-    else:  # accessories
-        draw.ellipse(box(330, 330), fill="white", outline=NAVY, width=line)
-        draw.ellipse(box(230, 230), fill=LIGHT)
-        draw.ellipse(box(70, 70), fill=PRI)
+        for dx in (-250, 260):
+            draw.rectangle(box(20, 60, dx, 120), fill=NAVY)
+    elif kind == "dining":  # a table and two chairs
+        draw.rounded_rectangle(box(360, 30, 0, -40), radius=int(8 * s), fill=NAVY)
+        for dx in (-150, 150):
+            draw.rectangle(box(18, 180, dx, 60), fill=NAVY)
+        for dx in (-280, 280):
+            draw.rounded_rectangle(
+                box(90, 200, dx, -10), radius=r, fill="white", outline=NAVY, width=line
+            )
+            draw.rectangle(box(110, 20, dx, 80), fill=PRI)
+    elif kind == "office":  # a desk with a screen
+        draw.rounded_rectangle(box(480, 28, 0, 0), radius=int(8 * s), fill=NAVY)
+        draw.rounded_rectangle(
+            box(140, 180, 150, 100), radius=r, fill="white", outline=NAVY, width=line
+        )
+        draw.rectangle(box(18, 160, -220, 90), fill=NAVY)
+        draw.rounded_rectangle(
+            box(200, 130, -40, -100), radius=r, fill=LIGHT, outline=NAVY, width=line
+        )
+    elif kind == "outdoor":  # a parasol and a chair
+        draw.pieslice(box(420, 260, -60, -60), 180, 360, fill=LIGHT, outline=NAVY, width=line)
+        draw.rectangle(box(14, 300, -60, 60), fill=NAVY)
+        draw.rounded_rectangle(
+            box(150, 120, 180, 80), radius=r, fill="white", outline=NAVY, width=line
+        )
+    elif kind == "kids":  # a small bed with a star
+        draw.rounded_rectangle(box(380, 140, 0, 40), radius=r, fill=LIGHT, outline=NAVY, width=line)
+        draw.rounded_rectangle(
+            box(70, 240, -190, -10), radius=r, fill="white", outline=NAVY, width=line
+        )
+        draw.ellipse(box(90, 90, 120, -120), fill=PRI)
+    else:  # anything else: a cabinet
+        draw.rounded_rectangle(box(320, 400), radius=r, fill="white", outline=NAVY, width=line)
+        draw.line((cx, cy - 200 * s, cx, cy + 200 * s), fill=NAVY, width=line)
+        for dx in (-30, 30):
+            draw.rounded_rectangle(box(12, 60, dx), radius=int(6 * s), fill=PRI)
 
 
 def studio_image(name: str, caption: str, kind: str, size: tuple[int, int] = (1200, 1200)) -> bytes:
@@ -322,14 +358,14 @@ def logo_image(name: str) -> bytes:
 
 
 def banner_image() -> bytes:
-    """The right-hand visual of the Main.dc.html hero: devices on a light circle."""
+    """The right-hand visual of the home hero: furniture on a light circle."""
     image = Image.new("RGB", (1600, 1200), LIGHT)
     draw = ImageDraw.Draw(image)
     draw.ellipse((300, 100, 1300, 1100), fill="white")
     draw.ellipse((380, 180, 1220, 1020), outline="#C9DCFB", width=6)
-    _device(draw, "laptops", 760, 560, 1.5)
-    _device(draw, "phones", 1180, 760, 0.8)
-    _device(draw, "accessories", 400, 880, 0.5)
+    _device(draw, "living-room", 800, 560, 1.3)
+    _device(draw, "dining", 1160, 860, 0.6)
+    _device(draw, "outdoor", 420, 860, 0.55)
     out = io.BytesIO()
     image.save(out, "JPEG", quality=90)
     return out.getvalue()
@@ -350,7 +386,20 @@ def product_photos(product: SeedProduct, category_name: str) -> list[tuple[str, 
                 found.append((path.name, path.read_bytes()))
     if found:
         return found
-    return [(f"{product.slug}.jpg", studio_image(product.name, category_name, product.category))]
+    return [
+        (
+            f"{product.slug}.jpg",
+            studio_image(product.name, category_name, main_of(product.category)),
+        )
+    ]
+
+
+def main_of(slug: str) -> str:
+    """The main category of a taxonomy category (itself when it is a main category)."""
+    for main in TAXONOMY:
+        if slug == main.slug or any(child.slug == slug for child in main.children):
+            return main.slug
+    return slug
 
 
 # --------------------------------------------------------------------------------------------
@@ -442,7 +491,7 @@ def seed_customers(db: Session, data: Catalogue, report: Report) -> dict[str, Us
                     full_name=person.full_name,
                     password=_new_password("SEED_CUSTOMER_PASSWORD", report, person.email),
                 )
-                # Development seed accounts (seed.3sixty.local) are created verified: no
+                # Development seed accounts (seed.furnihub.local) are created verified: no
                 # verification email can reach them (ADR-006 amendment 2026-11-12).
                 with atomic(db):
                     user = UserRepository.create_customer(
@@ -511,7 +560,8 @@ def seed_taxonomy(
                     name=spec.name,
                     slug=spec.slug,
                     sort_order=spec.sort_order,
-                    description=spec.description,
+                    description=spec.description or None,
+                    parent_id=categories[spec.parent].id if spec.parent else None,
                 ),
                 CTX,
             )
@@ -522,7 +572,7 @@ def seed_taxonomy(
             _set_image(
                 "categories",
                 report,
-                studio_image(spec.name, spec.description, spec.slug, (900, 900)),
+                studio_image(spec.name, spec.description, main_of(spec.slug), (900, 900)),
                 partial(CatalogAdminService.set_category_image, db, storage, admin, category.id),
             )
         categories[spec.slug] = category
@@ -531,7 +581,9 @@ def seed_taxonomy(
         brand = db.scalar(select(Brand).where(Brand.slug == brand_spec.slug))
         if brand is None:
             # A brand belongs to the categories of its products (ADR-012 decision 9).
-            homes = sorted({p.category for p in data.products if p.brand == brand_spec.slug})
+            homes = sorted(
+                {main_of(p.category) for p in data.products if p.brand == brand_spec.slug}
+            )
             home_ids = [categories[s].id for s in homes if s in categories] or [
                 next(iter(categories.values())).id
             ]
@@ -651,7 +703,7 @@ def seed_products(
                         name=spec.name,
                         slug=spec.slug,
                         category_id=categories[spec.category].id,
-                        brand_id=brands[spec.brand].id,
+                        brand_id=brands[spec.brand].id if spec.brand else None,
                         model=spec.model,
                         description=spec.description,
                         specifications=dict(spec.specifications),

@@ -40,7 +40,20 @@ from app.schemas.images import PublicImage
 from app.schemas.reviews import _blank_to_none, _paragraphs
 
 ServiceIcon = Literal[
-    "cctv", "gate", "fingerprint", "network", "wrench", "graduation-cap", "shield", "cpu"
+    "cctv",
+    "gate",
+    "fingerprint",
+    "network",
+    "wrench",
+    "graduation-cap",
+    "shield",
+    "cpu",
+    # ADR-014 phase 6: furniture services (models.services.SERVICE_ICONS).
+    "hammer",
+    "truck",
+    "ruler",
+    "sofa",
+    "paintbrush",
 ]
 ClientType = Literal["home", "business", "institution"]
 RequestStatus = Literal["new", "contacted", "scheduled", "completed", "cancelled"]

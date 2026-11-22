@@ -14,6 +14,7 @@ from pydantic import (
     model_validator,
 )
 
+from app.core.furniture import check_specifications
 from app.core.slugs import SLUG_PATTERN
 from app.models.common import MAX_MONEY_RWF
 from app.schemas.catalog import CatalogReference, StoreReference
@@ -89,6 +90,11 @@ def _check_update(model: BaseModel, required: tuple[str, ...]) -> None:
         raise ValueError(f"These fields cannot be null: {', '.join(nulls)}.")
 
 
+# ADR-014 phase 6: the known furniture attributes (app/core/furniture.py) are checked; any
+# other key stays a free specification.
+Specifications = Annotated[dict[str, Any], AfterValidator(check_specifications)]
+
+
 class ProductCreateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -98,7 +104,7 @@ class ProductCreateRequest(BaseModel):
     brand_id: uuid.UUID | None = None
     model: ModelName | None = None
     description: LongText | None = None
-    specifications: dict[str, Any] = Field(default_factory=dict)
+    specifications: Specifications = Field(default_factory=dict)
     warranty_text: LongText | None = None
     status: ProductStatus = "draft"
     is_featured: bool = Field(
@@ -118,7 +124,7 @@ class ProductUpdateRequest(BaseModel):
     brand_id: uuid.UUID | None = None
     model: ModelName | None = None
     description: LongText | None = None
-    specifications: dict[str, Any] | None = None
+    specifications: Specifications | None = None
     warranty_text: LongText | None = None
     status: ProductStatus | None = None
     is_featured: bool | None = Field(
@@ -145,7 +151,7 @@ class SellerProductCreateRequest(BaseModel):
     brand_id: uuid.UUID | None = None
     model: ModelName | None = None
     description: LongText | None = None
-    specifications: dict[str, Any] = Field(default_factory=dict)
+    specifications: Specifications = Field(default_factory=dict)
     warranty_text: LongText | None = None
     status: ProductStatus = "draft"
 
@@ -161,7 +167,7 @@ class SellerProductUpdateRequest(BaseModel):
     brand_id: uuid.UUID | None = None
     model: ModelName | None = None
     description: LongText | None = None
-    specifications: dict[str, Any] | None = None
+    specifications: Specifications | None = None
     warranty_text: LongText | None = None
     status: ProductStatus | None = None
 

@@ -59,6 +59,8 @@ For each step: models + Alembic migration (upgrade, downgrade to the previous re
 
 **ADR-014 phase 5 (2026-11-22).** No permission change. The admin Sellers page (`/admin/sellers`) opens with `sellers:read`; its decisions and commission form need `sellers:manage` and the backend checks both again. "Sold by" on cards, the product page and the cart (cart lines gained a read-only `store`), and the public `/store/[slug]` page. See ADR-014 "Phase 5 as built".
 
+**ADR-014 phase 6 (2026-11-22).** No permission change. Furniture taxonomy and attributes (`app/core/furniture.py`, `GET /catalog/attributes`, `material`/`color`/`style` filters and facets, checked on staff and seller product writes), furniture services with five new icons (migration `f2a4c6e8b0d1`), the marketplace name in configuration (`MARKETPLACE_NAME`, `NEXT_PUBLIC_MARKETPLACE_NAME`, default FurniHub) and the furniture development seed. See ADR-014 "Phase 6 as built".
+
 Permissions are added only when the feature that uses them is built (ADR-006). Administrator keeps every permission. "—" means no access. The roles and permissions are defined in code only (`backend/app/core/roles.py`); the database holds just the role names (a check constraint), so a matrix change needs no migration.
 
 **Final staff matrix (approved by the project owner on 2026-10-26, checkpoint 1b).** It replaces the four-role table of 2026-10-23: finance became a fifth role on 2026-10-25, and on 2026-10-26 `catalog:read` and `content:manage` were added, operations gained `inventory:adjust` and `delivery:read`, management gained `catalog:read`, `inventory:read`, `orders:read`, `reports:read` and `content:manage`, and sales gained `promotions:read`. Finance changes nothing.

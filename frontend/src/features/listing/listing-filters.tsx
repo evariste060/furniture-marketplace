@@ -21,6 +21,7 @@ import {
   type StockChoice,
 } from "@/lib/catalogue";
 import { cx } from "@/lib/cx";
+import { CHOICES, type FilterKey } from "@/lib/furniture";
 import { bandKey, bandLabel, type PriceBand } from "./price-bands";
 
 type Filters = ListingFilters;
@@ -65,7 +66,15 @@ function usePendingFacets(base: BaseQuery, applied: Filters, pending: Filters, i
 function useFilterState(state: ListingState, basePath: string, keepCategory = false) {
   const router = useRouter();
   const applied: Filters = useMemo(
-    () => ({ category: state.category, brands: state.brands, minPrice: state.minPrice, maxPrice: state.maxPrice, stock: state.stock, minRating: state.minRating }),
+    () => ({
+      category: state.category,
+      brands: state.brands,
+      minPrice: state.minPrice,
+      maxPrice: state.maxPrice,
+      stock: state.stock,
+      minRating: state.minRating,
+      attributes: state.attributes,
+    }),
     [state],
   );
   const [pending, setPending] = useState<Filters>(applied);
@@ -89,6 +98,13 @@ function useFilterState(state: ListingState, basePath: string, keepCategory = fa
     toggleStock: (choice: StockChoice) =>
       setPending((f) => ({ ...f, stock: f.stock.includes(choice) ? f.stock.filter((s) => s !== choice) : [...f.stock, choice] })),
     toggleRating: () => setPending((f) => ({ ...f, minRating: f.minRating === RATING ? null : RATING })),
+    toggleAttribute: (key: FilterKey, code: string) =>
+      setPending((f) => {
+        const on = f.attributes[key].includes(code);
+        const codes = on ? f.attributes[key].filter((c) => c !== code) : [...f.attributes[key], code];
+        const order: readonly string[] = CHOICES[key];
+        return { ...f, attributes: { ...f.attributes, [key]: codes.sort((a, b) => order.indexOf(a) - order.indexOf(b)) } };
+      }),
   };
 }
 
@@ -134,6 +150,14 @@ function SubcategoryGroup({ sub, state }: { sub: SubcategoryFilter; state: Listi
   );
 }
 
+/** The furniture attribute groups (ADR-014 phase 6): Material, Colour, Style, each listing the
+ * codes found with the other filters applied, plus any chosen one (so it can be unticked). */
+function attributeGroups(facets: CatalogFacets, pending: Filters) {
+  return (facets.attributes ?? [])
+    .map((group) => ({ key: group.key, values: group.values.filter((v) => v.count > 0 || pending.attributes[group.key].includes(v.value)) }))
+    .filter((group) => group.values.length > 0);
+}
+
 function Group({ legend, children }: { legend: string; children: ReactNode }) {
   return (
     <fieldset className="m-0 flex flex-col gap-2.5 border-0 border-t border-bd px-0 py-4">
@@ -160,6 +184,7 @@ export function FilterPanel({ state, facets: initial, basePath, base, first = "b
   const t = useTranslations("store.listing");
   const f = useFilterState(state, basePath);
   const facets = usePendingFacets(base, f.applied, f.pending, initial);
+  const tf = useTranslations("furniture");
   const n = (label: string, count: number) => t("withCount", { label, count });
   return (
     <aside
@@ -194,6 +219,18 @@ export function FilterPanel({ state, facets: initial, basePath, base, first = "b
           ))}
         </Group>
       )}
+      {attributeGroups(facets, f.pending).map((group) => (
+        <Group key={group.key} legend={tf(`names.${group.key}`)}>
+          {group.values.map((v) => (
+            <Checkbox
+              key={v.value}
+              label={n(tf(`${group.key}.${v.value}`), v.count)}
+              checked={f.pending.attributes[group.key].includes(v.value)}
+              onChange={() => f.toggleAttribute(group.key, v.value)}
+            />
+          ))}
+        </Group>
+      ))}
       <Group legend={t("price")}>
         {facets.price_bands.map((band) => (
           <Radio
@@ -264,6 +301,7 @@ export function FilterSheet({
 }: Props & { side?: "bottom" | "right"; className?: string; keepCategory?: boolean }) {
   const t = useTranslations("store.listing");
   const tu = useTranslations("ui");
+  const tf = useTranslations("furniture");
   const [open, setOpen] = useState(false);
   const f = useFilterState(state, basePath, keepCategory);
   const facets = usePendingFacets(base, f.applied, f.pending, initial);
@@ -344,6 +382,15 @@ export function FilterSheet({
               ))}
             </SheetGroup>
           )}
+          {attributeGroups(facets, f.pending).map((group) => (
+            <SheetGroup key={group.key} title={tf(`names.${group.key}`)}>
+              {group.values.map((v) => (
+                <Chip key={v.value} on={f.pending.attributes[group.key].includes(v.value)} onClick={() => f.toggleAttribute(group.key, v.value)}>
+                  {tf(`${group.key}.${v.value}`)}
+                </Chip>
+              ))}
+            </SheetGroup>
+          ))}
           <SheetGroup title={t("priceShort")}>
             {facets.price_bands.map((band) => {
               const on = samePrice(f.pending, band);
