@@ -21,6 +21,7 @@ import {
   passwordStrength,
   rememberResetIdentifier,
   resetIdentifier,
+  isSellerPath,
   safeReturnTo,
 } from "@/lib/auth";
 import { EMAIL_MAX, localPhone, NAME_MAX, splitName } from "@/lib/checkout";
@@ -128,6 +129,13 @@ function policyLinks() {
   };
 }
 
+/** The seller dashboard lives outside the storefront's locale routing, like the admin, so it is
+ * opened with a full page load (the locale router would prefix it). */
+function goTo(router: { replace: (href: string) => void }, href: string) {
+  if (isSellerPath(href)) window.location.assign(href);
+  else router.replace(href);
+}
+
 /** After signing in: staff go to the admin (outside the storefront's locale routing); customers
  * save the product they hearted, if any, then return to where they were. */
 function useFinishSignIn() {
@@ -146,7 +154,7 @@ function useFinishSignIn() {
       await browserApi.PUT("/api/v1/customers/me/wishlist/{product_id}", { params: { path: { product_id: wishlist } } }).catch(() => undefined);
     }
     await client.invalidateQueries();
-    router.replace(returnTo);
+    goTo(router, returnTo);
   };
 }
 
@@ -174,7 +182,7 @@ export function LoginView() {
   useEffect(() => {
     if (pending || !user) return;
     if (user.is_staff) window.location.assign("/admin");
-    else router.replace(returnTo);
+    else goTo(router, returnTo);
   }, [user, pending, returnTo, router]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {

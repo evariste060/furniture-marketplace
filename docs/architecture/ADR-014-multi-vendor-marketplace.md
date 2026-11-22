@@ -42,7 +42,7 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 1 | `stores`, seller application and admin review APIs, `require_approved_seller`, `sellers:*` permissions, runtime-role grants | Implemented (2026-11-21); see "Phase 1 as built" |
 | 2 | `products.store_id`, store-scoped seller product, image and inventory APIs, approved-store catalogue filter, public store endpoints, cross-store isolation tests | Implemented (2026-11-21); see "Phase 2 as built" |
 | 3 | `order_items.store_id`, `seller_orders`, checkout grouping, seller order API, parent status rollup, admin group view, commission and earnings | Built (2026-11-22, owner decisions 2026-11-21); see "Phase 3 as built" |
-| 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Not started |
+| 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Built (2026-11-22); see "Phase 4 as built" |
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Not started |
 | 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Not started |
 
@@ -145,6 +145,53 @@ Unconfirmed and cancelled seller orders are in neither. Payouts are not built, s
 - **Points for the owner:**
   - **Paid mobile-money orders that are never confirmed.** A paid mobile-money order whose store never confirms stays `received` with its stock committed. It cannot be cancelled, because no refund workflow is approved. This was already true when staff had to confirm it.
   - **Staff delivery note and fulfilment assignment.** `GET /staff/orders/{id}/delivery-note` and `PATCH /staff/orders/{id}/assignment` still exist in the API. They are platform-side fulfilment tools from the single-store design. Only the assignment control was removed from the admin page. Removing both, or moving the delivery note to sellers, needs the owner's decision.
+
+## Phase 4 as built (2026-11-22)
+
+Frontend only: no backend route, schema, migration or permission changed. Every screen calls the phase 1-3 seller routes, which resolve the caller's store on every request; the frontend only decides what to show.
+
+### Account: "Sell with us" (`/account/seller`)
+
+- A new Account menu item (side menu and the phone Account popup). It reads `GET /seller/application`; 404 means the customer has not applied.
+- **No application, pending or rejected:** the application form (name, description, contact email and phone, district, sector, street). It is checked in the browser with the backend's rules (`features/seller/store-form.ts`), then sent with `POST /seller/application` (first time) or `PUT` (edit while pending, or resubmit after a rejection; every field is sent again). Only those fields are sent: never an owner, status, slug or commission.
+- **Status card:** under review, approved, needs changes or suspended, with the administrator's reason while rejected or suspended. An approved store links to `/seller` (a full page load: the dashboard is outside the locale routing); approved and suspended stores have no form (the backend answers 409 `store_application_closed`).
+- **Errors:** `email_verification_required` shows a "verify your email" notice with the existing resend-link form; `store_name_taken` marks the name; `store_exists` and `store_application_closed` reload the status.
+
+### The seller dashboard (`/seller`)
+
+- **Where it lives:** outside the storefront's `[locale]` routing, like `/admin` (the locale middleware skips `/seller`). Its language is chosen in its top bar and kept in the same `admin_locale` cookie under `Path=/seller`, so the two panels never share a choice. Its messages are `admin.seller.*` in `messages/admin.json` and `admin.rw.json` (the Kinyarwanda is a draft, listed in `docs/frontend/rw-review-admin.md`). Sign-in with `returnTo=/seller` opens it with a full page load.
+- **Server check:** `src/app/seller/layout.tsx` checks the session on the server for every request (`lib/seller.ts`: `GET /auth/me`, `GET /seller/store`, and `GET /seller/application` when the store is not approved):
+  - no session: sign in, then back to `/seller`;
+  - a staff account: "Staff accounts can't sell", with a link to the admin;
+  - no store, or a pending, rejected or suspended one: a notice with the status and the reason, linking to the application;
+  - only the owner of an approved store gets the shell.
+  Each page also re-checks on the server (`SellerPage`, like the admin's `AdminPage`) and renders nothing otherwise. A suspension applies at the next request; the backend refuses every call at once anyway.
+- **Shared frame:** the admin shell was split into a shared frame (`features/admin/panel-shell.tsx`: sidebar, top bar, language menu, signed-in person, log out). `AdminShell` and `SellerShell` each give it their own links. The admin looks and behaves as before.
+- **Pages:**
+  - **Dashboard:** orders to confirm, orders to pack or dispatch, low-stock SKUs, pending and earned totals (goods, commission, the seller's share; "payouts are not part of the dashboard yet"), the store's commission rate and the latest orders.
+  - **Orders and order detail:** the store's own seller orders filtered by its status and the order number. The detail shows the store's lines, its share of the discount, commission and net, the recipient's name, phone and delivery address, the payment method and status, the whole order's status and the history. The one next step (confirm, start packing, mark dispatched, mark delivered) is behind a confirmation, with an optional note. Refusals are explained by code: `seller_order_awaiting_payment`, `seller_order_awaiting_other_stores`, `invalid_transition`, `inventory_conflict`. There is no cancel action: cancellation is the platform's.
+  - **Products, product editor and inventory:** the admin's own screens. A catalogue scope (`features/admin/catalog-scope.tsx`) points them at `/seller/products`, `/seller/images`, `/seller/inventory` and the public category and brand lists instead of `/staff/*` and `/inventory`. For a seller it removes platform merchandising (the featured flag, bulk publishing, the catalogue import) and never sends `is_featured` (`withoutMerchandising`), and it adds "New product". Inside the admin the scope follows the staff member's permissions as before.
+  - **Store profile:** name, description, contact details and location (only the changed fields are sent with `PATCH /seller/store`), logo and cover upload and removal, and the commission rate (read-only).
+
+### Tests
+
+- `frontend/src/features/seller/seller-helpers.test.ts`: next steps, refusal messages, navigation, sign-in return path, the panel language cookie, commission display, store form rules and bodies, when the application form opens, the merchandising strip, the category flattening, and the server check (signed out, staff, approved, suspended, no store).
+- `frontend/src/features/seller/seller-dashboard.test.tsx`:
+  - the seller's product list, editor and stock screen call only `/seller/*` and the public catalogue, and a new product is sent without `is_featured`;
+  - an order detail shows only the store's part, sends exactly `{status, reason}` and explains a refusal;
+  - a cancelled order offers no step, and another store's order reads as not found;
+  - the application: first submission, verification required, approved (no form) and resubmission after a rejection.
+- `category-hierarchy.test.tsx` now mounts the editor in the staff scope.
+
+### Not in this phase, and points for the owner
+
+- **Not built:**
+  - the public store page and "Sold by" on cards, the product page and the cart (phase 5), so the dashboard has no "view my store" link yet;
+  - the admin Sellers page (phase 5);
+  - seller notifications of new orders: the Orders badge counts orders waiting for the store's confirmation, read when a page loads.
+- **Not run in a browser:** the development database is still before migration `c6e8a0b2d4f7`, which refuses to run while the development orders exist. Seeing the dashboard with data needs the seed cleanup, the upgrade and a reseed on the local development database, which deletes its demo data and needs the owner's go-ahead.
+- **Branding:** the seller dashboard shows the current logo and no marketplace name ("Seller dashboard" in titles); the FurniHub name and logo arrive in phase 6.
+- **Categories and brands:** sellers choose from the public category and brand lists (active ones only). A product whose category was hidden later keeps its category, but the picker cannot show its name to the seller.
 
 ## Consequences
 

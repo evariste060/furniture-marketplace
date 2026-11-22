@@ -797,7 +797,8 @@
         "messages": "Ubutumwa bwanjye",
         "addresses": "Aderesi",
         "profile": "Umwirondoro n'umutekano",
-        "logout": "Sohoka"
+        "logout": "Sohoka",
+        "seller": "Curuza natwe"
       },
       "overviewMeta": "Konti yanjye",
       "hello": "Muraho, {name}",
@@ -909,7 +910,53 @@
       "setPasswordTitle": "Shyiraho ijambo ry'ibanga",
       "setPasswordText": "Konti yawe yafunguwe ukoresheje Google kandi nta jambo ry'ibanga ifite. Kugira ngo unakoreshe ijambo ry'ibanga, saba kode yo kurihindura maze uhitemo irishya.",
       "setPassword": "Shyiraho ijambo ry'ibanga",
-      "googleWelcome": "Murakaza neza! Konti yawe yafunguwe ukoresheje Google."
+      "googleWelcome": "Murakaza neza! Konti yawe yafunguwe ukoresheje Google.",
+      "seller": {
+        "nav": "Curuza natwe",
+        "title": "Curuza natwe",
+        "intro": "Fungura iduka ku rubuga: tubwire ibyerekeye iduka ryawe, umuyobozi asuzume ubusabe bwawe.",
+        "statusLabel": "Aho ubusabe bugeze",
+        "status": {
+          "pending": "Buri gusuzumwa",
+          "approved": "Bwemejwe",
+          "rejected": "Bukeneye guhindurwa",
+          "suspended": "Ryahagaritswe"
+        },
+        "statusText": {
+          "pending": "Twakiriye ubusabe bwa {store}. Tuzakoherereza email igihe byemejwe. Uracyashobora kubuhindura.",
+          "approved": "{store} ryemejwe. Cunga ibicuruzwa byawe, ububiko n'amatumiza unyuze mu buyobozi bw'umucuruzi.",
+          "rejected": "{store} ntiriremezwa. Hindura ubusabe bwawe hanyuma wongere ubwohereze.",
+          "suspended": "{store} ryarahagaritswe, bityo ibicuruzwa byaryo byarahishwe. Vugana n'urubuga kugira ngo ufashwe."
+        },
+        "reason": "Impamvu: {reason}",
+        "openDashboard": "Fungura ubuyobozi bw'umucuruzi",
+        "formTitle": "Iduka ryawe",
+        "name": "Izina ry'iduka",
+        "nameHelp": "Rigaragarira abakiriya. Rigomba kuba ridasanzwe ku rubuga.",
+        "about": "Igisobanuro",
+        "email": "Email yo kuvuganirwaho",
+        "phone": "Telefoni yo kuvuganirwaho",
+        "district": "Akarere",
+        "sector": "Umurenge",
+        "street": "Aderesi y'umuhanda",
+        "optional": "(si ngombwa)",
+        "submit": "Ohereza ubusabe",
+        "resubmit": "Ongera wohereze",
+        "save": "Bika impinduka",
+        "sent": "Ubusabe bwoherejwe. Tuzakoherereza email bumaze gusuzumwa.",
+        "saved": "Ubusabe bwabitswe",
+        "verifyFirst": "Banza wemeze aderesi ya email yawe mbere yo gusaba. Dushobora kukoherereza indi link yo kwemeza.",
+        "errors": {
+          "name": "Andika izina ry'iduka rifite inyuguti 2 kugeza ku 120.",
+          "nameTaken": "Irindi duka risanzwe rikoresha iri zina.",
+          "email": "Andika email yemewe.",
+          "phone": "Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456.",
+          "district": "Andika akarere kawe.",
+          "closed": "Ubu busabe ntibugishobora guhindurwa.",
+          "exists": "Usanzwe ufite iduka.",
+          "failed": "Ntitwashoboye kohereza ubusabe bwawe. Ongera ugerageze."
+        }
+      }
     },
     "orderInfo": {
       "status": {

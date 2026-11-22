@@ -11,12 +11,11 @@ import { Field, Input, RadioOption, Select } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, Td, Th } from "@/components/ui/table";
 import { useToast } from "@/components/ui/toast";
-import { browserApi } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 import type { components } from "@/lib/api/schema";
 import { cx } from "@/lib/cx";
-import { useStaffAccess } from "./access";
-import { ListFooter, LoadError, must, PageHeader, SearchBox, useListParams } from "./ui";
+import { useCatalogScope } from "./catalog-scope";
+import { ListFooter, LoadError, PageHeader, SearchBox, useListParams } from "./ui";
 
 type StockRow = components["schemas"]["InventoryListItem"];
 type Reason = components["schemas"]["StockAdjustmentRequest"]["reason"];
@@ -53,31 +52,29 @@ const VIEWS: { id: "low" | "all"; Icon: LucideIcon; tone: string }[] = [
   { id: "all", Icon: Boxes, tone: "bg-light text-pri-h" },
 ];
 
-/** Inventory.dc.html. The URL holds q, view and page. */
+/** Inventory.dc.html. The URL holds q, view and page. Also the seller's /seller/inventory
+ * (ADR-014 phase 4): their own store's SKUs only. */
 export function InventoryView() {
   const t = useTranslations("admin.inventory");
-  const { can } = useStaffAccess();
+  const scope = useCatalogScope();
   const { get, page, set, hrefWith } = useListParams();
   const q = get("q");
   // The design opens on "Low stock"; a search looks at every SKU unless low stock is chosen.
   const view = get("view") === "low" || get("view") === "all" ? get("view") : q ? "all" : "low";
   const [adjusting, setAdjusting] = useState<StockRow | null>(null);
   const list = useQuery({
-    queryKey: ["admin", "inventory", { q, view, page }],
-    queryFn: () => must(browserApi.GET("/api/v1/inventory", { params: { query: { q: q || undefined, low_stock: view === "low" ? true : undefined, page, size: PAGE_SIZE } } })),
+    queryKey: [scope.key, "inventory", { q, view, page }],
+    queryFn: () => scope.api.inventory({ q: q || undefined, low_stock: view === "low" ? true : undefined, page, size: PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
   const totals = useQuery({
-    queryKey: ["admin", "inventory", "totals"],
+    queryKey: [scope.key, "inventory", "totals"],
     queryFn: async () => {
-      const [all, low] = await Promise.all([
-        must(browserApi.GET("/api/v1/inventory", { params: { query: { size: 1 } } })),
-        must(browserApi.GET("/api/v1/inventory", { params: { query: { size: 1, low_stock: true } } })),
-      ]);
+      const [all, low] = await Promise.all([scope.api.inventory({ size: 1 }), scope.api.inventory({ size: 1, low_stock: true })]);
       return { all: all.total, low: low.total };
     },
   });
-  const adjust = can("inventory:adjust");
+  const { adjust } = scope;
   const columns = adjust ? 6 : 5;
 
   return (
@@ -220,6 +217,7 @@ export function InventoryView() {
  * lost response is applied once. */
 function AdjustDialog({ row, onClose }: { row: StockRow; onClose: () => void }) {
   const t = useTranslations("admin");
+  const scope = useCatalogScope();
   const client = useQueryClient();
   const toast = useToast();
   const [direction, setDirection] = useState<"add" | "remove">("add");
@@ -237,16 +235,11 @@ function AdjustDialog({ row, onClose }: { row: StockRow; onClose: () => void }) 
   const save = useMutation({
     mutationFn: () => {
       const label = t(`inventory.reasons.${reason.id}`);
-      return must(
-        browserApi.POST("/api/v1/inventory/{sku}/adjustments", {
-          params: { path: { sku: row.sku }, header: { "Idempotency-Key": key } },
-          body: { reason: reason.reason, quantity_delta: direction === "add" ? amount! : -amount!, note: note.trim() ? `${label}: ${note.trim()}` : label },
-        }),
-      );
+      return scope.api.adjust(row.sku, key, { reason: reason.reason, quantity_delta: direction === "add" ? amount! : -amount!, note: note.trim() ? `${label}: ${note.trim()}` : label });
     },
     onSuccess: () => {
       toast.show(t("inventory.adjusted", { sku: row.sku }));
-      void client.invalidateQueries({ queryKey: ["admin"] });
+      void client.invalidateQueries({ queryKey: [scope.key] });
       onClose();
     },
     onError: (e) => setError(e instanceof ApiError && e.status === 409 ? t("inventory.errors.conflict") : t("common.saveError")),

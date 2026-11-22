@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { CatalogScopeProvider, staffScope } from "./catalog-scope";
 import type { Permission } from "./nav";
 
 export type ClientStaffAccess = {
@@ -23,7 +24,13 @@ export function StaffAccessProvider({ access, children }: { access: ClientStaffA
     const held = new Set(access.permissions);
     return { ...access, can: (permission: Permission) => held.has(permission) };
   }, [access]);
-  return <AccessContext.Provider value={value}>{children}</AccessContext.Provider>;
+  // The product, editor and stock screens are shared with the seller dashboard (ADR-014 phase 4).
+  const scope = useMemo(() => staffScope(new Set(access.permissions)), [access]);
+  return (
+    <AccessContext.Provider value={value}>
+      <CatalogScopeProvider scope={scope}>{children}</CatalogScopeProvider>
+    </AccessContext.Provider>
+  );
 }
 
 export function useStaffAccess(): AccessValue {

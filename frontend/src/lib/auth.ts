@@ -12,6 +12,11 @@ export function safeReturnTo(value: string | string[] | null | undefined, fallba
   return raw;
 }
 
+/** /seller and its pages: the seller dashboard (ADR-014 phase 4), outside the locale routing. */
+export function isSellerPath(path: string): boolean {
+  return path === "/seller" || path.startsWith("/seller/") || path.startsWith("/seller?");
+}
+
 export const PASSWORD_MIN = 8;
 export const PASSWORD_MAX = 256;
 

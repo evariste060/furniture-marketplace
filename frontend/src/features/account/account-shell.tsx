@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Heart, House, LogOut, MapPin, MessageSquareText, Package, User } from "lucide-react";
+import { Heart, House, LogOut, MapPin, MessageSquareText, Package, Store, User } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, type ReactNode } from "react";
@@ -56,6 +56,7 @@ export const ACCOUNT_LINKS = [
   { href: "/account/messages", key: "messages", Icon: MessageSquareText },
   { href: "/account/addresses", key: "addresses", Icon: MapPin },
   { href: "/account/profile", key: "profile", Icon: User },
+  { href: "/account/seller", key: "seller", Icon: Store },
 ] as const;
 
 /** Whether an account menu link is the current page. */

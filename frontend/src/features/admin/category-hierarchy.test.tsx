@@ -8,6 +8,7 @@ import admin from "../../../messages/admin.json";
 import en from "../../../messages/en.json";
 import { ToastProvider } from "@/components/ui/toast";
 import { addableBrands, moveItem, nextSortOrder, siblingOrder, subtreeCount, visibleRows } from "./categories";
+import { CatalogScopeProvider, staffScope } from "./catalog-scope";
 import { brandOptions, isHidden, mainOptions, rootOf, splitCategory, subOptions } from "./category-options";
 import { ProductEditorView } from "./product-editor";
 
@@ -15,7 +16,6 @@ import { ProductEditorView } from "./product-editor";
  * the admin tree's search, filter, counts and reorder helpers. */
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), push: vi.fn() }) }));
-vi.mock("./access", () => ({ useStaffAccess: () => ({ can: () => true }) }));
 const api = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn(), PUT: vi.fn(), PATCH: vi.fn(), DELETE: vi.fn() }));
 vi.mock("@/lib/api/client", () => ({ browserApi: api }));
 
@@ -66,7 +66,11 @@ function renderEditor(productId?: string) {
   return render(
     <QueryClientProvider client={client}>
       <NextIntlClientProvider locale="en" messages={{ ...en, admin }} timeZone="Africa/Kigali">
-        <ToastProvider closeLabel="Close">{(<ProductEditorView productId={productId} />) as ReactNode}</ToastProvider>
+        <ToastProvider closeLabel="Close">
+          <CatalogScopeProvider scope={staffScope(new Set(["catalog:manage", "inventory:read", "inventory:adjust"]))}>
+            {(<ProductEditorView productId={productId} />) as ReactNode}
+          </CatalogScopeProvider>
+        </ToastProvider>
       </NextIntlClientProvider>
     </QueryClientProvider>,
   );

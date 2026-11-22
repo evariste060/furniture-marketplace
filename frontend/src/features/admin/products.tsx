@@ -1,7 +1,7 @@
 "use client";
 
 import { keepPreviousData, useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckSquare, ExternalLink, ImageOff, Layers, PackageSearch, Pencil, Rocket, Upload, X, type LucideIcon } from "lucide-react";
+import { CheckSquare, ExternalLink, ImageOff, Layers, PackageSearch, Pencil, Plus, Rocket, Upload, X, type LucideIcon } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
@@ -17,7 +17,7 @@ import { ApiError } from "@/lib/api/errors";
 import type { components } from "@/lib/api/schema";
 import { cx } from "@/lib/cx";
 import { formatMoney } from "@/lib/format";
-import { useStaffAccess } from "./access";
+import { useCatalogScope } from "./catalog-scope";
 import { ListFooter, LoadError, must, PageHeader, SearchBox, Thumb, useListParams } from "./ui";
 
 type ProductRow = components["schemas"]["StaffProductListItem"];
@@ -52,11 +52,12 @@ function isStatus(value: string): value is ProductStatus {
   return (PRODUCT_STATUSES as string[]).includes(value);
 }
 
-/** Products.dc.html. Filters live in the URL: view, status, q, category, brand, low, page. */
+/** Products.dc.html. Filters live in the URL: view, status, q, category, brand, low, page. Also
+ * the seller's /seller/products (ADR-014 phase 4): their own store's products only. */
 export function ProductsView() {
   const t = useTranslations("admin");
-  const { can } = useStaffAccess();
-  const manage = can("catalog:manage");
+  const scope = useCatalogScope();
+  const { manage, base } = scope;
   const { get, page, set, hrefWith } = useListParams();
   const view: View = isView(get("view")) ? (get("view") as View) : "";
   const status = isStatus(get("status")) ? (get("status") as ProductStatus) : "";
@@ -73,19 +74,19 @@ export function ProductsView() {
   const query = { ...shared, status: status || undefined, ...VIEWS[view] };
 
   const list = useQuery({
-    queryKey: ["admin", "products", { ...query, page }],
-    queryFn: () => must(browserApi.GET("/api/v1/staff/products", { params: { query: { ...query, page, size: PAGE_SIZE } } })),
+    queryKey: [scope.key, "products", { ...query, page }],
+    queryFn: () => scope.api.products({ ...query, page, size: PAGE_SIZE }),
     placeholderData: keepPreviousData,
   });
   // Each view's count under the search, category, brand and low-stock filters.
   const counts = useQueries({
     queries: VIEW_IDS.map((v) => ({
-      queryKey: ["admin", "products", "count", v, shared],
-      queryFn: async () => (await must(browserApi.GET("/api/v1/staff/products", { params: { query: { ...shared, ...VIEWS[v], size: 1 } } }))).total,
+      queryKey: [scope.key, "products", "count", v, shared],
+      queryFn: async () => (await scope.api.products({ ...shared, ...VIEWS[v], size: 1 })).total,
     })),
   });
-  const categories = useQuery({ queryKey: ["admin", "categories"], queryFn: () => must(browserApi.GET("/api/v1/staff/categories")), staleTime: 60_000 });
-  const brands = useQuery({ queryKey: ["admin", "brands"], queryFn: () => must(browserApi.GET("/api/v1/staff/brands")), staleTime: 60_000 });
+  const categories = useQuery({ queryKey: [scope.key, "categories"], queryFn: scope.api.categories, staleTime: 60_000 });
+  const brands = useQuery({ queryKey: [scope.key, "brands"], queryFn: scope.api.brands, staleTime: 60_000 });
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const rows = list.data?.items ?? [];
@@ -103,18 +104,24 @@ export function ProductsView() {
     <>
       <PageHeader
         title={t("products.title")}
-        description={t("products.description")}
+        description={scope.kind === "seller" ? t("seller.products.description") : t("products.description")}
         actions={
-          manage && (
-            // Administrators moderate products but do not create them (SC-05): sellers add products
-            // to their own store, so there is no New product action here.
-            <>
+          <>
+            {/* Administrators moderate products but do not create them (SC-05): sellers add
+                products to their own store. The catalogue import is platform merchandising. */}
+            {scope.merchandising && (
               <NextLink href="/admin/import" className={buttonClasses({ variant: "neutral", size: "sm", className: "gap-2" })}>
                 <Upload size={16} aria-hidden="true" />
                 {t("products.import")}
               </NextLink>
-            </>
-          )
+            )}
+            {scope.create && (
+              <NextLink href={`${base}/products/new`} className={buttonClasses({ size: "sm", className: "gap-2" })}>
+                <Plus size={16} aria-hidden="true" />
+                {t("seller.products.new")}
+              </NextLink>
+            )}
+          </>
         }
       />
 
@@ -160,7 +167,7 @@ export function ProductsView() {
             {(id) => (
               <Select id={id} value={categoryId} onChange={(e) => set({ category: e.target.value })} className="h-10 text-sm">
                 <option value="">{t("products.allCategories")}</option>
-                {categories.data?.items.map((c) => (
+                {categories.data?.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.parent_id ? `– ${c.name}` : c.name}
                   </option>
@@ -172,7 +179,7 @@ export function ProductsView() {
             {(id) => (
               <Select id={id} value={brandId} onChange={(e) => set({ brand: e.target.value })} className="h-10 text-sm">
                 <option value="">{t("products.allBrands")}</option>
-                {brands.data?.items.map((b) => (
+                {brands.data?.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
                   </option>
@@ -218,7 +225,7 @@ export function ProductsView() {
           </div>
         </div>
 
-        {manage && selected.size > 0 && <BulkBar ids={[...selected]} onDone={() => setSelected(new Set())} />}
+        {scope.merchandising && selected.size > 0 && <BulkBar ids={[...selected]} onDone={() => setSelected(new Set())} />}
 
         {list.isError ? (
           <LoadError onRetry={() => list.refetch()} className="m-5" />
@@ -233,7 +240,7 @@ export function ProductsView() {
           <Table aria-busy={list.isFetching}>
             <thead>
               <tr>
-                {manage && (
+                {scope.merchandising && (
                   <Th className="w-10">
                     <input
                       type="checkbox"
@@ -259,7 +266,7 @@ export function ProductsView() {
               {!list.data
                 ? Array.from({ length: 6 }, (_, i) => (
                     <tr key={i}>
-                      <Td colSpan={manage ? 8 : 7}>
+                      <Td colSpan={scope.merchandising ? 8 : 7}>
                         <Skeleton className="h-12 w-full" />
                       </Td>
                     </tr>
@@ -268,7 +275,7 @@ export function ProductsView() {
                     const picked = selected.has(p.id);
                     return (
                       <tr key={p.id} className={cx("transition-colors duration-150 motion-reduce:transition-none", picked ? "bg-light" : "hover:bg-page")}>
-                        {manage && (
+                        {scope.merchandising && (
                           <Td>
                             <input
                               type="checkbox"
@@ -283,7 +290,7 @@ export function ProductsView() {
                           <span className="flex items-center gap-3">
                             <Thumb image={p.image} size={48} />
                             <span className="flex min-w-0 flex-col gap-0.5">
-                              <NextLink href={`/admin/products/${p.id}`} className="line-clamp-2 font-semibold text-tx no-underline hover:text-pri-h hover:underline">
+                              <NextLink href={`${base}/products/${p.id}`} className="line-clamp-2 font-semibold text-tx no-underline hover:text-pri-h hover:underline">
                                 {p.name}
                               </NextLink>
                               <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-cap text-tx2">
@@ -320,7 +327,7 @@ export function ProductsView() {
                         <Td>
                           <span className="flex items-center justify-end gap-1.5">
                             <NextLink
-                              href={`/admin/products/${p.id}`}
+                              href={`${base}/products/${p.id}`}
                               aria-label={t(manage ? "products.edit" : "products.open", { name: p.name })}
                               title={t(manage ? "products.edit" : "products.open", { name: p.name })}
                               className="flex size-8 items-center justify-center rounded-lg border border-bd bg-white text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none"
@@ -387,14 +394,14 @@ function Filter({ label, className, children }: { label: string; className?: str
  * products are published from the editor or the bulk action. */
 function VisibleToggle({ product, disabled }: { product: ProductRow; disabled: boolean }) {
   const t = useTranslations("admin");
+  const scope = useCatalogScope();
   const client = useQueryClient();
   const toast = useToast();
   const change = useMutation({
-    mutationFn: (status: "active" | "hidden") =>
-      must(browserApi.PATCH("/api/v1/staff/products/{product_id}", { params: { path: { product_id: product.id } }, body: { status } })),
+    mutationFn: (status: "active" | "hidden") => scope.api.updateProduct(product.id, { status }),
     onSuccess: (_d, status) => {
       toast.show(t(status === "active" ? "products.shown" : "products.hidden", { name: product.name }));
-      void client.invalidateQueries({ queryKey: ["admin", "products"] });
+      void client.invalidateQueries({ queryKey: [scope.key, "products"] });
     },
     onError: (error) => toast.show(error instanceof ApiError && error.code === "product_has_no_images" ? t("products.needsPhoto") : t("common.saveError"), "error"),
   });

@@ -15,15 +15,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, Td, Th } from "@/components/ui/table";
 import { Toggle } from "@/components/ui/toggle";
 import { useToast } from "@/components/ui/toast";
-import { browserApi } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 import type { components } from "@/lib/api/schema";
 import { cx } from "@/lib/cx";
-import { useStaffAccess } from "./access";
+import { useCatalogScope } from "./catalog-scope";
 import { brandOptions, groupBrandOptions, mainOptions, splitCategory, subOptions, type CategoryNode, type Option } from "./category-options";
 import { PRODUCT_TONE, type ProductStatus } from "./products";
 import { groupDigits, parseAmount } from "./numbers";
-import { bodyFieldErrors, LoadError, must, PageHeader, postFiles, Thumb } from "./ui";
+import { bodyFieldErrors, LoadError, PageHeader, Thumb } from "./ui";
 
 type Product = components["schemas"]["StaffProductDetail"];
 type Variant = components["schemas"]["VariantResponse"];
@@ -57,12 +56,14 @@ export function moveItem<T>(list: readonly T[], from: number, to: number): T[] {
   return next;
 }
 
-/** ProductEditor.dc.html: /admin/products/new and /admin/products/[id]. */
+/** ProductEditor.dc.html: /admin/products/new and /admin/products/[id], and the seller's
+ * /seller/products/new and /seller/products/[id] (ADR-014 phase 4, the seller's own store). */
 export function ProductEditorView({ productId }: { productId?: string }) {
   const t = useTranslations("admin");
+  const scope = useCatalogScope();
   const query = useQuery({
-    queryKey: ["admin", "product", productId],
-    queryFn: () => must(browserApi.GET("/api/v1/staff/products/{product_id}", { params: { path: { product_id: productId! } } })),
+    queryKey: [scope.key, "product", productId],
+    queryFn: () => scope.api.product(productId!),
     enabled: Boolean(productId),
     retry: (count, error) => !(error instanceof ApiError && [404, 422].includes(error.status)) && count < 2,
   });
@@ -71,7 +72,7 @@ export function ProductEditorView({ productId }: { productId?: string }) {
       return (
         <Card padding={32} className="flex flex-col items-start gap-3">
           <h1 className="t-h2">{t("editor.notFound")}</h1>
-          <NextLink href="/admin/products" className={buttonClasses({ variant: "neutral", size: "sm" })}>
+          <NextLink href={`${scope.base}/products`} className={buttonClasses({ variant: "neutral", size: "sm" })}>
             {t("editor.back")}
           </NextLink>
         </Card>
@@ -122,13 +123,13 @@ function EditorForm({ product }: { product: Product | null }) {
   const router = useRouter();
   const client = useQueryClient();
   const toast = useToast();
-  const { can } = useStaffAccess();
-  const manage = can("catalog:manage");
+  const scope = useCatalogScope();
+  const { manage } = scope;
   const [form, setForm] = useState<FormState>(() => initialForm(product));
   const [variants, setVariants] = useState<Record<string, VariantEdit>>(() => Object.fromEntries((product?.variants ?? []).map((v) => [v.id, variantEdit(v)])));
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const categories = useQuery({ queryKey: ["admin", "categories"], queryFn: () => must(browserApi.GET("/api/v1/staff/categories")), staleTime: 60_000 });
-  const brands = useQuery({ queryKey: ["admin", "brands"], queryFn: () => must(browserApi.GET("/api/v1/staff/brands")), staleTime: 60_000 });
+  const categories = useQuery({ queryKey: [scope.key, "categories"], queryFn: scope.api.categories, staleTime: 60_000 });
+  const brands = useQuery({ queryKey: [scope.key, "brands"], queryFn: scope.api.brands, staleTime: 60_000 });
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
 
   const validate = (): Record<string, string> => {
@@ -155,15 +156,16 @@ function EditorForm({ product }: { product: Product | null }) {
         warranty_text: form.warranty.trim() || null,
         specifications: rowsToObject(form.specs),
         status: form.status,
-        is_featured: form.featured,
+        // Platform merchandising only; the seller routes never receive it.
+        ...(scope.merchandising ? { is_featured: form.featured } : {}),
       };
       const slug = form.slug.trim();
       if (!product) {
-        return must(browserApi.POST("/api/v1/staff/products", { body: { ...body, slug: slug || null } }));
+        return scope.api.createProduct({ ...body, slug: slug || null });
       }
       // Only what changed, so a slug or status rule is checked only when it is edited.
       const before = initialForm(product);
-      const changes: components["schemas"]["ProductUpdateRequest"] = {};
+      const changes: components["schemas"]["SellerProductUpdateRequest"] & { is_featured?: boolean } = {};
       if (body.name !== product.name) changes.name = body.name;
       if (form.description !== before.description) changes.description = body.description;
       if (form.brandId !== before.brandId) changes.brand_id = body.brand_id;
@@ -171,33 +173,29 @@ function EditorForm({ product }: { product: Product | null }) {
       if (form.model !== before.model) changes.model = body.model;
       if (form.warranty !== before.warranty) changes.warranty_text = body.warranty_text;
       if (JSON.stringify(body.specifications) !== JSON.stringify(rowsToObject(before.specs))) changes.specifications = body.specifications;
-      if (form.featured !== before.featured) changes.is_featured = form.featured;
+      if (scope.merchandising && form.featured !== before.featured) changes.is_featured = form.featured;
       if (slug && slug !== product.slug) changes.slug = slug;
       // Variant prices first: publishing checks the product as it will be.
       for (const variant of product.variants) {
         const edit = variants[variant.id];
         const was = variantEdit(variant);
         if (!edit || JSON.stringify(edit) === JSON.stringify(was)) continue;
-        await must(
-          browserApi.PATCH("/api/v1/staff/products/{product_id}/variants/{variant_id}", {
-            params: { path: { product_id: product.id, variant_id: variant.id } },
-            body: {
-              price: parseAmount(edit.price),
-              compare_at_price: edit.compare.trim() ? parseAmount(edit.compare) : null,
-              low_stock_threshold: parseAmount(edit.threshold),
-              is_active: edit.active,
-            },
-          }),
-        );
+        await scope.api.updateVariant(product.id, variant.id, {
+          price: parseAmount(edit.price),
+          compare_at_price: edit.compare.trim() ? parseAmount(edit.compare) : null,
+          low_stock_threshold: parseAmount(edit.threshold),
+          is_active: edit.active,
+        });
       }
       if (form.status !== product.status) changes.status = form.status;
       if (Object.keys(changes).length === 0) return product;
-      return must(browserApi.PATCH("/api/v1/staff/products/{product_id}", { params: { path: { product_id: product.id } }, body: changes }));
+      await scope.api.updateProduct(product.id, changes);
+      return product;
     },
     onSuccess: (saved) => {
       toast.show(t("common.saved"));
-      void client.invalidateQueries({ queryKey: ["admin"] });
-      if (!product) router.replace(`/admin/products/${saved.id}`);
+      void client.invalidateQueries({ queryKey: [scope.key] });
+      if (!product) router.replace(`${scope.base}/products/${saved.id}`);
     },
     onError: (error) => {
       if (error instanceof ApiError && error.code === "slug_taken") setErrors({ slug: t("editor.errors.slugTaken") });
@@ -205,7 +203,7 @@ function EditorForm({ product }: { product: Product | null }) {
       else if (error instanceof ApiError && error.status === 422) setErrors(bodyFieldErrors(error));
       else toast.show(t("common.saveError"), "error");
       // Variant changes may have been saved before the product failed.
-      if (product) void client.invalidateQueries({ queryKey: ["admin", "product", product.id] });
+      if (product) void client.invalidateQueries({ queryKey: [scope.key, "product", product.id] });
     },
   });
 
@@ -228,7 +226,7 @@ function EditorForm({ product }: { product: Product | null }) {
     >
       <PageHeader
         title={title}
-        back={{ label: t("editor.back"), href: "/admin/products" }}
+        back={{ label: t("editor.back"), href: `${scope.base}/products` }}
         badges={product && <Badge tone={PRODUCT_TONE[product.status]}>{t(`products.status.${product.status}`)}</Badge>}
         actions={
           <>
@@ -237,7 +235,7 @@ function EditorForm({ product }: { product: Product | null }) {
                 {t("editor.viewOnStore")}
               </a>
             )}
-            <NextLink href="/admin/products" className={buttonClasses({ variant: "neutral", size: "sm" })}>
+            <NextLink href={`${scope.base}/products`} className={buttonClasses({ variant: "neutral", size: "sm" })}>
               {t("common.cancel")}
             </NextLink>
             {manage && (
@@ -265,8 +263,8 @@ function EditorForm({ product }: { product: Product | null }) {
             </Field>
             <div className="grid gap-4 md:grid-cols-2">
               <CategoryFields
-                categories={categories.data?.items}
-                brands={brands.data?.items}
+                categories={categories.data}
+                brands={brands.data}
                 categoryId={form.categoryId}
                 brandId={form.brandId}
                 savedCategoryId={product?.category_id ?? ""}
@@ -328,7 +326,7 @@ function EditorForm({ product }: { product: Product | null }) {
               ))}
             </div>
             {errors.status && <span className="text-cap text-err">{errors.status}</span>}
-            <Checkbox label={t("editor.featured")} checked={form.featured} onChange={(e) => update("featured", e.target.checked)} />
+            {scope.merchandising && <Checkbox label={t("editor.featured")} checked={form.featured} onChange={(e) => update("featured", e.target.checked)} />}
           </Card>
           {product && <StockSummary product={product} />}
           <Card padding={20} className="flex flex-col gap-2.5">
@@ -458,14 +456,11 @@ function PairRows({ rows, onChange, nameLabel, valueLabel }: { rows: Row[]; onCh
 
 // ---- Images ------------------------------------------------------------------------------------
 
-function uploadImage(productId: string, file: File): Promise<ProductImageRow> {
-  return postFiles<ProductImageRow>(`staff/products/${productId}/images`, "file", [file]);
-}
-
 /** Product photos: the first is the cover; drag (or the arrow buttons) to reorder, which saves at
  * once. Each photo shows its bulk-upload file name. */
 function Images({ product, manage }: { product: Product; manage: boolean }) {
   const t = useTranslations("admin.editor");
+  const scope = useCatalogScope();
   const client = useQueryClient();
   const toast = useToast();
   const input = useRef<HTMLInputElement>(null);
@@ -475,10 +470,10 @@ function Images({ product, manage }: { product: Product; manage: boolean }) {
   const [editing, setEditing] = useState<ProductImageRow | null>(null);
   const images = order ? order.map((id) => saved.find((i) => i.id === id)).filter((i): i is ProductImageRow => Boolean(i)) : saved;
   const fileNames = new Map(product.photo_file_names.map((f) => [f.image_id, f.file_name]));
-  const refresh = () => client.invalidateQueries({ queryKey: ["admin", "product", product.id] });
+  const refresh = () => client.invalidateQueries({ queryKey: [scope.key, "product", product.id] });
 
   const reorder = useMutation({
-    mutationFn: (ids: string[]) => must(browserApi.PUT("/api/v1/staff/products/{product_id}/images/order", { params: { path: { product_id: product.id } }, body: { image_ids: ids } })),
+    mutationFn: (ids: string[]) => scope.api.reorderImages(product.id, ids),
     onSuccess: () => toast.show(t("orderSaved")),
     onError: () => {
       setOrder(null);
@@ -494,7 +489,7 @@ function Images({ product, manage }: { product: Product; manage: boolean }) {
           failed += 1;
           continue;
         }
-        await uploadImage(product.id, file).catch(() => (failed += 1));
+        await scope.api.uploadImage(product.id, file).catch(() => (failed += 1));
       }
       return { done: files.length - failed, failed };
     },
@@ -502,7 +497,7 @@ function Images({ product, manage }: { product: Product; manage: boolean }) {
     onSettled: () => void refresh(),
   });
   const remove = useMutation({
-    mutationFn: (id: string) => must(browserApi.DELETE("/api/v1/staff/images/{image_id}", { params: { path: { image_id: id } } })),
+    mutationFn: (id: string) => scope.api.deleteImage(id),
     onSuccess: () => toast.show(t("imageDeleted")),
     onError: (error) => toast.show(error instanceof ApiError && error.code === "last_product_image" ? t("lastImage") : t("deleteFailed"), "error"),
     onSettled: () => void refresh(),
@@ -625,10 +620,11 @@ function IconAction({ label, disabled, onClick, children }: { label: string; dis
 
 function AltTextDialog({ image, onClose, onSaved }: { image: ProductImageRow; onClose: () => void; onSaved: () => void }) {
   const t = useTranslations("admin");
+  const scope = useCatalogScope();
   const toast = useToast();
   const [alt, setAlt] = useState(image.alt_text ?? "");
   const save = useMutation({
-    mutationFn: () => must(browserApi.PATCH("/api/v1/staff/images/{image_id}", { params: { path: { image_id: image.id } }, body: { alt_text: alt.trim() || null } })),
+    mutationFn: () => scope.api.updateImage(image.id, alt.trim() || null),
     onSuccess: () => {
       toast.show(t("common.saved"));
       onSaved();
@@ -768,20 +764,20 @@ function Variants({
 
 /** Each variant's available stock, from the inventory list (stock changes only through Inventory). */
 function useVariantStock(product: Product): Map<string, number> {
-  const { can } = useStaffAccess();
+  const scope = useCatalogScope();
   const query = useQuery({
-    queryKey: ["admin", "inventory", "product", product.id],
-    queryFn: () => must(browserApi.GET("/api/v1/inventory", { params: { query: { q: product.name.slice(0, 160), size: 100 } } })),
-    enabled: can("inventory:read"),
+    queryKey: [scope.key, "inventory", "product", product.id],
+    queryFn: () => scope.api.inventory({ q: product.name.slice(0, 160), size: 100 }),
+    enabled: scope.stock,
   });
   return new Map((query.data?.items ?? []).filter((i) => i.product_id === product.id).map((i) => [i.variant_id, i.available_quantity]));
 }
 
 function StockSummary({ product }: { product: Product }) {
   const t = useTranslations("admin.editor");
-  const { can } = useStaffAccess();
+  const scope = useCatalogScope();
   const stock = useVariantStock(product);
-  if (!can("inventory:read")) return null;
+  if (!scope.stock) return null;
   const total = [...stock.values()].reduce((a, b) => a + b, 0);
   const thresholds = [...new Set(product.variants.map((v) => v.low_stock_threshold))];
   return (
@@ -797,7 +793,7 @@ function StockSummary({ product }: { product: Product }) {
           <span>{thresholds.length === 1 ? t("units", { count: thresholds[0] }) : t("perVariant")}</span>
         </div>
       )}
-      <NextLink href={`/admin/inventory?q=${encodeURIComponent(product.name.slice(0, 160))}`} className="text-sm font-medium">
+      <NextLink href={`${scope.base}/inventory?q=${encodeURIComponent(product.name.slice(0, 160))}`} className="text-sm font-medium">
         {t("openInventory")}
       </NextLink>
     </Card>
@@ -806,6 +802,7 @@ function StockSummary({ product }: { product: Product }) {
 
 function AddVariantDialog({ product, onClose }: { product: Product; onClose: () => void }) {
   const t = useTranslations("admin");
+  const scope = useCatalogScope();
   const client = useQueryClient();
   const toast = useToast();
   const [name, setName] = useState("");
@@ -817,23 +814,18 @@ function AddVariantDialog({ product, onClose }: { product: Product; onClose: () 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const create = useMutation({
     mutationFn: () =>
-      must(
-        browserApi.POST("/api/v1/staff/products/{product_id}/variants", {
-          params: { path: { product_id: product.id } },
-          body: {
-            name: name.trim(),
-            sku: sku.trim(),
-            price: parseAmount(price) ?? 0,
-            compare_at_price: compare.trim() ? parseAmount(compare) : null,
-            low_stock_threshold: parseAmount(threshold) ?? 0,
-            attributes: rowsToObject(attributes),
-            is_active: true,
-          },
-        }),
-      ),
+      scope.api.createVariant(product.id, {
+        name: name.trim(),
+        sku: sku.trim(),
+        price: parseAmount(price) ?? 0,
+        compare_at_price: compare.trim() ? parseAmount(compare) : null,
+        low_stock_threshold: parseAmount(threshold) ?? 0,
+        attributes: rowsToObject(attributes),
+        is_active: true,
+      }),
     onSuccess: () => {
       toast.show(t("editor.variantAdded"));
-      void client.invalidateQueries({ queryKey: ["admin"] });
+      void client.invalidateQueries({ queryKey: [scope.key] });
       onClose();
     },
     onError: (error) => {

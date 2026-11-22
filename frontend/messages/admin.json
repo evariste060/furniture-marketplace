@@ -1703,5 +1703,195 @@
     "customerDelivery": "Customer and delivery",
     "zone": "Delivery zone",
     "customerNote": "Customer note"
+  },
+  "seller": {
+    "shell": {
+      "panel": "Seller dashboard",
+      "home": "Seller dashboard — overview",
+      "navLabel": "Seller dashboard",
+      "owner": "Store owner",
+      "groups": {
+        "overview": "Overview",
+        "sales": "Sales",
+        "catalogue": "Catalogue",
+        "store": "Store"
+      },
+      "nav": {
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "products": "Products",
+        "inventory": "Inventory",
+        "store": "Store profile"
+      }
+    },
+    "titles": {
+      "suffix": "Seller dashboard",
+      "dashboard": "Dashboard",
+      "orders": "Orders",
+      "order": "Order",
+      "products": "Products",
+      "newProduct": "New product",
+      "product": "Product",
+      "inventory": "Inventory",
+      "store": "Store profile"
+    },
+    "gate": {
+      "staffTitle": "Staff accounts can’t sell",
+      "staffBody": "You’re signed in with a staff account. Stores belong to customer accounts; use the admin for platform work.",
+      "toAdmin": "Go to the admin",
+      "noStoreTitle": "You don’t have a store yet",
+      "noStoreBody": "Apply to sell from your account. Once an administrator approves your store, this dashboard opens.",
+      "apply": "Apply to sell",
+      "pendingTitle": "Your application is being reviewed",
+      "pendingBody": "An administrator is reviewing {store}. We’ll email you when it’s decided.",
+      "rejectedTitle": "Your application needs changes",
+      "rejectedBody": "{store} was not approved yet. Update your application and send it again.",
+      "suspendedTitle": "Your store is suspended",
+      "suspendedBody": "{store} is suspended, so its products are hidden and this dashboard is closed. Contact the marketplace for help.",
+      "reason": "Reason: {reason}",
+      "toApplication": "See my application",
+      "toShop": "Go to the store"
+    },
+    "dashboard": {
+      "title": "Welcome, {name}",
+      "titleNoName": "Welcome",
+      "description": "How {store} is doing, and what needs your attention.",
+      "toConfirm": "Orders to confirm",
+      "toConfirmHint": "Confirm them so the customer’s order can go ahead.",
+      "toShip": "Orders to pack or dispatch",
+      "toShipHint": "Confirmed orders that haven’t left your store yet.",
+      "lowStock": "Low-stock SKUs",
+      "lowStockHint": "At or below their alert level.",
+      "pending": "Pending earnings",
+      "pendingHint": "Confirmed orders not yet delivered and paid.",
+      "earned": "Earned",
+      "earnedHint": "Delivered and paid orders. Payouts are not part of the dashboard yet.",
+      "orders": "{count, plural, one {# order} other {# orders}}",
+      "merchandise": "Goods",
+      "commission": "Commission",
+      "net": "Your share",
+      "recent": "Recent orders",
+      "viewAll": "View all orders",
+      "noOrders": "No orders yet. They appear here when customers buy your products.",
+      "commissionRate": "Your commission rate is {rate}%, charged on goods after discounts. Delivery fees are not included."
+    },
+    "orders": {
+      "title": "Orders",
+      "description": "Your store’s part of each order. Cash-on-delivery orders appear when they’re placed, mobile-money orders once they’re paid.",
+      "searchLabel": "Search orders",
+      "searchPlaceholder": "Order number",
+      "statusLabel": "Your status",
+      "allStatuses": "All statuses",
+      "count": "{count, plural, one {# order} other {# orders}}",
+      "empty": "No orders yet.",
+      "emptyFiltered": "No orders match these filters.",
+      "columns": {
+        "order": "Order",
+        "placed": "Placed",
+        "recipient": "Recipient",
+        "units": "Items",
+        "goods": "Goods",
+        "net": "Your share",
+        "payment": "Payment",
+        "status": "Your status",
+        "orderStatus": "Whole order"
+      },
+      "open": "Open order {number}"
+    },
+    "order": {
+      "back": "Back to orders",
+      "notFound": "We couldn’t find this order in your store.",
+      "placed": "Placed {date}",
+      "items": "Your items",
+      "columns": {
+        "product": "Product",
+        "sku": "SKU",
+        "quantity": "Qty",
+        "price": "Price",
+        "discount": "Discount",
+        "total": "Total"
+      },
+      "money": {
+        "subtotal": "Subtotal",
+        "discount": "Your share of the discount",
+        "goods": "Goods",
+        "commission": "Commission ({rate}%)",
+        "net": "Your share"
+      },
+      "deliverTo": "Deliver to",
+      "phone": "Phone",
+      "zone": "Delivery zone",
+      "instructions": "Instructions",
+      "payment": "Payment",
+      "wholeOrder": "Whole order",
+      "wholeOrderHint": "Other stores may have items in this order. The order moves on when every store has done the same step.",
+      "history": "History",
+      "nextStep": "Next step",
+      "action": {
+        "confirmed": "Confirm order",
+        "processing": "Start packing",
+        "dispatched": "Mark as dispatched",
+        "delivered": "Mark as delivered"
+      },
+      "hint": {
+        "pending": "Confirm that you can supply these items.",
+        "confirmed": "Start packing once every store in the order has confirmed.",
+        "processing": "Mark it dispatched when the parcel leaves your store. This takes the items out of your stock.",
+        "dispatched": "Mark it delivered once the customer has received it.",
+        "delivered": "Delivered. Nothing more to do.",
+        "cancelled": "This order was cancelled."
+      },
+      "confirmTitle": "{action}?",
+      "confirmBody": "Order {number}. This step can’t be undone.",
+      "reasonLabel": "Note",
+      "reasonHelp": "Kept in the order’s history.",
+      "moved": "Order {number}: {status}",
+      "errors": {
+        "awaitingPayment": "This order isn’t paid yet, so it can’t be confirmed.",
+        "awaitingOtherStores": "Waiting for the other stores in this order to confirm.",
+        "invalid": "This step is no longer possible because the order changed. It has been refreshed.",
+        "inventory": "Your stock for these items doesn’t match the order. Check Inventory and try again.",
+        "failed": "We couldn’t update this order. Try again."
+      }
+    },
+    "products": {
+      "description": "Your store’s products, drafts included. Customers see active products of approved stores only.",
+      "new": "New product"
+    },
+    "store": {
+      "title": "Store profile",
+      "description": "What customers see on your public store page. Contact details and the street address are for the marketplace only.",
+      "details": "Details",
+      "name": "Store name",
+      "about": "Description",
+      "contact": "Contact",
+      "email": "Contact email",
+      "phone": "Contact phone",
+      "location": "Location",
+      "district": "District",
+      "sector": "Sector",
+      "street": "Street address",
+      "images": "Logo and cover",
+      "logo": "Logo",
+      "cover": "Cover image",
+      "imageHelp": "JPEG, PNG or WebP, at most 5 MB.",
+      "upload": "Upload",
+      "replace": "Replace",
+      "remove": "Remove",
+      "uploading": "Uploading…",
+      "imageSaved": "Image saved",
+      "imageRemoved": "Image removed",
+      "imageFailed": "We couldn’t save this image. Use a JPEG, PNG or WebP of at most 5 MB.",
+      "noImage": "No image yet",
+      "commission": "Commission",
+      "commissionRate": "{rate}% of goods after discounts, set by the marketplace.",
+      "errors": {
+        "name": "Enter a store name of 2 to 120 characters.",
+        "nameTaken": "Another store already uses this name.",
+        "email": "Enter a valid email address.",
+        "phone": "Enter a Rwandan mobile number, for example 0788 123 456.",
+        "district": "Enter your district."
+      }
+    }
   }
 }

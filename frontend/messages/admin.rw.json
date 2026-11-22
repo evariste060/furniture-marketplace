@@ -1703,5 +1703,195 @@
     "customerDelivery": "Umukiriya n'aho bigezwa",
     "zone": "Agace ko kugezamo",
     "customerNote": "Icyo umukiriya yanditse"
+  },
+  "seller": {
+    "shell": {
+      "panel": "Ubuyobozi bw'umucuruzi",
+      "home": "Ubuyobozi bw'umucuruzi — incamake",
+      "navLabel": "Ubuyobozi bw'umucuruzi",
+      "owner": "Nyir'iduka",
+      "groups": {
+        "overview": "Incamake",
+        "sales": "Ibicuruzwa byagurishijwe",
+        "catalogue": "Ibicuruzwa",
+        "store": "Iduka"
+      },
+      "nav": {
+        "dashboard": "Imbonerahamwe",
+        "orders": "Amatumiza",
+        "products": "Ibicuruzwa",
+        "inventory": "Ububiko",
+        "store": "Umwirondoro w'iduka"
+      }
+    },
+    "titles": {
+      "suffix": "Ubuyobozi bw'umucuruzi",
+      "dashboard": "Imbonerahamwe",
+      "orders": "Amatumiza",
+      "order": "Itumiza",
+      "products": "Ibicuruzwa",
+      "newProduct": "Igicuruzwa gishya",
+      "product": "Igicuruzwa",
+      "inventory": "Ububiko",
+      "store": "Umwirondoro w'iduka"
+    },
+    "gate": {
+      "staffTitle": "Konti z'abakozi ntizicuruza",
+      "staffBody": "Winjiye ukoresheje konti y'umukozi. Amaduka ni ay'abakiriya; koresha ubuyobozi ku mirimo y'urubuga.",
+      "toAdmin": "Jya mu buyobozi",
+      "noStoreTitle": "Nta duka urafungura",
+      "noStoreBody": "Saba gucuruza unyuze kuri konti yawe. Umuyobozi namara kwemeza iduka ryawe, ubu buyobozi buzafunguka.",
+      "apply": "Saba gucuruza",
+      "pendingTitle": "Ubusabe bwawe buri gusuzumwa",
+      "pendingBody": "Umuyobozi ari gusuzuma {store}. Tuzakoherereza email igihe byemejwe.",
+      "rejectedTitle": "Ubusabe bwawe bukeneye guhindurwa",
+      "rejectedBody": "{store} ntiriremezwa. Hindura ubusabe bwawe hanyuma wongere ubwohereze.",
+      "suspendedTitle": "Iduka ryawe ryarahagaritswe",
+      "suspendedBody": "{store} ryarahagaritswe, bityo ibicuruzwa byaryo byarahishwe kandi ubu buyobozi bwarafunzwe. Vugana n'urubuga kugira ngo ufashwe.",
+      "reason": "Impamvu: {reason}",
+      "toApplication": "Reba ubusabe bwanjye",
+      "toShop": "Jya mu iduka"
+    },
+    "dashboard": {
+      "title": "Murakaza neza, {name}",
+      "titleNoName": "Murakaza neza",
+      "description": "Uko {store} rihagaze, n'ibikeneye ko ubyitaho.",
+      "toConfirm": "Amatumiza yo kwemeza",
+      "toConfirmHint": "Yemeze kugira ngo itumiza ry'umukiriya rikomeze.",
+      "toShip": "Amatumiza yo gupakira cyangwa kohereza",
+      "toShipHint": "Amatumiza yemejwe ataravuye mu iduka ryawe.",
+      "lowStock": "SKU zisigaye nke",
+      "lowStockHint": "Zageze cyangwa ziri munsi y'urwego rwo kuburira.",
+      "pending": "Amafaranga ategerejwe",
+      "pendingHint": "Amatumiza yemejwe ataragezwa kandi ataranishyurwa.",
+      "earned": "Ayinjijwe",
+      "earnedHint": "Amatumiza yagejejwe kandi yishyuwe. Kwishyura abacuruzi ntibiri muri ubu buyobozi kugeza ubu.",
+      "orders": "{count, plural, one {itumiza #} other {amatumiza #}}",
+      "merchandise": "Ibicuruzwa",
+      "commission": "Komisiyo",
+      "net": "Umugabane wawe",
+      "recent": "Amatumiza aheruka",
+      "viewAll": "Reba amatumiza yose",
+      "noOrders": "Nta matumiza arahari. Azagaragara hano abakiriya nibagura ibicuruzwa byawe.",
+      "commissionRate": "Komisiyo yawe ni {rate}%, ibarwa ku bicuruzwa nyuma y'igabanywa. Amafaranga yo kugeza ntabarirwamo."
+    },
+    "orders": {
+      "title": "Amatumiza",
+      "description": "Igice cy'iduka ryawe muri buri tumiza. Amatumiza yishyurwa bagejejweho agaragara akimara gukorwa, ayishyurwa na mobile money amaze kwishyurwa.",
+      "searchLabel": "Shakisha amatumiza",
+      "searchPlaceholder": "Nimero y'itumiza",
+      "statusLabel": "Aho ugeze",
+      "allStatuses": "Aho bigeze hose",
+      "count": "{count, plural, one {itumiza #} other {amatumiza #}}",
+      "empty": "Nta matumiza arahari.",
+      "emptyFiltered": "Nta matumiza ahuye n'ibi byatoranyijwe.",
+      "columns": {
+        "order": "Itumiza",
+        "placed": "Ryakozwe",
+        "recipient": "Uwakira",
+        "units": "Ibintu",
+        "goods": "Ibicuruzwa",
+        "net": "Umugabane wawe",
+        "payment": "Ubwishyu",
+        "status": "Aho ugeze",
+        "orderStatus": "Itumiza ryose"
+      },
+      "open": "Fungura itumiza {number}"
+    },
+    "order": {
+      "back": "Subira ku matumiza",
+      "notFound": "Ntitwabonye iri tumiza mu iduka ryawe.",
+      "placed": "Ryakozwe {date}",
+      "items": "Ibintu byawe",
+      "columns": {
+        "product": "Igicuruzwa",
+        "sku": "SKU",
+        "quantity": "Umubare",
+        "price": "Igiciro",
+        "discount": "Igabanywa",
+        "total": "Igiteranyo"
+      },
+      "money": {
+        "subtotal": "Igiteranyo gito",
+        "discount": "Umugabane wawe w'igabanywa",
+        "goods": "Ibicuruzwa",
+        "commission": "Komisiyo ({rate}%)",
+        "net": "Umugabane wawe"
+      },
+      "deliverTo": "Bigezwe kuri",
+      "phone": "Telefoni",
+      "zone": "Agace ko kugezamo",
+      "instructions": "Amabwiriza",
+      "payment": "Ubwishyu",
+      "wholeOrder": "Itumiza ryose",
+      "wholeOrderHint": "Andi maduka ashobora kugira ibintu muri iri tumiza. Itumiza rikomeza iyo buri duka rimaze gukora intambwe imwe.",
+      "history": "Amateka",
+      "nextStep": "Intambwe ikurikira",
+      "action": {
+        "confirmed": "Emeza itumiza",
+        "processing": "Tangira gupakira",
+        "dispatched": "Shyira ko ryoherejwe",
+        "delivered": "Shyira ko ryagejejwe"
+      },
+      "hint": {
+        "pending": "Emeza ko ushobora gutanga ibi bintu.",
+        "confirmed": "Tangira gupakira buri duka riri muri iri tumiza rimaze kwemeza.",
+        "processing": "Shyira ko ryoherejwe igipfunyika nikiva mu iduka ryawe. Ibi bikura ibintu mu bubiko bwawe.",
+        "dispatched": "Shyira ko ryagejejwe umukiriya amaze kuryakira.",
+        "delivered": "Ryagejejwe. Nta kindi gisigaye.",
+        "cancelled": "Iri tumiza ryahagaritswe."
+      },
+      "confirmTitle": "{action}?",
+      "confirmBody": "Itumiza {number}. Iyi ntambwe ntisubirwamo.",
+      "reasonLabel": "Icyitonderwa",
+      "reasonHelp": "Kibikwa mu mateka y'itumiza.",
+      "moved": "Itumiza {number}: {status}",
+      "errors": {
+        "awaitingPayment": "Iri tumiza ntiriranishyurwa, bityo ntirishobora kwemezwa.",
+        "awaitingOtherStores": "Turategereje ko andi maduka ari muri iri tumiza yemeza.",
+        "invalid": "Iyi ntambwe ntigishobotse kuko itumiza ryahindutse. Ryavuguruwe.",
+        "inventory": "Ububiko bwawe bw'ibi bintu ntibuhuye n'itumiza. Reba Ububiko hanyuma wongere ugerageze.",
+        "failed": "Ntitwashoboye kuvugurura iri tumiza. Ongera ugerageze."
+      }
+    },
+    "products": {
+      "description": "Ibicuruzwa by'iduka ryawe, harimo n'ibitararangira. Abakiriya babona gusa ibicuruzwa bikora by'amaduka yemejwe.",
+      "new": "Igicuruzwa gishya"
+    },
+    "store": {
+      "title": "Umwirondoro w'iduka",
+      "description": "Ibyo abakiriya babona ku rupapuro rw'iduka ryawe. Aho bakuvugisha n'aderesi y'umuhanda ni iby'urubuga gusa.",
+      "details": "Ibisobanuro",
+      "name": "Izina ry'iduka",
+      "about": "Igisobanuro",
+      "contact": "Aho bakuvugisha",
+      "email": "Email yo kuvuganirwaho",
+      "phone": "Telefoni yo kuvuganirwaho",
+      "location": "Aho riherereye",
+      "district": "Akarere",
+      "sector": "Umurenge",
+      "street": "Aderesi y'umuhanda",
+      "images": "Ikirango n'ifoto yo hejuru",
+      "logo": "Ikirango",
+      "cover": "Ifoto yo hejuru",
+      "imageHelp": "JPEG, PNG cyangwa WebP, itarenze MB 5.",
+      "upload": "Ohereza",
+      "replace": "Simbuza",
+      "remove": "Kuraho",
+      "uploading": "Birimo koherezwa…",
+      "imageSaved": "Ifoto yabitswe",
+      "imageRemoved": "Ifoto yakuweho",
+      "imageFailed": "Ntitwashoboye kubika iyi foto. Koresha JPEG, PNG cyangwa WebP itarenze MB 5.",
+      "noImage": "Nta foto irashyirwaho",
+      "commission": "Komisiyo",
+      "commissionRate": "{rate}% by'ibicuruzwa nyuma y'igabanywa, bishyirwaho n'urubuga.",
+      "errors": {
+        "name": "Andika izina ry'iduka rifite inyuguti 2 kugeza ku 120.",
+        "nameTaken": "Irindi duka risanzwe rikoresha iri zina.",
+        "email": "Andika email yemewe.",
+        "phone": "Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456.",
+        "district": "Andika akarere kawe."
+      }
+    }
   }
 }

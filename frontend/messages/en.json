@@ -797,7 +797,8 @@
         "messages": "My messages",
         "addresses": "Addresses",
         "profile": "Profile & security",
-        "logout": "Log out"
+        "logout": "Log out",
+        "seller": "Sell with us"
       },
       "overviewMeta": "My account",
       "hello": "Hello, {name}",
@@ -909,7 +910,53 @@
       "setPasswordTitle": "Set a password",
       "setPasswordText": "Your account was created with Google and has no password yet. To also sign in with a password, request a reset code and choose one.",
       "setPassword": "Set a password",
-      "googleWelcome": "Welcome! Your account was created with Google."
+      "googleWelcome": "Welcome! Your account was created with Google.",
+      "seller": {
+        "nav": "Sell with us",
+        "title": "Sell with us",
+        "intro": "Open a store on the marketplace: tell us about your shop, and an administrator reviews your application.",
+        "statusLabel": "Application status",
+        "status": {
+          "pending": "Under review",
+          "approved": "Approved",
+          "rejected": "Needs changes",
+          "suspended": "Suspended"
+        },
+        "statusText": {
+          "pending": "We received your application for {store}. We’ll email you when it’s decided. You can still edit it.",
+          "approved": "{store} is approved. Manage your products, stock and orders from the seller dashboard.",
+          "rejected": "{store} was not approved yet. Update your application and send it again.",
+          "suspended": "{store} is suspended, so its products are hidden. Contact the marketplace for help."
+        },
+        "reason": "Reason: {reason}",
+        "openDashboard": "Open the seller dashboard",
+        "formTitle": "Your store",
+        "name": "Store name",
+        "nameHelp": "Shown to customers. It must be unique on the marketplace.",
+        "about": "Description",
+        "email": "Contact email",
+        "phone": "Contact phone",
+        "district": "District",
+        "sector": "Sector",
+        "street": "Street address",
+        "optional": "(optional)",
+        "submit": "Send application",
+        "resubmit": "Send again",
+        "save": "Save changes",
+        "sent": "Application sent. We’ll email you when it’s reviewed.",
+        "saved": "Application saved",
+        "verifyFirst": "Verify your email address before applying. We can send you a new verification link.",
+        "errors": {
+          "name": "Enter a store name of 2 to 120 characters.",
+          "nameTaken": "Another store already uses this name.",
+          "email": "Enter a valid email address.",
+          "phone": "Enter a Rwandan mobile number, for example 0788 123 456.",
+          "district": "Enter your district.",
+          "closed": "This application can no longer be changed.",
+          "exists": "You already have a store.",
+          "failed": "We couldn’t send your application. Try again."
+        }
+      }
     },
     "orderInfo": {
       "status": {

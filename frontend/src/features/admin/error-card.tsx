@@ -9,7 +9,7 @@ import { Button, buttonClasses } from "@/components/ui/button";
 
 /** An admin page that failed to render, in the AccessDenied card layout with ServerError.dc.html's
  * "Try again" and error reference (Next.js's digest of the server error, kept in the server log). */
-export function AdminErrorCard({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export function AdminErrorCard({ error, reset, home = "/admin" }: { error: Error & { digest?: string }; reset: () => void; home?: string }) {
   const t = useTranslations("admin.failed");
   const router = useRouter();
   useEffect(() => {
@@ -35,7 +35,7 @@ export function AdminErrorCard({ error, reset }: { error: Error & { digest?: str
             <RefreshCw size={16} aria-hidden="true" />
             {t("retry")}
           </Button>
-          <NextLink href="/admin" className={buttonClasses({ variant: "outline" })}>
+          <NextLink href={home} className={buttonClasses({ variant: "outline" })}>
             <House size={16} aria-hidden="true" />
             {t("back")}
           </NextLink>

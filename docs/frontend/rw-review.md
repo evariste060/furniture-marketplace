@@ -6,7 +6,7 @@ Every Kinyarwanda string on the storefront is a **draft** until a native speaker
 or "OK" in the last column (or in a review comment) and the developer updates `messages/rw.json`. Banner text comes from
 the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the admin, not here.
 
-1224 strings.
+1263 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -724,6 +724,7 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.account.nav.addresses` | Addresses | Aderesi | |
 | `store.account.nav.profile` | Profile & security | Umwirondoro n'umutekano | |
 | `store.account.nav.logout` | Log out | Sohoka | |
+| `store.account.nav.seller` | Sell with us | Curuza natwe | |
 | `store.account.overviewMeta` | My account | Konti yanjye | |
 | `store.account.hello` | Hello, {name} | Muraho, {name} | |
 | `store.account.overviewText` | Here’s what’s happening with your orders. | Dore uko ibyo watumije bihagaze. | |
@@ -833,6 +834,44 @@ the API (`title`, `subtitle`, `cta_label` in `{en, rw}`) and is reviewed in the 
 | `store.account.setPasswordText` | Your account was created with Google and has no password yet. To also sign in with a password, request a reset code and choose one. | Konti yawe yafunguwe ukoresheje Google kandi nta jambo ry'ibanga ifite. Kugira ngo unakoreshe ijambo ry'ibanga, saba kode yo kurihindura maze uhitemo irishya. | |
 | `store.account.setPassword` | Set a password | Shyiraho ijambo ry'ibanga | |
 | `store.account.googleWelcome` | Welcome! Your account was created with Google. | Murakaza neza! Konti yawe yafunguwe ukoresheje Google. | |
+| `store.account.seller.nav` | Sell with us | Curuza natwe | |
+| `store.account.seller.title` | Sell with us | Curuza natwe | |
+| `store.account.seller.intro` | Open a store on the marketplace: tell us about your shop, and an administrator reviews your application. | Fungura iduka ku rubuga: tubwire ibyerekeye iduka ryawe, umuyobozi asuzume ubusabe bwawe. | |
+| `store.account.seller.statusLabel` | Application status | Aho ubusabe bugeze | |
+| `store.account.seller.status.pending` | Under review | Buri gusuzumwa | |
+| `store.account.seller.status.approved` | Approved | Bwemejwe | |
+| `store.account.seller.status.rejected` | Needs changes | Bukeneye guhindurwa | |
+| `store.account.seller.status.suspended` | Suspended | Ryahagaritswe | |
+| `store.account.seller.statusText.pending` | We received your application for {store}. We’ll email you when it’s decided. You can still edit it. | Twakiriye ubusabe bwa {store}. Tuzakoherereza email igihe byemejwe. Uracyashobora kubuhindura. | |
+| `store.account.seller.statusText.approved` | {store} is approved. Manage your products, stock and orders from the seller dashboard. | {store} ryemejwe. Cunga ibicuruzwa byawe, ububiko n'amatumiza unyuze mu buyobozi bw'umucuruzi. | |
+| `store.account.seller.statusText.rejected` | {store} was not approved yet. Update your application and send it again. | {store} ntiriremezwa. Hindura ubusabe bwawe hanyuma wongere ubwohereze. | |
+| `store.account.seller.statusText.suspended` | {store} is suspended, so its products are hidden. Contact the marketplace for help. | {store} ryarahagaritswe, bityo ibicuruzwa byaryo byarahishwe. Vugana n'urubuga kugira ngo ufashwe. | |
+| `store.account.seller.reason` | Reason: {reason} | Impamvu: {reason} | |
+| `store.account.seller.openDashboard` | Open the seller dashboard | Fungura ubuyobozi bw'umucuruzi | |
+| `store.account.seller.formTitle` | Your store | Iduka ryawe | |
+| `store.account.seller.name` | Store name | Izina ry'iduka | |
+| `store.account.seller.nameHelp` | Shown to customers. It must be unique on the marketplace. | Rigaragarira abakiriya. Rigomba kuba ridasanzwe ku rubuga. | |
+| `store.account.seller.about` | Description | Igisobanuro | |
+| `store.account.seller.email` | Contact email | Email yo kuvuganirwaho | |
+| `store.account.seller.phone` | Contact phone | Telefoni yo kuvuganirwaho | |
+| `store.account.seller.district` | District | Akarere | |
+| `store.account.seller.sector` | Sector | Umurenge | |
+| `store.account.seller.street` | Street address | Aderesi y'umuhanda | |
+| `store.account.seller.optional` | (optional) | (si ngombwa) | |
+| `store.account.seller.submit` | Send application | Ohereza ubusabe | |
+| `store.account.seller.resubmit` | Send again | Ongera wohereze | |
+| `store.account.seller.save` | Save changes | Bika impinduka | |
+| `store.account.seller.sent` | Application sent. We’ll email you when it’s reviewed. | Ubusabe bwoherejwe. Tuzakoherereza email bumaze gusuzumwa. | |
+| `store.account.seller.saved` | Application saved | Ubusabe bwabitswe | |
+| `store.account.seller.verifyFirst` | Verify your email address before applying. We can send you a new verification link. | Banza wemeze aderesi ya email yawe mbere yo gusaba. Dushobora kukoherereza indi link yo kwemeza. | |
+| `store.account.seller.errors.name` | Enter a store name of 2 to 120 characters. | Andika izina ry'iduka rifite inyuguti 2 kugeza ku 120. | |
+| `store.account.seller.errors.nameTaken` | Another store already uses this name. | Irindi duka risanzwe rikoresha iri zina. | |
+| `store.account.seller.errors.email` | Enter a valid email address. | Andika email yemewe. | |
+| `store.account.seller.errors.phone` | Enter a Rwandan mobile number, for example 0788 123 456. | Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456. | |
+| `store.account.seller.errors.district` | Enter your district. | Andika akarere kawe. | |
+| `store.account.seller.errors.closed` | This application can no longer be changed. | Ubu busabe ntibugishobora guhindurwa. | |
+| `store.account.seller.errors.exists` | You already have a store. | Usanzwe ufite iduka. | |
+| `store.account.seller.errors.failed` | We couldn’t send your application. Try again. | Ntitwashoboye kohereza ubusabe bwawe. Ongera ugerageze. | |
 | `store.orderInfo.status.received` | Received | Ryakiriwe | |
 | `store.orderInfo.status.confirmed` | Confirmed | Ryemejwe | |
 | `store.orderInfo.status.processing` | Packing | Riri gupakirwa | |

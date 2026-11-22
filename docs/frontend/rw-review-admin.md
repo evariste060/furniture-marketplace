@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1403 strings.
+1557 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -1414,3 +1414,157 @@ updates `messages/admin.rw.json`.
 | `inbox.customerDelivery` | Customer and delivery | Umukiriya n'aho bigezwa | |
 | `inbox.zone` | Delivery zone | Agace ko kugezamo | |
 | `inbox.customerNote` | Customer note | Icyo umukiriya yanditse | |
+| `seller.shell.panel` | Seller dashboard | Ubuyobozi bw'umucuruzi | |
+| `seller.shell.home` | Seller dashboard — overview | Ubuyobozi bw'umucuruzi — incamake | |
+| `seller.shell.navLabel` | Seller dashboard | Ubuyobozi bw'umucuruzi | |
+| `seller.shell.owner` | Store owner | Nyir'iduka | |
+| `seller.shell.groups.overview` | Overview | Incamake | |
+| `seller.shell.groups.sales` | Sales | Ibicuruzwa byagurishijwe | |
+| `seller.shell.groups.catalogue` | Catalogue | Ibicuruzwa | |
+| `seller.shell.groups.store` | Store | Iduka | |
+| `seller.shell.nav.dashboard` | Dashboard | Imbonerahamwe | |
+| `seller.shell.nav.orders` | Orders | Amatumiza | |
+| `seller.shell.nav.products` | Products | Ibicuruzwa | |
+| `seller.shell.nav.inventory` | Inventory | Ububiko | |
+| `seller.shell.nav.store` | Store profile | Umwirondoro w'iduka | |
+| `seller.titles.suffix` | Seller dashboard | Ubuyobozi bw'umucuruzi | |
+| `seller.titles.dashboard` | Dashboard | Imbonerahamwe | |
+| `seller.titles.orders` | Orders | Amatumiza | |
+| `seller.titles.order` | Order | Itumiza | |
+| `seller.titles.products` | Products | Ibicuruzwa | |
+| `seller.titles.newProduct` | New product | Igicuruzwa gishya | |
+| `seller.titles.product` | Product | Igicuruzwa | |
+| `seller.titles.inventory` | Inventory | Ububiko | |
+| `seller.titles.store` | Store profile | Umwirondoro w'iduka | |
+| `seller.gate.staffTitle` | Staff accounts can’t sell | Konti z'abakozi ntizicuruza | |
+| `seller.gate.staffBody` | You’re signed in with a staff account. Stores belong to customer accounts; use the admin for platform work. | Winjiye ukoresheje konti y'umukozi. Amaduka ni ay'abakiriya; koresha ubuyobozi ku mirimo y'urubuga. | |
+| `seller.gate.toAdmin` | Go to the admin | Jya mu buyobozi | |
+| `seller.gate.noStoreTitle` | You don’t have a store yet | Nta duka urafungura | |
+| `seller.gate.noStoreBody` | Apply to sell from your account. Once an administrator approves your store, this dashboard opens. | Saba gucuruza unyuze kuri konti yawe. Umuyobozi namara kwemeza iduka ryawe, ubu buyobozi buzafunguka. | |
+| `seller.gate.apply` | Apply to sell | Saba gucuruza | |
+| `seller.gate.pendingTitle` | Your application is being reviewed | Ubusabe bwawe buri gusuzumwa | |
+| `seller.gate.pendingBody` | An administrator is reviewing {store}. We’ll email you when it’s decided. | Umuyobozi ari gusuzuma {store}. Tuzakoherereza email igihe byemejwe. | |
+| `seller.gate.rejectedTitle` | Your application needs changes | Ubusabe bwawe bukeneye guhindurwa | |
+| `seller.gate.rejectedBody` | {store} was not approved yet. Update your application and send it again. | {store} ntiriremezwa. Hindura ubusabe bwawe hanyuma wongere ubwohereze. | |
+| `seller.gate.suspendedTitle` | Your store is suspended | Iduka ryawe ryarahagaritswe | |
+| `seller.gate.suspendedBody` | {store} is suspended, so its products are hidden and this dashboard is closed. Contact the marketplace for help. | {store} ryarahagaritswe, bityo ibicuruzwa byaryo byarahishwe kandi ubu buyobozi bwarafunzwe. Vugana n'urubuga kugira ngo ufashwe. | |
+| `seller.gate.reason` | Reason: {reason} | Impamvu: {reason} | |
+| `seller.gate.toApplication` | See my application | Reba ubusabe bwanjye | |
+| `seller.gate.toShop` | Go to the store | Jya mu iduka | |
+| `seller.dashboard.title` | Welcome, {name} | Murakaza neza, {name} | |
+| `seller.dashboard.titleNoName` | Welcome | Murakaza neza | |
+| `seller.dashboard.description` | How {store} is doing, and what needs your attention. | Uko {store} rihagaze, n'ibikeneye ko ubyitaho. | |
+| `seller.dashboard.toConfirm` | Orders to confirm | Amatumiza yo kwemeza | |
+| `seller.dashboard.toConfirmHint` | Confirm them so the customer’s order can go ahead. | Yemeze kugira ngo itumiza ry'umukiriya rikomeze. | |
+| `seller.dashboard.toShip` | Orders to pack or dispatch | Amatumiza yo gupakira cyangwa kohereza | |
+| `seller.dashboard.toShipHint` | Confirmed orders that haven’t left your store yet. | Amatumiza yemejwe ataravuye mu iduka ryawe. | |
+| `seller.dashboard.lowStock` | Low-stock SKUs | SKU zisigaye nke | |
+| `seller.dashboard.lowStockHint` | At or below their alert level. | Zageze cyangwa ziri munsi y'urwego rwo kuburira. | |
+| `seller.dashboard.pending` | Pending earnings | Amafaranga ategerejwe | |
+| `seller.dashboard.pendingHint` | Confirmed orders not yet delivered and paid. | Amatumiza yemejwe ataragezwa kandi ataranishyurwa. | |
+| `seller.dashboard.earned` | Earned | Ayinjijwe | |
+| `seller.dashboard.earnedHint` | Delivered and paid orders. Payouts are not part of the dashboard yet. | Amatumiza yagejejwe kandi yishyuwe. Kwishyura abacuruzi ntibiri muri ubu buyobozi kugeza ubu. | |
+| `seller.dashboard.orders` | {count, plural, one {# order} other {# orders}} | {count, plural, one {itumiza #} other {amatumiza #}} | |
+| `seller.dashboard.merchandise` | Goods | Ibicuruzwa | |
+| `seller.dashboard.commission` | Commission | Komisiyo | |
+| `seller.dashboard.net` | Your share | Umugabane wawe | |
+| `seller.dashboard.recent` | Recent orders | Amatumiza aheruka | |
+| `seller.dashboard.viewAll` | View all orders | Reba amatumiza yose | |
+| `seller.dashboard.noOrders` | No orders yet. They appear here when customers buy your products. | Nta matumiza arahari. Azagaragara hano abakiriya nibagura ibicuruzwa byawe. | |
+| `seller.dashboard.commissionRate` | Your commission rate is {rate}%, charged on goods after discounts. Delivery fees are not included. | Komisiyo yawe ni {rate}%, ibarwa ku bicuruzwa nyuma y'igabanywa. Amafaranga yo kugeza ntabarirwamo. | |
+| `seller.orders.title` | Orders | Amatumiza | |
+| `seller.orders.description` | Your store’s part of each order. Cash-on-delivery orders appear when they’re placed, mobile-money orders once they’re paid. | Igice cy'iduka ryawe muri buri tumiza. Amatumiza yishyurwa bagejejweho agaragara akimara gukorwa, ayishyurwa na mobile money amaze kwishyurwa. | |
+| `seller.orders.searchLabel` | Search orders | Shakisha amatumiza | |
+| `seller.orders.searchPlaceholder` | Order number | Nimero y'itumiza | |
+| `seller.orders.statusLabel` | Your status | Aho ugeze | |
+| `seller.orders.allStatuses` | All statuses | Aho bigeze hose | |
+| `seller.orders.count` | {count, plural, one {# order} other {# orders}} | {count, plural, one {itumiza #} other {amatumiza #}} | |
+| `seller.orders.empty` | No orders yet. | Nta matumiza arahari. | |
+| `seller.orders.emptyFiltered` | No orders match these filters. | Nta matumiza ahuye n'ibi byatoranyijwe. | |
+| `seller.orders.columns.order` | Order | Itumiza | |
+| `seller.orders.columns.placed` | Placed | Ryakozwe | |
+| `seller.orders.columns.recipient` | Recipient | Uwakira | |
+| `seller.orders.columns.units` | Items | Ibintu | |
+| `seller.orders.columns.goods` | Goods | Ibicuruzwa | |
+| `seller.orders.columns.net` | Your share | Umugabane wawe | |
+| `seller.orders.columns.payment` | Payment | Ubwishyu | |
+| `seller.orders.columns.status` | Your status | Aho ugeze | |
+| `seller.orders.columns.orderStatus` | Whole order | Itumiza ryose | |
+| `seller.orders.open` | Open order {number} | Fungura itumiza {number} | |
+| `seller.order.back` | Back to orders | Subira ku matumiza | |
+| `seller.order.notFound` | We couldn’t find this order in your store. | Ntitwabonye iri tumiza mu iduka ryawe. | |
+| `seller.order.placed` | Placed {date} | Ryakozwe {date} | |
+| `seller.order.items` | Your items | Ibintu byawe | |
+| `seller.order.columns.product` | Product | Igicuruzwa | |
+| `seller.order.columns.sku` | SKU | SKU | |
+| `seller.order.columns.quantity` | Qty | Umubare | |
+| `seller.order.columns.price` | Price | Igiciro | |
+| `seller.order.columns.discount` | Discount | Igabanywa | |
+| `seller.order.columns.total` | Total | Igiteranyo | |
+| `seller.order.money.subtotal` | Subtotal | Igiteranyo gito | |
+| `seller.order.money.discount` | Your share of the discount | Umugabane wawe w'igabanywa | |
+| `seller.order.money.goods` | Goods | Ibicuruzwa | |
+| `seller.order.money.commission` | Commission ({rate}%) | Komisiyo ({rate}%) | |
+| `seller.order.money.net` | Your share | Umugabane wawe | |
+| `seller.order.deliverTo` | Deliver to | Bigezwe kuri | |
+| `seller.order.phone` | Phone | Telefoni | |
+| `seller.order.zone` | Delivery zone | Agace ko kugezamo | |
+| `seller.order.instructions` | Instructions | Amabwiriza | |
+| `seller.order.payment` | Payment | Ubwishyu | |
+| `seller.order.wholeOrder` | Whole order | Itumiza ryose | |
+| `seller.order.wholeOrderHint` | Other stores may have items in this order. The order moves on when every store has done the same step. | Andi maduka ashobora kugira ibintu muri iri tumiza. Itumiza rikomeza iyo buri duka rimaze gukora intambwe imwe. | |
+| `seller.order.history` | History | Amateka | |
+| `seller.order.nextStep` | Next step | Intambwe ikurikira | |
+| `seller.order.action.confirmed` | Confirm order | Emeza itumiza | |
+| `seller.order.action.processing` | Start packing | Tangira gupakira | |
+| `seller.order.action.dispatched` | Mark as dispatched | Shyira ko ryoherejwe | |
+| `seller.order.action.delivered` | Mark as delivered | Shyira ko ryagejejwe | |
+| `seller.order.hint.pending` | Confirm that you can supply these items. | Emeza ko ushobora gutanga ibi bintu. | |
+| `seller.order.hint.confirmed` | Start packing once every store in the order has confirmed. | Tangira gupakira buri duka riri muri iri tumiza rimaze kwemeza. | |
+| `seller.order.hint.processing` | Mark it dispatched when the parcel leaves your store. This takes the items out of your stock. | Shyira ko ryoherejwe igipfunyika nikiva mu iduka ryawe. Ibi bikura ibintu mu bubiko bwawe. | |
+| `seller.order.hint.dispatched` | Mark it delivered once the customer has received it. | Shyira ko ryagejejwe umukiriya amaze kuryakira. | |
+| `seller.order.hint.delivered` | Delivered. Nothing more to do. | Ryagejejwe. Nta kindi gisigaye. | |
+| `seller.order.hint.cancelled` | This order was cancelled. | Iri tumiza ryahagaritswe. | |
+| `seller.order.confirmTitle` | {action}? | {action}? | |
+| `seller.order.confirmBody` | Order {number}. This step can’t be undone. | Itumiza {number}. Iyi ntambwe ntisubirwamo. | |
+| `seller.order.reasonLabel` | Note | Icyitonderwa | |
+| `seller.order.reasonHelp` | Kept in the order’s history. | Kibikwa mu mateka y'itumiza. | |
+| `seller.order.moved` | Order {number}: {status} | Itumiza {number}: {status} | |
+| `seller.order.errors.awaitingPayment` | This order isn’t paid yet, so it can’t be confirmed. | Iri tumiza ntiriranishyurwa, bityo ntirishobora kwemezwa. | |
+| `seller.order.errors.awaitingOtherStores` | Waiting for the other stores in this order to confirm. | Turategereje ko andi maduka ari muri iri tumiza yemeza. | |
+| `seller.order.errors.invalid` | This step is no longer possible because the order changed. It has been refreshed. | Iyi ntambwe ntigishobotse kuko itumiza ryahindutse. Ryavuguruwe. | |
+| `seller.order.errors.inventory` | Your stock for these items doesn’t match the order. Check Inventory and try again. | Ububiko bwawe bw'ibi bintu ntibuhuye n'itumiza. Reba Ububiko hanyuma wongere ugerageze. | |
+| `seller.order.errors.failed` | We couldn’t update this order. Try again. | Ntitwashoboye kuvugurura iri tumiza. Ongera ugerageze. | |
+| `seller.products.description` | Your store’s products, drafts included. Customers see active products of approved stores only. | Ibicuruzwa by'iduka ryawe, harimo n'ibitararangira. Abakiriya babona gusa ibicuruzwa bikora by'amaduka yemejwe. | |
+| `seller.products.new` | New product | Igicuruzwa gishya | |
+| `seller.store.title` | Store profile | Umwirondoro w'iduka | |
+| `seller.store.description` | What customers see on your public store page. Contact details and the street address are for the marketplace only. | Ibyo abakiriya babona ku rupapuro rw'iduka ryawe. Aho bakuvugisha n'aderesi y'umuhanda ni iby'urubuga gusa. | |
+| `seller.store.details` | Details | Ibisobanuro | |
+| `seller.store.name` | Store name | Izina ry'iduka | |
+| `seller.store.about` | Description | Igisobanuro | |
+| `seller.store.contact` | Contact | Aho bakuvugisha | |
+| `seller.store.email` | Contact email | Email yo kuvuganirwaho | |
+| `seller.store.phone` | Contact phone | Telefoni yo kuvuganirwaho | |
+| `seller.store.location` | Location | Aho riherereye | |
+| `seller.store.district` | District | Akarere | |
+| `seller.store.sector` | Sector | Umurenge | |
+| `seller.store.street` | Street address | Aderesi y'umuhanda | |
+| `seller.store.images` | Logo and cover | Ikirango n'ifoto yo hejuru | |
+| `seller.store.logo` | Logo | Ikirango | |
+| `seller.store.cover` | Cover image | Ifoto yo hejuru | |
+| `seller.store.imageHelp` | JPEG, PNG or WebP, at most 5 MB. | JPEG, PNG cyangwa WebP, itarenze MB 5. | |
+| `seller.store.upload` | Upload | Ohereza | |
+| `seller.store.replace` | Replace | Simbuza | |
+| `seller.store.remove` | Remove | Kuraho | |
+| `seller.store.uploading` | Uploading… | Birimo koherezwa… | |
+| `seller.store.imageSaved` | Image saved | Ifoto yabitswe | |
+| `seller.store.imageRemoved` | Image removed | Ifoto yakuweho | |
+| `seller.store.imageFailed` | We couldn’t save this image. Use a JPEG, PNG or WebP of at most 5 MB. | Ntitwashoboye kubika iyi foto. Koresha JPEG, PNG cyangwa WebP itarenze MB 5. | |
+| `seller.store.noImage` | No image yet | Nta foto irashyirwaho | |
+| `seller.store.commission` | Commission | Komisiyo | |
+| `seller.store.commissionRate` | {rate}% of goods after discounts, set by the marketplace. | {rate}% by'ibicuruzwa nyuma y'igabanywa, bishyirwaho n'urubuga. | |
+| `seller.store.errors.name` | Enter a store name of 2 to 120 characters. | Andika izina ry'iduka rifite inyuguti 2 kugeza ku 120. | |
+| `seller.store.errors.nameTaken` | Another store already uses this name. | Irindi duka risanzwe rikoresha iri zina. | |
+| `seller.store.errors.email` | Enter a valid email address. | Andika email yemewe. | |
+| `seller.store.errors.phone` | Enter a Rwandan mobile number, for example 0788 123 456. | Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456. | |
+| `seller.store.errors.district` | Enter your district. | Andika akarere kawe. | |

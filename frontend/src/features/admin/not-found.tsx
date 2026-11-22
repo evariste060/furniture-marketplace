@@ -5,7 +5,7 @@ import { buttonClasses } from "@/components/ui/button";
 
 /** An unknown admin address, or an order or product that does not exist, in the AccessDenied
  * card layout (the admin has no design of its own for this). */
-export async function AdminNotFound() {
+export async function AdminNotFound({ home = "/admin" }: { home?: string }) {
   const t = await getTranslations("admin.missing");
   return (
     <div className="flex justify-center pt-24 max-md:pt-8">
@@ -15,7 +15,7 @@ export async function AdminNotFound() {
         </span>
         <h1 className="t-h2">{t("title")}</h1>
         <p className="text-tx2">{t("body")}</p>
-        <NextLink href="/admin" className={buttonClasses({ variant: "primary" })}>
+        <NextLink href={home} className={buttonClasses({ variant: "primary" })}>
           <House size={16} aria-hidden="true" />
           {t("back")}
         </NextLink>
