@@ -4,7 +4,7 @@ SC-05 (approved by the project owner on 2026-11-21): FurniHub is a multi-vendor 
 the only staff role is the Marketplace Administrator (stored as 'administrator'). The sales,
 operations, management and finance roles of the original single-business shop are removed; the
 fine-grained permissions below stay, every staff route still requires one, and the administrator
-holds them all. Sellers are store owners, not staff, and hold none (ADR-014).
+held them all until SC-06 (below). Sellers are store owners, not staff, and hold none (ADR-014).
 
 The staff role comes from staff_role_assignments and only counts when users.is_staff is true.
 Each staff user holds exactly one role (unique per user in the database). A user with no
@@ -46,6 +46,15 @@ seller applications, stores and their owners' contact details. Administrator onl
 other staff role receives them. Sellers are store owners, not staff: they hold no permission
 here, and their access is scoped to their own approved store (app.core.dependencies
 require_approved_seller).
+
+SC-06 (approved by the project owner on 2026-11-22, ADR-014 phase 7): the administrator runs the
+marketplace, not the stores. Store operations belong to sellers, so the administrator no longer
+holds orders:read, orders:fulfil (whole-order cancellation included), payments:read,
+payments:manage, inventory:read, inventory:adjust or the new catalog:edit (a product's content,
+variants and images, bulk images, bulk activation and the catalogue import). These stay declared
+and their routes stay in place, held by no role in V1: granting one again is a recorded scope
+change. catalog:manage now covers the shared catalogue (categories, brands) and product
+moderation (status and the featured flag) only.
 """
 
 from enum import StrEnum
@@ -71,6 +80,9 @@ class Permission(StrEnum):
     # categories, brands (module 5), products, variants (6), images (7), imports (8)
     CATALOG_MANAGE = "catalog:manage"
     CATALOG_READ = "catalog:read"  # staff product list and detail, drafts included (2026-10-26)
+    # A product's content, variants and images, bulk images, bulk activation and the catalogue
+    # import (SC-06, 2026-11-22). Held by no role in V1: sellers edit their own products.
+    CATALOG_EDIT = "catalog:edit"
     # Delivery zones, fees and settings (module 12; RE-026 B6)
     DELIVERY_READ = "delivery:read"  # view zones, fees and fee history
     DELIVERY_MANAGE = "delivery:manage"  # create and edit zones, change fees
@@ -113,9 +125,23 @@ StaffRoleName = Literal["administrator"]
 STAFF_ROLE_NAMES: tuple[StaffRoleName, ...] = ("administrator",)
 STAFF_ROLES = frozenset(STAFF_ROLE_NAMES)
 
+# Declared permissions that no role holds in V1 (SC-06): store operations are the sellers'.
+UNASSIGNED_PERMISSIONS: frozenset[str] = frozenset(
+    p.value
+    for p in (
+        Permission.ORDER_READ,
+        Permission.ORDER_FULFIL,
+        Permission.PAYMENTS_READ,
+        Permission.PAYMENTS_MANAGE,
+        Permission.INVENTORY_READ,
+        Permission.INVENTORY_ADJUST,
+        Permission.CATALOG_EDIT,
+    )
+)
+
 ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
     Role.CUSTOMER.value: frozenset(),
-    Role.ADMINISTRATOR.value: frozenset(p.value for p in Permission),
+    Role.ADMINISTRATOR.value: frozenset(p.value for p in Permission) - UNASSIGNED_PERMISSIONS,
 }
 
 

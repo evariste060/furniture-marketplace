@@ -12,9 +12,9 @@ def test_root_answers_200_with_the_service_information():
     response = client.get("/")
     assert response.status_code == 200
     body = response.json()
-    assert body["service"] == "3 Sixty Technologies API"
+    assert body["service"] == "FurniHub API"
     assert body["status"] == "ok"
-    assert body["message"] == "Welcome to the 3 Sixty Technologies API."
+    assert body["message"] == "Welcome to the FurniHub API."
 
 
 def test_root_links_to_the_health_and_documentation_endpoints():

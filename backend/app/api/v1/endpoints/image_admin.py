@@ -1,6 +1,6 @@
 """Staff product image management (module 7).
 
-Every route requires 'catalog:manage' (administrator). Rules, file handling and
+Every route requires 'catalog:edit', held by no role in V1 (SC-06). Rules, file handling and
 concurrency are in app.services.image_admin; validation and the public source in
 app.services.image_processing (ADR-009). Public image URLs appear in the catalogue product
 responses.
@@ -68,7 +68,7 @@ GUARDED: ResponseMap = {
         **_examples(
             role=(
                 "permission_denied",
-                "Access forbidden: requires 'catalog:manage' permission.",
+                "Access forbidden: requires 'catalog:edit' permission.",
                 None,
             )
         ),
@@ -161,12 +161,12 @@ UPDATE_422: ResponseMap = {
     }
 }
 
-CatalogManager = Annotated[User, Depends(require_permission(Permission.CATALOG_MANAGE))]
+CatalogEditor = Annotated[User, Depends(require_permission(Permission.CATALOG_EDIT))]
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 Storage = Annotated[MediaStorage, Depends(get_media_storage)]
 
-PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
+PERMISSION_NOTE = "Requires 'catalog:edit' (held by no role in V1, SC-06)."
 
 
 def image_response(image: ProductImage, storage: MediaStorage) -> ImageResponse:
@@ -205,7 +205,7 @@ def image_response(image: ProductImage, storage: MediaStorage) -> ImageResponse:
 def upload_image(
     product_id: uuid.UUID,
     file: Annotated[UploadFile, File(description="JPEG, PNG or WebP, at most 5 MB")],
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     ctx: Ctx,
     storage: Storage,
@@ -254,7 +254,7 @@ ORDER_422: ResponseMap = {
 def reorder_images(
     product_id: uuid.UUID,
     req: ImageOrderRequest,
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     storage: Storage,
     ctx: Ctx,
@@ -277,7 +277,7 @@ def reorder_images(
 def update_image(
     image_id: uuid.UUID,
     req: Annotated[ImageUpdateRequest, Body(openapi_examples=UPDATE_EXAMPLES)],
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     storage: Storage,
     ctx: Ctx,
@@ -298,6 +298,6 @@ def update_image(
     ),
     responses={**GUARDED, **IMAGE_404, **DELETE_422},
 )
-def delete_image(image_id: uuid.UUID, current_user: CatalogManager, db: Db, ctx: Ctx):
+def delete_image(image_id: uuid.UUID, current_user: CatalogEditor, db: Db, ctx: Ctx):
     ImageAdminService.delete(db, current_user, image_id, ctx, scope=PLATFORM)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

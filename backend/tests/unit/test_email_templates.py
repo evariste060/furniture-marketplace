@@ -87,7 +87,7 @@ def test_payment_welcome_quote_and_review_messages():
     paid = tpl.payment_succeeded(summary(), 2_502_000, "mtn_momo", LINK)
     assert "RWF 2,502,000 by MTN Mobile Money" in paid.text
     welcome = tpl.welcome("Aline", tpl.Link("Start shopping", "https://shop.example.rw/products"))
-    assert welcome.subject == "Welcome to 3 Sixty Technologies" and "Aline" in welcome.text
+    assert welcome.subject == "Welcome to FurniHub" and "Aline" in welcome.text
     quote = tpl.quote_received("Q-261102-ABCD", "Jean", "Acme Ltd", [("Laptop", 10)], None)
     assert "Q-261102-ABCD" in quote.text and "Laptop: qty 10" in quote.text
     review = tpl.review_thanks("Aline U.", "AirPods Pro", None)
@@ -162,7 +162,7 @@ def test_pending_templates_render_but_are_not_events():
 def test_the_email_verification_message():
     link = tpl.Link("Confirm my email", "https://shop.example.rw/verify-email#token=abc")
     message = tpl.email_verification("Aline", link, 24)
-    assert message.subject == "Confirm your email address for 3 Sixty Technologies"
+    assert message.subject == "Confirm your email address for FurniHub"
     assert (
         "Hi Aline" in message.text and "because this address was used to register" in message.text
     )

@@ -16,6 +16,10 @@ from tests.integration.test_checkout_api import (  # noqa: F401 (delivery is a f
 )
 from tests.support.sellers import new_store
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 ORDERS = "/api/v1/staff/orders"
 STAFF = "/api/v1/staff"
 

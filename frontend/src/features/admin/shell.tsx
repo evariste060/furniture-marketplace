@@ -1,20 +1,54 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Bell, CheckCheck, ChevronRight, ClipboardList, Headset, MessageSquare, Search, ShoppingBag, Wrench, type LucideIcon } from "lucide-react";
+import {
+  Bell,
+  CheckCheck,
+  ChevronRight,
+  ClipboardList,
+  Headset,
+  MessageSquare,
+  Search,
+  Store,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import NextLink from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { browserApi } from "@/lib/api/client";
 import { cx } from "@/lib/cx";
-import { StaffAccessProvider, useStaffAccess, type ClientStaffAccess } from "./access";
+import {
+  StaffAccessProvider,
+  useStaffAccess,
+  type ClientStaffAccess,
+} from "./access";
 import { activeNav, canOpen, NAV, type NavKey } from "./nav";
-import { PanelShell, POPUP, TOP_BUTTON, useDismiss, type PanelGroup } from "./panel-shell";
+import {
+  PanelShell,
+  POPUP,
+  TOP_BUTTON,
+  useDismiss,
+  type PanelGroup,
+} from "./panel-shell";
 
 /** AdminSidebar.dc.html + AdminTopbar.dc.html around every admin page, in the frame the seller
  * dashboard shares (panel-shell.tsx). */
-export function AdminShell({ access, children }: { access: ClientStaffAccess; children: ReactNode }) {
+export function AdminShell({
+  access,
+  children,
+}: {
+  access: ClientStaffAccess;
+  children: ReactNode;
+}) {
   return (
     <StaffAccessProvider access={access}>
       <AdminFrame>{children}</AdminFrame>
@@ -33,7 +67,14 @@ function AdminFrame({ children }: { children: ReactNode }) {
     label: t(`groups.${group}`),
     links: items
       .filter((item) => canOpen(access.permissions, item.anyOf))
-      .map(({ key, href, Icon }) => ({ key, href, Icon, label: t(`nav.${key}`), count: counts[key], active: key === active })),
+      .map(({ key, href, Icon }) => ({
+        key,
+        href,
+        Icon,
+        label: t(`nav.${key}`),
+        count: counts[key],
+        active: key === active,
+      })),
   }));
   return (
     <PanelShell
@@ -53,16 +94,6 @@ function AdminFrame({ children }: { children: ReactNode }) {
 
 function useNavCounts(): Partial<Record<NavKey, number>> {
   const { can } = useStaffAccess();
-  const orders = useQuery({
-    queryKey: ["admin", "count", "orders-received"],
-    enabled: can("orders:read"),
-    queryFn: async () =>
-      (
-        await browserApi.GET("/api/v1/staff/orders", {
-          params: { query: { status: "received", size: 1 } },
-        })
-      ).data?.total ?? 0,
-  });
   const reviews = useQuery({
     queryKey: ["admin", "count", "reviews-pending"],
     enabled: can("reviews:moderate"),
@@ -113,18 +144,21 @@ function useNavCounts(): Partial<Record<NavKey, number>> {
         })
       ).data?.total ?? 0,
   });
-  return { sellers: sellers.data, orders: orders.data, reviews: reviews.data, quotes: quotes.data, serviceRequests: serviceRequests.data, messages: messages.data };
+  return {
+    sellers: sellers.data,
+    reviews: reviews.data,
+    quotes: quotes.data,
+    serviceRequests: serviceRequests.data,
+    messages: messages.data,
+  };
 }
 
-/** Orders by number or phone, otherwise products by name, model or SKU (the API's own searches). */
+/** Products by name, model or SKU across the stores (the API's own search). SC-06: orders are the
+ * sellers', so the admin search no longer opens them. */
 export function adminSearchTarget(query: string): string | null {
   const q = query.trim();
   if (!q) return null;
-  const digits = q.replace(/[\s()-]/g, "");
-  const isPhone = /^(\+?250|0)7\d{8}$/.test(digits);
-  const isOrder = /^ORD-/i.test(q) || /^\d{6}-[A-Z0-9]{1,6}$/i.test(q);
-  const params = new URLSearchParams({ q });
-  return isPhone || isOrder ? `/admin/orders?${params}` : `/admin/products?${params}`;
+  return `/admin/products?${new URLSearchParams({ q })}`;
 }
 
 /** AdminTopbar.dc.html's search (Ctrl+K). */
@@ -164,7 +198,10 @@ function AdminSearch() {
         placeholder={t("searchPlaceholder")}
         className="min-w-0 flex-1 border-0 bg-transparent text-sm text-tx outline-none placeholder:text-tx2"
       />
-      <span aria-hidden="true" className="rounded-md border border-bd bg-white px-1.5 py-0.5 text-cap font-medium text-tx2 shadow-sh max-sm:hidden">
+      <span
+        aria-hidden="true"
+        className="rounded-md border border-bd bg-white px-1.5 py-0.5 text-cap font-medium text-tx2 shadow-sh max-sm:hidden"
+      >
         {t("searchShortcut")}
       </span>
     </form>
@@ -172,13 +209,44 @@ function AdminSearch() {
 }
 
 /** What can be waiting for the signed-in staff member, from the same counts as the sidebar's
- * badges (so only the areas their role can open). */
-const WAITING: { key: "orders" | "messages" | "quotes" | "serviceRequests" | "reviews"; href: string; Icon: LucideIcon; tone: string }[] = [
-  { key: "orders", href: "/admin/orders?status=received", Icon: ShoppingBag, tone: "bg-light text-pri" },
-  { key: "messages", href: "/admin/messages", Icon: Headset, tone: "bg-warn-bg text-warn-tx" },
-  { key: "quotes", href: "/admin/quotes", Icon: ClipboardList, tone: "bg-ok-bg text-ok-tx" },
-  { key: "serviceRequests", href: "/admin/service-requests?status=new", Icon: Wrench, tone: "bg-light text-pri-h" },
-  { key: "reviews", href: "/admin/reviews", Icon: MessageSquare, tone: "bg-pur-bg text-pur" },
+ * badges (so only the areas their role can open). SC-06: marketplace decisions and platform
+ * support only; store operations such as new orders are the sellers'. */
+const WAITING: {
+  key: "sellers" | "messages" | "quotes" | "serviceRequests" | "reviews";
+  href: string;
+  Icon: LucideIcon;
+  tone: string;
+}[] = [
+  {
+    key: "sellers",
+    href: "/admin/sellers?status=pending",
+    Icon: Store,
+    tone: "bg-light text-pri",
+  },
+  {
+    key: "messages",
+    href: "/admin/messages",
+    Icon: Headset,
+    tone: "bg-warn-bg text-warn-tx",
+  },
+  {
+    key: "quotes",
+    href: "/admin/quotes",
+    Icon: ClipboardList,
+    tone: "bg-ok-bg text-ok-tx",
+  },
+  {
+    key: "serviceRequests",
+    href: "/admin/service-requests?status=new",
+    Icon: Wrench,
+    tone: "bg-light text-pri-h",
+  },
+  {
+    key: "reviews",
+    href: "/admin/reviews",
+    Icon: MessageSquare,
+    tone: "bg-pur-bg text-pur",
+  },
 ];
 
 /** AdminTopbar.dc.html's bell: a red count of everything waiting, opening a list of links to it. */
@@ -197,7 +265,10 @@ function Notifications() {
     setOpen(false);
   }
   useDismiss(open, () => setOpen(false), box, button);
-  const items = WAITING.filter((w) => counts[w.key] !== undefined).map((w) => ({ ...w, count: counts[w.key] ?? 0 }));
+  const items = WAITING.filter((w) => counts[w.key] !== undefined).map((w) => ({
+    ...w,
+    count: counts[w.key] ?? 0,
+  }));
   const total = items.reduce((sum, w) => sum + w.count, 0);
   const waiting = items.filter((w) => w.count > 0);
 
@@ -210,23 +281,45 @@ function Notifications() {
         aria-controls={panelId}
         aria-label={t("notifications", { count: total })}
         onClick={() => setOpen((o) => !o)}
-        className={cx(TOP_BUTTON, "relative w-10 justify-center px-0 text-tx2 hover:text-tx")}
+        className={cx(
+          TOP_BUTTON,
+          "relative w-10 justify-center px-0 text-tx2 hover:text-tx",
+        )}
       >
         <Bell size={21} aria-hidden="true" />
         {total > 0 && (
-          <span aria-hidden="true" className="absolute top-0.5 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-err px-1 text-cap font-semibold text-white tabular-nums ring-2 ring-white">
+          <span
+            aria-hidden="true"
+            className="absolute top-0.5 right-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-err px-1 text-cap font-semibold text-white tabular-nums ring-2 ring-white"
+          >
             {total > 99 ? "99+" : total}
           </span>
         )}
       </button>
-      <div id={panelId} hidden={!open} role="region" aria-label={t("waitingTitle")} className={cx(POPUP, "w-[340px] max-w-[calc(100vw-32px)] flex-col overflow-hidden [&:not([hidden])]:flex")}>
+      <div
+        id={panelId}
+        hidden={!open}
+        role="region"
+        aria-label={t("waitingTitle")}
+        className={cx(
+          POPUP,
+          "w-[340px] max-w-[calc(100vw-32px)] flex-col overflow-hidden [&:not([hidden])]:flex",
+        )}
+      >
         <div className="flex items-center justify-between gap-3 border-b border-bd px-4 py-3">
           <b className="text-sm font-semibold">{t("waitingTitle")}</b>
-          {total > 0 && <span className="rounded-full bg-err-bg px-2 py-0.5 text-cap font-semibold text-err-tx tabular-nums">{t("newCount", { count: total })}</span>}
+          {total > 0 && (
+            <span className="rounded-full bg-err-bg px-2 py-0.5 text-cap font-semibold text-err-tx tabular-nums">
+              {t("newCount", { count: total })}
+            </span>
+          )}
         </div>
         {waiting.length === 0 ? (
           <div className="flex flex-col items-center gap-2.5 px-6 py-8 text-center">
-            <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-full bg-ok-bg text-ok-tx">
+            <span
+              aria-hidden="true"
+              className="flex size-11 items-center justify-center rounded-full bg-ok-bg text-ok-tx"
+            >
               <CheckCheck size={20} />
             </span>
             <p className="m-0 text-sm text-tx2">{t("waitingEmpty")}</p>
@@ -235,15 +328,31 @@ function Notifications() {
           <ul className="m-0 flex list-none flex-col p-1.5">
             {waiting.map(({ key, href, Icon, tone, count }) => (
               <li key={key}>
-                <NextLink href={href} onClick={() => setOpen(false)} className="group flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-tx no-underline hover:bg-page hover:text-tx">
-                  <span aria-hidden="true" className={cx("flex size-9 flex-none items-center justify-center rounded-lg", tone)}>
+                <NextLink
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className="group flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-tx no-underline hover:bg-page hover:text-tx"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cx(
+                      "flex size-9 flex-none items-center justify-center rounded-lg",
+                      tone,
+                    )}
+                  >
                     <Icon size={18} />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col">
-                    <b className="text-sm font-semibold">{t(`waiting.${key}`, { count })}</b>
+                    <b className="text-sm font-semibold">
+                      {t(`waiting.${key}`, { count })}
+                    </b>
                     <span className="text-cap text-tx2">{t(`nav.${key}`)}</span>
                   </span>
-                  <ChevronRight size={16} aria-hidden="true" className="flex-none text-bd2 group-hover:text-pri" />
+                  <ChevronRight
+                    size={16}
+                    aria-hidden="true"
+                    className="flex-none text-bd2 group-hover:text-pri"
+                  />
                 </NextLink>
               </li>
             ))}

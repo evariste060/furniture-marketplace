@@ -20,6 +20,10 @@ from tests.support.catalog import force_status
 from tests.support.commerce import new_order, seed_sku
 from tests.support.sellers import post_product
 
+# SC-06: the staff routes for orders, payments, stock and catalogue editing used here are held by
+# no role in V1; these tests grant them to the administrator (tests/conftest.py).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"
 NO_RATING = {"average": None, "count": 0}

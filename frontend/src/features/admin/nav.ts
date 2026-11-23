@@ -1,4 +1,21 @@
-import { Boxes, Building2, ClipboardCheck, CreditCard, FileUp, Headset, History, House, Layers, MapPin, MessageSquare, Package, Settings, ShoppingCart, Store, Tag, Upload, Users, Wrench, type LucideIcon } from "lucide-react";
+import {
+  Building2,
+  ChartLine,
+  ClipboardCheck,
+  Headset,
+  History,
+  House,
+  Layers,
+  MapPin,
+  MessageSquare,
+  Settings,
+  ShieldCheck,
+  Store,
+  Tag,
+  Users,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 
 /** The staff permissions the admin checks (backend app/core/roles.py). The backend enforces every
  * one again; the admin only uses them to decide what to show. */
@@ -13,6 +30,7 @@ export type Permission =
   | "inventory:adjust"
   | "catalog:manage"
   | "catalog:read"
+  | "catalog:edit"
   | "delivery:read"
   | "delivery:manage"
   | "settings:read"
@@ -34,7 +52,21 @@ export type Permission =
   | "sellers:manage";
 
 export type NavKey =
-  "dashboard" | "orders" | "payments" | "quotes" | "serviceRequests" | "messages" | "services" | "products" | "bulkImages" | "categories" | "import" | "inventory" | "reviews" | "delivery" | "promotions" | "sellers" | "staff" | "settings" | "audit";
+  | "dashboard"
+  | "sellers"
+  | "products"
+  | "categories"
+  | "promotions"
+  | "reviews"
+  | "messages"
+  | "serviceRequests"
+  | "quotes"
+  | "analytics"
+  | "settings"
+  | "delivery"
+  | "services"
+  | "staff"
+  | "audit";
 
 export type NavItem = {
   key: NavKey;
@@ -46,10 +78,12 @@ export type NavItem = {
   also?: string[];
 };
 
-/** AdminSidebar.dc.html groups. Analytics, Reports and Notifications are left out until their
- * backend modules (17, 18) exist. */
+/** The marketplace administrator's sidebar (SC-06, ADR-014 phase 7): marketplace governance,
+ * platform support, analytics and platform settings. Store operations (orders, payments, stock,
+ * catalogue editing, imports) are the sellers' and have no page here. Service and quote requests
+ * stay under Support while those services are FurniHub's own. */
 export const NAV: {
-  group: "overview" | "orders" | "catalogue" | "store" | "system";
+  group: "overview" | "marketplace" | "support" | "insights" | "platform";
   items: NavItem[];
 }[] = [
   {
@@ -64,54 +98,20 @@ export const NAV: {
     ],
   },
   {
-    group: "orders",
+    group: "marketplace",
     items: [
+      // ADR-014 phase 5: stores and seller applications.
       {
-        key: "orders",
-        href: "/admin/orders",
-        Icon: ShoppingCart,
-        anyOf: ["orders:read"],
+        key: "sellers",
+        href: "/admin/sellers",
+        Icon: Store,
+        anyOf: ["sellers:read"],
       },
-      {
-        key: "payments",
-        href: "/admin/payments",
-        Icon: CreditCard,
-        anyOf: ["payments:read"],
-      },
-      {
-        key: "quotes",
-        href: "/admin/quotes",
-        Icon: Building2,
-        anyOf: ["quotes:manage"],
-      },
-      {
-        key: "serviceRequests",
-        href: "/admin/service-requests",
-        Icon: ClipboardCheck,
-        anyOf: ["services:read"],
-      },
-      {
-        key: "messages",
-        href: "/admin/messages",
-        Icon: Headset,
-        anyOf: ["support:read"],
-      },
-    ],
-  },
-  {
-    group: "catalogue",
-    items: [
       {
         key: "products",
         href: "/admin/products",
-        Icon: Package,
+        Icon: ShieldCheck,
         anyOf: ["catalog:read"],
-      },
-      {
-        key: "bulkImages",
-        href: "/admin/products/images",
-        Icon: Upload,
-        anyOf: ["catalog:manage"],
       },
       {
         key: "categories",
@@ -121,16 +121,10 @@ export const NAV: {
         also: ["/admin/brands"],
       },
       {
-        key: "import",
-        href: "/admin/import",
-        Icon: FileUp,
-        anyOf: ["catalog:manage"],
-      },
-      {
-        key: "inventory",
-        href: "/admin/inventory",
-        Icon: Boxes,
-        anyOf: ["inventory:read"],
+        key: "promotions",
+        href: "/admin/promotions",
+        Icon: Tag,
+        anyOf: ["promotions:read"],
       },
       {
         key: "reviews",
@@ -138,17 +132,51 @@ export const NAV: {
         Icon: MessageSquare,
         anyOf: ["reviews:moderate"],
       },
+    ],
+  },
+  {
+    group: "support",
+    items: [
       {
-        key: "services",
-        href: "/admin/services",
-        Icon: Wrench,
+        key: "messages",
+        href: "/admin/messages",
+        Icon: Headset,
+        anyOf: ["support:read"],
+      },
+      {
+        key: "serviceRequests",
+        href: "/admin/service-requests",
+        Icon: ClipboardCheck,
         anyOf: ["services:read"],
+      },
+      {
+        key: "quotes",
+        href: "/admin/quotes",
+        Icon: Building2,
+        anyOf: ["quotes:manage"],
       },
     ],
   },
   {
-    group: "store",
+    group: "insights",
     items: [
+      {
+        key: "analytics",
+        href: "/admin/analytics",
+        Icon: ChartLine,
+        anyOf: ["reports:read"],
+      },
+    ],
+  },
+  {
+    group: "platform",
+    items: [
+      {
+        key: "settings",
+        href: "/admin/settings",
+        Icon: Settings,
+        anyOf: ["settings:read", "content:manage"],
+      },
       {
         key: "delivery",
         href: "/admin/delivery",
@@ -156,34 +184,16 @@ export const NAV: {
         anyOf: ["delivery:read"],
       },
       {
-        key: "promotions",
-        href: "/admin/promotions",
-        Icon: Tag,
-        anyOf: ["promotions:read"],
+        key: "services",
+        href: "/admin/services",
+        Icon: Wrench,
+        anyOf: ["services:read"],
       },
-      {
-        // ADR-014 phase 5: stores and seller applications.
-        key: "sellers",
-        href: "/admin/sellers",
-        Icon: Store,
-        anyOf: ["sellers:read"],
-      },
-    ],
-  },
-  {
-    group: "system",
-    items: [
       {
         key: "staff",
         href: "/admin/staff",
         Icon: Users,
         anyOf: ["staff:read"],
-      },
-      {
-        key: "settings",
-        href: "/admin/settings",
-        Icon: Settings,
-        anyOf: ["settings:read", "content:manage"],
       },
       {
         key: "audit",
@@ -195,13 +205,15 @@ export const NAV: {
   },
 ];
 
-export function canOpen(permissions: ReadonlySet<string> | readonly string[], anyOf: readonly Permission[]): boolean {
+export function canOpen(
+  permissions: ReadonlySet<string> | readonly string[],
+  anyOf: readonly Permission[],
+): boolean {
   const held = permissions instanceof Set ? permissions : new Set(permissions);
   return anyOf.some((p) => held.has(p));
 }
 
-/** The nav item a path belongs to: the longest matching href ("/admin/products/images" before
- * "/admin/products"). */
+/** The nav item a path belongs to: the longest matching href. */
 export function activeNav(pathname: string): NavKey | null {
   let best: NavItem | null = null;
   for (const { items } of NAV) {
@@ -209,7 +221,9 @@ export function activeNav(pathname: string): NavKey | null {
       const match =
         item.href === "/admin"
           ? pathname === "/admin"
-          : [item.href, ...(item.also ?? [])].some((href) => pathname === href || pathname.startsWith(`${href}/`));
+          : [item.href, ...(item.also ?? [])].some(
+              (href) => pathname === href || pathname.startsWith(`${href}/`),
+            );
       if (match && (!best || item.href.length > best.href.length)) best = item;
     }
   }

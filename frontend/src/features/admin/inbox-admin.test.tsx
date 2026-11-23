@@ -8,7 +8,6 @@ import admin from "../../../messages/admin.json";
 import en from "../../../messages/en.json";
 import { ToastProvider } from "@/components/ui/toast";
 import { MessagesView } from "./messages";
-import { OrdersView } from "./orders";
 import { QuotesView } from "./quotes";
 import { ReviewsView } from "./reviews";
 
@@ -18,72 +17,24 @@ import { ReviewsView } from "./reviews";
 // Drawers load their record after opening; give slow, busy test runs time to settle.
 configure({ asyncUtilTimeout: 5000 });
 
-const access = vi.hoisted(() => ({ fulfil: true }));
-vi.mock("./access", () => ({ useStaffAccess: () => ({ can: (p: string) => p !== "orders:fulfil" || access.fulfil }) }));
-const nav = vi.hoisted(() => ({ params: new URLSearchParams(), replace: vi.fn() }));
+vi.mock("./access", () => ({ useStaffAccess: () => ({ can: () => true }) }));
+const nav = vi.hoisted(() => ({
+  params: new URLSearchParams(),
+  replace: vi.fn(),
+}));
 vi.mock("next/navigation", () => ({
   useSearchParams: () => nav.params,
-  usePathname: () => "/admin/orders",
+  usePathname: () => "/admin/messages",
   useRouter: () => ({ replace: nav.replace, push: vi.fn() }),
 }));
-vi.mock("next/image", () => ({ default: (props: { src: string; alt: string }) => <img src={props.src} alt={props.alt} /> }));
+vi.mock("next/image", () => ({
+  default: (props: { src: string; alt: string }) => (
+    <img src={props.src} alt={props.alt} />
+  ),
+}));
 const api = vi.hoisted(() => ({ GET: vi.fn(), PATCH: vi.fn(), POST: vi.fn() }));
 vi.mock("@/lib/api/client", () => ({ browserApi: api }));
 
-const SUMMARY = {
-  id: "o1",
-  order_number: "3S-1001",
-  status: "received",
-  total: 250000,
-  item_count: 2,
-  payment_method: "cash_on_delivery",
-  payment_status: "pending",
-  created_at: "2026-11-17T08:00:00Z",
-  customer_name: "Jean Mugabo",
-  customer_phone: "+250788111222",
-};
-const DETAIL = {
-  ...SUMMARY,
-  updated_at: "2026-11-17T08:00:00Z",
-  currency_code: "RWF",
-  subtotal: 245000,
-  discount_total: 0,
-  delivery_fee: 5000,
-  tax_total: 0,
-  tax_treatment: null,
-  discount_code: null,
-  delivery_zone: "Kigali",
-  recipient_name: "Jean Mugabo",
-  recipient_phone: "+250788111222",
-  delivery_address: { street_address: "KN 5 Rd", district: "Gasabo", delivery_instructions: "Blue gate" },
-  lines: [{ id: "l1", store_name: "Kigali Home", product_name: "Galaxy A15", variant_name: null, sku: "SM-A15", quantity: 2, unit_price: 122500, line_total: 245000, image: null }],
-  seller_orders: [
-    {
-      id: "so1",
-      store_id: "s1",
-      store_name: "Kigali Home",
-      status: "pending",
-      subtotal: 245000,
-      discount_total: 0,
-      merchandise_total: 245000,
-      commission_rate_bps: 1000,
-      commission_amount: 24500,
-      seller_net_amount: 220500,
-      confirmed_at: null,
-      dispatched_at: null,
-      delivered_at: null,
-      cancelled_at: null,
-    },
-  ],
-  payment: null,
-  payments: [],
-  status_history: [{ status: "received", created_at: "2026-11-17T08:00:00Z", reason: null }],
-  user_id: null,
-  customer_email: "jean@example.com",
-  customer_note: null,
-  fulfilment_assignee_user_id: null,
-  fulfilment_assignee_name: null,
-};
 const QUOTE = {
   id: "q1",
   reference: "QR-261117-ABCDEF",
@@ -139,15 +90,37 @@ const THREAD = {
   has_account: false,
   locale: "en",
 };
-const THREAD_DETAIL = { ...THREAD, messages: [{ id: "m1", author: "customer", body: "It has been three days.", staff_name: null, created_at: "2026-11-17T08:00:00Z" }] };
+const THREAD_DETAIL = {
+  ...THREAD,
+  messages: [
+    {
+      id: "m1",
+      author: "customer",
+      body: "It has been three days.",
+      staff_name: null,
+      created_at: "2026-11-17T08:00:00Z",
+    },
+  ],
+};
 
-const ok = (data: unknown) => Promise.resolve({ data, error: undefined, response: { ok: true, status: 200 } });
+const ok = (data: unknown) =>
+  Promise.resolve({
+    data,
+    error: undefined,
+    response: { ok: true, status: 200 },
+  });
 
 function renderView(view: ReactNode) {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
     <QueryClientProvider client={client}>
-      <NextIntlClientProvider locale="en" messages={{ ...en, admin }} timeZone="Africa/Kigali">
+      <NextIntlClientProvider
+        locale="en"
+        messages={{ ...en, admin }}
+        timeZone="Africa/Kigali"
+      >
         <ToastProvider closeLabel="Close">{view}</ToastProvider>
       </NextIntlClientProvider>
     </QueryClientProvider>,
@@ -155,16 +128,16 @@ function renderView(view: ReactNode) {
 }
 
 beforeEach(() => {
-  access.fulfil = true;
   nav.params = new URLSearchParams();
   api.GET.mockImplementation((path: string) => {
-    if (path === "/api/v1/staff/orders") return ok({ items: [SUMMARY], total: 1, page: 1, size: 20 });
-    if (path === "/api/v1/staff/orders/{order_id}") return ok(DETAIL);
-    if (path === "/api/v1/staff/orders/assignees") return ok({ items: [] });
-    if (path === "/api/v1/staff/quote-requests") return ok({ items: [QUOTE], total: 1, page: 1, size: 20 });
-    if (path === "/api/v1/staff/reviews") return ok({ items: [REVIEW], total: 1, page: 1, size: 20 });
-    if (path === "/api/v1/staff/support-threads") return ok({ items: [THREAD], total: 1, page: 1, size: 20 });
-    if (path === "/api/v1/staff/support-threads/{thread_id}") return ok(THREAD_DETAIL);
+    if (path === "/api/v1/staff/quote-requests")
+      return ok({ items: [QUOTE], total: 1, page: 1, size: 20 });
+    if (path === "/api/v1/staff/reviews")
+      return ok({ items: [REVIEW], total: 1, page: 1, size: 20 });
+    if (path === "/api/v1/staff/support-threads")
+      return ok({ items: [THREAD], total: 1, page: 1, size: 20 });
+    if (path === "/api/v1/staff/support-threads/{thread_id}")
+      return ok(THREAD_DETAIL);
     return ok(null);
   });
   api.POST.mockImplementation(() => ok({ ...REVIEW, status: "approved" }));
@@ -178,60 +151,27 @@ beforeEach(() => {
 });
 afterEach(() => vi.clearAllMocks());
 
-describe("orders", () => {
-  it("filters by a status card", async () => {
-    const user = userEvent.setup();
-    renderView(<OrdersView />);
-    await user.click(await screen.findByRole("button", { name: /Received/, pressed: false }));
-    expect(nav.replace).toHaveBeenCalledWith("/admin/orders?status=received", { scroll: false });
-  });
-
-  it("opens an order in the drawer with its items and stores, and offers staff only cancellation", async () => {
-    const user = userEvent.setup();
-    renderView(<OrdersView />);
-    const row = (await screen.findByText("Jean Mugabo")).closest("tr")!;
-    expect(within(row).queryByRole("link", { name: /^Call/ })).not.toBeInTheDocument();
-    expect(within(row).getByRole("link", { name: /WhatsApp Jean Mugabo/ })).toHaveAttribute("href", "https://wa.me/250788111222");
-    await user.click(within(row).getByRole("button", { name: "Open order 3S-1001" }));
-    const drawer = await screen.findByRole("dialog");
-    expect(await within(drawer).findByText("Galaxy A15", undefined, { timeout: 5000 })).toBeInTheDocument();
-    expect(within(drawer).getByText(/KN 5 Rd, Gasabo/)).toBeInTheDocument();
-    expect(within(drawer).getByRole("link", { name: /Open full page/ })).toHaveAttribute("href", "/admin/orders/o1");
-    expect(row.className).toContain("bg-light");
-    // ADR-014 phase 3: the store fulfils its part; staff see it and can only cancel the order.
-    expect(within(drawer).getAllByText("Sold by Kigali Home").length).toBeGreaterThan(0);
-    expect(within(drawer).getByText("Waiting for the store")).toBeInTheDocument();
-    expect(within(drawer).getByText("Commission 10%")).toBeInTheDocument();
-    expect(within(drawer).queryByRole("button", { name: /Mark as/ })).not.toBeInTheDocument();
-    expect(within(drawer).queryByRole("combobox", { name: "Assigned to" })).not.toBeInTheDocument();
-    expect(within(drawer).getByRole("button", { name: "Cancel order" })).toBeInTheDocument();
-    expect(api.PATCH).not.toHaveBeenCalled();
-  });
-
-  it("shows no status actions without orders:fulfil", async () => {
-    access.fulfil = false;
-    const user = userEvent.setup();
-    renderView(<OrdersView />);
-    await user.click(await screen.findByRole("button", { name: "Open order 3S-1001" }));
-    const drawer = await screen.findByRole("dialog");
-    await within(drawer).findByText("Galaxy A15", undefined, { timeout: 5000 });
-    expect(within(drawer).queryByRole("button", { name: "Cancel order" })).not.toBeInTheDocument();
-    expect(within(drawer).getByText("Waiting for the store")).toBeInTheDocument(); // read-only
-  });
-});
-
 describe("quote requests", () => {
   it("lists requests in a table and moves one along from the drawer", async () => {
     const user = userEvent.setup();
     renderView(<QuotesView />);
     const row = (await screen.findByText("Kigali Tech Ltd")).closest("tr")!;
     expect(within(row).getByText("2 products · 25 units")).toBeInTheDocument();
-    await user.click(within(row).getByRole("button", { name: "Open the quote request from Kigali Tech Ltd" }));
+    await user.click(
+      within(row).getByRole("button", {
+        name: "Open the quote request from Kigali Tech Ltd",
+      }),
+    );
     const drawer = await screen.findByRole("dialog");
     expect(within(drawer).getByText("Laptops")).toBeInTheDocument();
     expect(within(drawer).getByText("For our new office")).toBeInTheDocument();
-    await user.click(within(drawer).getByRole("button", { name: /Mark as contacted/ }));
-    expect(api.PATCH).toHaveBeenCalledWith("/api/v1/staff/quote-requests/{quote_id}", { params: { path: { quote_id: "q1" } }, body: { status: "contacted" } });
+    await user.click(
+      within(drawer).getByRole("button", { name: /Mark as contacted/ }),
+    );
+    expect(api.PATCH).toHaveBeenCalledWith(
+      "/api/v1/staff/quote-requests/{quote_id}",
+      { params: { path: { quote_id: "q1" } }, body: { status: "contacted" } },
+    );
   });
 });
 
@@ -241,18 +181,32 @@ describe("reviews", () => {
     renderView(<ReviewsView />);
     const row = (await screen.findByText("Great phone")).closest("tr")!;
     expect(within(row).getByText("Galaxy A15")).toBeInTheDocument();
-    await user.click(within(row).getByRole("button", { name: "Open the review by Eric Habimana" }));
+    await user.click(
+      within(row).getByRole("button", {
+        name: "Open the review by Eric Habimana",
+      }),
+    );
     expect(row.className).toContain("bg-light");
     const drawer = await screen.findByRole("dialog");
-    expect(within(drawer).getByText("Battery lasts two days.")).toBeInTheDocument();
+    expect(
+      within(drawer).getByText("Battery lasts two days."),
+    ).toBeInTheDocument();
     await user.click(within(drawer).getByRole("button", { name: /Reject/ }));
-    expect(within(drawer).getByRole("alert")).toHaveTextContent("Choose a reason first.");
+    expect(within(drawer).getByRole("alert")).toHaveTextContent(
+      "Choose a reason first.",
+    );
     expect(api.POST).not.toHaveBeenCalled();
     await user.click(within(drawer).getByRole("button", { name: /Spam/ }));
     await user.click(within(drawer).getByRole("button", { name: /Reject/ }));
-    expect(api.POST).toHaveBeenCalledWith("/api/v1/staff/reviews/{review_id}/reject", { params: { path: { review_id: "rv1" } }, body: { reason: "Spam" } });
+    expect(api.POST).toHaveBeenCalledWith(
+      "/api/v1/staff/reviews/{review_id}/reject",
+      { params: { path: { review_id: "rv1" } }, body: { reason: "Spam" } },
+    );
     await user.click(within(drawer).getByRole("button", { name: /Approve/ }));
-    expect(api.POST).toHaveBeenCalledWith("/api/v1/staff/reviews/{review_id}/approve", { params: { path: { review_id: "rv1" } } });
+    expect(api.POST).toHaveBeenCalledWith(
+      "/api/v1/staff/reviews/{review_id}/approve",
+      { params: { path: { review_id: "rv1" } } },
+    );
   });
 });
 
@@ -261,17 +215,48 @@ describe("support", () => {
     const user = userEvent.setup();
     renderView(<MessagesView />);
     const row = (await screen.findByText("Where is my order?")).closest("tr")!;
-    expect(within(row).getByRole("link", { name: /WhatsApp Claude Niyonzima/ })).toHaveAttribute("href", expect.stringContaining("https://wa.me/250788333444"));
-    await user.click(within(row).getByRole("button", { name: "Open the conversation with Claude Niyonzima" }));
+    expect(
+      within(row).getByRole("link", { name: /WhatsApp Claude Niyonzima/ }),
+    ).toHaveAttribute(
+      "href",
+      expect.stringContaining("https://wa.me/250788333444"),
+    );
+    await user.click(
+      within(row).getByRole("button", {
+        name: "Open the conversation with Claude Niyonzima",
+      }),
+    );
     expect(row.className).toContain("bg-light");
     const drawer = await screen.findByRole("dialog");
-    expect(await within(drawer).findByRole("list", { name: "Conversation" }, { timeout: 5000 })).toHaveTextContent("It has been three days.");
+    expect(
+      await within(drawer).findByRole(
+        "list",
+        { name: "Conversation" },
+        { timeout: 5000 },
+      ),
+    ).toHaveTextContent("It has been three days.");
     api.POST.mockImplementation(() => ok(THREAD_DETAIL));
-    await user.type(within(drawer).getByRole("textbox", { name: /Reply/ }), "It leaves today.");
+    await user.type(
+      within(drawer).getByRole("textbox", { name: /Reply/ }),
+      "It leaves today.",
+    );
     await user.click(within(drawer).getByRole("button", { name: "Send" }));
-    expect(api.POST).toHaveBeenCalledWith("/api/v1/staff/support-threads/{thread_id}/messages", { params: { path: { thread_id: "t1" } }, body: { body: "It leaves today." } });
-    api.PATCH.mockImplementation(() => ok({ ...THREAD_DETAIL, status: "closed" }));
-    await user.click(within(drawer).getByRole("button", { name: "Close conversation" }));
-    expect(api.PATCH).toHaveBeenCalledWith("/api/v1/staff/support-threads/{thread_id}", { params: { path: { thread_id: "t1" } }, body: { status: "closed" } });
+    expect(api.POST).toHaveBeenCalledWith(
+      "/api/v1/staff/support-threads/{thread_id}/messages",
+      {
+        params: { path: { thread_id: "t1" } },
+        body: { body: "It leaves today." },
+      },
+    );
+    api.PATCH.mockImplementation(() =>
+      ok({ ...THREAD_DETAIL, status: "closed" }),
+    );
+    await user.click(
+      within(drawer).getByRole("button", { name: "Close conversation" }),
+    );
+    expect(api.PATCH).toHaveBeenCalledWith(
+      "/api/v1/staff/support-threads/{thread_id}",
+      { params: { path: { thread_id: "t1" } }, body: { status: "closed" } },
+    );
   });
 });

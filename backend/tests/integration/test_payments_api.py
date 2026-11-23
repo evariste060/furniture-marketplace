@@ -28,6 +28,10 @@ from tests.integration.test_promotions_api import apply, create_promotion
 from tests.support.commerce import hold_expiry, stock_clock_at, wait_until_due
 from tests.support.seller_orders import advance
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 SECRET = os.environ["PAYMENT_MOCK_WEBHOOK_SECRET"]
 PAY = "/api/v1/payments"
 HOOK = "/api/v1/webhooks"

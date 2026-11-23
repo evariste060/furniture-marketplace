@@ -1,26 +1,31 @@
 """Staff reports (module 18; PR-13; UAT scenario 7; plan §5 "18 — reports"; §7 Q25).
 
-Every endpoint requires reports:read (administrator; plan §3 final
-matrix). The XLSX export of a report is built from the same service call as its JSON, with the
-same filters, so the two reconcile.
+Every endpoint requires reports:read (administrator; plan §3 final matrix). The stock report
+and its export also need inventory:read, which no role holds in V1 (SC-06: stock is the
+sellers'). GET /staff/reports/marketplace is the marketplace overview (SC-06, ADR-014 phase 7).
+The XLSX export of a report is built from the same service call as its JSON, with the same
+filters, so the two reconcile.
 """
 
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path, Query, Response
+from fastapi import APIRouter, Depends, Path, Query, Request, Response
 from sqlalchemy.orm import Session
 
 from app.api.v1.pagination import PageNumber, PageSize
 from app.api.v1.responses import FORBIDDEN_403, UNAUTHORIZED_401, VALIDATION_422, ResponseMap
-from app.core.dependencies import require_permission
+from app.core.dependencies import ensure_permission, require_permission
 from app.core.errors import field_error
+from app.core.request_context import RequestContext, get_request_context
 from app.core.roles import Permission
 from app.db.session import get_db
 from app.models.identity import User
 from app.schemas.pagination import DEFAULT_PAGE_SIZE
 from app.schemas.reports import (
     GroupBy,
+    MarketplaceGroupBy,
+    MarketplaceReport,
     ReportType,
     SalesReport,
     StockReport,
@@ -53,6 +58,7 @@ SALES_RULE = (
 
 Reader = Annotated[User, Depends(require_permission(Permission.REPORTS_READ))]
 Db = Annotated[Session, Depends(get_db)]
+Ctx = Annotated[RequestContext, Depends(get_request_context)]
 FromDate = Annotated[date, Query(alias="from", description="First Kigali day (YYYY-MM-DD)")]
 ToDate = Annotated[date, Query(alias="to", description="Last Kigali day, inclusive")]
 Limit = Annotated[
@@ -104,19 +110,50 @@ def top_products_report(
 
 
 @router.get(
+    "/marketplace",
+    response_model=MarketplaceReport,
+    summary="Marketplace overview",
+    description=(
+        f"{PERMISSION_NOTE} Stores by status, active customer accounts and products on the "
+        "storefront now; and per day, week or month (`group_by`, default month): qualifying "
+        "orders, the stores' goods after discounts and the platform's commission in them, stores "
+        "approved for the first time and customer accounts registered. "
+        f"{SALES_RULE} Months and weeks are cut at the range. Aggregates only: no customer, "
+        "seller or order is identified (SC-06, ADR-014 phase 7)."
+    ),
+    responses={**GUARDED, **VALIDATION_422},
+)
+def marketplace_report(
+    _: Reader,
+    db: Db,
+    from_date: FromDate,
+    to_date: ToDate,
+    group_by: Annotated[MarketplaceGroupBy, Query(description="day, week or month")] = "month",
+) -> MarketplaceReport:
+    return report_service.marketplace(db, from_date, to_date, group_by)
+
+
+@router.get(
     "/stock",
     response_model=StockReport,
     summary="Stock report",
     description=(
         f"{PERMISSION_NOTE} One row per SKU, active or not, ordered by SKU, with the figures of "
         "GET /api/v1/inventory (available = on hand - unavailable - reserved - committed, never "
-        "below 0). Paginated; `totals` covers every SKU."
+        "below 0). Paginated; `totals` covers every SKU. Also needs 'inventory:read', held by "
+        "no role in V1 (SC-06)."
     ),
     responses={**GUARDED, **VALIDATION_422},
 )
 def stock_report(
-    _: Reader, db: Db, page: PageNumber = 1, size: PageSize = DEFAULT_PAGE_SIZE
+    user: Reader,
+    request: Request,
+    ctx: Ctx,
+    db: Db,
+    page: PageNumber = 1,
+    size: PageSize = DEFAULT_PAGE_SIZE,
 ) -> StockReport:
+    ensure_permission(db, ctx, request, user, Permission.INVENTORY_READ)
     return report_service.stock(db, page, size)
 
 
@@ -128,12 +165,15 @@ def stock_report(
         f"{PERMISSION_NOTE} `report_type` is `sales`, `top-products` or `stock`; the query "
         "parameters are those of the JSON report (`from`, `to` and `group_by` for sales; "
         "`from`, `to` and `limit` for top products; none for stock, which exports every SKU). "
-        "The rows and totals are those of the JSON report with the same parameters."
+        "The rows and totals are those of the JSON report with the same parameters. The stock "
+        "export also needs 'inventory:read', held by no role in V1 (SC-06)."
     ),
     responses={**XLSX_200, **GUARDED, **VALIDATION_422},
 )
 def export_report(
-    _: Reader,
+    user: Reader,
+    request: Request,
+    ctx: Ctx,
     db: Db,
     report_type: Annotated[ReportType, Path(description="sales, top-products or stock")],
     from_date: Annotated[
@@ -144,6 +184,7 @@ def export_report(
     limit: Limit = report_service.DEFAULT_TOP_PRODUCTS,
 ) -> Response:
     if report_type == "stock":
+        ensure_permission(db, ctx, request, user, Permission.INVENTORY_READ)
         generated_at, rows, totals = report_service.stock_snapshot(db)
         stamp = generated_at.strftime("%Y%m%d-%H%M")
         return _xlsx(stock_xlsx(generated_at, rows, totals), f"stock-{stamp}.xlsx")

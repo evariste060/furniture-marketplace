@@ -1,7 +1,9 @@
 """The approved permission matrix. SC-05 (2026-11-21): the Marketplace Administrator is the only
-staff role and holds every permission; customers, and sellers (who are customers owning a
-store, ADR-014), hold none. The permissions themselves stay fine-grained and every staff route
-still requires one. Changes need approval."""
+staff role; customers, and sellers (who are customers owning a store, ADR-014), hold no
+permission. SC-06 (2026-11-22): store operations are the sellers', so the administrator does not
+hold the order, payment, inventory and catalogue-editing permissions, which no role holds in V1.
+The permissions stay fine-grained and every staff route still requires one. Changes need
+approval."""
 
 import typing
 
@@ -10,6 +12,7 @@ import pytest
 from app.core.roles import (
     ROLE_PERMISSIONS,
     STAFF_ROLE_NAMES,
+    UNASSIGNED_PERMISSIONS,
     Permission,
     Role,
     StaffRoleName,
@@ -19,21 +22,25 @@ from app.core.roles import (
 )
 from app.models.identity import StaffRoleAssignment, User
 
-ALL_PERMISSIONS = [
+# SC-06: declared, held by no role in V1.
+UNASSIGNED = [
+    "catalog:edit",
+    "inventory:adjust",
+    "inventory:read",
+    "orders:fulfil",
+    "orders:read",
+    "payments:manage",
+    "payments:read",
+]
+ADMINISTRATOR_PERMISSIONS = [
     "audit:read",
     "catalog:manage",
     "catalog:read",
     "content:manage",
     "delivery:manage",
     "delivery:read",
-    "inventory:adjust",
-    "inventory:read",
     "invoices:recover",
     "notifications:manage",
-    "orders:fulfil",
-    "orders:read",
-    "payments:manage",
-    "payments:read",
     "promotions:manage",
     "promotions:read",
     "quotes:manage",
@@ -64,8 +71,9 @@ def _user(is_staff: bool, role: str | None) -> User:
 def test_matrix_matches_approved_policy():
     assert {role: sorted(perms) for role, perms in ROLE_PERMISSIONS.items()} == {
         "customer": [],
-        "administrator": ALL_PERMISSIONS,
+        "administrator": ADMINISTRATOR_PERMISSIONS,
     }
+    assert sorted(UNASSIGNED_PERMISSIONS) == UNASSIGNED
 
 
 def test_the_marketplace_administrator_is_the_only_staff_role():
@@ -74,10 +82,17 @@ def test_the_marketplace_administrator_is_the_only_staff_role():
     assert {r.value for r in Role} == {"customer", "administrator"}
 
 
-def test_the_administrator_holds_every_declared_permission():
+def test_the_administrator_holds_every_permission_but_the_store_operations():
     admin = _user(True, "administrator")
     assert staff_role(admin) == "administrator"
-    assert effective_permissions(admin) == sorted(p.value for p in Permission) == ALL_PERMISSIONS
+    assert effective_permissions(admin) == ADMINISTRATOR_PERMISSIONS
+    assert sorted(ADMINISTRATOR_PERMISSIONS + UNASSIGNED) == sorted(p.value for p in Permission)
+
+
+@pytest.mark.parametrize("permission", UNASSIGNED)
+def test_no_role_holds_a_store_operation_permission(permission: str):
+    for role in (_user(True, "administrator"), _user(False, None)):
+        assert not has_permission(role, permission)
 
 
 def test_customer_has_no_permissions():

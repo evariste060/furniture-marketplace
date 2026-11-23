@@ -29,6 +29,7 @@ LOGIN = "/api/v1/auth/login"
 SECRET_FIELDS = {"password", "password_hash", "token_hash", "session_token"}
 # SC-05 (2026-11-21): the Marketplace Administrator is the only staff role and holds every
 # permission.
+# SC-06: every permission but the store operations (orders, payments, stock, catalogue editing).
 ADMIN_PERMS = [
     "audit:read",
     "catalog:manage",
@@ -36,14 +37,8 @@ ADMIN_PERMS = [
     "content:manage",
     "delivery:manage",
     "delivery:read",
-    "inventory:adjust",
-    "inventory:read",
     "invoices:recover",
     "notifications:manage",
-    "orders:fulfil",
-    "orders:read",
-    "payments:manage",
-    "payments:read",
     "promotions:manage",
     "promotions:read",
     "quotes:manage",

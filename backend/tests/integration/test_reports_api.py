@@ -34,6 +34,10 @@ from tests.integration.test_payments_api import (  # noqa: F401
 from tests.support.commerce import hold_expiry, stock_clock_at
 from tests.support.seller_orders import step
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 REPORTS = "/api/v1/staff/reports"
 INVENTORY = "/api/v1/inventory"
 FIGURES = ("orders", "subtotal", "discount_total", "delivery_fee", "tax_total", "total")
@@ -518,3 +522,46 @@ def test_the_stock_export_matches_the_json_report(client, db, shop, admin_auth):
         None,
         f"{totals['low_stock_skus']} low",
     ]
+
+
+# ---- SC-06: the marketplace report (admin overview and Analytics & Reports) ----------------
+def test_the_marketplace_report_counts_sales_commission_stores_and_customers(
+    client, db, shop, admin_auth
+):
+    from app.models import SellerOrder
+
+    h = admin_auth["headers"]
+    v = sku(db, price=6_000)
+    first, second = paid(client, db, [(v, 1)]), paid(client, db, [(v, 3)])
+    sold_at(db, first, kigali(2026, 3, 9, 8, 0, 0))
+    sold_at(db, second, kigali(2026, 4, 2, 20, 0, 0))
+    place(client, db, [(v, 1)], "mtn_momo")  # never paid: not a sale
+
+    res = get(client, "/marketplace", h, **{"from": "2026-03-01", "to": "2026-04-30"})
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["group_by"] == "month" and body["timezone"] == "Africa/Kigali"
+    assert [p["period_start"] for p in body["periods"]] == ["2026-03-01", "2026-04-01"]
+    assert [p["orders"] for p in body["periods"]] == [1, 1]
+    sold = db.scalars(
+        select(SellerOrder).where(
+            SellerOrder.order_id.in_([uuid.UUID(first["id"]), uuid.UUID(second["id"])])
+        )
+    ).all()
+    assert body["totals"]["orders"] == 2
+    assert body["totals"]["merchandise_total"] == sum(s.merchandise_total for s in sold) == 24_000
+    assert body["totals"]["commission_amount"] == sum(s.commission_amount for s in sold)
+    assert body["totals"]["commission_amount"] > 0
+    # The store and its products exist now, whatever the window.
+    assert body["stores"]["approved"] >= 1 and body["published_products"] >= 1
+    assert body["customers"] >= 1
+    assert (
+        sum(p["merchandise_total"] for p in body["periods"]) == body["totals"]["merchandise_total"]
+    )
+
+
+def test_the_marketplace_report_is_aggregates_only_and_staff_only(client, customer_auth):
+    params = {"from": "2026-03-01", "to": "2026-03-31", "group_by": "week"}
+    refused = client.get(f"{REPORTS}/marketplace", params=params, headers=customer_auth["headers"])
+    assert refused.status_code == 403 and code(refused) == "permission_denied"
+    assert client.get(f"{REPORTS}/marketplace", params=params).status_code == 401

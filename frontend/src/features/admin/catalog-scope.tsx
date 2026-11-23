@@ -33,15 +33,20 @@ export type CatalogScope = {
   base: string;
   /** The first part of every query key, so a save refreshes only this panel's data. */
   key: "admin" | "seller";
-  /** Edit products, variants and photos. */
+  /** Edit products, variants and photos (sellers; staff need catalog:edit, held by no role in
+   * V1, SC-06). */
   manage: boolean;
+  /** Moderate a product: its visibility and the featured flag (staff with catalog:manage). */
+  moderate: boolean;
   /** Read stock figures. */
   stock: boolean;
   /** Record stock changes. */
   adjust: boolean;
-  /** Platform merchandising: the featured flag, bulk publishing and the catalogue import. A
-   * seller's requests never carry them (the backend refuses them with 422). */
+  /** Platform merchandising: the featured flag. A seller's requests never carry it (the backend
+   * refuses it with 422). */
   merchandising: boolean;
+  /** Publish several products at once (catalog:edit: no role in V1, SC-06). */
+  bulkPublish: boolean;
   /** Add products (sellers only: administrators moderate, SC-05). */
   create: boolean;
   api: {
@@ -121,24 +126,31 @@ export const SELLER_SCOPE: CatalogScope = {
   base: "/seller",
   key: "seller",
   manage: true,
+  moderate: false,
   stock: true,
   adjust: true,
   merchandising: false,
+  bulkPublish: false,
   create: true,
   api: SELLER_API,
 };
 
-/** A staff member's scope, from their permissions (the admin's StaffAccessProvider gives it). */
+/** A staff member's scope, from their permissions (the admin's StaffAccessProvider gives it).
+ * SC-06: the administrator moderates (visibility, featured) but does not edit a seller's product,
+ * its variants, photos or stock: those need catalog:edit and inventory:*, which no role holds. */
 export function staffScope(permissions: ReadonlySet<string>): CatalogScope {
-  const manage = permissions.has("catalog:manage");
+  const edit = permissions.has("catalog:edit");
+  const moderate = permissions.has("catalog:manage");
   return {
     kind: "staff",
     base: "/admin",
     key: "admin",
-    manage,
+    manage: edit,
+    moderate,
     stock: permissions.has("inventory:read"),
     adjust: permissions.has("inventory:adjust"),
-    merchandising: manage,
+    merchandising: moderate,
+    bulkPublish: edit,
     create: false,
     api: STAFF_API,
   };

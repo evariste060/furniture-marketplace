@@ -842,7 +842,7 @@ export interface paths {
         head?: never;
         /**
          * Update a product
-         * @description Requires 'catalog:manage' (administrator). Partial update of the product fields and status (draft, active, hidden, archived). Activating needs at least one product image (409 product_has_no_images). Only active products in an active category, with an active brand or none, are public. A rename keeps the slug. Audited as 'catalog.product_update' with the old and new values; a request that changes nothing is not audited.
+         * @description Moderation needs 'catalog:manage': `status` (draft, active, hidden, archived) and `is_featured`. Any other field also needs 'catalog:edit', held by no role in V1 (SC-06; 403 permission_denied): sellers edit their own products. Activating needs at least one product image (409 product_has_no_images). Only active products in an active category, with an active brand or none, are public. A rename keeps the slug. Audited as 'catalog.product_update' with the old and new values; a request that changes nothing is not audited.
          */
         patch: operations["update_product_api_v1_staff_products__product_id__patch"];
         trace?: never;
@@ -858,7 +858,7 @@ export interface paths {
         put?: never;
         /**
          * Bulk upload product images (processed in the background)
-         * @description Requires 'catalog:manage' (administrator). Up to 20 files and 100 MB per request (send more as further batches). Name each file `<product-slug>.jpg` for position 1 or `<product-slug>__<n>.jpg` for position n (1–99); jpg, jpeg, png or webp, matched case-insensitively. The staff product list and detail show the expected names. A file over 5 MB, or more than 20 files, rejects the whole request before anything is stored (413, 422); 507 when the upload area or disk is full. Names that match no product (`unknown_slug`), are malformed (`invalid_filename`) or name the same position twice in one request (`duplicate_position`, neither applied) fail at once. The rest are stored and processed by the worker (python -m app.worker): each file replaces the image at its position (or adds one there), or is `unchanged` when it is the same file. Poll GET /staff/jobs/{id}. Audited per image as 'catalog.image_bulk_add' or 'catalog.image_bulk_replace' and per job as 'catalog.image_bulk_complete'.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). Up to 20 files and 100 MB per request (send more as further batches). Name each file `<product-slug>.jpg` for position 1 or `<product-slug>__<n>.jpg` for position n (1–99); jpg, jpeg, png or webp, matched case-insensitively. The staff product list and detail show the expected names. A file over 5 MB, or more than 20 files, rejects the whole request before anything is stored (413, 422); 507 when the upload area or disk is full. Names that match no product (`unknown_slug`), are malformed (`invalid_filename`) or name the same position twice in one request (`duplicate_position`, neither applied) fail at once. The rest are stored and processed by the worker (python -m app.worker): each file replaces the image at its position (or adds one there), or is `unchanged` when it is the same file. Poll GET /staff/jobs/{id}. Audited per image as 'catalog.image_bulk_add' or 'catalog.image_bulk_replace' and per job as 'catalog.image_bulk_complete'.
          */
         post: operations["bulk_upload_images_api_v1_staff_products_bulk_images_post"];
         delete?: never;
@@ -878,7 +878,7 @@ export interface paths {
         put?: never;
         /**
          * Activate several products at once
-         * @description Requires 'catalog:manage' (administrator). Up to 200 product IDs. Each product goes through the publication guard: `activated`, `skipped_no_images` (no product image yet), `already_active` or `not_found`. One 'catalog.product_update' audit record per activated product.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). Up to 200 product IDs. Each product goes through the publication guard: `activated`, `skipped_no_images` (no product image yet), `already_active` or `not_found`. One 'catalog.product_update' audit record per activated product.
          */
         post: operations["bulk_activate_products_api_v1_staff_products_bulk_activate_post"];
         delete?: never;
@@ -898,7 +898,7 @@ export interface paths {
         put?: never;
         /**
          * Add a variant (SKU) to a product
-         * @description Requires 'catalog:manage' (administrator). price and compare_at_price are whole RWF (compare_at_price is display only). Stock is managed through the inventory endpoints. Audited as 'catalog.variant_create'.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). price and compare_at_price are whole RWF (compare_at_price is display only). Stock is managed through the inventory endpoints. Audited as 'catalog.variant_create'.
          */
         post: operations["create_variant_api_v1_staff_products__product_id__variants_post"];
         delete?: never;
@@ -919,14 +919,14 @@ export interface paths {
         post?: never;
         /**
          * Deactivate a variant
-         * @description Requires 'catalog:manage' (administrator). The variant is not removed: stock and orders reference it. It is set to is_active=false and hidden from the public catalogue. Repeating it is a no-op. Audited as 'catalog.variant_deactivate'.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). The variant is not removed: stock and orders reference it. It is set to is_active=false and hidden from the public catalogue. Repeating it is a no-op. Audited as 'catalog.variant_deactivate'.
          */
         delete: operations["delete_variant_api_v1_staff_products__product_id__variants__variant_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update a variant
-         * @description Requires 'catalog:manage' (administrator). Partial update; is_active=true reactivates a deactivated variant. Audited as 'catalog.variant_update' with the old and new values, including price.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). Partial update; is_active=true reactivates a deactivated variant. Audited as 'catalog.variant_update' with the old and new values, including price.
          */
         patch: operations["update_variant_api_v1_staff_products__product_id__variants__variant_id__patch"];
         trace?: never;
@@ -942,7 +942,7 @@ export interface paths {
         put?: never;
         /**
          * Upload a product image
-         * @description Requires 'catalog:manage' (administrator). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB) and optional `variant_id` and `alt_text`. The file is identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. It is appended after the product's other images. Audited as 'catalog.image_upload'.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). multipart/form-data with `file` (JPEG, PNG or WebP, at most 5 MB) and optional `variant_id` and `alt_text`. The file is identified by decoding it, not by its name or declared type. The exact upload is kept privately; the public source keeps its format and is turned upright, stripped of metadata and scaled down only if its longest side is above 2400 px. It is appended after the product's other images. Audited as 'catalog.image_upload'.
          */
         post: operations["upload_image_api_v1_staff_products__product_id__images_post"];
         delete?: never;
@@ -961,7 +961,7 @@ export interface paths {
         get?: never;
         /**
          * Reorder a product's images
-         * @description Requires 'catalog:manage' (administrator). `image_ids` lists every product-level image of the product (not variant images) exactly once, in the new display order. They get positions 1..n (sort_order 0..n-1) in one transaction, so the bulk upload file names follow the new order. Returns those images in that order. Audited as 'catalog.image_reorder'; the order they already have is not audited.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). `image_ids` lists every product-level image of the product (not variant images) exactly once, in the new display order. They get positions 1..n (sort_order 0..n-1) in one transaction, so the bulk upload file names follow the new order. Returns those images in that order. Audited as 'catalog.image_reorder'; the order they already have is not audited.
          */
         put: operations["reorder_images_api_v1_staff_products__product_id__images_order_put"];
         post?: never;
@@ -983,14 +983,14 @@ export interface paths {
         post?: never;
         /**
          * Delete an image
-         * @description Requires 'catalog:manage' (administrator). Removes the image from the catalogue and retires its stored files (public source and private original) in the same transaction; the cleanup worker deletes them afterwards. Audited as 'catalog.image_delete'.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). Removes the image from the catalogue and retires its stored files (public source and private original) in the same transaction; the cleanup worker deletes them afterwards. Audited as 'catalog.image_delete'.
          */
         delete: operations["delete_image_api_v1_staff_images__image_id__delete"];
         options?: never;
         head?: never;
         /**
          * Update an image's order, alt text or variant
-         * @description Requires 'catalog:manage' (administrator). Partial update of sort_order (>= 0), alt_text (null clears it) and variant_id (a variant of the same product; null makes it a product-level image). Audited as 'catalog.image_update'; a request that changes nothing is not audited.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). Partial update of sort_order (>= 0), alt_text (null clears it) and variant_id (a variant of the same product; null makes it a product-level image). Audited as 'catalog.image_update'; a request that changes nothing is not audited.
          */
         patch: operations["update_image_api_v1_staff_images__image_id__patch"];
         trace?: never;
@@ -1004,7 +1004,7 @@ export interface paths {
         };
         /**
          * Download the catalogue import template
-         * @description Requires 'catalog:manage' (administrator). The header row of the import file (and, for xlsx, an Instructions sheet describing every column). It contains no data rows, so importing it unchanged changes nothing.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). The header row of the import file (and, for xlsx, an Instructions sheet describing every column). It contains no data rows, so importing it unchanged changes nothing.
          */
         get: operations["download_template_api_v1_staff_imports_template_get"];
         put?: never;
@@ -1026,7 +1026,7 @@ export interface paths {
         put?: never;
         /**
          * Import products and variants from a CSV or XLSX file
-         * @description Requires 'catalog:manage' (administrator). multipart/form-data with `file` (.csv in UTF-8 or .xlsx, at most 10 MB and 5000 data rows). The file is processed within the request. Every row is checked first; valid rows are then applied in one transaction (SKU matching: existing SKUs are updated, new ones created) and invalid rows are reported by row number and column. 201 returns the job: 'completed' (valid rows applied) or 'failed' (the file was unusable; nothing changed). See docs/api/catalogue-import.md.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). multipart/form-data with `file` (.csv in UTF-8 or .xlsx, at most 10 MB and 5000 data rows). The file is processed within the request. Every row is checked first; valid rows are then applied in one transaction (SKU matching: existing SKUs are updated, new ones created) and invalid rows are reported by row number and column. 201 returns the job: 'completed' (valid rows applied) or 'failed' (the file was unusable; nothing changed). See docs/api/catalogue-import.md.
          */
         post: operations["upload_import_api_v1_staff_imports_post"];
         delete?: never;
@@ -1044,7 +1044,7 @@ export interface paths {
         };
         /**
          * Read an import job
-         * @description Requires 'catalog:manage' (administrator). Status, row counts and row errors of one import.
+         * @description Requires 'catalog:edit' (held by no role in V1, SC-06). Status, row counts and row errors of one import.
          */
         get: operations["get_import_api_v1_staff_imports__job_id__get"];
         put?: never;
@@ -1084,7 +1084,7 @@ export interface paths {
         };
         /**
          * A job's progress and every item's outcome
-         * @description Requires 'catalog:manage' (administrator). Poll it after starting a job: `state` is finished when no item is queued or processing.
+         * @description Requires 'catalog:edit' (no role in V1, SC-06). Poll it after starting a job: `state` is finished when no item is queued or processing.
          */
         get: operations["get_job_api_v1_staff_jobs__job_id__get"];
         put?: never;
@@ -1106,7 +1106,7 @@ export interface paths {
         put?: never;
         /**
          * Requeue a job's failed items
-         * @description Requires 'catalog:manage' (administrator). Failed items go back to the queue with their attempts reset; done items are never redone. Audited as 'job.retry_failed'.
+         * @description Requires 'catalog:edit' (no role in V1, SC-06). Failed items go back to the queue with their attempts reset; done items are never redone. Audited as 'job.retry_failed'.
          */
         post: operations["retry_failed_api_v1_staff_jobs__job_id__retry_failed_post"];
         delete?: never;
@@ -2590,7 +2590,7 @@ export interface paths {
         };
         /**
          * Payment attempts (reconciliation list)
-         * @description Requires 'payments:read' (administrator). Read-only; newest first. `amount_total` sums `amount` over every attempt matching the filters, not just this page.
+         * @description Requires 'payments:read' (held by no role in V1, SC-06). Read-only; newest first. `amount_total` sums `amount` over every attempt matching the filters, not just this page.
          */
         get: operations["list_payments_api_v1_staff_payments_get"];
         put?: never;
@@ -2632,7 +2632,7 @@ export interface paths {
         put?: never;
         /**
          * Record cash on delivery as collected
-         * @description Requires 'payments:manage' (administrator). Only for a cash-on-delivery payment of a delivered order (409 order_not_delivered before that; TC-12). Delivery already marks it succeeded (§7 Q14); confirming a succeeded payment changes nothing. Audited as 'payment.cod_confirm'.
+         * @description Requires 'payments:manage' (held by no role in V1, SC-06). Only for a cash-on-delivery payment of a delivered order (409 order_not_delivered before that; TC-12). Delivery already marks it succeeded (§7 Q14); confirming a succeeded payment changes nothing. Audited as 'payment.cod_confirm'.
          */
         post: operations["confirm_cod_api_v1_staff_payments__attempt_id__confirm_cod_post"];
         delete?: never;
@@ -2650,7 +2650,7 @@ export interface paths {
         };
         /**
          * List orders
-         * @description Requires 'orders:read' (every staff role). Newest first, with the customer's name and phone. `from` and `to` bound the creation time (inclusive); `payment_status` and `payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number (any accepted format; matches the order's phone) or part of an order number. `store_id` keeps orders with a line from that store (ADR-014 phase 3).
+         * @description Requires 'orders:read' (held by no role in V1, SC-06). Newest first, with the customer's name and phone. `from` and `to` bound the creation time (inclusive); `payment_status` and `payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number (any accepted format; matches the order's phone) or part of an order number. `store_id` keeps orders with a line from that store (ADR-014 phase 3).
          */
         get: operations["list_staff_orders_api_v1_staff_orders_get"];
         put?: never;
@@ -2670,7 +2670,7 @@ export interface paths {
         };
         /**
          * Staff an order can be assigned to
-         * @description Requires 'orders:fulfil' (administrator). Every active staff account (name and role only), by name: the choices for PATCH /staff/orders/{id}/assignment.
+         * @description Requires 'orders:fulfil' (held by no role in V1, SC-06). Every active staff account (name and role only), by name: the choices for PATCH /staff/orders/{id}/assignment.
          */
         get: operations["list_assignees_api_v1_staff_orders_assignees_get"];
         put?: never;
@@ -2716,7 +2716,7 @@ export interface paths {
         head?: never;
         /**
          * Cancel an order
-         * @description Requires 'orders:fulfil' (administrator). ADR-014 phase 3 (owner decision 2): sellers run fulfilment and the order's confirmed, processing, dispatched and delivered follow its stores' seller orders, so the only status staff can set is `cancelled`; any other answers 409 order_status_follows_seller_orders. Cancellation, its status history row and audit event commit atomically; it releases active holds and the promotion use, cancels an unpaid payment and every seller order. Committed stock is never released by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409 inventory_conflict. The customer's notification is recorded with the change and sent after the response (module 17).
+         * @description Requires 'orders:fulfil' (held by no role in V1, SC-06: no one cancels a whole order by hand; the expiry job still does). ADR-014 phase 3 (owner decision 2): sellers run fulfilment and the order's confirmed, processing, dispatched and delivered follow its stores' seller orders, so the only status staff can set is `cancelled`; any other answers 409 order_status_follows_seller_orders. Cancellation, its status history row and audit event commit atomically; it releases active holds and the promotion use, cancels an unpaid payment and every seller order. Committed stock is never released by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409 inventory_conflict. The customer's notification is recorded with the change and sent after the response (module 17).
          */
         patch: operations["change_order_status_api_v1_staff_orders__order_id__status_patch"];
         trace?: never;
@@ -2736,7 +2736,7 @@ export interface paths {
         head?: never;
         /**
          * Assign fulfilment responsibility for an order
-         * @description Requires 'orders:fulfil' (administrator). The target must be an active staff account with one of the repository's assigned staff roles. The assignment and audit event commit atomically.
+         * @description Requires 'orders:fulfil' (held by no role in V1, SC-06). The target must be an active staff account with one of the repository's assigned staff roles. The assignment and audit event commit atomically.
          */
         patch: operations["assign_order_fulfilment_api_v1_staff_orders__order_id__assignment_patch"];
         trace?: never;
@@ -2794,7 +2794,7 @@ export interface paths {
         };
         /**
          * Stock list, with the low-stock filter
-         * @description Requires 'inventory:read' (administrator). One row per SKU, active or not, ordered by SKU, with the same figures as GET /inventory/{sku}. `low_stock=true` lists SKUs whose available quantity is at or below their low_stock_threshold (threshold above 0): this is the low-stock alert. `low_stock=false` lists the others; omit it for all. `q` matches a case-insensitive substring of the SKU, variant name or product name.
+         * @description Requires 'inventory:read' (held by no role in V1, SC-06). One row per SKU, active or not, ordered by SKU, with the same figures as GET /inventory/{sku}. `low_stock=true` lists SKUs whose available quantity is at or below their low_stock_threshold (threshold above 0): this is the low-stock alert. `low_stock=false` lists the others; omit it for all. `q` matches a case-insensitive substring of the SKU, variant name or product name.
          */
         get: operations["list_inventory_api_v1_inventory_get"];
         put?: never;
@@ -2814,7 +2814,7 @@ export interface paths {
         };
         /**
          * Stock figures for a SKU
-         * @description Returns physical, unavailable, reserved (active), committed and available quantities read from PostgreSQL. A SKU without an inventory record reports zeros. Requires 'inventory:read' (administrator).
+         * @description Returns physical, unavailable, reserved (active), committed and available quantities read from PostgreSQL. A SKU without an inventory record reports zeros. Requires 'inventory:read' (held by no role in V1, SC-06).
          */
         get: operations["get_inventory_api_v1_inventory__sku__get"];
         put?: never;
@@ -2836,7 +2836,7 @@ export interface paths {
         put?: never;
         /**
          * Record a physical stock change
-         * @description Applies a receipt, adjustment or inspected return to physical on_hand and appends a stock-ledger movement, in one transaction with an 'inventory.adjust' audit record. Requires 'inventory:adjust' (administrator).
+         * @description Applies a receipt, adjustment or inspected return to physical on_hand and appends a stock-ledger movement, in one transaction with an 'inventory.adjust' audit record. Requires 'inventory:adjust' (held by no role in V1, SC-06).
          *
          *     **Idempotency:** the `Idempotency-Key` header is required (8-100 characters: letters, digits, `_ . : -`). Repeating a request with the same key returns the original movement with HTTP 200 and `replayed: true`, without changing stock again. Reusing a key for a different change returns 409. Keys are scoped to the calling staff member.
          *
@@ -2929,6 +2929,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/staff/reports/marketplace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Marketplace overview
+         * @description Requires 'reports:read' (administrator). Stores by status, active customer accounts and products on the storefront now; and per day, week or month (`group_by`, default month): qualifying orders, the stores' goods after discounts and the platform's commission in them, stores approved for the first time and customer accounts registered. Counts only paid orders and delivered cash-on-delivery orders (orders with a succeeded payment; UAT scenario 7), each once, dated by its first payment success. `from` and `to` are inclusive Africa/Kigali dates (YYYY-MM-DD), at most 366 days apart; weeks start on Monday (§7 Q25). Amounts are whole RWF. Months and weeks are cut at the range. Aggregates only: no customer, seller or order is identified (SC-06, ADR-014 phase 7).
+         */
+        get: operations["marketplace_report_api_v1_staff_reports_marketplace_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/staff/reports/stock": {
         parameters: {
             query?: never;
@@ -2938,7 +2958,7 @@ export interface paths {
         };
         /**
          * Stock report
-         * @description Requires 'reports:read' (administrator). One row per SKU, active or not, ordered by SKU, with the figures of GET /api/v1/inventory (available = on hand - unavailable - reserved - committed, never below 0). Paginated; `totals` covers every SKU.
+         * @description Requires 'reports:read' (administrator). One row per SKU, active or not, ordered by SKU, with the figures of GET /api/v1/inventory (available = on hand - unavailable - reserved - committed, never below 0). Paginated; `totals` covers every SKU. Also needs 'inventory:read', held by no role in V1 (SC-06).
          */
         get: operations["stock_report_api_v1_staff_reports_stock_get"];
         put?: never;
@@ -2958,7 +2978,7 @@ export interface paths {
         };
         /**
          * Export a report to Excel (XLSX)
-         * @description Requires 'reports:read' (administrator). `report_type` is `sales`, `top-products` or `stock`; the query parameters are those of the JSON report (`from`, `to` and `group_by` for sales; `from`, `to` and `limit` for top products; none for stock, which exports every SKU). The rows and totals are those of the JSON report with the same parameters.
+         * @description Requires 'reports:read' (administrator). `report_type` is `sales`, `top-products` or `stock`; the query parameters are those of the JSON report (`from`, `to` and `group_by` for sales; `from`, `to` and `limit` for top products; none for stock, which exports every SKU). The rows and totals are those of the JSON report with the same parameters. The stock export also needs 'inventory:read', held by no role in V1 (SC-06).
          */
         get: operations["export_report_api_v1_staff_reports__report_type__export_get"];
         put?: never;
@@ -5585,6 +5605,118 @@ export interface components {
              * @description Account password
              */
             password: string;
+        };
+        /** MarketplaceFigures */
+        MarketplaceFigures: {
+            /**
+             * Orders
+             * @description Qualifying orders (the sales rule)
+             */
+            orders: number;
+            /**
+             * Merchandise Total
+             * @description Goods after discounts sold by the stores in those orders (RWF)
+             */
+            merchandise_total: number;
+            /**
+             * Commission Amount
+             * @description The platform's commission on them (RWF)
+             */
+            commission_amount: number;
+            /**
+             * New Stores
+             * @description Stores approved for the first time
+             */
+            new_stores: number;
+            /**
+             * New Customers
+             * @description Customer accounts registered (store owners included)
+             */
+            new_customers: number;
+        };
+        /** MarketplacePeriod */
+        MarketplacePeriod: {
+            /**
+             * Orders
+             * @description Qualifying orders (the sales rule)
+             */
+            orders: number;
+            /**
+             * Merchandise Total
+             * @description Goods after discounts sold by the stores in those orders (RWF)
+             */
+            merchandise_total: number;
+            /**
+             * Commission Amount
+             * @description The platform's commission on them (RWF)
+             */
+            commission_amount: number;
+            /**
+             * New Stores
+             * @description Stores approved for the first time
+             */
+            new_stores: number;
+            /**
+             * New Customers
+             * @description Customer accounts registered (store owners included)
+             */
+            new_customers: number;
+            /**
+             * Period Start
+             * Format: date
+             * @description First Kigali day of the period within the range
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             * @description Last Kigali day of the period within the range
+             */
+            period_end: string;
+        };
+        /**
+         * MarketplaceReport
+         * @description The marketplace overview (SC-06, ADR-014 phase 7): counts now, and aggregated figures
+         *     per period. No customer, seller or order is identified.
+         */
+        MarketplaceReport: {
+            /**
+             * From
+             * Format: date
+             */
+            from: string;
+            /**
+             * To
+             * Format: date
+             */
+            to: string;
+            /**
+             * Group By
+             * @enum {string}
+             */
+            group_by: "day" | "week" | "month";
+            /**
+             * Timezone
+             * @default Africa/Kigali
+             */
+            timezone: string;
+            stores: components["schemas"]["StoreCounts"];
+            /**
+             * Customers
+             * @description Active customer accounts now (store owners included)
+             */
+            customers: number;
+            /**
+             * Published Products
+             * @description Products on the storefront now
+             */
+            published_products: number;
+            /**
+             * Periods
+             * @description Every day, week or month of the range in order, including empty ones
+             */
+            periods: components["schemas"]["MarketplacePeriod"][];
+            totals: components["schemas"]["MarketplaceFigures"];
         };
         /**
          * MeResponse
@@ -9739,6 +9871,23 @@ export interface components {
         StoreCommissionRequest: {
             /** Commission Rate Bps */
             commission_rate_bps: number | null;
+        };
+        /**
+         * StoreCounts
+         * @description Stores by status now (ADR-014).
+         */
+        StoreCounts: {
+            /** Approved */
+            approved: number;
+            /**
+             * Pending
+             * @description Applications waiting for a decision
+             */
+            pending: number;
+            /** Rejected */
+            rejected: number;
+            /** Suspended */
+            suspended: number;
         };
         /** StoreHistoryEntry */
         StoreHistoryEntry: {
@@ -20152,6 +20301,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TopProductsReport"];
+                };
+            };
+            /** @description Token missing, invalid, expired or revoked */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Account inactive, or role lacks the required permission */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request body, path or query failed validation */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    marketplace_report_api_v1_staff_reports_marketplace_get: {
+        parameters: {
+            query: {
+                /** @description First Kigali day (YYYY-MM-DD) */
+                from: string;
+                /** @description Last Kigali day, inclusive */
+                to: string;
+                /** @description day, week or month */
+                group_by?: "day" | "week" | "month";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarketplaceReport"];
                 };
             };
             /** @description Token missing, invalid, expired or revoked */

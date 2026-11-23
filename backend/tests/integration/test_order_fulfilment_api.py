@@ -38,6 +38,10 @@ from tests.support.commerce import needs_stores
 from tests.support.seller_orders import move, owner_headers, seller_orders
 from tests.support.sellers import new_store
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 
 @pytest.fixture
 def session_factory(pg_engine):

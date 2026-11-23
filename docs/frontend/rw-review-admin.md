@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1642 strings.
+1478 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -15,35 +15,31 @@ updates `messages/admin.rw.json`.
 | `shell.home` | {marketplace} admin — dashboard | {marketplace} ubuyobozi — imbonerahamwe | |
 | `shell.navLabel` | Admin | Ubuyobozi | |
 | `shell.groups.overview` | Overview | Incamake | |
-| `shell.groups.orders` | Orders | Amatumiza | |
-| `shell.groups.catalogue` | Catalogue | Ibicuruzwa | |
-| `shell.groups.store` | Store | Iduka | |
-| `shell.groups.system` | System | Sisitemu | |
-| `shell.nav.dashboard` | Dashboard | Imbonerahamwe | |
-| `shell.nav.orders` | Orders | Amatumiza | |
-| `shell.nav.payments` | Payments | Ubwishyu | |
-| `shell.nav.products` | Products | Ibicuruzwa | |
-| `shell.nav.bulkImages` | Product photos | Amafoto y'ibicuruzwa | |
-| `shell.nav.categories` | Categories & Brands | Ibyiciro n'ibirango | |
-| `shell.nav.import` | Catalogue Import | Kwinjiza ibicuruzwa | |
-| `shell.nav.inventory` | Inventory | Ububiko | |
-| `shell.nav.reviews` | Reviews | Ibitekerezo | |
-| `shell.nav.delivery` | Delivery Zones | Uturere two kugeza | |
-| `shell.nav.promotions` | Promotions | Poromosiyo | |
-| `shell.nav.staff` | Staff & Roles | Abakozi n'inshingano | |
-| `shell.nav.settings` | Settings & Pages | Igenamiterere n'impapuro | |
-| `shell.nav.audit` | Audit Log | Igitabo cy'ibikorwa | |
-| `shell.nav.quotes` | Quote requests | Ubusabe bw'ibiciro | |
-| `shell.nav.messages` | Support | Ubufasha | |
-| `shell.nav.services` | Services | Serivisi | |
-| `shell.nav.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
+| `shell.groups.marketplace` | Marketplace | Isoko | |
+| `shell.groups.support` | Platform support | Ubufasha bw'urubuga | |
+| `shell.groups.insights` | Insights | Isesengura | |
+| `shell.groups.platform` | Platform | Urubuga | |
+| `shell.nav.dashboard` | Overview | Incamake | |
 | `shell.nav.sellers` | Sellers | Abacuruzi | |
+| `shell.nav.products` | Product moderation | Kugenzura ibicuruzwa | |
+| `shell.nav.categories` | Categories & Brands | Ibyiciro n'ibirango | |
+| `shell.nav.promotions` | Promotions | Poromosiyo | |
+| `shell.nav.reviews` | Reviews & Moderation | Ibitekerezo no kugenzura | |
+| `shell.nav.messages` | Platform support | Ubufasha bw'urubuga | |
+| `shell.nav.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
+| `shell.nav.quotes` | Quote requests | Ubusabe bw'ibiciro | |
+| `shell.nav.analytics` | Analytics & Reports | Isesengura na raporo | |
+| `shell.nav.settings` | Platform settings | Igenamiterere ry'urubuga | |
+| `shell.nav.delivery` | Delivery zones | Uturere two kugeza | |
+| `shell.nav.services` | Services | Serivisi | |
+| `shell.nav.staff` | Administrators | Abayobozi | |
+| `shell.nav.audit` | Audit Log | Igitabo cy'ibikorwa | |
 | `shell.newCount` | {count} new | {count} bishya | |
 | `shell.logout` | Log out | Sohoka | |
 | `shell.openMenu` | Open admin menu | Fungura menu y'ubuyobozi | |
 | `shell.closeMenu` | Close admin menu | Funga menu y'ubuyobozi | |
 | `shell.searchLabel` | Search the admin | Shakisha mu buyobozi | |
-| `shell.searchPlaceholder` | Search orders, products, customers… | Shakisha amatumiza, ibicuruzwa, abakiriya… | |
+| `shell.searchPlaceholder` | Search products across the stores… | Shakisha ibicuruzwa mu maduka yose… | |
 | `shell.searchShortcut` | Ctrl + K | Ctrl + K | |
 | `shell.skipToContent` | Skip to content | Jya ku bikubiyemo | |
 | `shell.close` | Close | Funga | |
@@ -55,7 +51,7 @@ updates `messages/admin.rw.json`.
 | `shell.notifications` | Notifications: {count, plural, =0 {nothing waiting} one {# waiting} other {# waiting}} | Imenyesha: {count, plural, =0 {nta kirategereje} one {# gitegereje} other {# bitegereje}} | |
 | `shell.waitingTitle` | Waiting for you | Ibigutegereje | |
 | `shell.waitingEmpty` | All caught up: nothing is waiting for you. | Byose byarangiye: nta kigutegereje. | |
-| `shell.waiting.orders` | {count, plural, one {# new order to confirm} other {# new orders to confirm}} | {count, plural, one {Itumiza # rishya ryo kwemeza} other {Amatumiza # mashya yo kwemeza}} | |
+| `shell.waiting.sellers` | {count, plural, one {# seller application to review} other {# seller applications to review}} | {count, plural, one {Ubusabe # bw'umucuruzi bwo gusuzuma} other {Ubusabe # bw'abacuruzi bwo gusuzuma}} | |
 | `shell.waiting.messages` | {count, plural, one {# message to reply to} other {# messages to reply to}} | {count, plural, one {Ubutumwa # bwo gusubiza} other {Ubutumwa # bwo gusubiza}} | |
 | `shell.waiting.quotes` | {count, plural, one {# new quote request} other {# new quote requests}} | {count, plural, one {Ubusabe # bushya bw'igiciro} other {Ubusabe # bushya bw'ibiciro}} | |
 | `shell.waiting.reviews` | {count, plural, one {# review to approve} other {# reviews to approve}} | {count, plural, one {Igitekerezo # cyo kwemeza} other {Ibitekerezo # byo kwemeza}} | |
@@ -117,179 +113,61 @@ updates `messages/admin.rw.json`.
 | `status.sellerOrder.dispatched` | Out for delivery | Riri mu nzira | |
 | `status.sellerOrder.delivered` | Delivered | Ryagejejwe | |
 | `status.sellerOrder.cancelled` | Cancelled | Ryahagaritswe | |
-| `dashboard.title` | Dashboard | Imbonerahamwe | |
-| `dashboard.description` | Overview of your store, orders and key performance metrics. | Incamake y'iduka ryawe, amatumiza n'imibare y'ingenzi. | |
 | `dashboard.period` | Period | Igihe | |
-| `dashboard.periods.7` | Last 7 days | Iminsi 7 ishize | |
 | `dashboard.periods.30` | Last 30 days | Iminsi 30 ishize | |
 | `dashboard.periods.90` | Last 90 days | Iminsi 90 ishize | |
+| `dashboard.periods.365` | Last 12 months | Amezi 12 ashize | |
 | `dashboard.greeting.morning` | Good morning, {name} | Mwaramutse, {name} | |
 | `dashboard.greeting.afternoon` | Good afternoon, {name} | Mwiriwe, {name} | |
 | `dashboard.greeting.evening` | Good evening, {name} | Mwiriwe, {name} | |
-| `dashboard.subtitle` | Here’s what’s happening at {marketplace} today. | Dore ibiri kubera kuri {marketplace} uyu munsi. | |
-| `dashboard.totalOrders` | Total Orders | Amatumiza yose | |
-| `dashboard.totalRevenue` | Total Revenue | Amafaranga yose yinjiye | |
-| `dashboard.products` | Products | Ibicuruzwa | |
-| `dashboard.inCatalogue` | in catalogue | biri mu iduka | |
-| `dashboard.pendingPayments` | Pending Payments | Ubwishyu butegerejwe | |
-| `dashboard.pendingHint` | awaiting confirmation | bitegereje kwemezwa | |
+| `dashboard.subtitle` | How {marketplace} is growing, and the decisions waiting for you. | Uko {marketplace} iri gutera imbere, n'ibyemezo bigutegereje. | |
 | `dashboard.vsPreviousDays` | vs previous {days} days | ugereranyije n'iminsi {days} ibanza | |
-| `dashboard.salesOverview` | Sales Overview | Incamake y'igurisha | |
 | `dashboard.metricLabel` | Chart shows | Igishushanyo cyerekana | |
-| `dashboard.metric.total` | Revenue | Amafaranga yinjiye | |
+| `dashboard.metric.merchandise_total` | Goods sold | Ibyagurishijwe | |
+| `dashboard.metric.commission_amount` | Commission | Komisiyo | |
 | `dashboard.metric.orders` | Orders | Amatumiza | |
 | `dashboard.ordersCount` | {count, plural, one {# order} other {# orders}} | {count, plural, one {itumiza #} other {amatumiza #}} | |
 | `dashboard.chartLabel` | {metric} from {from} to {to}: {total} in total | {metric} kuva {from} kugeza {to}: {total} byose hamwe | |
 | `dashboard.weekOf` | Week of {date} | Icyumweru cya {date} | |
 | `dashboard.noSales` | No paid orders in this period yet. | Nta tumiza ryishyuwe muri iki gihe. | |
-| `dashboard.recentOrders` | Recent Orders | Amatumiza aheruka | |
-| `dashboard.noRecent` | No orders yet. | Nta matumiza arahari. | |
 | `dashboard.topSelling` | Top Selling Products | Ibicuruzwa bigurwa cyane | |
 | `dashboard.sold` | {count} sold | {count} byagurishijwe | |
 | `dashboard.noTopSelling` | Nothing sold in this period yet. | Nta kintu cyagurishijwe muri iki gihe. | |
-| `dashboard.systemAlerts` | System Alerts | Imenyesha rya sisitemu | |
-| `dashboard.alerts.view` | View {name} | Reba {name} | |
-| `dashboard.alerts.viewShort` | View | Reba | |
-| `dashboard.alerts.lowStock.title` | Low stock | Bisigaye bike | |
-| `dashboard.alerts.lowStock.body` | {count, plural, =0 {Every item is above its alert level.} one {# item is running low.} other {# items are running low.}} | {count, plural, =0 {Ibicuruzwa byose birenze urugero rw'imenyesha.} one {Igicuruzwa # kiri gushira.} other {Ibicuruzwa # biri gushira.}} | |
-| `dashboard.alerts.dispatch.title` | Ready to dispatch | Biteguye koherezwa | |
-| `dashboard.alerts.dispatch.body` | {count, plural, =0 {Nothing is waiting to go out.} one {# order is packed and waiting.} other {# orders are packed and waiting.}} | {count, plural, =0 {Nta kintu gitegereje koherezwa.} one {Itumiza # ryapakiwe riri gutegereza.} other {Amatumiza # yapakiwe ari gutegereza.}} | |
-| `dashboard.alerts.reconcile.title` | Payment issues | Ibibazo by'ubwishyu | |
-| `dashboard.alerts.reconcile.body` | {count, plural, =0 {No payments need checking.} one {# payment needs reconciling.} other {# payments need reconciling.}} | {count, plural, =0 {Nta bwishyu bukeneye kugenzurwa.} one {Ubwishyu # bukeneye guhuzwa.} other {Ubwishyu # bukeneye guhuzwa.}} | |
-| `dashboard.alerts.reviews.title` | Reviews to approve | Ibitekerezo byo kwemeza | |
-| `dashboard.alerts.reviews.body` | {count, plural, =0 {No reviews are waiting.} one {# review is waiting.} other {# reviews are waiting.}} | {count, plural, =0 {Nta gitekerezo gitegereje.} one {Igitekerezo # kirategereje.} other {Ibitekerezo # birategereje.}} | |
 | `dashboard.up` | Up {percent}% | Byazamutseho {percent}% | |
 | `dashboard.down` | Down {percent}% | Byagabanutseho {percent}% | |
 | `dashboard.flat` | No change | Nta mpinduka | |
-| `dashboard.ordersByStatus` | Orders by Status | Amatumiza bitewe n'aho ageze | |
-| `dashboard.viewAll` | View all | Reba byose | |
-| `dashboard.totalLabel` | Total orders | Amatumiza yose | |
-| `dashboard.statusChart` | {total} orders: {parts} | Amatumiza {total}: {parts} | |
-| `dashboard.share` | {count} ({percent}%) | {count} ({percent}%) | |
-| `dashboard.noOrders` | No orders in this period. | Nta matumiza muri iki gihe. | |
-| `dashboard.lowStockItems` | Low Stock Items | Ibisigaye bike | |
-| `dashboard.left` | {count} left | Hasigaye {count} | |
-| `dashboard.sku` | SKU: {sku} | SKU: {sku} | |
-| `dashboard.noLowStock` | Nothing is low on stock. | Nta gicuruzwa kiri gushira. | |
-| `dashboard.quickActions` | Quick Actions | Ibikorwa byihuse | |
-| `dashboard.actions.import` | Import catalogue | Injiza ibicuruzwa | |
-| `dashboard.actions.orders` | View orders | Reba amatumiza | |
-| `dashboard.actions.stock` | Manage stock | Genzura ububiko | |
-| `dashboard.actions.promotion` | New promotion | Poromosiyo nshya | |
-| `orders.title` | Orders | Amatumiza | |
-| `orders.description` | Follow every order from the moment it arrives until it reaches the customer. | Kurikirana buri tumiza kuva rigeze kugeza rigeze ku mukiriya. | |
-| `orders.all` | All orders | Amatumiza yose | |
-| `orders.count` | {count, plural, one {# order} other {# orders}} | {count, plural, one {itumiza #} other {amatumiza #}} | |
-| `orders.items` | {count, plural, one {# item} other {# items}} | {count, plural, one {igicuruzwa #} other {ibicuruzwa #}} | |
-| `orders.clearFilters` | Clear filters | Kuraho akayunguruzo | |
-| `orders.tabsLabel` | Order status | Aho itumiza rigeze | |
-| `orders.tabAll` | All ({count}) | Byose ({count}) | |
-| `orders.tab` | {label} ({count}) | {label} ({count}) | |
-| `orders.searchLabel` | Search orders | Shakisha amatumiza | |
-| `orders.searchPlaceholder` | Order number or customer phone | Nimero y'itumiza cyangwa telefoni y'umukiriya | |
-| `orders.periodLabel` | Order date | Itariki y'itumiza | |
+| `dashboard.goodsSales` | Goods sold | Ibicuruzwa byagurishijwe | |
+| `dashboard.commission` | Commission earned | Komisiyo yinjiye | |
+| `dashboard.orders` | Paid orders | Amatumiza yishyuwe | |
+| `dashboard.approvedStores` | Approved stores | Amaduka yemewe | |
+| `dashboard.newInPeriod` | {count, plural, =0 {none new in this period} one {# new in this period} other {# new in this period}} | {count, plural, =0 {nta rishya muri iki gihe} one {# rishya muri iki gihe} other {# mashya muri iki gihe}} | |
+| `dashboard.trend` | Marketplace trend | Uko isoko rihagaze | |
+| `dashboard.marketplace` | Marketplace | Isoko | |
+| `dashboard.viewSellers` | View sellers | Reba abacuruzi | |
+| `dashboard.stores.approved` | Approved stores | Amaduka yemewe | |
+| `dashboard.stores.pending` | Applications waiting | Ubusabe butegereje | |
+| `dashboard.stores.suspended` | Suspended stores | Amaduka yahagaritswe | |
+| `dashboard.stores.rejected` | Rejected applications | Ubusabe bwanzwe | |
+| `dashboard.customers` | Customer accounts | Konti z'abakiriya | |
+| `dashboard.publishedProducts` | Products on the store | Ibicuruzwa biri ku isoko | |
+| `dashboard.attention` | Needs your attention | Ibikeneye ko ubyitaho | |
+| `dashboard.tasks.view` | View {name} | Reba {name} | |
+| `dashboard.tasks.viewShort` | View | Reba | |
+| `dashboard.tasks.applications.title` | Seller applications | Ubusabe bw'abacuruzi | |
+| `dashboard.tasks.applications.body` | {count, plural, =0 {No applications are waiting.} one {# application is waiting for review.} other {# applications are waiting for review.}} | {count, plural, =0 {Nta busabe butegereje.} one {Ubusabe # butegereje gusuzumwa.} other {Ubusabe # butegereje gusuzumwa.}} | |
+| `dashboard.tasks.reviews.title` | Reviews to moderate | Ibitekerezo byo kugenzura | |
+| `dashboard.tasks.reviews.body` | {count, plural, =0 {No reviews are waiting.} one {# review is waiting.} other {# reviews are waiting.}} | {count, plural, =0 {Nta gitekerezo gitegereje.} one {Igitekerezo # kirategereje.} other {Ibitekerezo # birategereje.}} | |
+| `dashboard.tasks.messages.title` | Support conversations | Ibiganiro by'ubufasha | |
+| `dashboard.tasks.messages.body` | {count, plural, =0 {No conversations are open.} one {# conversation is open.} other {# conversations are open.}} | {count, plural, =0 {Nta kiganiro gifunguye.} one {Ikiganiro # kirafunguye.} other {Ibiganiro # birafunguye.}} | |
+| `dashboard.tasks.serviceRequests.title` | Service requests | Ubusabe bwa serivisi | |
+| `dashboard.tasks.serviceRequests.body` | {count, plural, =0 {No new service requests.} one {# new service request.} other {# new service requests.}} | {count, plural, =0 {Nta busabe bushya bwa serivisi.} one {Ubusabe bushya # bwa serivisi.} other {Ubusabe bushya # bwa serivisi.}} | |
+| `dashboard.tasks.quotes.title` | Quote requests | Ubusabe bw'ibiciro | |
+| `dashboard.tasks.quotes.body` | {count, plural, =0 {No new quote requests.} one {# new quote request.} other {# new quote requests.}} | {count, plural, =0 {Nta busabe bushya bw'ibiciro.} one {Ubusabe bushya # bw'igiciro.} other {Ubusabe bushya # bw'ibiciro.}} | |
 | `orders.periods.7` | Last 7 days | Iminsi 7 ishize | |
 | `orders.periods.30` | Last 30 days | Iminsi 30 ishize | |
 | `orders.periods.90` | Last 90 days | Iminsi 90 ishize | |
 | `orders.periods.all` | Any time | Igihe icyo ari cyo cyose | |
-| `orders.methodLabel` | Payment method | Uburyo bwo kwishyura | |
-| `orders.allMethods` | All payment methods | Uburyo bwose bwo kwishyura | |
-| `orders.columns.order` | Order | Itumiza | |
-| `orders.columns.customer` | Customer | Umukiriya | |
-| `orders.columns.date` | Date | Itariki | |
-| `orders.columns.items` | Items | Ibicuruzwa | |
-| `orders.columns.total` | Total | Igiteranyo | |
-| `orders.columns.payment` | Payment | Kwishyura | |
-| `orders.columns.status` | Status | Aho rigeze | |
-| `orders.open` | Open order {number} | Fungura itumiza {number} | |
-| `orders.empty` | No orders match these filters. | Nta tumiza rihuye n'aka kayunguruzo. | |
-| `orders.noPayment` | No payment | Nta bwishyu | |
-| `orders.listLabel` | Orders list | Urutonde rw'ibyatumijwe | |
-| `orders.whatsappName` | WhatsApp {name} | Andikira {name} kuri WhatsApp | |
-| `orders.hints.all` | Every order placed | Ibyatumijwe byose | |
-| `orders.hints.received` | Waiting to be confirmed | Bitegereje kwemezwa | |
-| `orders.hints.confirmed` | Ready to prepare | Biteguye gutegurwa | |
-| `orders.hints.processing` | Being packed | Birimo gupakirwa | |
-| `orders.hints.dispatched` | On the way | Biri mu nzira | |
-| `orders.hints.delivered` | With the customer | Byageze ku mukiriya | |
-| `orders.hints.cancelled` | Stopped, stock released | Byahagaritswe, ububiko bwasubijwe | |
-| `order.title` | Order #{number} | Itumiza #{number} | |
-| `order.placed` | Placed {date} | Ryatanzwe {date} | |
-| `order.guest` | Guest checkout | Yaguze nta konti | |
-| `order.account` | Customer account | Konti y'umukiriya | |
-| `order.deliveryNote` | Delivery note | Inyandiko yo kugeza | |
-| `order.invoice` | Invoice | Fagitire | |
-| `order.cancel` | Cancel order | Hagarika itumiza | |
-| `order.cancelTitle` | Cancel order #{number}? | Hagarika itumiza #{number}? | |
-| `order.cancelBody` | The customer’s reserved stock is released. Paid or confirmed cash-on-delivery orders can’t be cancelled. | Ibicuruzwa byari bibikiwe umukiriya bisubizwa mu bubiko. Amatumiza yishyuwe cyangwa ayemejwe yo kwishyura ubigejejweho ntashobora guhagarikwa. | |
-| `order.cancelReason` | Reason | Impamvu | |
-| `order.cancelConfirm` | Cancel order | Hagarika itumiza | |
-| `order.keep` | Keep order | Gumana itumiza | |
-| `order.done` | This order is {status}. No further steps. | Iri tumiza ni {status}. Nta yindi ntambwe isigaye. | |
-| `order.statusChanged` | Order marked as {status} | Itumiza ryashyizwe kuri {status} | |
-| `order.transitionConflict` | The order changed in the meantime, or its stock or payment doesn’t allow this step. Reload and try again. | Itumiza ryahindutse hagati aho, cyangwa ububiko cyangwa ubwishyu bwaryo ntibwemera iyi ntambwe. Ongera ufungure urupapuro wongere ugerageze. | |
-| `order.items` | Items | Ibicuruzwa | |
-| `order.columns.product` | Product | Igicuruzwa | |
-| `order.columns.sku` | SKU | SKU | |
-| `order.columns.qty` | Qty | Umubare | |
-| `order.columns.unit` | Unit price | Igiciro kimwe | |
-| `order.columns.total` | Total | Igiteranyo | |
-| `order.subtotal` | Subtotal | Igiteranyo gito | |
-| `order.delivery` | Delivery · {zone} | Kugeza · {zone} | |
-| `order.deliveryNoZone` | Delivery | Kugeza | |
-| `order.free` | Free | Ubuntu | |
-| `order.discount` | Discount {code} | Igabanywa {code} | |
-| `order.discountNoCode` | Discount | Igabanywa | |
-| `order.total` | Total | Igiteranyo | |
-| `order.vat` | Includes VAT {amount} | Harimo TVA {amount} | |
-| `order.history` | Status history | Amateka y'aho ryageze | |
-| `order.customer` | Customer | Umukiriya | |
-| `order.whatsapp` | WhatsApp customer | Andikira umukiriya kuri WhatsApp | |
-| `order.deliveryTitle` | Delivery | Kugeza | |
-| `order.landmark` | Landmark: {text} | Ikimenyetso: {text} | |
-| `order.zone` | Zone: | Akarere: | |
-| `order.note` | Customer note: | Icyo umukiriya yanditse: | |
-| `order.payment` | Payment | Kwishyura | |
-| `order.method` | Method | Uburyo | |
-| `order.status` | Status | Aho bigeze | |
-| `order.amount` | Amount | Amafaranga | |
-| `order.provider` | Provider | Utanga serivisi | |
-| `order.paidAt` | Paid | Byishyuwe | |
-| `order.attempts` | {count, plural, one {# payment attempt} other {# payment attempts}} | {count, plural, one {igerageza # ryo kwishyura} other {amagerageza # yo kwishyura}} | |
-| `order.viewPayments` | View payment records | Reba inyandiko z'ubwishyu | |
-| `order.noPayment` | No payment yet. | Nta bwishyu buraba. | |
-| `order.notFound` | Order not found | Itumiza ntiryabonetse | |
-| `order.notFoundBody` | This order doesn’t exist or the link is wrong. | Iri tumiza ntiribaho cyangwa ihuza ntiriri byo. | |
-| `order.back` | Back to orders | Subira ku matumiza | |
-| `order.soldBy` | Sold by {store} | Bigurishwa na {store} | |
-| `order.sellerOrders.title` | Stores in this order ({count}) | Amaduka ari muri iri tumiza ({count}) | |
-| `order.sellerOrders.hint` | Each store confirms, packs, dispatches and delivers its own part; the order’s status follows the stores. | Buri duka ryemeza, ripakira, ryohereza kandi rigeza igice cyaryo; uko itumiza rihagaze bikurikira amaduka. | |
-| `order.sellerOrders.merchandise` | Goods | Ibicuruzwa | |
-| `order.sellerOrders.commission` | Commission {rate}% | Komisiyo {rate}% | |
-| `payments.title` | Payments | Ubwishyu | |
-| `payments.description` | Every payment attempt, newest first. Rows marked for a check need reconciling with the provider. | Igerageza ryose ryo kwishyura, irya vuba mbere. Ibyashyizweho ikimenyetso cyo kugenzura bikeneye guhuzwa n'utanga serivisi. | |
-| `payments.tiles.all` | All payments | Ubwishyu bwose | |
-| `payments.tiles.succeeded` | Successful | Byagenze neza | |
-| `payments.tiles.pending` | Pending | Biracyategerejwe | |
-| `payments.tiles.failed` | Failed | Byanze | |
-| `payments.count` | {count, plural, one {# payment} other {# payments}} | {count, plural, one {ubwishyu #} other {ubwishyu #}} | |
-| `payments.totalLabel` | Total amount of matching payments | Amafaranga yose y'ubwishyu buhuye n'akayunguruzo | |
-| `payments.totalCount` | {count, plural, =0 {No payments} one {# payment} other {# payments}} in this total | {count, plural, =0 {Nta bwishyu} one {Ubwishyu #} other {Ubwishyu #}} muri iki giteranyo | |
-| `payments.clearFilters` | Clear filters | Kuraho akayunguruzo | |
-| `payments.tabsLabel` | Payment status | Aho ubwishyu bugeze | |
-| `payments.methodLabel` | Method | Uburyo | |
-| `payments.allMethods` | All methods | Uburyo bwose | |
-| `payments.columns.reference` | Provider reference | Nimero y'utanga serivisi | |
-| `payments.columns.order` | Order | Itumiza | |
-| `payments.columns.method` | Method | Uburyo | |
-| `payments.columns.date` | Date | Itariki | |
-| `payments.columns.amount` | Amount | Amafaranga | |
-| `payments.columns.status` | Status | Aho bigeze | |
-| `payments.noReference` | — | — | |
-| `payments.empty` | No payments match these filters. | Nta bwishyu buhuye n'aka kayunguruzo. | |
-| `payments.needsCheck` | Needs reconciliation | Bikeneye guhuzwa | |
 | `products.title` | Products | Ibicuruzwa | |
-| `products.import` | Import | Injiza | |
 | `products.viewsLabel` | Product views | Uko ibicuruzwa byerekanwa | |
 | `products.views.all` | All products | Ibicuruzwa byose | |
 | `products.views.missingImages` | Missing images | Nta mafoto | |
@@ -297,7 +175,7 @@ updates `messages/admin.rw.json`.
 | `products.viewHints.all` | Everything in the catalogue | Ibiri mu iduka byose | |
 | `products.viewHints.missingImages` | Published, but no photo yet | Byashyizwe ahagaragara ariko nta foto | |
 | `products.viewHints.readyToPublish` | Drafts that have photos | Imishinga ifite amafoto | |
-| `products.description` | Manage the catalogue: prices, stock, photos and what shows on the store. | Genzura ibicuruzwa: ibiciro, ububiko, amafoto n'ibigaragara mu iduka. | |
+| `products.description` | Every store's products. Sellers keep their own details, prices, photos and stock; you hide or archive a product that breaks the rules and choose what is featured. | Ibicuruzwa by'amaduka yose. Abacuruzi ni bo bita ku makuru, ibiciro, amafoto n'ububiko byabyo; wowe uhisha cyangwa ubika igicuruzwa kirenga ku mategeko kandi uhitamo ibigaragazwa imbere. | |
 | `products.count` | {count, plural, one {# product} other {# products}} | {count, plural, one {igicuruzwa #} other {ibicuruzwa #}} | |
 | `products.clearFilters` | Clear filters | Kuraho akayunguruzo | |
 | `products.noBrand` | No brand | Nta kirango | |
@@ -340,6 +218,7 @@ updates `messages/admin.rw.json`.
 | `products.publishSelected` | Publish selected | Shyira ahagaragara ibyatoranyijwe | |
 | `products.bulkResult` | {activated} published{skipped, plural, =0 {} other {, # skipped (no photos)}}{already, plural, =0 {} other {, # already published}}. | {activated} byashyizwe ahagaragara{skipped, plural, =0 {} other {, # byasimbutswe (nta mafoto)}}{already, plural, =0 {} other {, # byari bisanzwe bigaragara}}. | |
 | `products.bulkFailed` | The products couldn’t be published. Reload and try again. | Ibicuruzwa ntibyashyizwe ahagaragara. Ongera ufungure urupapuro wongere ugerageze. | |
+| `products.moderationTitle` | Product moderation | Kugenzura ibicuruzwa | |
 | `editor.newTitle` | New product | Igicuruzwa gishya | |
 | `editor.create` | Create product | Kora igicuruzwa | |
 | `editor.viewOnStore` | View on store | Reba mu iduka | |
@@ -374,7 +253,6 @@ updates `messages/admin.rw.json`.
 | `editor.altTitle` | Photo description | Igisobanuro cy'ifoto | |
 | `editor.altLabel` | Alt text | Inyandiko isobanura ifoto | |
 | `editor.altHelp` | Describes the photo for screen readers, e.g. “Galaxy A55 in navy, front and back”. | Isobanura ifoto ku bakoresha porogaramu zisoma ecran, urugero “Galaxy A55 y'ubururu bwijimye, imbere n'inyuma”. | |
-| `editor.nextFileName` | For bulk upload, name the next photo {name}. | Mu kohereza byinshi icyarimwe, ifoto ikurikira yite {name}. | |
 | `editor.variants` | Variants, price & stock | Ubwoko, igiciro n'ububiko | |
 | `editor.addVariant` | Add variant | Ongeramo ubwoko | |
 | `editor.noVariants` | No variants yet. Add one to set a price. | Nta bwoko burahari. Ongeramo bumwe kugira ngo ushyireho igiciro. | |
@@ -441,48 +319,7 @@ updates `messages/admin.rw.json`.
 | `editor.furniture` | Furniture details | Ibiranga igikoresho | |
 | `editor.furnitureHelp` | Measurements in centimetres and kilograms. Material, colour and style are the storefront's filters. | Ibipimo muri santimetero na kilogarama. Icyo gikozwemo, ibara n'imiterere ni byo bishakishwa mu iduka. | |
 | `editor.notSet` | Not set | Ntibyashyizweho | |
-| `bulk.title` | Product photos | Amafoto y'ibicuruzwa | |
-| `bulk.backToProducts` | Back to products | Subira ku bicuruzwa | |
-| `bulk.description` | Upload many product photos at once. Each file’s name says which product it belongs to and where it goes. | Ohereza amafoto menshi y'ibicuruzwa icyarimwe. Izina rya buri dosiye rivuga igicuruzwa ifoto ari iyacyo n'aho ijya. | |
-| `bulk.steps.name` | Name your files | Ita amazina amadosiye yawe | |
-| `bulk.steps.nameBody` | product-slug.jpg is the cover, product-slug__2.jpg the second photo, and so on. The product list and editor show each product’s file names. | product-slug.jpg ni ifoto y'imbere, product-slug__2.jpg ifoto ya kabiri, n'ibindi. Urutonde rw'ibicuruzwa n'aho bihindurirwa byerekana amazina y'amadosiye ya buri gicuruzwa. | |
-| `bulk.steps.missing` | Products missing photos | Ibicuruzwa bidafite amafoto | |
-| `bulk.steps.upload` | Upload the photos | Ohereza amafoto | |
-| `bulk.steps.uploadBody` | JPEG, PNG or WebP, up to 5 MB each. They’re sent in batches of 20; a photo at a taken position replaces the old one. | JPEG, PNG cyangwa WebP, buri imwe itarenze MB 5. Yoherezwa mu matsinda ya 20; ifoto ijya ahari indi isimbura iya mbere. | |
-| `bulk.steps.check` | Check the report | Reba raporo | |
-| `bulk.steps.checkBody` | Each file shows its product and result. Retry failed files once the problem is fixed. | Buri dosiye yerekana igicuruzwa cyayo n'uko byagenze. Ongera wohereze ayanze ikibazo kimaze gukemuka. | |
-| `bulk.drop` | Drag your photos here, or <browse>browse</browse> | Kurura amafoto yawe hano, cyangwa <browse>uyashakishe</browse> | |
-| `bulk.dropHint` | .jpg, .png or .webp · max 5 MB each · any number of files | .jpg, .png cyangwa .webp · buri imwe itarenze MB 5 · umubare uwo ari wo wose | |
-| `bulk.progress` | {batches} of {total, plural, one {# batch} other {# batches}} sent | {batches} kuri {total, plural, one {itsinda #} other {amatsinda #}} byoherejwe | |
-| `bulk.progressLabel` | Upload progress | Aho kohereza bigeze | |
-| `bulk.percent` | {percent}% processed | {percent}% byakozwe | |
-| `bulk.finished` | Finished | Byarangiye | |
-| `bulk.stalled` | Still waiting: photos are processed by the background worker. Check that it is running. | Biracyategerejwe: amafoto akorwa na porogaramu ikora inyuma. Reba ko iri gukora. | |
-| `bulk.tiles.files` | Files | Amadosiye | |
-| `bulk.tiles.done` | Done | Byarangiye | |
-| `bulk.tiles.waiting` | Waiting | Bitegereje | |
-| `bulk.tiles.failed` | Failed | Byanze | |
-| `bulk.report` | Upload report | Raporo yo kohereza | |
-| `bulk.retry` | Retry failed | Ongera wohereze ayanze | |
-| `bulk.retried` | Failed photos sent again | Amafoto yanze yongeye koherezwa | |
-| `bulk.columns.file` | File | Dosiye | |
-| `bulk.columns.product` | Product | Igicuruzwa | |
-| `bulk.columns.position` | Position | Umwanya | |
-| `bulk.columns.result` | Result | Uko byagenze | |
-| `bulk.outcome.added` | Added | Yongeweho | |
-| `bulk.outcome.replaced` | Replaced | Yasimbuwe | |
-| `bulk.outcome.unchanged` | Unchanged | Nta cyahindutse | |
-| `bulk.outcome.done` | Done | Byarangiye | |
-| `bulk.outcome.failed` | Failed | Byanze | |
-| `bulk.outcome.processing` | Processing | Biri gukorwa | |
-| `bulk.outcome.queued` | Queued | Biri ku murongo | |
-| `bulk.outcome.sending` | Sending | Biroherezwa | |
-| `bulk.local.too_large` | Over 5 MB: make it smaller and upload it again. | Irenze MB 5: yigabanye wongere uyohereze. | |
-| `bulk.local.not_image` | Not a .jpg, .png or .webp file. | Si dosiye ya .jpg, .png cyangwa .webp. | |
-| `bulk.errors.batch` | This batch wasn’t accepted. Try these files again. | Iri tsinda ntiryakiriwe. Ongera wohereze aya madosiye. | |
-| `bulk.errors.storage` | The upload area is full. Try again later. | Ahabikwa amafoto huzuye. Ongera ugerageze nyuma. | |
-| `bulk.errors.tooLarge` | A file in this batch is over 5 MB. | Dosiye imwe muri iri tsinda irenze MB 5. | |
-| `bulk.errors.retry` | The failed photos couldn’t be sent again. Try again. | Amafoto yanze ntiyongeye koherezwa. Ongera ugerageze. | |
+| `editor.moderationNote` | Sellers maintain their own products. As an administrator you can change the visibility (hide or archive a product that breaks the rules) and the featured flag; the other fields are the seller's. | Abacuruzi ni bo bita ku bicuruzwa byabo. Nk'umuyobozi, ushobora guhindura uko kigaragara (guhisha cyangwa kubika igicuruzwa kirenga ku mategeko) n'ikimenyetso cyo kugaragazwa imbere; ibindi ni iby'umucuruzi. | |
 | `inventory.title` | Inventory | Ububiko | |
 | `inventory.description` | Stock for every variant: what's on the shelf, what's held for orders and what can still be sold. | Ububiko bwa buri bwoko: ibiri ku gipangu, ibibikiwe amatumiza n'ibishobora kugurishwa. | |
 | `inventory.tiles.low` | Low stock | Ibisigaye bike | |
@@ -723,41 +560,6 @@ updates `messages/admin.rw.json`.
 | `catalogue.inMenuCannotRemove` | The {category} store menu lists {brand}; take it off that menu first. | Menu y’iduka ya {category} irimo {brand}; banza ukikuremo. | |
 | `catalogue.inItsMenuShort` | (in its store menu) | (kiri muri menu yacyo) | |
 | `catalogue.otherBrandsJoin` | Other brands (they join {name}) | Ibindi birango (byinjira muri {name}) | |
-| `import.title` | Catalogue import | Kwinjiza ibicuruzwa | |
-| `import.description` | Update many existing products at once from a CSV or Excel file. Sellers add new products to their own store. | Vugurura ibicuruzwa byinshi bisanzweho icyarimwe uhereye kuri dosiye ya CSV cyangwa Excel. Abacuruzi ni bo bongeramo ibicuruzwa bishya mu iduka ryabo. | |
-| `import.steps.template` | Download the template | Kuramo icyitegererezo | |
-| `import.steps.templateBody` | Columns for product, brand, category, variant, price, stock and specs. | Inkingi z'igicuruzwa, ikirango, icyiciro, ubwoko, igiciro, ububiko n'ibiranga. | |
-| `import.steps.upload` | Upload your file | Ohereza dosiye yawe | |
-| `import.steps.uploadBody` | CSV or XLSX up to 10 MB. Existing SKUs are updated and new SKUs are added to existing products; rows for unknown products are refused. | CSV cyangwa XLSX itarenze MB 10. SKU zisanzwe zivugururwa, inshya zigashyirwa ku bicuruzwa bisanzweho; imirongo y'ibicuruzwa bitazwi ntiyemerwa. | |
-| `import.steps.check` | Check the report | Reba raporo | |
-| `import.steps.checkBody` | Rows with errors are skipped; the rest are imported. Download the report to fix them. | Imirongo ifite amakosa irasimbukwa; indi ikinjizwa. Kuramo raporo kugira ngo uyakosore. | |
-| `import.templateXlsx` | Template (.xlsx) | Icyitegererezo (.xlsx) | |
-| `import.templateCsv` | or .csv | cyangwa .csv | |
-| `import.drop` | Drag your file here, or <browse>browse</browse> | Kurura dosiye yawe hano, cyangwa <browse>uyishakishe</browse> | |
-| `import.dropHint` | .csv or .xlsx · max 10 MB | .csv cyangwa .xlsx · itarenze MB 10 | |
-| `import.processing` | Importing… | Biri kwinjizwa… | |
-| `import.statusDone` | {count, plural, one {# row} other {# rows}} · processed | {count, plural, one {umurongo #} other {imirongo #}} · byakozwe | |
-| `import.statusFailed` | Not imported | Ntibyinjijwe | |
-| `import.statusRejected` | Not sent | Ntibyoherejwe | |
-| `import.progressLabel` | Import progress | Aho kwinjiza bigeze | |
-| `import.tiles.read` | Rows read | Imirongo yasomwe | |
-| `import.tiles.imported` | Imported | Byinjijwe | |
-| `import.tiles.errors` | Errors (skipped) | Amakosa (byasimbutswe) | |
-| `import.tiles.warnings` | Warnings | Imiburo | |
-| `import.report` | Error report | Raporo y'amakosa | |
-| `import.download` | Download report | Kuramo raporo | |
-| `import.failedNote` | The file couldn’t be used, so nothing was changed. | Dosiye ntiyashobotse gukoreshwa, nta cyahindutse. | |
-| `import.fileLevel` | File | Dosiye | |
-| `import.truncated` | Only the first 1,000 errors are shown; {count} rows have errors in total. | Herekanwa amakosa 1,000 ya mbere gusa; imirongo {count} yose ifite amakosa. | |
-| `import.kinds.error` | Error | Ikosa | |
-| `import.kinds.warning` | Warning | Umuburo | |
-| `import.columns.kind` | Type | Ubwoko | |
-| `import.columns.row` | Row | Umurongo | |
-| `import.columns.field` | Field | Igice | |
-| `import.columns.problem` | Problem | Ikibazo | |
-| `import.errors.tooLarge` | The file is over 10 MB. | Dosiye irenze MB 10. | |
-| `import.errors.invalid` | Use a .csv or .xlsx file that isn’t empty. | Koresha dosiye ya .csv cyangwa .xlsx itarimo ubusa. | |
-| `import.errors.failed` | The import didn’t finish. Nothing was changed. Try again. | Kwinjiza ntibyarangiye. Nta cyahindutse. Ongera ugerageze. | |
 | `delivery.title` | Delivery zones | Uturere two kugeza | |
 | `delivery.addZone` | Add zone | Ongeramo akarere | |
 | `delivery.editZone` | Edit zone | Hindura akarere | |
@@ -1259,27 +1061,22 @@ updates `messages/admin.rw.json`.
 | `titles.audit` | Audit log | Igitabo cy'ibikorwa | |
 | `titles.categories` | Categories & brands | Ibyiciro n'ibirango | |
 | `titles.delivery` | Delivery zones | Uturere two kugeza | |
-| `titles.import` | Catalogue import | Kwinjiza ibicuruzwa | |
-| `titles.inventory` | Inventory | Ububiko | |
-| `titles.messages` | Support | Ubufasha | |
-| `titles.orders` | Orders | Amatumiza | |
-| `titles.order` | Order | Itumiza | |
-| `titles.dashboard` | Dashboard | Imbonerahamwe | |
-| `titles.payments` | Payments | Ubwishyu | |
-| `titles.productPhotos` | Product photos | Amafoto y'ibicuruzwa | |
+| `titles.messages` | Platform support | Ubufasha bw'urubuga | |
+| `titles.dashboard` | Overview | Incamake | |
 | `titles.newProduct` | New product | Igicuruzwa gishya | |
-| `titles.products` | Products | Ibicuruzwa | |
+| `titles.products` | Product moderation | Kugenzura ibicuruzwa | |
 | `titles.product` | Product | Igicuruzwa | |
 | `titles.promotions` | Promotions | Poromosiyo | |
 | `titles.quotes` | Quote requests | Ubusabe bw'ibiciro | |
-| `titles.reviews` | Reviews | Ibitekerezo | |
-| `titles.settings` | Settings & pages | Igenamiterere n'impapuro | |
-| `titles.staff` | Staff & roles | Abakozi n'inshingano | |
+| `titles.reviews` | Reviews & moderation | Ibitekerezo no kugenzura | |
+| `titles.settings` | Platform settings | Igenamiterere ry'urubuga | |
+| `titles.staff` | Administrators | Abayobozi | |
 | `titles.brands` | Brands | Ibirango | |
 | `titles.services` | Services | Serivisi | |
 | `titles.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
 | `titles.sellers` | Sellers | Abacuruzi | |
 | `titles.seller` | Seller | Umucuruzi | |
+| `titles.analytics` | Analytics & reports | Isesengura na raporo | |
 | `services.title` | Services | Serivisi | |
 | `services.description` | The furniture services on the store’s Services pages, in their order. Services are not sold online: each one has a request form. | Serivisi z'ibikoresho byo mu nzu ziri ku mpapuro za Serivisi z'iduka, uko zikurikirana. Serivisi ntizigurishwa kuri interineti: buri imwe ifite ifishi y'ubusabe. | |
 | `services.add` | Add service | Ongeraho serivisi | |
@@ -1436,6 +1233,7 @@ updates `messages/admin.rw.json`.
 | `seller.shell.groups.store` | Store | Iduka | |
 | `seller.shell.nav.dashboard` | Dashboard | Imbonerahamwe | |
 | `seller.shell.nav.orders` | Orders | Amatumiza | |
+| `seller.shell.nav.earnings` | Earnings | Inyungu | |
 | `seller.shell.nav.products` | Products | Ibicuruzwa | |
 | `seller.shell.nav.inventory` | Inventory | Ububiko | |
 | `seller.shell.nav.store` | Store profile | Umwirondoro w'iduka | |
@@ -1449,6 +1247,7 @@ updates `messages/admin.rw.json`.
 | `seller.titles.product` | Product | Igicuruzwa | |
 | `seller.titles.inventory` | Inventory | Ububiko | |
 | `seller.titles.store` | Store profile | Umwirondoro w'iduka | |
+| `seller.titles.earnings` | Earnings | Inyungu | |
 | `seller.gate.staffTitle` | Staff accounts can’t sell | Konti z'abakozi ntizicuruza | |
 | `seller.gate.staffBody` | You’re signed in with a staff account. Stores belong to customer accounts; use the admin for platform work. | Winjiye ukoresheje konti y'umukozi. Amaduka ni ay'abakiriya; koresha ubuyobozi ku mirimo y'urubuga. | |
 | `seller.gate.toAdmin` | Go to the admin | Jya mu buyobozi | |
@@ -1469,8 +1268,6 @@ updates `messages/admin.rw.json`.
 | `seller.dashboard.description` | How {store} is doing, and what needs your attention. | Uko {store} rihagaze, n'ibikeneye ko ubyitaho. | |
 | `seller.dashboard.toConfirm` | Orders to confirm | Amatumiza yo kwemeza | |
 | `seller.dashboard.toConfirmHint` | Confirm them so the customer’s order can go ahead. | Yemeze kugira ngo itumiza ry'umukiriya rikomeze. | |
-| `seller.dashboard.toShip` | Orders to pack or dispatch | Amatumiza yo gupakira cyangwa kohereza | |
-| `seller.dashboard.toShipHint` | Confirmed orders that haven’t left your store yet. | Amatumiza yemejwe ataravuye mu iduka ryawe. | |
 | `seller.dashboard.lowStock` | Low-stock SKUs | SKU zisigaye nke | |
 | `seller.dashboard.lowStockHint` | At or below their alert level. | Zageze cyangwa ziri munsi y'urwego rwo kuburira. | |
 | `seller.dashboard.pending` | Pending earnings | Amafaranga ategerejwe | |
@@ -1485,6 +1282,11 @@ updates `messages/admin.rw.json`.
 | `seller.dashboard.viewAll` | View all orders | Reba amatumiza yose | |
 | `seller.dashboard.noOrders` | No orders yet. They appear here when customers buy your products. | Nta matumiza arahari. Azagaragara hano abakiriya nibagura ibicuruzwa byawe. | |
 | `seller.dashboard.commissionRate` | Your commission rate is {rate}%, charged on goods after discounts. Delivery fees are not included. | Komisiyo yawe ni {rate}%, ibarwa ku bicuruzwa nyuma y'igabanywa. Amafaranga yo kugeza ntabarirwamo. | |
+| `seller.dashboard.toPack` | Orders to pack | Amatumiza yo gupakira | |
+| `seller.dashboard.toPackHint` | Confirmed and waiting to be packed. | Yemejwe kandi ategereje gupakirwa. | |
+| `seller.dashboard.toDispatch` | Orders to dispatch | Amatumiza yo kohereza | |
+| `seller.dashboard.toDispatchHint` | Packed and waiting to leave your store. | Yapakiwe kandi ategereje kuva mu iduka ryawe. | |
+| `seller.dashboard.viewEarnings` | See earnings by order | Reba inyungu kuri buri tumiza | |
 | `seller.orders.title` | Orders | Amatumiza | |
 | `seller.orders.description` | Your store’s part of each order. Cash-on-delivery orders appear when they’re placed, mobile-money orders once they’re paid. | Igice cy'iduka ryawe muri buri tumiza. Amatumiza yishyurwa bagejejweho agaragara akimara gukorwa, ayishyurwa na mobile money amaze kwishyurwa. | |
 | `seller.orders.searchLabel` | Search orders | Shakisha amatumiza | |
@@ -1581,6 +1383,17 @@ updates `messages/admin.rw.json`.
 | `seller.store.errors.email` | Enter a valid email address. | Andika email yemewe. | |
 | `seller.store.errors.phone` | Enter a Rwandan mobile number, for example 0788 123 456. | Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456. | |
 | `seller.store.errors.district` | Enter your district. | Andika akarere kawe. | |
+| `seller.earnings.title` | Earnings | Inyungu | |
+| `seller.earnings.description` | What your store has earned from its orders, after {marketplace}'s commission. Payouts are not part of the dashboard yet. | Ibyo iduka ryawe ryinjije ku matumiza yaryo, hamaze gukurwamo komisiyo ya {marketplace}. Kwishyurwa ntibiri ku mbonerahamwe ubu. | |
+| `seller.earnings.byOrder` | Earnings by order | Inyungu kuri buri tumiza | |
+| `seller.earnings.empty` | No orders yet. Earnings appear here when customers buy your products. | Nta matumiza arahari. Inyungu zigaragara hano iyo abakiriya baguze ibicuruzwa byawe. | |
+| `seller.earnings.columns.order` | Order | Itumiza | |
+| `seller.earnings.columns.placed` | Placed | Ryatanzwe | |
+| `seller.earnings.columns.goods` | Goods | Ibicuruzwa | |
+| `seller.earnings.columns.commission` | Commission | Komisiyo | |
+| `seller.earnings.columns.net` | Your share | Umugabane wawe | |
+| `seller.earnings.columns.payment` | Payment | Ubwishyu | |
+| `seller.earnings.columns.status` | Status | Aho rigeze | |
 | `sellers.title` | Sellers | Abacuruzi | |
 | `sellers.description` | Stores and seller applications. Approve or reject applications, suspend or reinstate stores, and set a store’s commission. | Amaduka n’ubusabe bwo gucuruza. Emeza cyangwa wange ubusabe, hagarika cyangwa usubizeho iduka, kandi ushyireho komisiyo y’iduka. | |
 | `sellers.statusLabel` | Filter by status | Shungura ukurikije uko bihagaze | |
@@ -1653,3 +1466,26 @@ updates `messages/admin.rw.json`.
 | `sellers.errors.short` | Write at least 10 characters. | Andika nibura inyuguti 10. | |
 | `sellers.errors.stale` | This store changed since you opened it. Check its status and try again. | Iri duka ryahindutse kuva warifungura. Reba uko rihagaze wongere ugerageze. | |
 | `sellers.errors.failed` | We couldn’t save the decision. Try again. | Ntitwashoboye kubika icyemezo. Ongera ugerageze. | |
+| `analytics.title` | Analytics & reports | Isesengura na raporo | |
+| `analytics.description` | How the marketplace is growing: sales, commission, stores and customers per period. Aggregates only; no customer or order details. | Uko isoko riri gutera imbere: igurisha, komisiyo, amaduka n'abakiriya muri buri gihe. Imibare rusange gusa; nta makuru y'umukiriya cyangwa y'itumiza. | |
+| `analytics.range` | Period | Igihe | |
+| `analytics.ranges.30` | Last 30 days, by day | Iminsi 30 ishize, ku munsi | |
+| `analytics.ranges.90` | Last 90 days, by week | Iminsi 90 ishize, ku cyumweru | |
+| `analytics.ranges.365` | Last 12 months, by month | Amezi 12 ashize, ku kwezi | |
+| `analytics.growth` | Marketplace growth | Iterambere ry'isoko | |
+| `analytics.growthHelp` | Paid orders, dated by their first successful payment (Kigali time). | Amatumiza yishyuwe, abarwa ku munsi w'ubwishyu bwa mbere bwagenze neza (isaha ya Kigali). | |
+| `analytics.exportSales` | Export sales (Excel) | Kuramo igurisha (Excel) | |
+| `analytics.period` | Period | Igihe | |
+| `analytics.columns.orders` | Paid orders | Amatumiza yishyuwe | |
+| `analytics.columns.merchandise_total` | Goods sold | Ibyagurishijwe | |
+| `analytics.columns.commission_amount` | Commission | Komisiyo | |
+| `analytics.columns.new_stores` | New stores | Amaduka mashya | |
+| `analytics.columns.new_customers` | New customers | Abakiriya bashya | |
+| `analytics.total` | Total | Byose hamwe | |
+| `analytics.topProducts` | Best-selling products | Ibicuruzwa bigurwa cyane | |
+| `analytics.exportTop` | Export best sellers (Excel) | Kuramo ibigurwa cyane (Excel) | |
+| `analytics.product` | Product | Igicuruzwa | |
+| `analytics.units` | Units | Umubare | |
+| `analytics.orders` | Orders | Amatumiza | |
+| `analytics.revenue` | Revenue | Amafaranga yinjiye | |
+| `analytics.noSales` | Nothing sold in this period yet. | Nta kintu cyagurishijwe muri iki gihe. | |

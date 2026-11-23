@@ -1,7 +1,28 @@
 "use client";
 
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BadgeCheck, Check, CheckCheck, ChevronRight, Clock, ExternalLink, EyeOff, Inbox, Info, MessageSquareText, Package, Receipt, ShieldCheck, Star, type LucideIcon } from "lucide-react";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import {
+  BadgeCheck,
+  Check,
+  CheckCheck,
+  ChevronRight,
+  Clock,
+  ExternalLink,
+  EyeOff,
+  Inbox,
+  Info,
+  MessageSquareText,
+  Package,
+  Receipt,
+  ShieldCheck,
+  Star,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -15,7 +36,17 @@ import { browserApi } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { cx } from "@/lib/cx";
 import { formatDate } from "@/lib/format";
-import { Avatar, DrawerSection, Fact, FACTS, ListHeading, rowClass, StatusCards, Timeline, TimelineItem } from "./inbox";
+import {
+  Avatar,
+  DrawerSection,
+  Fact,
+  FACTS,
+  ListHeading,
+  rowClass,
+  StatusCards,
+  Timeline,
+  TimelineItem,
+} from "./inbox";
 import { timeAgo } from "./time";
 import { ListFooter, LoadError, must, PageHeader, useListParams } from "./ui";
 
@@ -24,12 +55,26 @@ type Status = Review["status"];
 type Tab = Status | "";
 
 const STATUSES = ["pending", "approved", "rejected"] as const;
-const TABS = ["", "pending", "approved", "rejected"] as const satisfies readonly Tab[];
+const TABS = [
+  "",
+  "pending",
+  "approved",
+  "rejected",
+] as const satisfies readonly Tab[];
 const PAGE_SIZE = 20;
 /** Reviews.dc.html reject reasons; the chosen wording is stored as the staff-only reason. */
-export const REJECT_REASONS = ["spam", "offensive", "offTopic", "personalInfo"] as const;
+export const REJECT_REASONS = [
+  "spam",
+  "offensive",
+  "offTopic",
+  "personalInfo",
+] as const;
 type Reason = (typeof REJECT_REASONS)[number];
-const STATUS_TONE: Record<Status, BadgeTone> = { pending: "soft-warn", approved: "soft-ok", rejected: "soft-err" };
+const STATUS_TONE: Record<Status, BadgeTone> = {
+  pending: "soft-warn",
+  approved: "soft-ok",
+  rejected: "soft-err",
+};
 /** The status cards: an icon and its colours. */
 const LOOK: Record<Tab, { Icon: LucideIcon; chip: string; ring: string }> = {
   "": { Icon: Star, chip: "bg-navy text-white", ring: "ring-navy" },
@@ -41,9 +86,20 @@ const LOOK: Record<Tab, { Icon: LucideIcon; chip: string; ring: string }> = {
 function Stars({ rating, size }: { rating: number; size: number }) {
   const t = useTranslations("admin.reviews");
   return (
-    <span role="img" aria-label={t("stars", { count: rating })} className="inline-flex flex-none gap-px text-star">
+    <span
+      role="img"
+      aria-label={t("stars", { count: rating })}
+      className="inline-flex flex-none gap-px text-star"
+    >
       {[1, 2, 3, 4, 5].map((n) => (
-        <Star key={n} size={size} aria-hidden="true" fill="currentColor" strokeWidth={0} className={n > rating ? "text-bd2" : undefined} />
+        <Star
+          key={n}
+          size={size}
+          aria-hidden="true"
+          fill="currentColor"
+          strokeWidth={0}
+          className={n > rating ? "text-bd2" : undefined}
+        />
       ))}
     </span>
   );
@@ -59,19 +115,41 @@ export function ReviewsView() {
   const tc = useTranslations("admin.common");
   const { get, page, set, hrefWith } = useListParams();
   const raw = get("status");
-  const status: Tab = raw === "all" ? "" : (STATUSES as readonly string[]).includes(raw) ? (raw as Status) : "pending";
+  const status: Tab =
+    raw === "all"
+      ? ""
+      : (STATUSES as readonly string[]).includes(raw)
+        ? (raw as Status)
+        : "pending";
   const [openId, setOpenId] = useState<string | null>(null);
   const [now] = useState(() => Date.now());
   const list = useQuery({
     queryKey: ["admin", "reviews", { status, page }],
-    queryFn: () => must(browserApi.GET("/api/v1/staff/reviews", { params: { query: { status: status || undefined, page, size: PAGE_SIZE } } })),
+    queryFn: () =>
+      must(
+        browserApi.GET("/api/v1/staff/reviews", {
+          params: {
+            query: { status: status || undefined, page, size: PAGE_SIZE },
+          },
+        }),
+      ),
     placeholderData: keepPreviousData,
   });
   const counts = useQuery({
     queryKey: ["admin", "reviews", "counts"],
     queryFn: async () => {
-      const totals = await Promise.all(TABS.map((s) => must(browserApi.GET("/api/v1/staff/reviews", { params: { query: { status: s || undefined, size: 1 } } }))));
-      return Object.fromEntries(TABS.map((s, i) => [s, totals[i]!.total])) as Record<Tab, number>;
+      const totals = await Promise.all(
+        TABS.map((s) =>
+          must(
+            browserApi.GET("/api/v1/staff/reviews", {
+              params: { query: { status: s || undefined, size: 1 } },
+            }),
+          ),
+        ),
+      );
+      return Object.fromEntries(
+        TABS.map((s, i) => [s, totals[i]!.total]),
+      ) as Record<Tab, number>;
     },
   });
   const items = list.data?.items ?? [];
@@ -86,7 +164,10 @@ export function ReviewsView() {
         label={t("tabsLabel")}
         className="grid-cols-2 lg:grid-cols-4"
         value={status}
-        onChange={(s) => (setOpenId(null), set({ status: s === "pending" ? null : s || "all" }))}
+        onChange={(s) => (
+          setOpenId(null),
+          set({ status: s === "pending" ? null : s || "all" })
+        )}
         cards={TABS.map((s) => ({
           key: s,
           ...LOOK[s],
@@ -97,8 +178,16 @@ export function ReviewsView() {
         }))}
       />
 
-      <section aria-label={t("listLabel")} className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
-        <ListHeading Icon={LOOK[status].Icon} chip={LOOK[status].chip} title={t(`tiles.${status || "all"}`)} total={list.data?.total} />
+      <section
+        aria-label={t("listLabel")}
+        className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh"
+      >
+        <ListHeading
+          Icon={LOOK[status].Icon}
+          chip={LOOK[status].chip}
+          title={t(`tiles.${status || "all"}`)}
+          total={list.data?.total}
+        />
         {list.isError ? (
           <LoadError onRetry={() => list.refetch()} className="m-4" />
         ) : !list.data ? (
@@ -109,10 +198,24 @@ export function ReviewsView() {
           </div>
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
-            <span aria-hidden="true" className={cx("flex size-14 items-center justify-center rounded-full", status === "pending" ? "bg-ok-bg text-ok-tx" : "bg-light text-pri-h")}>
-              {status === "pending" ? <CheckCheck size={26} /> : <MessageSquareText size={26} />}
+            <span
+              aria-hidden="true"
+              className={cx(
+                "flex size-14 items-center justify-center rounded-full",
+                status === "pending"
+                  ? "bg-ok-bg text-ok-tx"
+                  : "bg-light text-pri-h",
+              )}
+            >
+              {status === "pending" ? (
+                <CheckCheck size={26} />
+              ) : (
+                <MessageSquareText size={26} />
+              )}
             </span>
-            <p className="m-0 max-w-96 text-sm text-tx2">{t(`empty.${status || "all"}`)}</p>
+            <p className="m-0 max-w-96 text-sm text-tx2">
+              {t(`empty.${status || "all"}`)}
+            </p>
           </div>
         ) : (
           <Table aria-busy={list.isFetching}>
@@ -130,18 +233,33 @@ export function ReviewsView() {
             </thead>
             <tbody>
               {items.map((r) => (
-                <ReviewRow key={r.id} review={r} now={now} selected={r.id === openId} onOpen={() => setOpenId(r.id)} />
+                <ReviewRow
+                  key={r.id}
+                  review={r}
+                  now={now}
+                  selected={r.id === openId}
+                  onOpen={() => setOpenId(r.id)}
+                />
               ))}
             </tbody>
           </Table>
         )}
-        {list.data && list.data.total > PAGE_SIZE && <ListFooter page={page} size={PAGE_SIZE} total={list.data.total} hrefFor={(n) => hrefWith({ page: n })} />}
+        {list.data && list.data.total > PAGE_SIZE && (
+          <ListFooter
+            page={page}
+            size={PAGE_SIZE}
+            total={list.data.total}
+            hrefFor={(n) => hrefWith({ page: n })}
+          />
+        )}
       </section>
 
       <Drawer
         open={opened !== null}
         onClose={() => setOpenId(null)}
-        title={opened ? t("drawerTitle", { name: opened.author_name }) : t("title")}
+        title={
+          opened ? t("drawerTitle", { name: opened.author_name }) : t("title")
+        }
         closeLabel={tc("close")}
         className="max-w-[min(520px,100%)]!"
       >
@@ -151,15 +269,31 @@ export function ReviewsView() {
   );
 }
 
-function ReviewRow({ review, now, selected, onOpen }: { review: Review; now: number; selected: boolean; onOpen: () => void }) {
+function ReviewRow({
+  review,
+  now,
+  selected,
+  onOpen,
+}: {
+  review: Review;
+  now: number;
+  selected: boolean;
+  onOpen: () => void;
+}) {
   const t = useTranslations("admin.reviews");
   return (
     <tr className={rowClass(selected, review.status === "pending")}>
       <Td className="min-w-[170px]">
         <div className="flex items-center gap-3">
           <Avatar name={review.author_name} />
-          <button type="button" onClick={onOpen} className="flex min-w-0 cursor-pointer flex-col border-0 bg-transparent p-0 text-left">
-            <b className="font-semibold text-pri-h hover:underline">{review.author_name}</b>
+          <button
+            type="button"
+            onClick={onOpen}
+            className="flex min-w-0 cursor-pointer flex-col border-0 bg-transparent p-0 text-left"
+          >
+            <b className="font-semibold text-pri-h hover:underline">
+              {review.author_name}
+            </b>
             <span className="inline-flex items-center gap-1 text-cap text-ok-tx">
               <BadgeCheck size={12} aria-hidden="true" />
               {t("verified")}
@@ -170,27 +304,50 @@ function ReviewRow({ review, now, selected, onOpen }: { review: Review; now: num
       <Td className="max-w-[250px] min-w-[200px]">
         <span className="flex flex-col gap-0.5">
           <Stars rating={review.rating} size={13} />
-          <span className={cx("truncate text-sm", review.title ? "font-semibold text-tx" : "text-tx2 italic")}>{review.title || t("noTitle")}</span>
-          {review.body && <span className="truncate text-cap text-tx2">{review.body}</span>}
+          <span
+            className={cx(
+              "truncate text-sm",
+              review.title ? "font-semibold text-tx" : "text-tx2 italic",
+            )}
+          >
+            {review.title || t("noTitle")}
+          </span>
+          {review.body && (
+            <span className="truncate text-cap text-tx2">{review.body}</span>
+          )}
         </span>
       </Td>
       <Td className="max-w-[180px]">
         <span className="flex flex-col gap-0.5">
           <span className="truncate font-medium">{review.product_name}</span>
-          <span className="font-mono text-cap whitespace-nowrap text-tx2">{review.order_number}</span>
+          <span className="font-mono text-cap whitespace-nowrap text-tx2">
+            {review.order_number}
+          </span>
         </span>
       </Td>
       <Td className="whitespace-nowrap">
         <span className="flex flex-col">
           <span className="font-medium">{timeAgo(review.created_at, now)}</span>
-          <span className="text-cap text-tx2">{formatDate(review.created_at, "dateTime")}</span>
+          <span className="text-cap text-tx2">
+            {formatDate(review.created_at, "dateTime")}
+          </span>
         </span>
       </Td>
       <Td>
-        <Badge tone={STATUS_TONE[review.status]}>{t(`status.${review.status}`)}</Badge>
+        <Badge tone={STATUS_TONE[review.status]}>
+          {t(`status.${review.status}`)}
+        </Badge>
       </Td>
       <Td className="text-right">
-        <Button variant="neutral" size="sm" square className="px-0!" onClick={onOpen} aria-label={t("open", { name: review.author_name })} title={t("openShort")}>
+        <Button
+          variant="neutral"
+          size="sm"
+          square
+          className="px-0!"
+          onClick={onOpen}
+          aria-label={t("open", { name: review.author_name })}
+          title={t("openShort")}
+        >
           <ChevronRight size={16} aria-hidden="true" />
         </Button>
       </Td>
@@ -208,15 +365,28 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
   const done = (message: string) => {
     toast.show(message);
     void client.invalidateQueries({ queryKey: ["admin", "reviews"] });
-    void client.invalidateQueries({ queryKey: ["admin", "count", "reviews-pending"] });
+    void client.invalidateQueries({
+      queryKey: ["admin", "count", "reviews-pending"],
+    });
   };
   const approve = useMutation({
-    mutationFn: () => must(browserApi.POST("/api/v1/staff/reviews/{review_id}/approve", { params: { path: { review_id: review.id } } })),
+    mutationFn: () =>
+      must(
+        browserApi.POST("/api/v1/staff/reviews/{review_id}/approve", {
+          params: { path: { review_id: review.id } },
+        }),
+      ),
     onSuccess: () => done(t("approved")),
     onError: () => toast.show(tc("saveError"), "error"),
   });
   const reject = useMutation({
-    mutationFn: (why: Reason) => must(browserApi.POST("/api/v1/staff/reviews/{review_id}/reject", { params: { path: { review_id: review.id } }, body: { reason: t(`reasons.${why}`) } })),
+    mutationFn: (why: Reason) =>
+      must(
+        browserApi.POST("/api/v1/staff/reviews/{review_id}/reject", {
+          params: { path: { review_id: review.id } },
+          body: { reason: t(`reasons.${why}`) },
+        }),
+      ),
     onSuccess: () => done(t("rejected")),
     onError: () => toast.show(tc("saveError"), "error"),
   });
@@ -227,23 +397,44 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
       {/* The rating and title, who wrote it, and where it stands. */}
       <div className="flex flex-col gap-3 rounded-xl border border-bd bg-linear-to-br from-light to-white p-4">
         <div className="flex items-start gap-3">
-          <span aria-hidden="true" className="flex size-14 flex-none flex-col items-center justify-center rounded-xl bg-warn-bg leading-none text-warn-tx">
+          <span
+            aria-hidden="true"
+            className="flex size-14 flex-none flex-col items-center justify-center rounded-xl bg-warn-bg leading-none text-warn-tx"
+          >
             <b className="t-h3 tabular-nums">{review.rating}</b>
             <span className="text-cap">/ 5</span>
           </span>
           <div className="flex min-w-0 flex-col gap-1">
             <span className="flex flex-wrap items-center gap-2">
               <Stars rating={review.rating} size={16} />
-              <Badge tone={STATUS_TONE[review.status]}>{t(`status.${review.status}`)}</Badge>
+              <Badge tone={STATUS_TONE[review.status]}>
+                {t(`status.${review.status}`)}
+              </Badge>
             </span>
-            <b className={cx("text-lg break-words", review.title ? "font-bold text-navy" : "font-medium text-tx2 italic")}>{review.title || t("noTitle")}</b>
+            <b
+              className={cx(
+                "text-lg break-words",
+                review.title
+                  ? "font-bold text-navy"
+                  : "font-medium text-tx2 italic",
+              )}
+            >
+              {review.title || t("noTitle")}
+            </b>
             <span className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-cap text-tx2">
-              <span className="font-semibold text-tx">{review.author_name}</span>
+              <span className="font-semibold text-tx">
+                {review.author_name}
+              </span>
               <span className="inline-flex items-center gap-1 text-ok-tx">
                 <BadgeCheck size={13} aria-hidden="true" />
                 {t("verified")}
               </span>
-              <span>{t("writtenAgo", { ago: timeAgo(review.created_at, now), date: formatDate(review.created_at, "dateTime") })}</span>
+              <span>
+                {t("writtenAgo", {
+                  ago: timeAgo(review.created_at, now),
+                  date: formatDate(review.created_at, "dateTime"),
+                })}
+              </span>
             </span>
           </div>
         </div>
@@ -253,13 +444,21 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
       <DrawerSection title={t("reviewHeading")}>
         {review.body ? (
           <figure className="m-0 flex gap-3 rounded-xl border border-bd bg-white p-4">
-            <MessageSquareText size={18} aria-hidden="true" className="mt-0.5 flex-none text-star" />
+            <MessageSquareText
+              size={18}
+              aria-hidden="true"
+              className="mt-0.5 flex-none text-star"
+            />
             <blockquote className="m-0">
-              <p className="m-0 break-words whitespace-pre-line text-tx">{review.body}</p>
+              <p className="m-0 break-words whitespace-pre-line text-tx">
+                {review.body}
+              </p>
             </blockquote>
           </figure>
         ) : (
-          <p className="m-0 rounded-xl bg-page px-4 py-3 text-sm text-tx2 italic">{t("noBody")}</p>
+          <p className="m-0 rounded-xl bg-page px-4 py-3 text-sm text-tx2 italic">
+            {t("noBody")}
+          </p>
         )}
       </DrawerSection>
 
@@ -267,10 +466,17 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
       <DrawerSection title={t("decisionTitle")}>
         {review.status !== "rejected" && (
           <div className="flex flex-col gap-2">
-            <span id="review-reason" className="text-cap font-semibold text-tx2">
+            <span
+              id="review-reason"
+              className="text-cap font-semibold text-tx2"
+            >
               {review.status === "approved" ? t("hideWhy") : t("rejectWhy")}
             </span>
-            <div role="group" aria-labelledby="review-reason" className="flex flex-wrap gap-2">
+            <div
+              role="group"
+              aria-labelledby="review-reason"
+              className="flex flex-wrap gap-2"
+            >
               {REJECT_REASONS.map((r) => {
                 const on = reason === r;
                 return (
@@ -281,7 +487,11 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
                     onClick={() => (setReason(on ? null : r), setError(null))}
                     className={cx(
                       "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150 motion-reduce:transition-none",
-                      on ? "border-err bg-err-bg text-err-tx" : error ? "border-err bg-white text-tx2" : "border-bd bg-white text-tx2 hover:border-bd2 hover:text-tx",
+                      on
+                        ? "border-err bg-err-bg text-err-tx"
+                        : error
+                          ? "border-err bg-white text-tx2"
+                          : "border-bd bg-white text-tx2 hover:border-bd2 hover:text-tx",
                     )}
                   >
                     {on && <Check size={14} aria-hidden="true" />}
@@ -299,7 +509,12 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
         )}
         <div className="flex flex-wrap gap-2">
           {review.status !== "approved" && (
-            <Button size="sm" disabled={busy} onClick={() => approve.mutate()} className="gap-2">
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={() => approve.mutate()}
+              className="gap-2"
+            >
               <Check size={16} aria-hidden="true" />
               {t("approve")}
             </Button>
@@ -330,19 +545,28 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
       <DrawerSection title={t("aboutHeading")}>
         <dl className={FACTS}>
           <Fact Icon={Package} label={t("product")}>
-            <Link href={`/admin/products/${review.product_id}`} className="break-words">
+            <Link
+              href={`/admin/products/${review.product_id}`}
+              className="break-words"
+            >
               {review.product_name}
             </Link>
-            <a href={`/product/${review.product_slug}`} target="_blank" rel="noopener noreferrer" className="mt-0.5 flex items-center gap-1 text-cap font-normal text-tx2 hover:text-pri-h">
+            <a
+              href={`/product/${review.product_slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-0.5 flex items-center gap-1 text-cap font-normal text-tx2 hover:text-pri-h"
+            >
               <ExternalLink size={12} aria-hidden="true" />
               {t("viewOnStore")}
               <span className="sr-only"> {t("newTab")}</span>
             </a>
           </Fact>
           <Fact Icon={Receipt} label={t("order")}>
-            <Link href={`/admin/orders?q=${encodeURIComponent(review.order_number)}`} className="font-mono whitespace-nowrap">
+            {/* The order number only (SC-06: the admin has no order page). */}
+            <span className="font-mono whitespace-nowrap">
               {review.order_number}
-            </Link>
+            </span>
           </Fact>
         </dl>
       </DrawerSection>
@@ -350,13 +574,23 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
       {/* When it arrived, and who decided before and why. */}
       <DrawerSection title={t("moderationHeading")}>
         <Timeline>
-          <TimelineItem Icon={Inbox} label={t("activity.received")} at={review.created_at} />
+          <TimelineItem
+            Icon={Inbox}
+            label={t("activity.received")}
+            at={review.created_at}
+          />
           {review.moderated_at && (
             <TimelineItem
               Icon={ShieldCheck}
-              label={t("activity.moderated", { status: t(`status.${review.status}`) })}
+              label={t("activity.moderated", {
+                status: t(`status.${review.status}`),
+              })}
               at={review.moderated_at}
-              note={review.moderation_reason ? t("reason", { reason: review.moderation_reason }) : null}
+              note={
+                review.moderation_reason
+                  ? t("reason", { reason: review.moderation_reason })
+                  : null
+              }
             />
           )}
         </Timeline>

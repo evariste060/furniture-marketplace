@@ -13,6 +13,7 @@ from app.schemas.inventory import InventoryListItem
 from app.schemas.pagination import Page
 
 GroupBy = Literal["day", "week"]
+MarketplaceGroupBy = Literal["day", "week", "month"]
 ReportType = Literal["sales", "top-products", "stock"]
 
 TIMEZONE = "Africa/Kigali"
@@ -75,3 +76,46 @@ class StockReport(Page[InventoryListItem]):
 
     generated_at: datetime = Field(description="Database time of the figures (Kigali offset)")
     totals: StockTotals = Field(description="Over every SKU, not just this page")
+
+
+class StoreCounts(BaseModel):
+    """Stores by status now (ADR-014)."""
+
+    approved: int = Field(ge=0)
+    pending: int = Field(ge=0, description="Applications waiting for a decision")
+    rejected: int = Field(ge=0)
+    suspended: int = Field(ge=0)
+
+
+class MarketplaceFigures(BaseModel):
+    orders: int = Field(ge=0, description="Qualifying orders (the sales rule)")
+    merchandise_total: int = Field(
+        ge=0, description="Goods after discounts sold by the stores in those orders (RWF)"
+    )
+    commission_amount: int = Field(ge=0, description="The platform's commission on them (RWF)")
+    new_stores: int = Field(ge=0, description="Stores approved for the first time")
+    new_customers: int = Field(
+        ge=0, description="Customer accounts registered (store owners included)"
+    )
+
+
+class MarketplacePeriod(MarketplaceFigures):
+    period_start: date = Field(description="First Kigali day of the period within the range")
+    period_end: date = Field(description="Last Kigali day of the period within the range")
+
+
+class MarketplaceReport(BaseModel):
+    """The marketplace overview (SC-06, ADR-014 phase 7): counts now, and aggregated figures
+    per period. No customer, seller or order is identified."""
+
+    from_date: date = Field(serialization_alias="from")
+    to_date: date = Field(serialization_alias="to")
+    group_by: MarketplaceGroupBy
+    timezone: str = TIMEZONE
+    stores: StoreCounts
+    customers: int = Field(ge=0, description="Active customer accounts now (store owners included)")
+    published_products: int = Field(ge=0, description="Products on the storefront now")
+    periods: list[MarketplacePeriod] = Field(
+        description="Every day, week or month of the range in order, including empty ones"
+    )
+    totals: MarketplaceFigures

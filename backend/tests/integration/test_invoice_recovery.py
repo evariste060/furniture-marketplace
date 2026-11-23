@@ -31,6 +31,10 @@ from tests.integration.test_invoices_api import (
 from tests.integration.test_payments_api import delivery, momo_order, started  # noqa: F401
 from tests.support.seller_orders import move, seller_orders
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 STAFF_PAYMENTS = "/api/v1/staff/payments"
 CTX = RequestContext(ip_address="127.0.0.1", user_agent="invoice-recovery-test")
 TIMEOUT = 30

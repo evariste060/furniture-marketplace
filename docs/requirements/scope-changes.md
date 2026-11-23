@@ -4,6 +4,49 @@ The original requirement documents stay unchanged (see `original-checksums.txt`)
 to the MVP scope approved by the project owner after they were written is recorded here, newest
 first. Where this file and an original document disagree, this file wins.
 
+## SC-06: sellers operate their stores, administrators govern the marketplace (2026-11-22)
+
+Approved by the project owner on 2026-11-22 (brief "Seller & Administrator Dashboard
+Responsibility Consolidation" and the owner's answers the same day). Trello card: none (no
+furniture board exists). Built as ADR-014 phase 7.
+
+The Marketplace Administrator no longer runs store operations; each approved seller runs their own
+store from `/seller`. The administrator governs the marketplace: sellers, product moderation,
+categories and brands, promotions, reviews, platform support, analytics, settings, administrators
+and the audit log.
+
+- **Permissions held by no role.** `orders:read`, `orders:fulfil`, `payments:read`,
+  `payments:manage`, `inventory:read`, `inventory:adjust` and the new `catalog:edit` stay declared,
+  and every route keeps its check, but no role holds them in V1
+  (`UNASSIGNED_PERMISSIONS` in `app/core/roles.py`). The administrator is refused with 403
+  `permission_denied` on the staff order, payment, stock, stock report, variant, photo, bulk photo,
+  bulk publish, catalogue import and import job routes. Nothing is deleted, so a later scope change
+  can give a permission back without touching a route.
+- **Product moderation only.** `PATCH /api/v1/staff/products/{id}` needs `catalog:manage` for
+  `status` and `is_featured` and also `catalog:edit` (no role) for any other field. Products are
+  created and edited by their sellers (SC-05 already stopped staff creating them).
+- **No whole-order cancellation by hand.** Staff could cancel a whole order (`orders:fulfil`);
+  nobody can now. Sellers cancel their own seller group as before, and the expiry job still
+  cancels unpaid orders. Payment, stock commitment and the parent order stay with the platform.
+- **Cash on delivery** needs no staff confirmation: a COD payment is settled automatically when its
+  last store delivers. The staff confirmation route is unassigned with `payments:manage`.
+- **Admin pages removed:** Orders and order detail, Payments, Inventory, Catalogue import and
+  Product photos. The admin search finds products only; the bell no longer counts new orders and
+  now counts seller applications.
+- **New:** `GET /api/v1/staff/reports/marketplace` (`reports:read`; day, week or month): paid
+  orders, goods sold and commission (from seller orders), new stores and new customers per period,
+  and stores by status, customer accounts and published products now. Aggregates only, no
+  customer, seller or order detail. It drives the new admin Overview and the
+  `/admin/analytics` page (with the existing sales and best-seller Excel exports).
+- **Seller dashboard:** a new Earnings page (`/seller/earnings`) shows the existing pending and
+  earned totals and each seller order's goods, commission and share; the overview splits "to pack"
+  and "to dispatch". No payouts, payout requests or seller promo codes are added.
+- **Unchanged for now:** technical services, service requests and quote requests stay
+  platform-owned under Platform support; making them seller-owned is a later phase. Invoice
+  recovery (`invoices:recover`, backend only) stays with the administrator.
+- **Known gap:** there is no moderation lock, so a seller can set a product the administrator hid
+  back to active. A lock needs a new column and is left for the owner to approve.
+
 ## SC-05: the Marketplace Administrator is the only staff role (2026-11-21)
 
 Approved by the project owner on 2026-11-21. Trello card: none (no furniture board exists).
@@ -13,7 +56,8 @@ single-business shop and are not carried into the marketplace. FurniHub V1 has o
 the **Marketplace Administrator** (stored as `administrator`).
 
 - **Permissions stay.** Every staff route still requires its own fine-grained permission
-  (`catalog:manage`, `sellers:manage`, ...); the Marketplace Administrator holds them all. The
+  (`catalog:manage`, `sellers:manage`, ...); the Marketplace Administrator holds them all
+  (until SC-06, which leaves the store operations to the sellers). The
   authorization checks themselves are unchanged, so a role can be added later as a new scope
   change without touching the routes.
 - **Staff accounts.** Administrators still create, edit, disable and re-enable other

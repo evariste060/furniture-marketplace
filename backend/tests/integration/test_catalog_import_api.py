@@ -23,6 +23,10 @@ from app.services.import_files import XLSX_CONTENT_TYPE, template_headers
 from tests.support.catalog import force_status
 from tests.support.sellers import post_product
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 STAFF = "/api/v1/staff"
 IMPORTS = f"{STAFF}/imports"
 HEADERS = [

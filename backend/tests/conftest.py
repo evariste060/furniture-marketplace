@@ -382,3 +382,18 @@ def second_admin_auth(client: TestClient, db: Session) -> dict:
     """Another Marketplace Administrator, the only staff role (SC-05): for tests that need two
     distinct staff members, such as an order assignee."""
     return make_staff(db, "administrator", "admin.two@example.com", "+250788000002")
+
+
+@pytest.fixture
+def store_operations_granted(monkeypatch: pytest.MonkeyPatch) -> None:
+    """SC-06 (ADR-014 phase 7): the staff routes for orders, payments, stock and catalogue editing
+    stay declared but no role holds their permissions in V1, so the administrator gets 403 there.
+    The modules that test those routes themselves grant the permissions back to the administrator
+    for the test only; tests/integration/test_store_operations_unassigned.py checks the 403s."""
+    from app.core.roles import ROLE_PERMISSIONS, UNASSIGNED_PERMISSIONS
+
+    monkeypatch.setitem(
+        ROLE_PERMISSIONS,
+        "administrator",
+        ROLE_PERMISSIONS["administrator"] | UNASSIGNED_PERMISSIONS,
+    )

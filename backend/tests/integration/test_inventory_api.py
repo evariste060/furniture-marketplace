@@ -13,6 +13,10 @@ from app.models.operations import AuditRecord
 from app.services import inventory as inv
 from tests.support.commerce import new_order, on_hand, seed_sku, soon
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 BASE = "/api/v1/inventory"
 
 

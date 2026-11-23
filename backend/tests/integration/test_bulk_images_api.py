@@ -23,6 +23,10 @@ from app.services.bulk_images import Placement, parse_file_name
 from app.services.image_processing import MAX_UPLOAD_BYTES
 from tests.support.sellers import post_product
 
+# SC-06: these routes' permissions are held by no role in V1; the tests here grant them to the
+# administrator (tests/conftest.py store_operations_granted).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 STAFF = "/api/v1/staff"
 BULK = f"{STAFF}/products/bulk-images"
 

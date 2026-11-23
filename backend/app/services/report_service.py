@@ -36,15 +36,23 @@ from app.core.errors import field_error
 from app.core.kigali_time import KIGALI, to_kigali
 from app.models import OrderItem, Product, ProductVariant
 from app.models.commerce import Order, PaymentAttempt
+from app.models.identity import User
+from app.models.marketplace import SellerOrder, Store
+from app.repositories.catalog import public_product_ids
 from app.schemas.inventory import InventoryListItem
 from app.schemas.reports import (
     TIMEZONE,
     GroupBy,
+    MarketplaceFigures,
+    MarketplaceGroupBy,
+    MarketplacePeriod,
+    MarketplaceReport,
     SalesFigures,
     SalesPeriod,
     SalesReport,
     StockReport,
     StockTotals,
+    StoreCounts,
     TopProduct,
     TopProductsReport,
 )
@@ -97,7 +105,16 @@ class _Period:
     end: date
 
 
-def _periods(from_date: date, to_date: date, group_by: GroupBy) -> list[_Period]:
+def _periods(from_date: date, to_date: date, group_by: MarketplaceGroupBy) -> list[_Period]:
+    if group_by == "month":
+        months = []
+        first = from_date.replace(day=1)
+        while first <= to_date:
+            following = (first.replace(day=28) + timedelta(days=4)).replace(day=1)
+            last = following - timedelta(days=1)
+            months.append(_Period(first, max(first, from_date), min(last, to_date)))
+            first = following
+        return months
     if group_by == "day":
         days = (to_date - from_date).days + 1
         return [_Period(day, day, day) for day in (from_date + timedelta(n) for n in range(days))]
@@ -137,6 +154,105 @@ def sales(db: Session, from_date: date, to_date: date, group_by: GroupBy) -> Sal
     )
     return SalesReport(
         from_date=from_date, to_date=to_date, group_by=group_by, periods=periods, totals=totals
+    )
+
+
+MARKETPLACE_FIGURES = (
+    "orders",
+    "merchandise_total",
+    "commission_amount",
+    "new_stores",
+    "new_customers",
+)
+STORE_STATUSES = ("approved", "pending", "rejected", "suspended")
+
+
+def marketplace(
+    db: Session, from_date: date, to_date: date, group_by: MarketplaceGroupBy
+) -> MarketplaceReport:
+    """The marketplace overview (SC-06, ADR-014 phase 7). Orders, goods and commission follow
+    the sales rule (a sale is dated by its first payment success); goods and commission are the
+    stores' seller orders in those sales, cancelled seller orders left out. A new store is dated
+    by its first approval, a new customer by registration. Only counts and sums leave the
+    database: nobody is identified."""
+    check_range(from_date, to_date)
+    start, end = kigali_bounds(from_date, to_date)
+
+    def bucket(column: Any) -> Any:
+        return cast(func.date_trunc(group_by, func.timezone(TIMEZONE, column)), Date)
+
+    found: dict[date, dict[str, int]] = {}
+
+    def put(query: Any, *names: str) -> None:
+        for row in db.execute(query):
+            figures = found.setdefault(row.bucket, {})
+            for name in names:
+                figures[name] = int(getattr(row, name))
+
+    sales_rows = _sales(from_date, to_date)
+    sale_bucket = bucket(sales_rows.c.sale_at)
+    put(
+        select(sale_bucket.label("bucket"), func.count().label("orders"))
+        .select_from(sales_rows)
+        .group_by(sale_bucket),
+        "orders",
+    )
+    put(
+        select(
+            sale_bucket.label("bucket"),
+            _money(SellerOrder.merchandise_total).label("merchandise_total"),
+            _money(SellerOrder.commission_amount).label("commission_amount"),
+        )
+        .select_from(sales_rows)
+        .join(SellerOrder, SellerOrder.order_id == sales_rows.c.order_id)
+        .where(SellerOrder.status != "cancelled")
+        .group_by(sale_bucket),
+        "merchandise_total",
+        "commission_amount",
+    )
+    approved = bucket(Store.approved_at)
+    put(
+        select(approved.label("bucket"), func.count().label("new_stores"))
+        .where(Store.approved_at >= start, Store.approved_at < end)
+        .group_by(approved),
+        "new_stores",
+    )
+    registered = bucket(User.created_at)
+    put(
+        select(registered.label("bucket"), func.count().label("new_customers"))
+        .where(User.is_staff.is_(False), User.created_at >= start, User.created_at < end)
+        .group_by(registered),
+        "new_customers",
+    )
+
+    periods = []
+    for period in _periods(from_date, to_date, group_by):
+        figures = found.pop(period.key, {})
+        periods.append(
+            MarketplacePeriod(
+                period_start=period.start,
+                period_end=period.end,
+                **{name: figures.get(name, 0) for name in MARKETPLACE_FIGURES},
+            )
+        )
+    assert not found, "a figure outside the range's periods"
+    totals = MarketplaceFigures(
+        **{name: sum(getattr(p, name) for p in periods) for name in MARKETPLACE_FIGURES}
+    )
+    by_status = dict(db.execute(select(Store.status, func.count()).group_by(Store.status)).all())
+    customers = db.scalar(
+        select(func.count()).select_from(User).where(User.is_staff.is_(False), User.is_active)
+    )
+    published = db.scalar(select(func.count()).select_from(public_product_ids().subquery()))
+    return MarketplaceReport(
+        from_date=from_date,
+        to_date=to_date,
+        group_by=group_by,
+        stores=StoreCounts(**{status: int(by_status.get(status, 0)) for status in STORE_STATUSES}),
+        customers=int(customers or 0),
+        published_products=int(published or 0),
+        periods=periods,
+        totals=totals,
     )
 
 

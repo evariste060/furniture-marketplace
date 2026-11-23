@@ -153,11 +153,11 @@ def lookup_order(
     response_model=Page[StaffOrderSummaryResponse],
     summary="List orders",
     description=(
-        "Requires 'orders:read' (every staff role). Newest first, with the customer's name and "
-        "phone. `from` and `to` bound the creation time (inclusive); `payment_status` and "
-        "`payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number "
-        "(any accepted format; matches the order's phone) or part of an order number. "
-        "`store_id` keeps orders with a line from that store (ADR-014 phase 3)."
+        "Requires 'orders:read' (held by no role in V1, SC-06). Newest first, with the customer's "
+        "name and phone. `from` and `to` bound the creation time (inclusive); `payment_status` and "
+        "`payment_method` are the latest payment attempt's. `q` is a Rwandan mobile number (any "
+        "accepted format; matches the order's phone) or part of an order number. `store_id` keeps "
+        "orders with a line from that store (ADR-014 phase 3)."
     ),
     responses={**AUTH_ERRORS, **VALIDATION_422},
 )
@@ -193,7 +193,7 @@ def list_staff_orders(
     response_model=OrderAssigneesResponse,
     summary="Staff an order can be assigned to",
     description=(
-        "Requires 'orders:fulfil' (administrator). Every active staff account "
+        "Requires 'orders:fulfil' (held by no role in V1, SC-06). Every active staff account "
         "(name and role only), by name: the choices for PATCH /staff/orders/{id}/assignment."
     ),
     responses={**AUTH_ERRORS},
@@ -222,15 +222,16 @@ def get_staff_order(order_id: uuid.UUID, _: OrderReader, db: Db) -> StaffOrderDe
     status_code=status.HTTP_200_OK,
     summary="Cancel an order",
     description=(
-        "Requires 'orders:fulfil' (administrator). ADR-014 phase 3 (owner decision 2): sellers "
-        "run fulfilment and the order's confirmed, processing, dispatched and delivered follow "
-        "its stores' seller orders, so the only status staff can set is `cancelled`; any other "
-        "answers 409 order_status_follows_seller_orders. Cancellation, its status history row "
-        "and audit event commit atomically; it releases active holds and the promotion use, "
-        "cancels an unpaid payment and every seller order. Committed stock is never released "
-        "by cancellation (ADR-002), so cancelling a paid or confirmed cash-on-delivery order "
-        "returns 409 inventory_conflict. The customer's notification is recorded with the "
-        "change and sent after the response (module 17)."
+        "Requires 'orders:fulfil' (held by no role in V1, SC-06: no one cancels a whole order by "
+        "hand; the expiry job still does). ADR-014 phase 3 (owner decision 2): sellers run "
+        "fulfilment and the order's confirmed, processing, dispatched and delivered follow its "
+        "stores' seller orders, so the only status staff can set is `cancelled`; any other answers "
+        "409 order_status_follows_seller_orders. Cancellation, its status history row and audit "
+        "event commit atomically; it releases active holds and the promotion use, cancels an "
+        "unpaid payment and every seller order. Committed stock is never released by cancellation "
+        "(ADR-002), so cancelling a paid or confirmed cash-on-delivery order returns 409 "
+        "inventory_conflict. The customer's notification is recorded with the change and sent "
+        "after the response (module 17)."
     ),
     responses={**AUTH_ERRORS, **ORDER_404, **ORDER_409, **VALIDATION_422},
 )
@@ -256,7 +257,7 @@ def change_order_status(
     status_code=status.HTTP_200_OK,
     summary="Assign fulfilment responsibility for an order",
     description=(
-        "Requires 'orders:fulfil' (administrator). The target must be an active "
+        "Requires 'orders:fulfil' (held by no role in V1, SC-06). The target must be an active "
         "staff account with one of the repository's assigned staff roles. The assignment and "
         "audit event commit atomically."
     ),

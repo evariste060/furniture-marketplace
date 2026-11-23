@@ -1,6 +1,6 @@
 """Staff catalogue import (module 8; TC-15).
 
-Every route requires 'catalog:manage' (administrator). Reading, checking and applying
+Every route requires 'catalog:edit', held by no role in V1 (SC-06). Reading, checking and applying
 rows is in app.services.catalog_import; file formats and templates in app.services.import_files.
 Any catalogue manager may read any import job: jobs hold only counts and row/column errors, no
 personal data, and the catalogue is shared by all catalogue staff.
@@ -32,11 +32,11 @@ from app.services.import_files import (
 
 router = APIRouter(prefix="/staff", tags=["Staff Catalogue"])
 
-CatalogManager = Annotated[User, Depends(require_permission(Permission.CATALOG_MANAGE))]
+CatalogEditor = Annotated[User, Depends(require_permission(Permission.CATALOG_EDIT))]
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 
-PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
+PERMISSION_NOTE = "Requires 'catalog:edit' (held by no role in V1, SC-06)."
 EXTENSIONS = {".csv": "csv", ".xlsx": "xlsx"}
 FILENAME_MAX_LENGTH = 255
 FILE_TOO_LARGE = "The file is larger than 10 MB."
@@ -60,7 +60,7 @@ GUARDED: ResponseMap = {
         **FORBIDDEN_403[403],
         **_content(
             role=_example(
-                "permission_denied", "Access forbidden: requires 'catalog:manage' permission."
+                "permission_denied", "Access forbidden: requires 'catalog:edit' permission."
             )
         ),
     },
@@ -138,7 +138,7 @@ def _read(file: UploadFile) -> bytes:
     },
 )
 def download_template(
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     file_format: Annotated[Literal["csv", "xlsx"], Query(alias="format")],
 ) -> Response:
     if file_format == "csv":
@@ -173,7 +173,7 @@ def download_template(
 )
 def upload_import(
     file: Annotated[UploadFile, File(description=".csv (UTF-8) or .xlsx, at most 10 MB")],
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     ctx: Ctx,
 ) -> ImportJobResponse:
@@ -202,5 +202,5 @@ def upload_import(
     description=f"{PERMISSION_NOTE} Status, row counts and row errors of one import.",
     responses={**GUARDED, **JOB_404, **VALIDATION_422},
 )
-def get_import(job_id: uuid.UUID, current_user: CatalogManager, db: Db) -> ImportJobResponse:
+def get_import(job_id: uuid.UUID, current_user: CatalogEditor, db: Db) -> ImportJobResponse:
     return ImportJobResponse.model_validate(CatalogImportService.get(db, job_id))

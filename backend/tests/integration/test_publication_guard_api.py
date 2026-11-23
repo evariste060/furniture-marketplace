@@ -19,6 +19,10 @@ from app.services import product_admin
 from tests.support.media import image_row
 from tests.support.sellers import new_store, post_product
 
+# SC-06: the staff routes for orders, payments, stock and catalogue editing used here are held by
+# no role in V1; these tests grant them to the administrator (tests/conftest.py).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 STAFF = "/api/v1/staff"
 
 

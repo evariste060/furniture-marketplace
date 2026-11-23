@@ -1,19 +1,22 @@
 """Staff product and variant management (module 6), and the staff product list and detail.
 
-Changes require 'catalog:manage' (administrator). The list and detail require
+Moderation (status and the featured flag) requires 'catalog:manage' (administrator). A product's
+content, its variants, bulk images and bulk activation require 'catalog:edit', which no role holds
+in V1 (SC-06, ADR-014 phase 7: sellers edit their own products). The list and detail require
 'catalog:read' (administrator) and show drafts too. Rules and
 concurrency are in app.services.product_admin. The public, read-only views are
 GET /catalog/products and GET /catalog/products/{slug}.
 
 Stores (ADR-014 phase 2; SC-05): staff act on every store (CatalogScope.platform()) and moderate
-products (view, edit, hide, archive); they do not create them, so POST /staff/products answers
-409 staff_product_creation_disabled. Sellers manage their own products under /seller/products.
+products (view, hide, restore, archive, feature); they do not create them, so POST
+/staff/products answers 409 staff_product_creation_disabled. Sellers manage their own products
+under /seller/products.
 """
 
 import uuid
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, File, Query, Response, UploadFile, status
+from fastapi import APIRouter, Depends, File, Query, Request, Response, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.endpoints.image_admin import image_response
@@ -25,7 +28,7 @@ from app.api.v1.responses import (
     VALIDATION_422,
     ResponseMap,
 )
-from app.core.dependencies import require_permission
+from app.core.dependencies import ensure_permission, require_permission
 from app.core.errors import field_error
 from app.core.request_context import RequestContext, get_request_context
 from app.core.roles import Permission
@@ -74,6 +77,8 @@ from app.services.product_admin import (
 router = APIRouter(prefix="/staff", tags=["Staff Catalogue"])
 
 GUARDED: ResponseMap = {**UNAUTHORIZED_401, **FORBIDDEN_403}
+# What staff may change on a product without 'catalog:edit' (SC-06): moderation only.
+MODERATION_FIELDS = frozenset({"status", "is_featured"})
 PRODUCT_404: ResponseMap = {404: {**ERR, "description": "No product with this ID"}}
 VARIANT_404: ResponseMap = {
     404: {**ERR, "description": "No product with this ID, or no such variant on it"}
@@ -86,12 +91,14 @@ SKU_409: ResponseMap = {
 }
 
 CatalogManager = Annotated[User, Depends(require_permission(Permission.CATALOG_MANAGE))]
+CatalogEditor = Annotated[User, Depends(require_permission(Permission.CATALOG_EDIT))]
 CatalogReader = Annotated[User, Depends(require_permission(Permission.CATALOG_READ))]
 Storage = Annotated[MediaStorage, Depends(get_media_storage)]
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 
 PERMISSION_NOTE = "Requires 'catalog:manage' (administrator)."
+EDIT_NOTE = "Requires 'catalog:edit' (held by no role in V1, SC-06)."
 PLATFORM = CatalogScope.platform()
 STAFF_CREATE_409: ResponseMap = {
     409: {
@@ -266,7 +273,7 @@ BULK_UPLOAD_NOTE = (
     response_model=JobResponse,
     status_code=status.HTTP_202_ACCEPTED,
     summary="Bulk upload product images (processed in the background)",
-    description=f"{PERMISSION_NOTE} {BULK_UPLOAD_NOTE}",
+    description=f"{EDIT_NOTE} {BULK_UPLOAD_NOTE}",
     responses={
         **GUARDED,
         413: {
@@ -281,7 +288,7 @@ def bulk_upload_images(
     files: Annotated[
         list[UploadFile], File(description=f"1–{MAX_FILES} image files named by product slug")
     ],
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     storage: Storage,
 ) -> JobResponse:
@@ -294,14 +301,14 @@ def bulk_upload_images(
     response_model=BulkActivateResponse,
     summary="Activate several products at once",
     description=(
-        f"{PERMISSION_NOTE} Up to 200 product IDs. Each product goes through the publication "
+        f"{EDIT_NOTE} Up to 200 product IDs. Each product goes through the publication "
         "guard: `activated`, `skipped_no_images` (no product image yet), `already_active` or "
         "`not_found`. One 'catalog.product_update' audit record per activated product."
     ),
     responses={**GUARDED, **VALIDATION_422},
 )
 def bulk_activate_products(
-    req: BulkActivateRequest, current_user: CatalogManager, db: Db, ctx: Ctx
+    req: BulkActivateRequest, current_user: CatalogEditor, db: Db, ctx: Ctx
 ) -> BulkActivateResponse:
     outcomes = bulk_activate(db, current_user, req.product_ids, ctx, scope=PLATFORM)
     counts = {name: 0 for name in ("activated", "skipped_no_images", "already_active", "not_found")}
@@ -341,10 +348,11 @@ def create_product(
     response_model=ProductResponse,
     summary="Update a product",
     description=(
-        f"{PERMISSION_NOTE} Partial update of the product fields and status (draft, active, "
-        "hidden, archived). Activating needs at least one product image (409 "
-        "product_has_no_images). Only active products in an active category, with an active "
-        "brand or none, are public. A rename keeps the slug. Audited as "
+        "Moderation needs 'catalog:manage': `status` (draft, active, hidden, archived) and "
+        "`is_featured`. Any other field also needs 'catalog:edit', held by no role in V1 (SC-06; "
+        "403 permission_denied): sellers edit their own products. Activating needs at least one "
+        "product image (409 product_has_no_images). Only active products in an active "
+        "category, with an active brand or none, are public. A rename keeps the slug. Audited as "
         "'catalog.product_update' with the old and new values; a request that changes nothing "
         "is not audited."
     ),
@@ -353,10 +361,13 @@ def create_product(
 def update_product(
     product_id: uuid.UUID,
     req: ProductUpdateRequest,
+    request: Request,
     current_user: CatalogManager,
     db: Db,
     ctx: Ctx,
 ) -> ProductResponse:
+    if req.model_fields_set - MODERATION_FIELDS:
+        ensure_permission(db, ctx, request, current_user, Permission.CATALOG_EDIT)
     product = ProductAdminService.update_product(
         db, current_user, product_id, req, ctx, scope=PLATFORM
     )
@@ -369,7 +380,7 @@ def update_product(
     status_code=status.HTTP_201_CREATED,
     summary="Add a variant (SKU) to a product",
     description=(
-        f"{PERMISSION_NOTE} price and compare_at_price are whole RWF (compare_at_price is display "
+        f"{EDIT_NOTE} price and compare_at_price are whole RWF (compare_at_price is display "
         "only). Stock is managed through the inventory endpoints. "
         "Audited as 'catalog.variant_create'."
     ),
@@ -378,7 +389,7 @@ def update_product(
 def create_variant(
     product_id: uuid.UUID,
     req: VariantCreateRequest,
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     ctx: Ctx,
 ) -> VariantResponse:
@@ -393,7 +404,7 @@ def create_variant(
     response_model=VariantResponse,
     summary="Update a variant",
     description=(
-        f"{PERMISSION_NOTE} Partial update; is_active=true reactivates a deactivated variant. "
+        f"{EDIT_NOTE} Partial update; is_active=true reactivates a deactivated variant. "
         "Audited as 'catalog.variant_update' with the old and new values, including price."
     ),
     responses={**GUARDED, **VARIANT_404, **SKU_409, **VALIDATION_422},
@@ -402,7 +413,7 @@ def update_variant(
     product_id: uuid.UUID,
     variant_id: uuid.UUID,
     req: VariantUpdateRequest,
-    current_user: CatalogManager,
+    current_user: CatalogEditor,
     db: Db,
     ctx: Ctx,
 ) -> VariantResponse:
@@ -418,14 +429,14 @@ def update_variant(
     response_class=Response,
     summary="Deactivate a variant",
     description=(
-        f"{PERMISSION_NOTE} The variant is not removed: stock and orders reference it. It is "
+        f"{EDIT_NOTE} The variant is not removed: stock and orders reference it. It is "
         "set to is_active=false and hidden from the public catalogue. Repeating it is a no-op. "
         "Audited as 'catalog.variant_deactivate'."
     ),
     responses={**GUARDED, **VARIANT_404, **VALIDATION_422},
 )
 def delete_variant(
-    product_id: uuid.UUID, variant_id: uuid.UUID, current_user: CatalogManager, db: Db, ctx: Ctx
+    product_id: uuid.UUID, variant_id: uuid.UUID, current_user: CatalogEditor, db: Db, ctx: Ctx
 ):
     ProductAdminService.deactivate_variant(
         db, current_user, product_id, variant_id, ctx, scope=PLATFORM

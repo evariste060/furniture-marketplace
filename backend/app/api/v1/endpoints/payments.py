@@ -5,8 +5,9 @@
   `X-Order-Phone` header for status, so the phone never appears in a URL). Guest attempts count
   on the guest-lookup limits (ADR-008 S6). Every mismatch is the same 404.
 - POST /webhooks/{provider}: provider callbacks, verified before anything is stored.
-- GET /staff/payments and /staff/payments/events: payments:read (administrator); read-only.
-  POST /staff/payments/{attempt_id}/confirm-cod: payments:manage (administrator).
+- GET /staff/payments and /staff/payments/events: payments:read (held by no role in V1, SC-06);
+  read-only.
+  POST /staff/payments/{attempt_id}/confirm-cod: payments:manage (held by no role in V1, SC-06).
 """
 
 import uuid
@@ -221,7 +222,7 @@ async def provider_webhook(
     response_model=StaffPaymentPage,
     summary="Payment attempts (reconciliation list)",
     description=(
-        "Requires 'payments:read' (administrator). Read-only; newest first. "
+        "Requires 'payments:read' (held by no role in V1, SC-06). Read-only; newest first. "
         "`amount_total` sums `amount` over every attempt matching the filters, not just this page."
     ),
     responses={**GUARDED, **VALIDATION_422},
@@ -273,10 +274,10 @@ def list_payment_events(
     response_model=StaffPaymentItem,
     summary="Record cash on delivery as collected",
     description=(
-        "Requires 'payments:manage' (administrator). Only for a cash-on-delivery payment of a "
-        "delivered order (409 order_not_delivered before that; TC-12). Delivery already marks it "
-        "succeeded (§7 Q14); confirming a succeeded payment changes nothing. Audited as "
-        "'payment.cod_confirm'."
+        "Requires 'payments:manage' (held by no role in V1, SC-06). Only for a cash-on-delivery "
+        "payment of a delivered order (409 order_not_delivered before that; TC-12). Delivery "
+        "already marks it succeeded (§7 Q14); confirming a succeeded payment changes nothing. "
+        "Audited as 'payment.cod_confirm'."
     ),
     responses={
         **GUARDED,

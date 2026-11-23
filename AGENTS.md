@@ -18,7 +18,8 @@ Sellers are store owners, not staff: never give a seller a staff role or a globa
 Seller access is scoped to the caller's own approved store, resolved on the backend on every request; another store's resource answers 404. Hiding UI is never the control.
 Never accept store_id, store status, commission or merchandising fields from seller request bodies.
 Every seller route needs a cross-store test: seller A is refused seller B's store, products, images, stock and orders.
-Keep one parent order and one payment per checkout; sellers change only their own seller group, and payment, stock commitment and whole-order cancellation stay with the platform.
+Keep one parent order and one payment per checkout; sellers change only their own seller group, and payment and stock commitment stay with the platform. No one cancels a whole order by hand (SC-06); only the expiry job cancels unpaid orders.
+Store operations (orders, payments, stock, catalogue editing) are the sellers'; their staff permissions are held by no role (SC-06). The administrator moderates products (visibility, featured) and governs the marketplace.
 Show sellers only the customer data their own order group needs.
 Keep the marketplace name in configuration, not hard-coded in components; change English and Kinyarwanda messages together.
 Destructive data scripts run only in development against a local database, after confirming the environment.

@@ -32,6 +32,10 @@ from tests.integration.test_cart_security import DownStore, _settings, peer
 from tests.integration.test_delivery_api import create_zone, set_threshold
 from tests.support.commerce import new_order, seed_sku, soon, wait_until_due
 
+# SC-06: the staff routes for orders, payments, stock and catalogue editing used here are held by
+# no role in V1; these tests grant them to the administrator (tests/conftest.py).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 PROMOTIONS = "/api/v1/staff/promotions"
 CART = "/api/v1/cart"
 APPLY = f"{CART}/apply-code"

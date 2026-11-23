@@ -17,6 +17,10 @@ from app.services.wishlist_service import WishlistService
 from tests.support.catalog import force_status
 from tests.support.sellers import new_store, post_product
 
+# SC-06: the staff routes for orders, payments, stock and catalogue editing used here are held by
+# no role in V1; these tests grant them to the administrator (tests/conftest.py).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 STAFF = "/api/v1/staff"
 WISH = "/api/v1/customers/me/wishlist"
 

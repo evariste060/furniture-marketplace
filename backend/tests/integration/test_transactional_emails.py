@@ -181,7 +181,7 @@ def test_the_welcome_email_follows_email_verification(client, db, emails):
     [row] = rows(db, "welcome")
     assert (row.subject_type, row.order_id, row.status) == ("user", None, "sent")
     [mail] = emails.messages
-    assert mail.subject == "Welcome to 3 Sixty Technologies" and "Eric Mugisha" in mail.text
+    assert mail.subject == "Welcome to FurniHub" and "Eric Mugisha" in mail.text
     assert f'href="{SITE}/products"' in mail.html
 
 

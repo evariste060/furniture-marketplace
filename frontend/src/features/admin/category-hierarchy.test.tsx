@@ -7,19 +7,48 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import admin from "../../../messages/admin.json";
 import en from "../../../messages/en.json";
 import { ToastProvider } from "@/components/ui/toast";
-import { addableBrands, moveItem, nextSortOrder, siblingOrder, subtreeCount, visibleRows } from "./categories";
+import {
+  addableBrands,
+  moveItem,
+  nextSortOrder,
+  siblingOrder,
+  subtreeCount,
+  visibleRows,
+} from "./categories";
 import { CatalogScopeProvider, staffScope } from "./catalog-scope";
-import { brandOptions, isHidden, mainOptions, rootOf, splitCategory, subOptions } from "./category-options";
+import {
+  brandOptions,
+  isHidden,
+  mainOptions,
+  rootOf,
+  splitCategory,
+  subOptions,
+} from "./category-options";
 import { ProductEditorView } from "./product-editor";
 
 /** Category hierarchy (2026-11-16): the product editor's Main category → Subcategory pickers and
  * the admin tree's search, filter, counts and reorder helpers. */
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ replace: vi.fn(), push: vi.fn() }) }));
-const api = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn(), PUT: vi.fn(), PATCH: vi.fn(), DELETE: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+}));
+const api = vi.hoisted(() => ({
+  GET: vi.fn(),
+  POST: vi.fn(),
+  PUT: vi.fn(),
+  PATCH: vi.fn(),
+  DELETE: vi.fn(),
+}));
 vi.mock("@/lib/api/client", () => ({ browserApi: api }));
 
-const cat = (id: string, name: string, parent_id: string | null, sort_order: number, is_active = true, product_count = 0) => ({
+const cat = (
+  id: string,
+  name: string,
+  parent_id: string | null,
+  sort_order: number,
+  is_active = true,
+  product_count = 0,
+) => ({
   id,
   name,
   slug: id,
@@ -46,29 +75,73 @@ const CATEGORIES = [
   cat("old", "Old stock", "retired", 1),
 ];
 const BRANDS = [
-  { id: "samsung", name: "Samsung", slug: "samsung", is_active: true, logo: null, product_count: 0, created_at: "", updated_at: "" },
-  { id: "nokia", name: "Nokia", slug: "nokia", is_active: false, logo: null, product_count: 0, created_at: "", updated_at: "" },
-  { id: "apple", name: "Apple", slug: "apple", is_active: true, logo: null, product_count: 0, created_at: "", updated_at: "" },
+  {
+    id: "samsung",
+    name: "Samsung",
+    slug: "samsung",
+    is_active: true,
+    logo: null,
+    product_count: 0,
+    created_at: "",
+    updated_at: "",
+  },
+  {
+    id: "nokia",
+    name: "Nokia",
+    slug: "nokia",
+    is_active: false,
+    logo: null,
+    product_count: 0,
+    created_at: "",
+    updated_at: "",
+  },
+  {
+    id: "apple",
+    name: "Apple",
+    slug: "apple",
+    is_active: true,
+    logo: null,
+    product_count: 0,
+    created_at: "",
+    updated_at: "",
+  },
 ];
-const ok = (data: unknown, status = 200) => Promise.resolve({ data, error: undefined, response: { ok: true, status } });
+const ok = (data: unknown, status = 200) =>
+  Promise.resolve({ data, error: undefined, response: { ok: true, status } });
 
 function respond(product?: Record<string, unknown>) {
   api.GET.mockImplementation((path: string) => {
     if (path === "/api/v1/staff/categories") return ok({ items: CATEGORIES });
     if (path === "/api/v1/staff/brands") return ok({ items: BRANDS });
     if (path === "/api/v1/staff/products/{product_id}") return ok(product);
-    if (path === "/api/v1/catalog/attributes") return ok({ attributes: [], default_set: [], sets: {} });
+    if (path === "/api/v1/catalog/attributes")
+      return ok({ attributes: [], default_set: [], sets: {} });
     return ok({ items: [], total: 0, page: 1, size: 20 });
   });
 }
 
-function renderEditor(productId?: string) {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+function renderEditor(
+  productId?: string,
+  // catalog:edit is held by no role in V1 (SC-06); the editor itself is the same for sellers.
+  permissions: string[] = [
+    "catalog:manage",
+    "catalog:edit",
+    "inventory:read",
+    "inventory:adjust",
+  ],
+) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
     <QueryClientProvider client={client}>
-      <NextIntlClientProvider locale="en" messages={{ ...en, admin }} timeZone="Africa/Kigali">
+      <NextIntlClientProvider
+        locale="en"
+        messages={{ ...en, admin }}
+        timeZone="Africa/Kigali"
+      >
         <ToastProvider closeLabel="Close">
-          <CatalogScopeProvider scope={staffScope(new Set(["catalog:manage", "inventory:read", "inventory:adjust"]))}>
+          <CatalogScopeProvider scope={staffScope(new Set(permissions))}>
             {(<ProductEditorView productId={productId} />) as ReactNode}
           </CatalogScopeProvider>
         </ToastProvider>
@@ -77,7 +150,10 @@ function renderEditor(productId?: string) {
   );
 }
 
-const options = (select: HTMLElement) => within(select).getAllByRole("option").map((o) => o.textContent);
+const options = (select: HTMLElement) =>
+  within(select)
+    .getAllByRole("option")
+    .map((o) => o.textContent);
 
 afterEach(() => vi.clearAllMocks());
 
@@ -91,24 +167,57 @@ describe("category options", () => {
   });
 
   it("offers visible categories in order, plus the product's current hidden one", () => {
-    expect(mainOptions(CATEGORIES, "").map((o) => o.id)).toEqual(["phones", "laptops"]);
-    expect(subOptions(CATEGORIES, "laptops", "").map((o) => o.id)).toEqual(["notebooks", "gaming"]);
-    expect(subOptions(CATEGORIES, "phones", "").map((o) => o.id)).toEqual(["smartphones", "tablets"]);
-    expect(subOptions(CATEGORIES, "phones", "feature")).toContainEqual({ id: "feature", name: "Feature Phones", hidden: true });
-    expect(mainOptions(CATEGORIES, "old")).toContainEqual({ id: "retired", name: "Retired", hidden: true });
+    expect(mainOptions(CATEGORIES, "").map((o) => o.id)).toEqual([
+      "phones",
+      "laptops",
+    ]);
+    expect(subOptions(CATEGORIES, "laptops", "").map((o) => o.id)).toEqual([
+      "notebooks",
+      "gaming",
+    ]);
+    expect(subOptions(CATEGORIES, "phones", "").map((o) => o.id)).toEqual([
+      "smartphones",
+      "tablets",
+    ]);
+    expect(subOptions(CATEGORIES, "phones", "feature")).toContainEqual({
+      id: "feature",
+      name: "Feature Phones",
+      hidden: true,
+    });
+    expect(mainOptions(CATEGORIES, "old")).toContainEqual({
+      id: "retired",
+      name: "Retired",
+      hidden: true,
+    });
     expect(subOptions(CATEGORIES, "", "")).toEqual([]);
   });
 
   it("splits a stored category into the two pickers", () => {
-    expect(splitCategory(CATEGORIES, "tablets")).toEqual({ mainId: "phones", subId: "tablets" });
-    expect(splitCategory(CATEGORIES, "phones")).toEqual({ mainId: "phones", subId: "" });
+    expect(splitCategory(CATEGORIES, "tablets")).toEqual({
+      mainId: "phones",
+      subId: "tablets",
+    });
+    expect(splitCategory(CATEGORIES, "phones")).toEqual({
+      mainId: "phones",
+      subId: "",
+    });
     expect(splitCategory(CATEGORIES, "")).toEqual({ mainId: "", subId: "" });
-    expect(splitCategory(CATEGORIES, "unknown")).toEqual({ mainId: "", subId: "" });
+    expect(splitCategory(CATEGORIES, "unknown")).toEqual({
+      mainId: "",
+      subId: "",
+    });
   });
 
   it("offers active brands by name, plus the current hidden one", () => {
-    expect(brandOptions(BRANDS, "").map((b) => b.id)).toEqual(["apple", "samsung"]);
-    expect(brandOptions(BRANDS, "nokia").map((b) => b.id)).toEqual(["apple", "nokia", "samsung"]);
+    expect(brandOptions(BRANDS, "").map((b) => b.id)).toEqual([
+      "apple",
+      "samsung",
+    ]);
+    expect(brandOptions(BRANDS, "nokia").map((b) => b.id)).toEqual([
+      "apple",
+      "nokia",
+      "samsung",
+    ]);
   });
 });
 
@@ -119,14 +228,25 @@ describe("category tree helpers", () => {
   });
 
   it("keeps the matches of a search and status filter with their main categories", () => {
-    expect([...visibleRows(CATEGORIES, "tab", "all")].sort()).toEqual(["phones", "tablets"]);
-    expect([...visibleRows(CATEGORIES, "", "hidden")].sort()).toEqual(["feature", "phones", "retired"]);
+    expect([...visibleRows(CATEGORIES, "tab", "all")].sort()).toEqual([
+      "phones",
+      "tablets",
+    ]);
+    expect([...visibleRows(CATEGORIES, "", "hidden")].sort()).toEqual([
+      "feature",
+      "phones",
+      "retired",
+    ]);
     expect(visibleRows(CATEGORIES, "", "all").size).toBe(CATEGORIES.length);
     expect(visibleRows(CATEGORIES, "zzz", "all").size).toBe(0);
   });
 
   it("moves a category among its siblings and puts new ones last", () => {
-    expect(siblingOrder(CATEGORIES, "tablets", -1)).toEqual(["tablets", "smartphones", "feature"]);
+    expect(siblingOrder(CATEGORIES, "tablets", -1)).toEqual([
+      "tablets",
+      "smartphones",
+      "feature",
+    ]);
     expect(siblingOrder(CATEGORIES, "smartphones", -1)).toBeNull();
     expect(siblingOrder(CATEGORIES, "retired", 1)).toBeNull();
     expect(nextSortOrder(CATEGORIES, "phones")).toBe(4);
@@ -142,18 +262,34 @@ describe("product editor: main category, then subcategory", () => {
     const main = await screen.findByLabelText("Main category");
     await waitFor(() => expect(main).toBeEnabled());
     const sub = screen.getByLabelText("Subcategory");
-    expect(options(main)).toEqual(["Choose a main category…", "Phones & Tablets", "Laptops & Computers"]);
+    expect(options(main)).toEqual([
+      "Choose a main category…",
+      "Phones & Tablets",
+      "Laptops & Computers",
+    ]);
     expect(sub).toBeDisabled();
 
     await userEvent.selectOptions(main, "phones");
-    expect(options(sub)).toEqual(["None (directly in the main category)", "Smartphones", "Tablets"]);
+    expect(options(sub)).toEqual([
+      "None (directly in the main category)",
+      "Smartphones",
+      "Tablets",
+    ]);
     await userEvent.selectOptions(sub, "tablets");
     expect(sub).toHaveValue("tablets");
 
     await userEvent.selectOptions(main, "laptops");
     expect(sub).toHaveValue("");
-    expect(options(sub)).toEqual(["None (directly in the main category)", "Laptops", "Gaming Laptops"]);
-    expect(options(screen.getByLabelText("Brand"))).toEqual(["No brand", "Apple", "Samsung"]);
+    expect(options(sub)).toEqual([
+      "None (directly in the main category)",
+      "Laptops",
+      "Gaming Laptops",
+    ]);
+    expect(options(screen.getByLabelText("Brand"))).toEqual([
+      "No brand",
+      "Apple",
+      "Samsung",
+    ]);
   });
 
   it("saves the subcategory, or the main category when none is picked", async () => {
@@ -164,13 +300,20 @@ describe("product editor: main category, then subcategory", () => {
     await waitFor(() => expect(main).toBeEnabled());
     await userEvent.type(screen.getByLabelText("Product name"), "Galaxy S24");
     await userEvent.selectOptions(main, "phones");
-    await userEvent.selectOptions(screen.getByLabelText("Subcategory"), "smartphones");
-    await userEvent.click(screen.getByRole("button", { name: "Create product" }));
+    await userEvent.selectOptions(
+      screen.getByLabelText("Subcategory"),
+      "smartphones",
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create product" }),
+    );
     await waitFor(() => expect(api.POST).toHaveBeenCalledTimes(1));
     expect(api.POST.mock.calls[0][1].body.category_id).toBe("smartphones");
 
     await userEvent.selectOptions(screen.getByLabelText("Subcategory"), "");
-    await userEvent.click(screen.getByRole("button", { name: "Create product" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create product" }),
+    );
     await waitFor(() => expect(api.POST).toHaveBeenCalledTimes(2));
     expect(api.POST.mock.calls[1][1].body.category_id).toBe("phones");
   });
@@ -178,10 +321,16 @@ describe("product editor: main category, then subcategory", () => {
   it("asks for a main category before saving", async () => {
     respond();
     renderEditor();
-    await waitFor(() => expect(screen.getByLabelText("Main category")).toBeEnabled());
+    await waitFor(() =>
+      expect(screen.getByLabelText("Main category")).toBeEnabled(),
+    );
     await userEvent.type(screen.getByLabelText("Product name"), "Galaxy S24");
-    await userEvent.click(screen.getByRole("button", { name: "Create product" }));
-    expect(await screen.findByText("Choose a main category.")).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create product" }),
+    );
+    expect(
+      await screen.findByText("Choose a main category."),
+    ).toBeInTheDocument();
     expect(api.POST).not.toHaveBeenCalled();
   });
 
@@ -212,6 +361,51 @@ describe("product editor: main category, then subcategory", () => {
     expect(screen.getByLabelText("Brand")).toHaveValue("nokia");
     expect(options(screen.getByLabelText("Brand"))).toContain("Nokia (hidden)");
   });
+
+  it("lets the administrator moderate only: visibility and featured, never the seller's details (SC-06)", async () => {
+    respond({
+      id: "p1",
+      name: "Oak sofa",
+      slug: "oak-sofa",
+      description: null,
+      brand_id: null,
+      category_id: "tablets",
+      model: null,
+      warranty_text: null,
+      status: "active",
+      is_featured: false,
+      specifications: {},
+      variants: [],
+      images: [],
+      photo_file_names: [],
+      updated_at: "2026-11-22T00:00:00Z",
+    });
+    api.PATCH.mockImplementation(() => ok({}));
+    renderEditor("p1", ["catalog:manage", "catalog:read"]);
+    expect(
+      await screen.findByText(admin.editor.moderationNote),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByLabelText("Product name")).toHaveValue("Oak sofa"),
+    );
+    expect(screen.getByLabelText("Product name")).toBeDisabled();
+    expect(screen.getByLabelText("Main category")).toBeDisabled();
+    await userEvent.click(screen.getByRole("radio", { name: /Hidden/ }));
+    await userEvent.click(
+      screen.getByRole("checkbox", { name: admin.editor.featured }),
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: admin.common.saveChanges }),
+    );
+    await waitFor(() => expect(api.PATCH).toHaveBeenCalledTimes(1));
+    expect(api.PATCH.mock.calls[0][0]).toBe(
+      "/api/v1/staff/products/{product_id}",
+    );
+    expect(api.PATCH.mock.calls[0][1].body).toEqual({
+      status: "hidden",
+      is_featured: true,
+    });
+  });
 });
 
 describe("menu brands picker helpers (2026-11-16)", () => {
@@ -229,6 +423,9 @@ describe("menu brands picker helpers (2026-11-16)", () => {
       { id: "n", name: "Nokia", is_active: false },
       { id: "h", name: "HP", is_active: true },
     ];
-    expect(addableBrands(brands, ["h"]).map((b) => b.name)).toEqual(["Apple", "Samsung"]);
+    expect(addableBrands(brands, ["h"]).map((b) => b.name)).toEqual([
+      "Apple",
+      "Samsung",
+    ]);
   });
 });

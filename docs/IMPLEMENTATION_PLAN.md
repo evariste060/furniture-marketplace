@@ -61,6 +61,8 @@ For each step: models + Alembic migration (upgrade, downgrade to the previous re
 
 **ADR-014 phase 6 (2026-11-22).** No permission change. Furniture taxonomy and attributes (`app/core/furniture.py`, `GET /catalog/attributes`, `material`/`color`/`style` filters and facets, checked on staff and seller product writes), furniture services with five new icons (migration `f2a4c6e8b0d1`), the marketplace name in configuration (`MARKETPLACE_NAME`, `NEXT_PUBLIC_MARKETPLACE_NAME`, default FurniHub) and the furniture development seed. See ADR-014 "Phase 6 as built".
 
+**ADR-014 phase 7 / SC-06 (2026-11-22).** Store operations leave the administrator: `orders:*`, `payments:*`, `inventory:*` and the new `catalog:edit` are held by no role, so the staff order, payment, stock, catalogue editing, import and bulk photo routes answer 403 to the administrator and their admin pages are removed. `catalog:manage` is product moderation only (visibility and featured). No one cancels a whole order by hand. New `GET /staff/reports/marketplace` (`reports:read`) for the admin Overview and Analytics & Reports; sellers get an Earnings page. See SC-06 and ADR-014 "Phase 7 as built".
+
 Permissions are added only when the feature that uses them is built (ADR-006). Administrator keeps every permission. "—" means no access. The roles and permissions are defined in code only (`backend/app/core/roles.py`); the database holds just the role names (a check constraint), so a matrix change needs no migration.
 
 **Final staff matrix (approved by the project owner on 2026-10-26, checkpoint 1b).** It replaces the four-role table of 2026-10-23: finance became a fifth role on 2026-10-25, and on 2026-10-26 `catalog:read` and `content:manage` were added, operations gained `inventory:adjust` and `delivery:read`, management gained `catalog:read`, `inventory:read`, `orders:read`, `reports:read` and `content:manage`, and sales gained `promotions:read`. Finance changes nothing.
@@ -92,6 +94,7 @@ Permissions are added only when the feature that uses them is built (ADR-006). A
 | `quotes:manage` | business quote requests: list and status | ✓ | ✓ | — | — | — | 19 (owner decision 2026-10-29) |
 | `sellers:read` | seller applications, stores and owner contact details | ✓ | — | — | — | — | ADR-014 phase 1 (owner decision 2026-11-21) |
 | `sellers:manage` | approve, reject, suspend, reinstate stores; commission override | ✓ | — | — | — | — | ADR-014 phase 1 (owner decision 2026-11-21) |
+| `catalog:edit` | edit a product's details, variants and photos; imports, bulk photos, bulk publish | — | — | — | — | — | SC-06 (2026-11-22): held by no role in V1, like `orders:*`, `payments:*` and `inventory:*` |
 
 ## 4. Before module 5 (in this order)
 

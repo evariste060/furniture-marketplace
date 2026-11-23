@@ -78,6 +78,20 @@ def _deny(db: Session, ctx: RequestContext, request: Request, user: User, detail
     )
 
 
+def ensure_permission(
+    db: Session, ctx: RequestContext, request: Request, user: User, required_permission: str
+) -> None:
+    """403 permission_denied (audited as auth.access_denied) unless the user's role holds the
+    permission. require_permission uses it; a route that needs a second permission for some of
+    its inputs calls it directly."""
+    if not has_permission(user, required_permission):
+        _deny(db, ctx, request, user, {"required_permission": required_permission})
+        raise Forbidden(
+            f"Access forbidden: requires '{required_permission}' permission.",
+            code="permission_denied",
+        )
+
+
 def require_permission(required_permission: str) -> Callable:
     """Dependency factory ensuring current user's role has the specified permission.
 
@@ -92,12 +106,7 @@ def require_permission(required_permission: str) -> Callable:
         current_user: Annotated[User, Depends(get_current_user)],
         db: Annotated[Session, Depends(get_db)],
     ) -> User:
-        if not has_permission(current_user, required_permission):
-            _deny(db, ctx, request, current_user, {"required_permission": required_permission})
-            raise Forbidden(
-                f"Access forbidden: requires '{required_permission}' permission.",
-                code="permission_denied",
-            )
+        ensure_permission(db, ctx, request, current_user, required_permission)
         return current_user
 
     # Read by tests that enumerate every permission-protected route.

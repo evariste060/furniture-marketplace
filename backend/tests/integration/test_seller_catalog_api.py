@@ -18,6 +18,10 @@ from tests.integration.test_image_admin_api import image_bytes, storage  # noqa:
 from tests.support.catalog import force_status
 from tests.support.sellers import approved_seller, decide
 
+# SC-06: the staff routes for orders, payments, stock and catalogue editing used here are held by
+# no role in V1; these tests grant them to the administrator (tests/conftest.py).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 SELLER = "/api/v1/seller"
 STAFF = "/api/v1/staff"
 PUBLIC = "/api/v1/catalog"

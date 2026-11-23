@@ -29,6 +29,10 @@ from tests.integration.test_promotions_api import apply, create_promotion
 from tests.support.commerce import wait_until_due
 from tests.support.seller_orders import advance, move, seller_orders
 
+# SC-06: the staff routes for orders, payments, stock and catalogue editing used here are held by
+# no role in V1; these tests grant them to the administrator (tests/conftest.py).
+pytestmark = pytest.mark.usefixtures("store_operations_granted")
+
 CHECKOUT = "/api/v1/checkout"
 HISTORY = "/api/v1/customers/me/orders"
 LOOKUP = "/api/v1/orders/lookup"

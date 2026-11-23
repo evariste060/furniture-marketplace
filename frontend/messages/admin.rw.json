@@ -5,38 +5,34 @@
     "navLabel": "Ubuyobozi",
     "groups": {
       "overview": "Incamake",
-      "orders": "Amatumiza",
-      "catalogue": "Ibicuruzwa",
-      "store": "Iduka",
-      "system": "Sisitemu"
+      "marketplace": "Isoko",
+      "support": "Ubufasha bw'urubuga",
+      "insights": "Isesengura",
+      "platform": "Urubuga"
     },
     "nav": {
-      "dashboard": "Imbonerahamwe",
-      "orders": "Amatumiza",
-      "payments": "Ubwishyu",
-      "products": "Ibicuruzwa",
-      "bulkImages": "Amafoto y'ibicuruzwa",
+      "dashboard": "Incamake",
+      "sellers": "Abacuruzi",
+      "products": "Kugenzura ibicuruzwa",
       "categories": "Ibyiciro n'ibirango",
-      "import": "Kwinjiza ibicuruzwa",
-      "inventory": "Ububiko",
-      "reviews": "Ibitekerezo",
-      "delivery": "Uturere two kugeza",
       "promotions": "Poromosiyo",
-      "staff": "Abakozi n'inshingano",
-      "settings": "Igenamiterere n'impapuro",
-      "audit": "Igitabo cy'ibikorwa",
-      "quotes": "Ubusabe bw'ibiciro",
-      "messages": "Ubufasha",
-      "services": "Serivisi",
+      "reviews": "Ibitekerezo no kugenzura",
+      "messages": "Ubufasha bw'urubuga",
       "serviceRequests": "Ubusabe bwa serivisi",
-      "sellers": "Abacuruzi"
+      "quotes": "Ubusabe bw'ibiciro",
+      "analytics": "Isesengura na raporo",
+      "settings": "Igenamiterere ry'urubuga",
+      "delivery": "Uturere two kugeza",
+      "services": "Serivisi",
+      "staff": "Abayobozi",
+      "audit": "Igitabo cy'ibikorwa"
     },
     "newCount": "{count} bishya",
     "logout": "Sohoka",
     "openMenu": "Fungura menu y'ubuyobozi",
     "closeMenu": "Funga menu y'ubuyobozi",
     "searchLabel": "Shakisha mu buyobozi",
-    "searchPlaceholder": "Shakisha amatumiza, ibicuruzwa, abakiriya…",
+    "searchPlaceholder": "Shakisha ibicuruzwa mu maduka yose…",
     "searchShortcut": "Ctrl + K",
     "skipToContent": "Jya ku bikubiyemo",
     "close": "Funga",
@@ -53,7 +49,7 @@
     "waitingTitle": "Ibigutegereje",
     "waitingEmpty": "Byose byarangiye: nta kigutegereje.",
     "waiting": {
-      "orders": "{count, plural, one {Itumiza # rishya ryo kwemeza} other {Amatumiza # mashya yo kwemeza}}",
+      "sellers": "{count, plural, one {Ubusabe # bw'umucuruzi bwo gusuzuma} other {Ubusabe # bw'abacuruzi bwo gusuzuma}}",
       "messages": "{count, plural, one {Ubutumwa # bwo gusubiza} other {Ubutumwa # bwo gusubiza}}",
       "quotes": "{count, plural, one {Ubusabe # bushya bw'igiciro} other {Ubusabe # bushya bw'ibiciro}}",
       "reviews": "{count, plural, one {Igitekerezo # cyo kwemeza} other {Ibitekerezo # byo kwemeza}}",
@@ -134,219 +130,87 @@
     }
   },
   "dashboard": {
-    "title": "Imbonerahamwe",
-    "description": "Incamake y'iduka ryawe, amatumiza n'imibare y'ingenzi.",
     "period": "Igihe",
     "periods": {
-      "7": "Iminsi 7 ishize",
       "30": "Iminsi 30 ishize",
-      "90": "Iminsi 90 ishize"
+      "90": "Iminsi 90 ishize",
+      "365": "Amezi 12 ashize"
     },
     "greeting": {
       "morning": "Mwaramutse, {name}",
       "afternoon": "Mwiriwe, {name}",
       "evening": "Mwiriwe, {name}"
     },
-    "subtitle": "Dore ibiri kubera kuri {marketplace} uyu munsi.",
-    "totalOrders": "Amatumiza yose",
-    "totalRevenue": "Amafaranga yose yinjiye",
-    "products": "Ibicuruzwa",
-    "inCatalogue": "biri mu iduka",
-    "pendingPayments": "Ubwishyu butegerejwe",
-    "pendingHint": "bitegereje kwemezwa",
+    "subtitle": "Uko {marketplace} iri gutera imbere, n'ibyemezo bigutegereje.",
     "vsPreviousDays": "ugereranyije n'iminsi {days} ibanza",
-    "salesOverview": "Incamake y'igurisha",
     "metricLabel": "Igishushanyo cyerekana",
     "metric": {
-      "total": "Amafaranga yinjiye",
+      "merchandise_total": "Ibyagurishijwe",
+      "commission_amount": "Komisiyo",
       "orders": "Amatumiza"
     },
     "ordersCount": "{count, plural, one {itumiza #} other {amatumiza #}}",
     "chartLabel": "{metric} kuva {from} kugeza {to}: {total} byose hamwe",
     "weekOf": "Icyumweru cya {date}",
     "noSales": "Nta tumiza ryishyuwe muri iki gihe.",
-    "recentOrders": "Amatumiza aheruka",
-    "noRecent": "Nta matumiza arahari.",
     "topSelling": "Ibicuruzwa bigurwa cyane",
     "sold": "{count} byagurishijwe",
     "noTopSelling": "Nta kintu cyagurishijwe muri iki gihe.",
-    "systemAlerts": "Imenyesha rya sisitemu",
-    "alerts": {
-      "view": "Reba {name}",
-      "viewShort": "Reba",
-      "lowStock": {
-        "title": "Bisigaye bike",
-        "body": "{count, plural, =0 {Ibicuruzwa byose birenze urugero rw'imenyesha.} one {Igicuruzwa # kiri gushira.} other {Ibicuruzwa # biri gushira.}}"
-      },
-      "dispatch": {
-        "title": "Biteguye koherezwa",
-        "body": "{count, plural, =0 {Nta kintu gitegereje koherezwa.} one {Itumiza # ryapakiwe riri gutegereza.} other {Amatumiza # yapakiwe ari gutegereza.}}"
-      },
-      "reconcile": {
-        "title": "Ibibazo by'ubwishyu",
-        "body": "{count, plural, =0 {Nta bwishyu bukeneye kugenzurwa.} one {Ubwishyu # bukeneye guhuzwa.} other {Ubwishyu # bukeneye guhuzwa.}}"
-      },
-      "reviews": {
-        "title": "Ibitekerezo byo kwemeza",
-        "body": "{count, plural, =0 {Nta gitekerezo gitegereje.} one {Igitekerezo # kirategereje.} other {Ibitekerezo # birategereje.}}"
-      }
-    },
     "up": "Byazamutseho {percent}%",
     "down": "Byagabanutseho {percent}%",
     "flat": "Nta mpinduka",
-    "ordersByStatus": "Amatumiza bitewe n'aho ageze",
-    "viewAll": "Reba byose",
-    "totalLabel": "Amatumiza yose",
-    "statusChart": "Amatumiza {total}: {parts}",
-    "share": "{count} ({percent}%)",
-    "noOrders": "Nta matumiza muri iki gihe.",
-    "lowStockItems": "Ibisigaye bike",
-    "left": "Hasigaye {count}",
-    "sku": "SKU: {sku}",
-    "noLowStock": "Nta gicuruzwa kiri gushira.",
-    "quickActions": "Ibikorwa byihuse",
-    "actions": {
-      "import": "Injiza ibicuruzwa",
-      "orders": "Reba amatumiza",
-      "stock": "Genzura ububiko",
-      "promotion": "Poromosiyo nshya"
+    "goodsSales": "Ibicuruzwa byagurishijwe",
+    "commission": "Komisiyo yinjiye",
+    "orders": "Amatumiza yishyuwe",
+    "approvedStores": "Amaduka yemewe",
+    "newInPeriod": "{count, plural, =0 {nta rishya muri iki gihe} one {# rishya muri iki gihe} other {# mashya muri iki gihe}}",
+    "trend": "Uko isoko rihagaze",
+    "marketplace": "Isoko",
+    "viewSellers": "Reba abacuruzi",
+    "stores": {
+      "approved": "Amaduka yemewe",
+      "pending": "Ubusabe butegereje",
+      "suspended": "Amaduka yahagaritswe",
+      "rejected": "Ubusabe bwanzwe"
+    },
+    "customers": "Konti z'abakiriya",
+    "publishedProducts": "Ibicuruzwa biri ku isoko",
+    "attention": "Ibikeneye ko ubyitaho",
+    "tasks": {
+      "view": "Reba {name}",
+      "viewShort": "Reba",
+      "applications": {
+        "title": "Ubusabe bw'abacuruzi",
+        "body": "{count, plural, =0 {Nta busabe butegereje.} one {Ubusabe # butegereje gusuzumwa.} other {Ubusabe # butegereje gusuzumwa.}}"
+      },
+      "reviews": {
+        "title": "Ibitekerezo byo kugenzura",
+        "body": "{count, plural, =0 {Nta gitekerezo gitegereje.} one {Igitekerezo # kirategereje.} other {Ibitekerezo # birategereje.}}"
+      },
+      "messages": {
+        "title": "Ibiganiro by'ubufasha",
+        "body": "{count, plural, =0 {Nta kiganiro gifunguye.} one {Ikiganiro # kirafunguye.} other {Ibiganiro # birafunguye.}}"
+      },
+      "serviceRequests": {
+        "title": "Ubusabe bwa serivisi",
+        "body": "{count, plural, =0 {Nta busabe bushya bwa serivisi.} one {Ubusabe bushya # bwa serivisi.} other {Ubusabe bushya # bwa serivisi.}}"
+      },
+      "quotes": {
+        "title": "Ubusabe bw'ibiciro",
+        "body": "{count, plural, =0 {Nta busabe bushya bw'ibiciro.} one {Ubusabe bushya # bw'igiciro.} other {Ubusabe bushya # bw'ibiciro.}}"
+      }
     }
   },
   "orders": {
-    "title": "Amatumiza",
-    "description": "Kurikirana buri tumiza kuva rigeze kugeza rigeze ku mukiriya.",
-    "all": "Amatumiza yose",
-    "count": "{count, plural, one {itumiza #} other {amatumiza #}}",
-    "items": "{count, plural, one {igicuruzwa #} other {ibicuruzwa #}}",
-    "clearFilters": "Kuraho akayunguruzo",
-    "tabsLabel": "Aho itumiza rigeze",
-    "tabAll": "Byose ({count})",
-    "tab": "{label} ({count})",
-    "searchLabel": "Shakisha amatumiza",
-    "searchPlaceholder": "Nimero y'itumiza cyangwa telefoni y'umukiriya",
-    "periodLabel": "Itariki y'itumiza",
     "periods": {
       "7": "Iminsi 7 ishize",
       "30": "Iminsi 30 ishize",
       "90": "Iminsi 90 ishize",
       "all": "Igihe icyo ari cyo cyose"
-    },
-    "methodLabel": "Uburyo bwo kwishyura",
-    "allMethods": "Uburyo bwose bwo kwishyura",
-    "columns": {
-      "order": "Itumiza",
-      "customer": "Umukiriya",
-      "date": "Itariki",
-      "items": "Ibicuruzwa",
-      "total": "Igiteranyo",
-      "payment": "Kwishyura",
-      "status": "Aho rigeze"
-    },
-    "open": "Fungura itumiza {number}",
-    "empty": "Nta tumiza rihuye n'aka kayunguruzo.",
-    "noPayment": "Nta bwishyu",
-    "listLabel": "Urutonde rw'ibyatumijwe",
-    "whatsappName": "Andikira {name} kuri WhatsApp",
-    "hints": {
-      "all": "Ibyatumijwe byose",
-      "received": "Bitegereje kwemezwa",
-      "confirmed": "Biteguye gutegurwa",
-      "processing": "Birimo gupakirwa",
-      "dispatched": "Biri mu nzira",
-      "delivered": "Byageze ku mukiriya",
-      "cancelled": "Byahagaritswe, ububiko bwasubijwe"
     }
-  },
-  "order": {
-    "title": "Itumiza #{number}",
-    "placed": "Ryatanzwe {date}",
-    "guest": "Yaguze nta konti",
-    "account": "Konti y'umukiriya",
-    "deliveryNote": "Inyandiko yo kugeza",
-    "invoice": "Fagitire",
-    "cancel": "Hagarika itumiza",
-    "cancelTitle": "Hagarika itumiza #{number}?",
-    "cancelBody": "Ibicuruzwa byari bibikiwe umukiriya bisubizwa mu bubiko. Amatumiza yishyuwe cyangwa ayemejwe yo kwishyura ubigejejweho ntashobora guhagarikwa.",
-    "cancelReason": "Impamvu",
-    "cancelConfirm": "Hagarika itumiza",
-    "keep": "Gumana itumiza",
-    "done": "Iri tumiza ni {status}. Nta yindi ntambwe isigaye.",
-    "statusChanged": "Itumiza ryashyizwe kuri {status}",
-    "transitionConflict": "Itumiza ryahindutse hagati aho, cyangwa ububiko cyangwa ubwishyu bwaryo ntibwemera iyi ntambwe. Ongera ufungure urupapuro wongere ugerageze.",
-    "items": "Ibicuruzwa",
-    "columns": {
-      "product": "Igicuruzwa",
-      "sku": "SKU",
-      "qty": "Umubare",
-      "unit": "Igiciro kimwe",
-      "total": "Igiteranyo"
-    },
-    "subtotal": "Igiteranyo gito",
-    "delivery": "Kugeza · {zone}",
-    "deliveryNoZone": "Kugeza",
-    "free": "Ubuntu",
-    "discount": "Igabanywa {code}",
-    "discountNoCode": "Igabanywa",
-    "total": "Igiteranyo",
-    "vat": "Harimo TVA {amount}",
-    "history": "Amateka y'aho ryageze",
-    "customer": "Umukiriya",
-    "whatsapp": "Andikira umukiriya kuri WhatsApp",
-    "deliveryTitle": "Kugeza",
-    "landmark": "Ikimenyetso: {text}",
-    "zone": "Akarere:",
-    "note": "Icyo umukiriya yanditse:",
-    "payment": "Kwishyura",
-    "method": "Uburyo",
-    "status": "Aho bigeze",
-    "amount": "Amafaranga",
-    "provider": "Utanga serivisi",
-    "paidAt": "Byishyuwe",
-    "attempts": "{count, plural, one {igerageza # ryo kwishyura} other {amagerageza # yo kwishyura}}",
-    "viewPayments": "Reba inyandiko z'ubwishyu",
-    "noPayment": "Nta bwishyu buraba.",
-    "notFound": "Itumiza ntiryabonetse",
-    "notFoundBody": "Iri tumiza ntiribaho cyangwa ihuza ntiriri byo.",
-    "back": "Subira ku matumiza",
-    "soldBy": "Bigurishwa na {store}",
-    "sellerOrders": {
-      "title": "Amaduka ari muri iri tumiza ({count})",
-      "hint": "Buri duka ryemeza, ripakira, ryohereza kandi rigeza igice cyaryo; uko itumiza rihagaze bikurikira amaduka.",
-      "merchandise": "Ibicuruzwa",
-      "commission": "Komisiyo {rate}%"
-    }
-  },
-  "payments": {
-    "title": "Ubwishyu",
-    "description": "Igerageza ryose ryo kwishyura, irya vuba mbere. Ibyashyizweho ikimenyetso cyo kugenzura bikeneye guhuzwa n'utanga serivisi.",
-    "tiles": {
-      "all": "Ubwishyu bwose",
-      "succeeded": "Byagenze neza",
-      "pending": "Biracyategerejwe",
-      "failed": "Byanze"
-    },
-    "count": "{count, plural, one {ubwishyu #} other {ubwishyu #}}",
-    "totalLabel": "Amafaranga yose y'ubwishyu buhuye n'akayunguruzo",
-    "totalCount": "{count, plural, =0 {Nta bwishyu} one {Ubwishyu #} other {Ubwishyu #}} muri iki giteranyo",
-    "clearFilters": "Kuraho akayunguruzo",
-    "tabsLabel": "Aho ubwishyu bugeze",
-    "methodLabel": "Uburyo",
-    "allMethods": "Uburyo bwose",
-    "columns": {
-      "reference": "Nimero y'utanga serivisi",
-      "order": "Itumiza",
-      "method": "Uburyo",
-      "date": "Itariki",
-      "amount": "Amafaranga",
-      "status": "Aho bigeze"
-    },
-    "noReference": "—",
-    "empty": "Nta bwishyu buhuye n'aka kayunguruzo.",
-    "needsCheck": "Bikeneye guhuzwa"
   },
   "products": {
     "title": "Ibicuruzwa",
-    "import": "Injiza",
     "viewsLabel": "Uko ibicuruzwa byerekanwa",
     "views": {
       "all": "Ibicuruzwa byose",
@@ -358,7 +222,7 @@
       "missingImages": "Byashyizwe ahagaragara ariko nta foto",
       "readyToPublish": "Imishinga ifite amafoto"
     },
-    "description": "Genzura ibicuruzwa: ibiciro, ububiko, amafoto n'ibigaragara mu iduka.",
+    "description": "Ibicuruzwa by'amaduka yose. Abacuruzi ni bo bita ku makuru, ibiciro, amafoto n'ububiko byabyo; wowe uhisha cyangwa ubika igicuruzwa kirenga ku mategeko kandi uhitamo ibigaragazwa imbere.",
     "count": "{count, plural, one {igicuruzwa #} other {ibicuruzwa #}}",
     "clearFilters": "Kuraho akayunguruzo",
     "noBrand": "Nta kirango",
@@ -404,7 +268,8 @@
     "clearSelection": "Kuraho amahitamo",
     "publishSelected": "Shyira ahagaragara ibyatoranyijwe",
     "bulkResult": "{activated} byashyizwe ahagaragara{skipped, plural, =0 {} other {, # byasimbutswe (nta mafoto)}}{already, plural, =0 {} other {, # byari bisanzwe bigaragara}}.",
-    "bulkFailed": "Ibicuruzwa ntibyashyizwe ahagaragara. Ongera ufungure urupapuro wongere ugerageze."
+    "bulkFailed": "Ibicuruzwa ntibyashyizwe ahagaragara. Ongera ufungure urupapuro wongere ugerageze.",
+    "moderationTitle": "Kugenzura ibicuruzwa"
   },
   "editor": {
     "newTitle": "Igicuruzwa gishya",
@@ -441,7 +306,6 @@
     "altTitle": "Igisobanuro cy'ifoto",
     "altLabel": "Inyandiko isobanura ifoto",
     "altHelp": "Isobanura ifoto ku bakoresha porogaramu zisoma ecran, urugero “Galaxy A55 y'ubururu bwijimye, imbere n'inyuma”.",
-    "nextFileName": "Mu kohereza byinshi icyarimwe, ifoto ikurikira yite {name}.",
     "variants": "Ubwoko, igiciro n'ububiko",
     "addVariant": "Ongeramo ubwoko",
     "noVariants": "Nta bwoko burahari. Ongeramo bumwe kugira ngo ushyireho igiciro.",
@@ -513,63 +377,8 @@
     "otherBrands": "Ibindi birango",
     "furniture": "Ibiranga igikoresho",
     "furnitureHelp": "Ibipimo muri santimetero na kilogarama. Icyo gikozwemo, ibara n'imiterere ni byo bishakishwa mu iduka.",
-    "notSet": "Ntibyashyizweho"
-  },
-  "bulk": {
-    "title": "Amafoto y'ibicuruzwa",
-    "backToProducts": "Subira ku bicuruzwa",
-    "description": "Ohereza amafoto menshi y'ibicuruzwa icyarimwe. Izina rya buri dosiye rivuga igicuruzwa ifoto ari iyacyo n'aho ijya.",
-    "steps": {
-      "name": "Ita amazina amadosiye yawe",
-      "nameBody": "product-slug.jpg ni ifoto y'imbere, product-slug__2.jpg ifoto ya kabiri, n'ibindi. Urutonde rw'ibicuruzwa n'aho bihindurirwa byerekana amazina y'amadosiye ya buri gicuruzwa.",
-      "missing": "Ibicuruzwa bidafite amafoto",
-      "upload": "Ohereza amafoto",
-      "uploadBody": "JPEG, PNG cyangwa WebP, buri imwe itarenze MB 5. Yoherezwa mu matsinda ya 20; ifoto ijya ahari indi isimbura iya mbere.",
-      "check": "Reba raporo",
-      "checkBody": "Buri dosiye yerekana igicuruzwa cyayo n'uko byagenze. Ongera wohereze ayanze ikibazo kimaze gukemuka."
-    },
-    "drop": "Kurura amafoto yawe hano, cyangwa <browse>uyashakishe</browse>",
-    "dropHint": ".jpg, .png cyangwa .webp · buri imwe itarenze MB 5 · umubare uwo ari wo wose",
-    "progress": "{batches} kuri {total, plural, one {itsinda #} other {amatsinda #}} byoherejwe",
-    "progressLabel": "Aho kohereza bigeze",
-    "percent": "{percent}% byakozwe",
-    "finished": "Byarangiye",
-    "stalled": "Biracyategerejwe: amafoto akorwa na porogaramu ikora inyuma. Reba ko iri gukora.",
-    "tiles": {
-      "files": "Amadosiye",
-      "done": "Byarangiye",
-      "waiting": "Bitegereje",
-      "failed": "Byanze"
-    },
-    "report": "Raporo yo kohereza",
-    "retry": "Ongera wohereze ayanze",
-    "retried": "Amafoto yanze yongeye koherezwa",
-    "columns": {
-      "file": "Dosiye",
-      "product": "Igicuruzwa",
-      "position": "Umwanya",
-      "result": "Uko byagenze"
-    },
-    "outcome": {
-      "added": "Yongeweho",
-      "replaced": "Yasimbuwe",
-      "unchanged": "Nta cyahindutse",
-      "done": "Byarangiye",
-      "failed": "Byanze",
-      "processing": "Biri gukorwa",
-      "queued": "Biri ku murongo",
-      "sending": "Biroherezwa"
-    },
-    "local": {
-      "too_large": "Irenze MB 5: yigabanye wongere uyohereze.",
-      "not_image": "Si dosiye ya .jpg, .png cyangwa .webp."
-    },
-    "errors": {
-      "batch": "Iri tsinda ntiryakiriwe. Ongera wohereze aya madosiye.",
-      "storage": "Ahabikwa amafoto huzuye. Ongera ugerageze nyuma.",
-      "tooLarge": "Dosiye imwe muri iri tsinda irenze MB 5.",
-      "retry": "Amafoto yanze ntiyongeye koherezwa. Ongera ugerageze."
-    }
+    "notSet": "Ntibyashyizweho",
+    "moderationNote": "Abacuruzi ni bo bita ku bicuruzwa byabo. Nk'umuyobozi, ushobora guhindura uko kigaragara (guhisha cyangwa kubika igicuruzwa kirenga ku mategeko) n'ikimenyetso cyo kugaragazwa imbere; ibindi ni iby'umucuruzi."
   },
   "inventory": {
     "title": "Ububiko",
@@ -852,53 +661,6 @@
     "inMenuCannotRemove": "Menu y’iduka ya {category} irimo {brand}; banza ukikuremo.",
     "inItsMenuShort": "(kiri muri menu yacyo)",
     "otherBrandsJoin": "Ibindi birango (byinjira muri {name})"
-  },
-  "import": {
-    "title": "Kwinjiza ibicuruzwa",
-    "description": "Vugurura ibicuruzwa byinshi bisanzweho icyarimwe uhereye kuri dosiye ya CSV cyangwa Excel. Abacuruzi ni bo bongeramo ibicuruzwa bishya mu iduka ryabo.",
-    "steps": {
-      "template": "Kuramo icyitegererezo",
-      "templateBody": "Inkingi z'igicuruzwa, ikirango, icyiciro, ubwoko, igiciro, ububiko n'ibiranga.",
-      "upload": "Ohereza dosiye yawe",
-      "uploadBody": "CSV cyangwa XLSX itarenze MB 10. SKU zisanzwe zivugururwa, inshya zigashyirwa ku bicuruzwa bisanzweho; imirongo y'ibicuruzwa bitazwi ntiyemerwa.",
-      "check": "Reba raporo",
-      "checkBody": "Imirongo ifite amakosa irasimbukwa; indi ikinjizwa. Kuramo raporo kugira ngo uyakosore."
-    },
-    "templateXlsx": "Icyitegererezo (.xlsx)",
-    "templateCsv": "cyangwa .csv",
-    "drop": "Kurura dosiye yawe hano, cyangwa <browse>uyishakishe</browse>",
-    "dropHint": ".csv cyangwa .xlsx · itarenze MB 10",
-    "processing": "Biri kwinjizwa…",
-    "statusDone": "{count, plural, one {umurongo #} other {imirongo #}} · byakozwe",
-    "statusFailed": "Ntibyinjijwe",
-    "statusRejected": "Ntibyoherejwe",
-    "progressLabel": "Aho kwinjiza bigeze",
-    "tiles": {
-      "read": "Imirongo yasomwe",
-      "imported": "Byinjijwe",
-      "errors": "Amakosa (byasimbutswe)",
-      "warnings": "Imiburo"
-    },
-    "report": "Raporo y'amakosa",
-    "download": "Kuramo raporo",
-    "failedNote": "Dosiye ntiyashobotse gukoreshwa, nta cyahindutse.",
-    "fileLevel": "Dosiye",
-    "truncated": "Herekanwa amakosa 1,000 ya mbere gusa; imirongo {count} yose ifite amakosa.",
-    "kinds": {
-      "error": "Ikosa",
-      "warning": "Umuburo"
-    },
-    "columns": {
-      "kind": "Ubwoko",
-      "row": "Umurongo",
-      "field": "Igice",
-      "problem": "Ikibazo"
-    },
-    "errors": {
-      "tooLarge": "Dosiye irenze MB 10.",
-      "invalid": "Koresha dosiye ya .csv cyangwa .xlsx itarimo ubusa.",
-      "failed": "Kwinjiza ntibyarangiye. Nta cyahindutse. Ongera ugerageze."
-    }
   },
   "delivery": {
     "title": "Uturere two kugeza",
@@ -1522,27 +1284,22 @@
     "audit": "Igitabo cy'ibikorwa",
     "categories": "Ibyiciro n'ibirango",
     "delivery": "Uturere two kugeza",
-    "import": "Kwinjiza ibicuruzwa",
-    "inventory": "Ububiko",
-    "messages": "Ubufasha",
-    "orders": "Amatumiza",
-    "order": "Itumiza",
-    "dashboard": "Imbonerahamwe",
-    "payments": "Ubwishyu",
-    "productPhotos": "Amafoto y'ibicuruzwa",
+    "messages": "Ubufasha bw'urubuga",
+    "dashboard": "Incamake",
     "newProduct": "Igicuruzwa gishya",
-    "products": "Ibicuruzwa",
+    "products": "Kugenzura ibicuruzwa",
     "product": "Igicuruzwa",
     "promotions": "Poromosiyo",
     "quotes": "Ubusabe bw'ibiciro",
-    "reviews": "Ibitekerezo",
-    "settings": "Igenamiterere n'impapuro",
-    "staff": "Abakozi n'inshingano",
+    "reviews": "Ibitekerezo no kugenzura",
+    "settings": "Igenamiterere ry'urubuga",
+    "staff": "Abayobozi",
     "brands": "Ibirango",
     "services": "Serivisi",
     "serviceRequests": "Ubusabe bwa serivisi",
     "sellers": "Abacuruzi",
-    "seller": "Umucuruzi"
+    "seller": "Umucuruzi",
+    "analytics": "Isesengura na raporo"
   },
   "services": {
     "title": "Serivisi",
@@ -1731,6 +1488,7 @@
       "nav": {
         "dashboard": "Imbonerahamwe",
         "orders": "Amatumiza",
+        "earnings": "Inyungu",
         "products": "Ibicuruzwa",
         "inventory": "Ububiko",
         "store": "Umwirondoro w'iduka"
@@ -1746,7 +1504,8 @@
       "newProduct": "Igicuruzwa gishya",
       "product": "Igicuruzwa",
       "inventory": "Ububiko",
-      "store": "Umwirondoro w'iduka"
+      "store": "Umwirondoro w'iduka",
+      "earnings": "Inyungu"
     },
     "gate": {
       "staffTitle": "Konti z'abakozi ntizicuruza",
@@ -1771,8 +1530,6 @@
       "description": "Uko {store} rihagaze, n'ibikeneye ko ubyitaho.",
       "toConfirm": "Amatumiza yo kwemeza",
       "toConfirmHint": "Yemeze kugira ngo itumiza ry'umukiriya rikomeze.",
-      "toShip": "Amatumiza yo gupakira cyangwa kohereza",
-      "toShipHint": "Amatumiza yemejwe ataravuye mu iduka ryawe.",
       "lowStock": "SKU zisigaye nke",
       "lowStockHint": "Zageze cyangwa ziri munsi y'urwego rwo kuburira.",
       "pending": "Amafaranga ategerejwe",
@@ -1786,7 +1543,12 @@
       "recent": "Amatumiza aheruka",
       "viewAll": "Reba amatumiza yose",
       "noOrders": "Nta matumiza arahari. Azagaragara hano abakiriya nibagura ibicuruzwa byawe.",
-      "commissionRate": "Komisiyo yawe ni {rate}%, ibarwa ku bicuruzwa nyuma y'igabanywa. Amafaranga yo kugeza ntabarirwamo."
+      "commissionRate": "Komisiyo yawe ni {rate}%, ibarwa ku bicuruzwa nyuma y'igabanywa. Amafaranga yo kugeza ntabarirwamo.",
+      "toPack": "Amatumiza yo gupakira",
+      "toPackHint": "Yemejwe kandi ategereje gupakirwa.",
+      "toDispatch": "Amatumiza yo kohereza",
+      "toDispatchHint": "Yapakiwe kandi ategereje kuva mu iduka ryawe.",
+      "viewEarnings": "Reba inyungu kuri buri tumiza"
     },
     "orders": {
       "title": "Amatumiza",
@@ -1905,6 +1667,21 @@
         "phone": "Andika nimero ya telefoni yo mu Rwanda, urugero 0788 123 456.",
         "district": "Andika akarere kawe."
       }
+    },
+    "earnings": {
+      "title": "Inyungu",
+      "description": "Ibyo iduka ryawe ryinjije ku matumiza yaryo, hamaze gukurwamo komisiyo ya {marketplace}. Kwishyurwa ntibiri ku mbonerahamwe ubu.",
+      "byOrder": "Inyungu kuri buri tumiza",
+      "empty": "Nta matumiza arahari. Inyungu zigaragara hano iyo abakiriya baguze ibicuruzwa byawe.",
+      "columns": {
+        "order": "Itumiza",
+        "placed": "Ryatanzwe",
+        "goods": "Ibicuruzwa",
+        "commission": "Komisiyo",
+        "net": "Umugabane wawe",
+        "payment": "Ubwishyu",
+        "status": "Aho rigeze"
+      }
     }
   },
   "sellers": {
@@ -1996,5 +1773,34 @@
       "stale": "Iri duka ryahindutse kuva warifungura. Reba uko rihagaze wongere ugerageze.",
       "failed": "Ntitwashoboye kubika icyemezo. Ongera ugerageze."
     }
+  },
+  "analytics": {
+    "title": "Isesengura na raporo",
+    "description": "Uko isoko riri gutera imbere: igurisha, komisiyo, amaduka n'abakiriya muri buri gihe. Imibare rusange gusa; nta makuru y'umukiriya cyangwa y'itumiza.",
+    "range": "Igihe",
+    "ranges": {
+      "30": "Iminsi 30 ishize, ku munsi",
+      "90": "Iminsi 90 ishize, ku cyumweru",
+      "365": "Amezi 12 ashize, ku kwezi"
+    },
+    "growth": "Iterambere ry'isoko",
+    "growthHelp": "Amatumiza yishyuwe, abarwa ku munsi w'ubwishyu bwa mbere bwagenze neza (isaha ya Kigali).",
+    "exportSales": "Kuramo igurisha (Excel)",
+    "period": "Igihe",
+    "columns": {
+      "orders": "Amatumiza yishyuwe",
+      "merchandise_total": "Ibyagurishijwe",
+      "commission_amount": "Komisiyo",
+      "new_stores": "Amaduka mashya",
+      "new_customers": "Abakiriya bashya"
+    },
+    "total": "Byose hamwe",
+    "topProducts": "Ibicuruzwa bigurwa cyane",
+    "exportTop": "Kuramo ibigurwa cyane (Excel)",
+    "product": "Igicuruzwa",
+    "units": "Umubare",
+    "orders": "Amatumiza",
+    "revenue": "Amafaranga yinjiye",
+    "noSales": "Nta kintu cyagurishijwe muri iki gihe."
   }
 }

@@ -1,6 +1,7 @@
 """Background jobs (approved 2026-10-26, checkpoint 1b topic 4): read a job's progress and retry
 its failed items. The worker process (python -m app.worker) does the work. The only job type is
-bulk_image_upload, a catalogue change, so the routes need 'catalog:manage'."""
+bulk_image_upload, a catalogue change, so the routes need 'catalog:edit', which no role holds in
+V1 (SC-06: sellers edit their own products; bulk images are not offered to them yet)."""
 
 import uuid
 from typing import Annotated
@@ -34,7 +35,7 @@ RETRY_409: ResponseMap = {
         "they were queued must be uploaded again)",
     }
 }
-CatalogManager = Annotated[User, Depends(require_permission(Permission.CATALOG_MANAGE))]
+CatalogEditor = Annotated[User, Depends(require_permission(Permission.CATALOG_EDIT))]
 Db = Annotated[Session, Depends(get_db)]
 Ctx = Annotated[RequestContext, Depends(get_request_context)]
 
@@ -44,12 +45,12 @@ Ctx = Annotated[RequestContext, Depends(get_request_context)]
     response_model=JobResponse,
     summary="A job's progress and every item's outcome",
     description=(
-        "Requires 'catalog:manage' (administrator). Poll it after starting a job: "
+        "Requires 'catalog:edit' (no role in V1, SC-06). Poll it after starting a job: "
         "`state` is finished when no item is queued or processing."
     ),
     responses={**GUARDED, **JOB_404, **VALIDATION_422},
 )
-def get_job(job_id: uuid.UUID, current_user: CatalogManager, db: Db) -> JobResponse:
+def get_job(job_id: uuid.UUID, current_user: CatalogEditor, db: Db) -> JobResponse:
     return JobResponse.from_job(jobs.get_job(db, job_id))
 
 
@@ -58,11 +59,11 @@ def get_job(job_id: uuid.UUID, current_user: CatalogManager, db: Db) -> JobRespo
     response_model=JobResponse,
     summary="Requeue a job's failed items",
     description=(
-        "Requires 'catalog:manage' (administrator). Failed items go back to the queue "
+        "Requires 'catalog:edit' (no role in V1, SC-06). Failed items go back to the queue "
         "with their attempts reset; done items are never redone. Audited as "
         "'job.retry_failed'."
     ),
     responses={**GUARDED, **JOB_404, **RETRY_409, **VALIDATION_422},
 )
-def retry_failed(job_id: uuid.UUID, current_user: CatalogManager, db: Db, ctx: Ctx) -> JobResponse:
+def retry_failed(job_id: uuid.UUID, current_user: CatalogEditor, db: Db, ctx: Ctx) -> JobResponse:
     return JobResponse.from_job(jobs.retry_failed(db, current_user, job_id, ctx))

@@ -45,6 +45,7 @@ Each phase is implemented separately, runs the backend and frontend checks liste
 | 4 | Frontend: "Become a seller" and application status in Account; `/seller` dashboard reusing the admin shell and components | Built (2026-11-22); see "Phase 4 as built" |
 | 5 | Frontend: `/store/[slug]`, "Sold by" on cards, product page and cart; admin Sellers page | Built (2026-11-22); see "Phase 5 as built" |
 | 6 | Furniture taxonomy, attribute sets, filters, services and quotes adaptation, FurniHub branding (English and Kinyarwanda), furniture seed data | Built (2026-11-22); see "Phase 6 as built" |
+| 7 | SC-06: store operations leave the admin (unassigned permissions), product moderation only, marketplace report, admin Overview and Analytics & Reports, seller Earnings | Built (2026-11-22); see "Phase 7 as built" |
 
 ## Staff roles: SC-05 (2026-11-21)
 
@@ -286,6 +287,61 @@ Furniture domain, services, branding and development data (decisions 14 to 17). 
 - **Local development database not reseeded.** It is still at phase 2 (`b2d4f6a8c0e1`). Moving it to this phase deletes its demo data (seed cleanup with the phase-2 code, `alembic upgrade head`, runtime-role provisioning, the seed, the taxonomy and services scripts) and waits for the owner's go-ahead.
 - **Not filtered:** dimensions, weight, finish and condition are shown and edited but not offered as filters.
 - **Quote form** still asks for "product name or model" lines; widening it (rooms, delivery dates per item) was out of scope.
+
+## Phase 7 as built (SC-06, 2026-11-22)
+
+The owner's brief separated the roles: sellers operate their stores, the administrator governs the
+marketplace. Owner answers: no one cancels a whole order by hand; the Payments page goes; services
+and quotes become seller-owned in a later phase; the only new backend data is the marketplace
+report.
+
+### Backend
+
+- `UNASSIGNED_PERMISSIONS` (`app/core/roles.py`): orders, payments, inventory and the new
+  `catalog:edit` are declared but held by no role. `ensure_permission` (`app/core/dependencies.py`)
+  is the same check as `require_permission`, for checks that depend on the request body or path;
+  it audits `auth.access_denied`.
+- Catalogue editing routes (variants, photos, bulk photos, bulk publish, imports, import jobs)
+  require `catalog:edit`; `PATCH /staff/products/{id}` requires it only when a field other than
+  `status` or `is_featured` is sent. The stock report and its export require `inventory:read`.
+- `GET /staff/reports/marketplace` (`report_service.marketplace`): sales by the reports' rule (a
+  succeeded payment, dated by the first success, in Kigali days), goods and commission from the
+  non-cancelled seller orders of those sales, new stores by `approved_at`, new non-staff accounts,
+  stores by status, active customer accounts and products that pass the public catalogue filter.
+
+### Admin (`/admin`)
+
+Menu: Overview; Marketplace (Sellers, Product moderation, Categories & Brands, Promotions, Reviews
+& Moderation); Platform support (Support, Service requests, Quote requests); Insights (Analytics &
+Reports); Platform (Platform settings, Delivery zones, Services, Administrators, Audit Log). The
+Overview shows goods sold, commission, paid orders and approved stores with the previous period,
+the marketplace trend, stores by status, customers and published products, the decisions waiting
+(seller applications, reviews, support, service and quote requests) and best sellers. The product
+editor shows the seller's data read-only with visibility and featured editable. Support and review
+details show the order number as text (there is no admin order page).
+
+### Seller (`/seller`)
+
+Menu: Dashboard, Orders, Earnings, Products, Inventory, Store profile. Earnings shows the pending
+and earned totals and a paged list of the store's seller orders with goods, commission and share.
+
+### Tests
+
+`test_store_operations_unassigned.py` (every unassigned route refused to the administrator,
+moderation-only PATCH), the marketplace report in `test_reports_api.py`, the administrator's
+permission list in `test_staff_authorization_api.py` and `test_roles.py`. The modules that test
+the unassigned routes themselves grant the permissions back for the test only
+(`store_operations_granted` in `tests/conftest.py`). Frontend: nav and role helpers, search.
+
+### Not in this phase, and points for the owner
+
+- **Moderation lock:** a seller can reactivate a product the administrator hid; a lock needs a new
+  column.
+- **Unused code kept:** the catalogue import, bulk photo and staff order/payment services stay
+  behind their unassigned permissions; removing them is a separate clean-up.
+- **Seller-owned services and quotes** are the next phase.
+- **PostgreSQL acceptance tests** (`tests/postgres`) still call some unassigned staff routes as the
+  administrator; they need a test database and Redis and were not run here.
 
 ## Consequences
 
