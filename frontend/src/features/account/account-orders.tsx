@@ -79,7 +79,7 @@ export function AccountOverview() {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <h1 className="t-h1 text-navy">{t("hello", { name: firstName(user?.full_name) ?? "" })}</h1>
+        <h1 className="t-h1 text-head">{t("hello", { name: firstName(user?.full_name) ?? "" })}</h1>
         <p className="text-tx2">{t("overviewText")}</p>
       </div>
       <Card padding={24} className="flex flex-col gap-1 max-sm:p-4">
@@ -147,7 +147,7 @@ export function OrdersView() {
   const orders = useOrders(page);
   return (
     <>
-      <h1 className="t-h1 text-navy">{t("ordersTitle")}</h1>
+      <h1 className="t-h1 text-head">{t("ordersTitle")}</h1>
       {orders.isPending ? (
         [0, 1, 2].map((i) => <Skeleton key={i} className="h-[132px] w-full rounded-xl" />)
       ) : orders.isError ? (
@@ -159,7 +159,7 @@ export function OrdersView() {
       ) : (
         <>
           {orders.data.items.map((o) => (
-            <article key={o.id} className="flex flex-col gap-3.5 rounded-xl border border-bd bg-white p-5 max-sm:p-4">
+            <article key={o.id} className="flex flex-col gap-3.5 rounded-xl border border-bd bg-card p-5 max-sm:p-4">
               <div className="flex flex-wrap items-center gap-3">
                 <h2 className="text-base font-semibold">{t("orderNumber", { number: o.order_number })}</h2>
                 <StatusBadge status={o.status} />
@@ -236,7 +236,7 @@ export function OrderDetailView({ number }: { number: string }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="t-h1 text-navy">{t("orderNumber", { number: order.order_number })}</h1>
+            <h1 className="t-h1 text-head">{t("orderNumber", { number: order.order_number })}</h1>
             <StatusBadge status={order.status} />
           </div>
           <span className="text-sm text-tx2">
@@ -260,7 +260,7 @@ export function OrderDetailView({ number }: { number: string }) {
           {t("cancelledNote")}
         </div>
       ) : (
-        <section aria-label={t("progressLabel")} className="rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+        <section aria-label={t("progressLabel")} className="rounded-xl border border-bd bg-card p-6 max-sm:p-4">
           <ProgressRow order={order} />
         </section>
       )}
@@ -293,7 +293,7 @@ function OrderItems({ order }: { order: OrderDetail }) {
   }
 
   return (
-    <section aria-labelledby="order-items" className="flex flex-col rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+    <section aria-labelledby="order-items" className="flex flex-col rounded-xl border border-bd bg-card p-6 max-sm:p-4">
       <h2 id="order-items" className="t-h3 pb-2">
         {t("itemsTitle")}
       </h2>

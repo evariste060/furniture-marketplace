@@ -1,12 +1,13 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Heart, House, LogOut, MapPin, MessageSquareText, Package, Store, User } from "lucide-react";
+import { Heart, House, LayoutDashboard, LogOut, MapPin, MessageSquareText, Package, User } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, type ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FormAlert } from "@/features/auth/auth-forms";
+import { useSellerApplication } from "@/features/account/seller-application";
 import { useProfile } from "@/features/checkout/use-checkout";
 import { SESSION_KEY, useSession } from "@/features/session/use-session";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -48,7 +49,8 @@ function GoogleWelcome() {
   return <FormAlert tone="ok">{t("googleWelcome")}</FormAlert>;
 }
 
-/** The account pages, in menu order: the side menu here and the phone tab bar's Account popup. */
+/** The account pages, in menu order: the side menu here and the phone tab bar's Account popup.
+ * Applying to sell starts from "Become a seller" in the store menu (SC-08), not from here. */
 export const ACCOUNT_LINKS = [
   { href: "/account", key: "overview", Icon: House },
   { href: "/account/orders", key: "orders", Icon: Package },
@@ -56,8 +58,23 @@ export const ACCOUNT_LINKS = [
   { href: "/account/messages", key: "messages", Icon: MessageSquareText },
   { href: "/account/addresses", key: "addresses", Icon: MapPin },
   { href: "/account/profile", key: "profile", Icon: User },
-  { href: "/account/seller", key: "seller", Icon: Store },
 ] as const;
+
+/** "Seller Dashboard" in the account menus (SC-08), only while the signed-in customer's store is
+ * approved (GET /seller/application). Not a control: the /seller layout checks the store again on
+ * the server and the backend refuses every seller call without an approved store. The dashboard
+ * is outside the storefront's locale routing, so it is a full page load. */
+export function SellerDashboardLink({ enabled, className, onClick }: { enabled: boolean; className: string; onClick?: () => void }) {
+  const t = useTranslations("store.account.nav");
+  const { data: application } = useSellerApplication(enabled);
+  if (!enabled || application?.status !== "approved") return null;
+  return (
+    <a href="/seller" onClick={onClick} className={className}>
+      <LayoutDashboard size={18} aria-hidden="true" />
+      {t("sellerDashboard")}
+    </a>
+  );
+}
 
 /** Whether an account menu link is the current page. */
 export function isAccountLinkActive(href: string, pathname: string): boolean {
@@ -93,7 +110,7 @@ function AccountNav({ ready }: { ready: boolean }) {
   const linkClass = "flex items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2.5 font-medium no-underline";
 
   return (
-    <nav aria-label={t("navLabel")} className="hidden w-full flex-col gap-1 rounded-xl border border-bd bg-white p-4 sm:flex sm:max-w-[260px] sm:flex-[1_1_240px]">
+    <nav aria-label={t("navLabel")} className="hidden w-full flex-col gap-1 rounded-xl border border-bd bg-card p-4 sm:flex sm:max-w-[260px] sm:flex-[1_1_240px]">
       <div className="flex items-center gap-3 px-3 pt-2 pb-4 max-sm:pb-2">
         <span className="inline-flex size-11 flex-none items-center justify-center rounded-full bg-pri text-[15px] font-semibold text-white" aria-hidden="true">
           {profile ? initials(profile.full_name) : ""}
@@ -113,7 +130,8 @@ function AccountNav({ ready }: { ready: boolean }) {
             </Link>
           );
         })}
-        <button type="button" onClick={logOut} className={cx(linkClass, "cursor-pointer border-0 bg-transparent text-left text-base text-err")}>
+        <SellerDashboardLink enabled={ready} className={cx(linkClass, "text-tx2 hover:text-pri-h")} />
+        <button type="button" onClick={logOut} className={cx(linkClass, "cursor-pointer border-0 bg-transparent text-left text-base text-err-fg")}>
           <LogOut size={18} aria-hidden="true" />
           {t("nav.logout")}
         </button>

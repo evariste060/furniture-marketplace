@@ -221,7 +221,7 @@ export function MessagesView() {
 
       <section
         aria-label={t("listLabel")}
-        className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh"
+        className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh"
       >
         <ListHeading
           Icon={LOOK[status].Icon}
@@ -533,11 +533,11 @@ function ThreadPanel({ id, now }: { id: string; now: number }) {
       {/* What it is about, and closing or reopening it. */}
       <DrawerSection title={t("subjectTitle")}>
         <div className="flex flex-col gap-2.5 rounded-xl border border-bd bg-page p-4">
-          <b className="text-base font-semibold break-words text-navy">
+          <b className="text-base font-semibold break-words text-head">
             {thread.subject}
           </b>
           <span className="flex flex-wrap items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-cap font-medium text-tx2 ring-1 ring-bd">
+            <span className="inline-flex items-center gap-1 rounded-full bg-card px-2 py-0.5 text-cap font-medium text-tx2 ring-1 ring-bd">
               <Icon size={12} aria-hidden="true" />
               {t(`topics.${thread.topic}`)}
             </span>
@@ -623,7 +623,7 @@ function ThreadPanel({ id, now }: { id: string; now: number }) {
                       "flex size-8 flex-none items-center justify-center rounded-full text-cap font-semibold",
                       staff
                         ? "bg-pri text-white"
-                        : "border border-bd bg-white text-tx2",
+                        : "border border-bd bg-card text-tx2",
                     )}
                   >
                     {staff ? <Headset size={15} /> : initials(thread.name)}
@@ -645,7 +645,7 @@ function ThreadPanel({ id, now }: { id: string; now: number }) {
                         "m-0 rounded-2xl px-4 py-2.5 break-words whitespace-pre-line shadow-sh",
                         staff
                           ? "rounded-br-sm bg-pri text-white"
-                          : "rounded-bl-sm border border-bd bg-white text-tx",
+                          : "rounded-bl-sm border border-bd bg-card text-tx",
                       )}
                     >
                       {m.body}
@@ -742,7 +742,7 @@ function Composer({
       </label>
       <div
         className={cx(
-          "flex flex-col rounded-xl border bg-white focus-within:border-pri focus-within:shadow-focus",
+          "flex flex-col rounded-xl border bg-card focus-within:border-pri focus-within:shadow-focus",
           error ? "border-err" : "border-bd",
         )}
       >
@@ -763,7 +763,7 @@ function Composer({
             id="support-reply-note"
             className={cx(
               "flex min-w-0 flex-1 items-center gap-1.5 text-cap",
-              error ? "text-err" : "text-tx2",
+              error ? "text-err-fg" : "text-tx2",
             )}
           >
             {error ? (

@@ -25,14 +25,14 @@ type SearchParams = Record<string, string | string[] | undefined>;
 
 /** The API query: the visitor's filters, then the page's own filter (which wins). */
 export function apiQuery(base: BaseQuery, state: ListingState) {
-  return { ...filterQuery(state), ...base, brand: [...(base.brand ?? []), ...state.brands] };
+  return { ...filterQuery(state), ...base };
 }
 
-/** The listing state for a page: a brand page (Category first) offers the category choice and no
- * brand choice; the other pages the reverse. */
+/** The listing state for a page: a brand page (Category first) offers the category choice; the
+ * other pages have their own category. Brands are not a storefront filter (SC-09). */
 function pageState(params: SearchParams, first: FirstGroup): ListingState {
   const state = parseListingState(params);
-  return first === "category" ? { ...state, brands: [] } : { ...state, category: null };
+  return first === "category" ? state : { ...state, category: null };
 }
 
 /** "Showing N products" in the listing hero. */
@@ -102,7 +102,7 @@ export async function ListingResults({
   return (
     <div className="bg-page">
       {/* Mobile toolbar: sticks under the header while the listing scrolls. */}
-      <div className="sticky top-(--store-header-h) z-30 flex flex-col gap-3 border-b border-bd bg-white px-4 py-3 lg:hidden">
+      <div className="sticky top-(--store-header-h) z-30 flex flex-col gap-3 border-b border-bd bg-card px-4 py-3 lg:hidden">
         <div className="flex gap-2.5">
           <FilterSheet {...props} />
           <SortSelect state={state} basePath={path} compact />
@@ -138,7 +138,7 @@ export async function ListingResults({
                   aria-current={state.view === view ? "true" : undefined}
                   className={cx(
                     "flex size-[42px] items-center justify-center",
-                    state.view === view ? "bg-pri text-white hover:text-white" : "bg-white text-tx2",
+                    state.view === view ? "bg-pri text-white hover:text-white" : "bg-card text-tx2",
                   )}
                 >
                   {view === "grid" ? <LayoutGrid size={18} aria-hidden="true" /> : <List size={18} aria-hidden="true" />}
@@ -147,7 +147,7 @@ export async function ListingResults({
             </div>
           </div>
           {products.items.length === 0 ? (
-            <div className="flex flex-col items-start gap-2 rounded-xl border border-bd bg-white p-8">
+            <div className="flex flex-col items-start gap-2 rounded-xl border border-bd bg-card p-8">
               <h2 className="t-h3">{t("empty")}</h2>
               <p className="text-tx2">{t("emptyHint")}</p>
               {chips.length > 0 && (
@@ -199,13 +199,6 @@ export function activeChips(state: ListingState, facets: CatalogFacets, t: Listi
       without: { category: null, page: 1 },
     });
   }
-  chips.push(
-    ...state.brands.map((slug) => ({
-    key: `brand-${slug}`,
-    label: facets.brands.find((b) => b.slug === slug)?.name ?? slug,
-      without: { brands: state.brands.filter((b) => b !== slug), page: 1 },
-    })),
-  );
   if (state.minPrice !== null || state.maxPrice !== null) {
     chips.push({
       key: "price",
@@ -226,7 +219,7 @@ export function ChipLink({ href, label, removeLabel }: { href: string; label: st
   return (
     <span className="inline-flex flex-none items-center gap-1.5 rounded-md bg-light px-2.5 py-1.5 text-sm font-medium whitespace-nowrap text-pri-h">
       {label}
-      <Link href={href} aria-label={removeLabel} className="flex text-current hover:text-pri">
+      <Link href={href} aria-label={removeLabel} className="flex text-current hover:text-pri-fg">
         <X size={14} aria-hidden="true" />
       </Link>
     </span>

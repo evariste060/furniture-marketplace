@@ -171,10 +171,9 @@ describe("Continue with Google on Login", () => {
     expect((fetchMock.mock.calls[0] as [string])[0]).toBe("/api/auth/login");
   });
 
-  it("does not suggest staff can use Google", () => {
+  it("shows no staff sign-in note (removed, SC-07)", () => {
     renderWith(<LoginView />);
-    expect(screen.getByText(en.store.auth.staffNote)).toBeInTheDocument();
-    expect(en.store.auth.staffNote).toMatch(/email and password/);
+    expect(screen.queryByText(/admin panel/i)).not.toBeInTheDocument();
   });
 });
 

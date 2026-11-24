@@ -6,7 +6,6 @@ import {
   ArrowRight,
   ArrowUp,
   Building2,
-  ClipboardCheck,
   Headset,
   HandCoins,
   MessageSquare,
@@ -113,7 +112,7 @@ function shortMoney(value: number | undefined): string | undefined {
 type MarketplaceReport = components["schemas"]["MarketplaceReport"];
 
 type TaskKey =
-  "applications" | "reviews" | "messages" | "serviceRequests" | "quotes";
+  "applications" | "reviews" | "messages" | "quotes";
 
 /** How many wait, from each list's total (one row asked for). */
 async function waitingCount(key: TaskKey): Promise<number> {
@@ -139,14 +138,6 @@ async function waitingCount(key: TaskKey): Promise<number> {
         await must(
           browserApi.GET("/api/v1/staff/support-threads", {
             params: { query: { status: "open", size: 1 } },
-          }),
-        )
-      ).total;
-    case "serviceRequests":
-      return (
-        await must(
-          browserApi.GET("/api/v1/staff/service-requests", {
-            params: { query: { status: "new", size: 1 } },
           }),
         )
       ).total;
@@ -229,10 +220,7 @@ export function Dashboard() {
     <>
       <PageHeader
         title={
-          <span suppressHydrationWarning>
-            {t(`greeting.${greeting}`, { name: firstName })}{" "}
-            <span aria-hidden="true">👋</span>
-          </span>
+          <span suppressHydrationWarning>{t(`greeting.${greeting}`, { name: firstName })}</span>
         }
         description={t("subtitle")}
         actions={
@@ -241,7 +229,7 @@ export function Dashboard() {
               aria-label={t("period")}
               value={period}
               onChange={(e) => setPeriod(Number(e.target.value) as Period)}
-              className="h-10 w-44 bg-white text-sm shadow-sh"
+              className="h-10 w-44 bg-card text-sm shadow-sh"
             >
               {PERIODS.map((p) => (
                 <option key={p} value={p}>
@@ -326,8 +314,7 @@ export function Dashboard() {
   );
 }
 
-/** What waits for the administrator. Service and quote requests stay here while those services
- * are FurniHub's own (they move to the stores in a later phase). */
+/** What waits for the administrator: seller applications, reviews, support and quote requests. */
 const TASKS: {
   key: TaskKey;
   href: string;
@@ -357,13 +344,6 @@ const TASKS: {
     tone: "bg-warn-bg text-warn-tx",
   },
   {
-    key: "serviceRequests",
-    href: "/admin/service-requests?status=new",
-    perm: "services:read",
-    Icon: ClipboardCheck,
-    tone: "bg-light text-pri-h",
-  },
-  {
     key: "quotes",
     href: "/admin/quotes",
     perm: "quotes:manage",
@@ -391,13 +371,13 @@ const KPI_STYLE = {
   },
   light: {
     card: "border border-pri/20 bg-light text-tx hover:text-tx",
-    icon: "bg-white text-pri-h",
+    icon: "bg-card text-pri-h",
     note: "text-tx2",
     ghost: "text-pri/10",
   },
   purple: {
     card: "border border-pur/20 bg-pur-bg text-tx hover:text-tx",
-    icon: "bg-white text-pur",
+    icon: "bg-card text-pur",
     note: "text-tx2",
     ghost: "text-pur/10",
   },
@@ -516,7 +496,7 @@ function Section({
   return (
     <section
       className={cx(
-        "flex min-w-0 flex-col rounded-xl border border-bd bg-white shadow-sh",
+        "flex min-w-0 flex-col rounded-xl border border-bd bg-card shadow-sh",
         className,
       )}
     >
@@ -542,7 +522,7 @@ function SectionLink({
   return (
     <NextLink
       href={href}
-      className="group flex items-center gap-1 rounded-md text-sm font-semibold text-pri-h no-underline hover:text-pri"
+      className="group flex items-center gap-1 rounded-md text-sm font-semibold text-pri-h no-underline hover:text-pri-fg"
     >
       {children}
       <ArrowRight
@@ -810,7 +790,7 @@ function TrendOverview({
                     />
                     <span
                       aria-hidden="true"
-                      className="pointer-events-none absolute z-10 flex flex-col rounded-lg border border-bd bg-white px-3 py-2 whitespace-nowrap shadow-sh2"
+                      className="pointer-events-none absolute z-10 flex flex-col rounded-lg border border-bd bg-card px-3 py-2 whitespace-nowrap shadow-sh2"
                       style={{
                         left: `${x(shown)}%`,
                         top: `${y(values[shown])}%`,
@@ -1070,7 +1050,7 @@ function Attention({ tasks }: { tasks: (Task | false)[] }) {
             <NextLink
               href={href}
               aria-label={t("tasks.view", { name: t(`tasks.${key}.title`) })}
-              className="group flex items-center gap-1 text-sm font-semibold whitespace-nowrap text-pri-h no-underline hover:text-pri"
+              className="group flex items-center gap-1 text-sm font-semibold whitespace-nowrap text-pri-h no-underline hover:text-pri-fg"
             >
               <span aria-hidden="true">{t("tasks.viewShort")}</span>
               <ArrowRight

@@ -4,6 +4,80 @@ The original requirement documents stay unchanged (see `original-checksums.txt`)
 to the MVP scope approved by the project owner after they were written is recorded here, newest
 first. Where this file and an original document disagree, this file wins.
 
+## SC-09: Back to top, one pinned header, no brands on the storefront (2026-11-24)
+
+Approved by the project owner on 2026-11-24 (brief "FurniHub — Small UI & UX Enhancements", items
+2 to 4). Trello card: none. Frontend only; no backend, API or database change. Item 1 (cascading
+seller location) is not done yet: it needs a Rwanda location dataset and the owner's approval for
+the dependency and for storing cell and village.
+
+- **Back to top.** A round button in the page corner on every storefront page, once the page has
+  scrolled past 600px; hidden again near the top. It scrolls smoothly (at once with reduced
+  motion) and sits centred above the WhatsApp button, above the phone tab bar on small screens.
+- **One pinned header.** When the header scrolls out of view it slides back in and stays pinned as
+  one block: the actions row and the blue store menu together (it used to pin the actions row
+  alone and hide the store menu).
+- **No brands on the storefront.** The home page's Trusted Brands section is removed, and brands
+  are no longer a filter anywhere: the Brand group in the filter panel and the phone filter
+  sheet, the brand chips, `?brand=` in listing URLs (ignored), the mega menu's brand column (it
+  lists the subcategories) and the phone menu's Brands row. **Left in place:** brand data, the
+  admin's brand pages and the API; the `/brands` and `/brand/{slug}` pages still open when a link
+  leads there (the product page's brand name links to its brand page).
+
+## SC-08: seller application wizard, Seller Dashboard link, grey dark mode (2026-11-24)
+
+Approved by the project owner on 2026-11-24 (items 6 to 9 of the storefront brief). Trello card:
+none. Frontend only; the seller application API and its rules are unchanged.
+
+- **Account menu.** "Sell with us" is removed from the account side menu and the phone Account
+  popup. Applying starts from "Become a seller" in the store menu (SC-07), which opens
+  `/account/seller`; a pending, rejected or suspended application shows its status there.
+- **Seller Dashboard** appears in both account menus only while `GET /seller/application`
+  answers `approved`, and opens `/seller`. It is not the control: the `/seller` layout checks the
+  store on the server (a customer without an approved store gets the notice, no dashboard), and
+  every seller API call requires an approved store (`require_approved_seller`, 403
+  `seller_not_approved`). The menu follows sign-in, sign-out (the customer queries are dropped),
+  refresh and approval (the status is read again when the page regains focus).
+- **Application wizard.** The application form is four steps with "Step n of 4" and a progress
+  bar: Your store (name, description), Contact (email, phone), Location (district, sector,
+  street), Review (every answer, Edit per section) and Submit. Next checks the step with the
+  existing rules (`checkStoreForm`); answers are kept moving back and forth; the same POST/PUT
+  calls and error handling, and a store name the backend refuses returns to step 1.
+- **Dark mode in charcoal greys** instead of navy: page `#1b1c1f` < card `#242529` < subtle
+  `#2e3034`, borders `#383a40`/`#4a4d55`, never pure black. The navy bars, the admin sidebar and the
+  blue category bar turn charcoal too. Two text tokens, `pri-fg` and `err-fg` (equal to `pri` and
+  `err` in light mode), are lighter in dark mode, where the solid brand blue and red are below
+  4.5:1 as text; the solid colours stay for buttons. Light mode and the saved choice are unchanged.
+
+## SC-07: storefront changes: Services removed, Become a seller, dark mode, search suggestions (2026-11-23)
+
+Approved by the project owner on 2026-11-23 (brief "Storefront UI Enhancement Task"). Trello card:
+none (no furniture board exists). Frontend only; no backend, API or database change.
+
+- **Services removed from the platform's pages.** The storefront's Services pages
+  (`/services`, `/services/{slug}`, `/services/{slug}/request`), the Services entries in the
+  category bar, the All Categories menu, the phone menu and the footer, the home page's services
+  section and the Services place in the hero showcase are gone, as are the admin's Services and
+  Service requests pages, their sidebar entries, badge counts and Overview tasks. This replaces
+  SC-06's plan to make services seller-owned later. **Left in place:** the backend's services and
+  service-request API, tables and data (ADR-013) are unchanged and no page uses them; removing
+  them needs a migration and is left for the owner to approve. The audit log still names past
+  service events.
+- **Become a seller** on the right of the store's category bar, and in the phone menu, opens the
+  existing seller application (`/account/seller`; sign-in first for guests).
+- **Dark mode.** A toggle in the header's actions row (and Appearance in the phone menu) switches
+  light and dark at once, everywhere (storefront, account, seller dashboard, admin). The choice is
+  kept in this browser (`localStorage`) and applied before the first paint. Light stays the
+  default. The design tokens gain two roles that equal the existing values in light mode,
+  `card` (white surfaces) and `head` (navy headings), and a dark palette for the neutral tokens
+  (`html[data-theme="dark"]` in `globals.css`); brand blues, navy bars and status colours keep
+  their values. This extends the design handoff's "no new colours" rule for dark mode only.
+- **Search suggestions.** The header's search box shows the shopper's recent searches (kept in
+  this browser, at most six, each removable, and "Clear") and popular products (the best-selling
+  product names from `GET /catalog/products`) while it has focus; typing narrows both; one click
+  searches. Every search that opens `/search` is remembered.
+- **Login page:** the note telling staff to sign in there is removed.
+
 ## SC-06: sellers operate their stores, administrators govern the marketplace (2026-11-22)
 
 Approved by the project owner on 2026-11-22 (brief "Seller & Administrator Dashboard

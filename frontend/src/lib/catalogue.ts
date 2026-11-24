@@ -75,17 +75,12 @@ export type MenuProduct = {
 };
 
 /** A brand with products in a category, and how many (the category's brand facet). */
-export type MenuBrand = { name: string; slug: string; count: number };
 
 export type MenuCategory = {
   id: string;
   name: string;
   slug: string;
-  /** The brands the menu lists: staff's chosen list (any may have 0 products) or, for a category
-   * with neither a list nor subcategories, those with public products in it, by name. Empty
-   * when the menu lists the subcategories instead. */
-  brands: MenuBrand[];
-  /** Its subcategories, in merchandising order; listed when `brands` is empty. */
+  /** Its subcategories, in merchandising order: the menu's middle column. */
   subcategories: { id: string; name: string; slug: string }[];
   /** Null when the products could not be loaded (the menu shows an error and the category link). */
   products: { items: MenuProduct[]; total: number } | null;
@@ -119,9 +114,10 @@ export function menuProductQuery(slug: string) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Listing state in the URL: /deals?brand=a&brand=b&category=c&min_price=…&max_price=…&stock=in
+// Listing state in the URL: /deals?category=c&min_price=…&max_price=…&stock=in
 // &rating=4&material=solid_wood&color=oak&style=modern&sort=price_asc&view=list&page=2 (and q=…
-// on /search)
+// on /search). Brands are not a storefront filter (SC-09): ?brand= is ignored; a brand page
+// filters by its own brand (BaseQuery).
 
 /** "relevance" (best match) exists only with a search and is then the default. */
 export const SORTS = ["relevance", "popular", "price_asc", "price_desc", "newest", "top_rated"] as const;
@@ -131,7 +127,6 @@ export type ListingView = (typeof VIEWS)[number];
 export const STOCK = ["in", "out"] as const;
 export type StockChoice = (typeof STOCK)[number];
 export const LISTING_PAGE_SIZE = 12;
-export const MAX_BRANDS = 20;
 /** Reviews per page on the product page. */
 export const REVIEW_PAGE_SIZE = 3;
 
@@ -140,7 +135,6 @@ export type ListingState = {
   q: string | null;
   /** One category (the brand page's Category group, the search chips). */
   category: string | null;
-  brands: string[];
   minPrice: number | null;
   maxPrice: number | null;
   /** Both or neither ticked means no availability filter. */
@@ -153,11 +147,10 @@ export type ListingState = {
   page: number;
 };
 
-export type ListingFilters = Pick<ListingState, "category" | "brands" | "minPrice" | "maxPrice" | "stock" | "minRating" | "attributes">;
+export type ListingFilters = Pick<ListingState, "category" | "minPrice" | "maxPrice" | "stock" | "minRating" | "attributes">;
 
 export const EMPTY_FILTERS: ListingFilters = {
   category: null,
-  brands: [],
   minPrice: null,
   maxPrice: null,
   stock: [],
@@ -199,7 +192,6 @@ export function parseListingState(params: Params, { search = false }: { search?:
   const q = search ? searchText(params.q) : null;
   const categoryParam = first(params.category);
   const category = categoryParam && SLUG.test(categoryParam) ? categoryParam : null;
-  const brands = [...new Set(all(params.brand).filter((b) => SLUG.test(b)))].slice(0, MAX_BRANDS);
   let minPrice = wholeNumber(first(params.min_price), 1_000_000_000);
   let maxPrice = wholeNumber(first(params.max_price), 1_000_000_000);
   if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) minPrice = maxPrice = null;
@@ -212,7 +204,6 @@ export function parseListingState(params: Params, { search = false }: { search?:
   return {
     q,
     category,
-    brands,
     minPrice,
     maxPrice,
     stock: stock.length === STOCK.length ? [] : stock,
@@ -229,7 +220,6 @@ export function listingSearch(state: ListingState): string {
   const query = new URLSearchParams();
   if (state.q) query.set("q", state.q);
   if (state.category) query.set("category", state.category);
-  for (const b of state.brands) query.append("brand", b);
   if (state.minPrice !== null) query.set("min_price", String(state.minPrice));
   if (state.maxPrice !== null) query.set("max_price", String(state.maxPrice));
   for (const s of state.stock.length === STOCK.length ? [] : state.stock) query.append("stock", s);
@@ -259,7 +249,6 @@ export function filterQuery(state: ListingFilters & { q?: string | null }) {
   return {
     ...(state.q ? { q: state.q } : {}),
     ...(state.category ? { category: state.category } : {}),
-    ...(state.brands.length ? { brand: state.brands } : {}),
     ...(state.minPrice !== null ? { min_price: state.minPrice } : {}),
     ...(state.maxPrice !== null ? { max_price: state.maxPrice } : {}),
     ...(state.stock.length === 1 ? { in_stock: state.stock[0] === "in" } : {}),
@@ -276,7 +265,6 @@ export function productQuery(state: ListingState) {
 export function activeFilterCount(state: ListingFilters): number {
   return (
     (state.category ? 1 : 0) +
-    state.brands.length +
     (state.minPrice !== null || state.maxPrice !== null ? 1 : 0) +
     (state.stock.length === 1 ? 1 : 0) +
     (state.minRating !== null ? 1 : 0) +

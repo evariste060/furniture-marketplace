@@ -183,34 +183,3 @@ export function getStore(slug: string) {
 export function getPage(slug: string, lang: "en" | "rw") {
   return atRequestTime(() => cachedPage(slug, lang));
 }
-
-/** The active technical services (ADR-013), in staff's order, in the page's language. */
-async function cachedServices(locale: "en" | "rw") {
-  "use cache";
-  cacheLife("catalogue");
-  cacheTag("catalogue");
-  const { data, error, response } = await publicApi().GET("/api/v1/services", { params: { query: { locale } } });
-  if (!data) throw ApiError.from(response.status, error);
-  return data;
-}
-
-async function cachedService(slug: string, locale: "en" | "rw") {
-  "use cache";
-  cacheLife("catalogue");
-  cacheTag("catalogue");
-  const { data, error, response } = await publicApi().GET("/api/v1/services/{slug}", {
-    params: { path: { slug }, query: { locale } },
-  });
-  if (response.status === 404) return null;
-  if (!data) throw ApiError.from(response.status, error);
-  return data;
-}
-
-export function getServices(locale: "en" | "rw") {
-  return atRequestTime(() => cachedServices(locale));
-}
-
-/** One active service, or null when it does not exist or is hidden. */
-export function getService(slug: string, locale: "en" | "rw") {
-  return atRequestTime(() => cachedService(slug, locale));
-}

@@ -56,14 +56,14 @@ export default function PolicyPage({ params }: Props) {
   );
 }
 
-const ARTICLE = "flex min-w-0 flex-[999_1_560px] flex-col gap-5 rounded-xl border border-bd bg-white p-10 max-sm:p-5 lg:max-w-[860px]";
+const ARTICLE = "flex min-w-0 flex-[999_1_560px] flex-col gap-5 rounded-xl border border-bd bg-card p-10 max-sm:p-5 lg:max-w-[860px]";
 
 async function PolicyNav({ params }: Pick<Props, "params">) {
   const { slug } = await params;
   const t = await getTranslations("store.policy");
   const current = infoPageKey(slug);
   return (
-    <nav aria-label={t("navLabel")} className="flex w-full flex-col gap-0.5 rounded-xl border border-bd bg-white p-4 sm:max-w-[260px] sm:flex-[1_1_240px]">
+    <nav aria-label={t("navLabel")} className="flex w-full flex-col gap-0.5 rounded-xl border border-bd bg-card p-4 sm:max-w-[260px] sm:flex-[1_1_240px]">
       <span className="t-over px-3 py-2 text-mut">{t("navTitle")}</span>
       {(Object.keys(INFO_PAGES) as InfoPageKey[]).map((key) => (
         <Link
@@ -110,7 +110,7 @@ async function PolicyArticle({ params }: Pick<Props, "params">) {
         items={[{ label: th("home"), href: getPathname({ href: "/", locale }) }, { label: t("help") }, { label: page.title, lang }]}
       />
       <div className="flex flex-col gap-1.5">
-        <h1 lang={lang} className="t-h1 text-navy">
+        <h1 lang={lang} className="t-h1 text-head">
           {page.title}
         </h1>
         <span className="text-sm text-mut">

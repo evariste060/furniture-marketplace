@@ -26,18 +26,18 @@ export function ListingCard({ product, preload = false }: { product: CatalogProd
   const { variant, image, discount, stock, cart } = cardData(product);
   const href = `/product/${product.slug}`;
   return (
-    <article className={cx("@container relative flex h-full flex-col gap-3 rounded-xl border border-bd bg-white px-3.5 pt-9 pb-3.5 text-tx", CARD_HOVER)}>
+    <article className={cx("@container relative flex h-full flex-col gap-3 rounded-xl border border-bd bg-card px-3.5 pt-9 pb-3.5 text-tx", CARD_HOVER)}>
       <div className="absolute top-2.5 left-3 flex gap-1.5">
         {discount ? <Badge tone="err">{t("discountOff", { percent: discount })}</Badge> : null}
         <Badge tone={STOCK[stock].tone}>{t(STOCK[stock].key)}</Badge>
       </div>
       <div className={BODY}>
         <Link href={href} tabIndex={-1} aria-hidden="true" className="flex flex-none items-center justify-center">
-          <ProductImage image={image} alt="" sizes={IMAGE_SIZES.listing} preload={preload} className={cx(PHOTO, "bg-white", CARD_IMAGE_ZOOM)} />
+          <ProductImage image={image} alt="" sizes={IMAGE_SIZES.listing} preload={preload} className={cx(PHOTO, "bg-card", CARD_IMAGE_ZOOM)} />
         </Link>
         <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-          {product.brand && <span className="t-over text-pri">{product.brand.name}</span>}
-          <Link href={href} className={cx("t-h4 text-tx hover:text-pri", CARD_TITLE_HOVER)}>
+          {product.brand && <span className="t-over text-pri-fg">{product.brand.name}</span>}
+          <Link href={href} className={cx("t-h4 text-tx hover:text-pri-fg", CARD_TITLE_HOVER)}>
             {product.name}
           </Link>
           {variant?.name && <span className="text-cap text-mut">{variant.name}</span>}
@@ -45,7 +45,7 @@ export function ListingCard({ product, preload = false }: { product: CatalogProd
           {product.rating.count > 0 && <RatingStars rating={product.rating} />}
           {variant && (
             <>
-              <span className={cx("t-price mt-0.5", discount ? "text-err" : "text-tx")}>{formatMoney(variant.price)}</span>
+              <span className={cx("t-price mt-0.5", discount ? "text-err-fg" : "text-tx")}>{formatMoney(variant.price)}</span>
               {discount && variant.compare_at_price ? (
                 <span className="text-cap text-mut line-through">
                   <span className="sr-only">{t("was")} </span>

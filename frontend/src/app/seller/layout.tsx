@@ -10,6 +10,7 @@ import { QueryProvider } from "@/lib/query/provider";
 import { getSellerVisitor } from "@/lib/seller";
 import { inter } from "../fonts";
 import "../globals.css";
+import { ThemeScript } from "@/lib/theme-script";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("admin.seller.titles");
@@ -22,7 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
  * suspension applies at once. The language comes from the panel's cookie (path /seller). */
 export default function SellerLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className="bg-page">
         <QueryProvider>
           <Suspense fallback={<ShellFallback />}>
@@ -65,7 +69,7 @@ function ShellFallback() {
     <div aria-busy="true" className="flex min-h-dvh bg-page">
       <div className="hidden w-60 flex-none bg-deep lg:block" />
       <div className="flex-1">
-        <div className="h-[68px] border-b border-bd bg-white" />
+        <div className="h-[68px] border-b border-bd bg-card" />
       </div>
     </div>
   );

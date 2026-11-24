@@ -31,7 +31,7 @@ export async function SellerGate({ visitor }: { visitor: Exclude<SellerVisitor, 
   const { Icon } = view;
   return (
     <main id="main" className="flex min-h-dvh items-center justify-center bg-page p-4">
-      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-white p-8 text-center">
+      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-card p-8 text-center">
         <span aria-hidden="true" className={cx("flex size-20 items-center justify-center rounded-full", view.tone)}>
           <Icon size={32} />
         </span>

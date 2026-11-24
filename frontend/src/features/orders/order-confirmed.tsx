@@ -143,7 +143,7 @@ function Confirmed({ orderNumber, proof, signedIn, onDenied }: { orderNumber: st
 
   return (
     <>
-      <section className="flex flex-col items-center gap-3.5 rounded-xl border border-bd bg-white p-8 text-center max-sm:p-5">
+      <section className="flex flex-col items-center gap-3.5 rounded-xl border border-bd bg-card p-8 text-center max-sm:p-5">
         <span className="flex size-20 items-center justify-center rounded-full bg-ok-bg text-ok">
           <CircleCheck size={40} aria-hidden="true" />
         </span>
@@ -168,7 +168,7 @@ function Confirmed({ orderNumber, proof, signedIn, onDenied }: { orderNumber: st
         </div>
       </section>
       <div className="flex flex-wrap items-start gap-6">
-        <section aria-labelledby="order-details" className="flex min-w-0 flex-[999_1_460px] flex-col rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+        <section aria-labelledby="order-details" className="flex min-w-0 flex-[999_1_460px] flex-col rounded-xl border border-bd bg-card p-6 max-sm:p-4">
           <h2 id="order-details" className="t-h3 pb-2">
             {t("details")}
           </h2>
@@ -209,7 +209,7 @@ function Confirmed({ orderNumber, proof, signedIn, onDenied }: { orderNumber: st
             )}
             <div className="flex items-center justify-between pt-1.5">
               <b className="t-h4">{t(paid ? "totalPaid" : "totalToPay")}</b>
-              <b className="t-price text-navy">{formatMoney(order.total)}</b>
+              <b className="t-price text-head">{formatMoney(order.total)}</b>
             </div>
             <span>
               <Badge tone={paid ? "soft-ok" : "soft-warn"}>{t(paid ? "paid" : "payOnDelivery")}</Badge>
@@ -245,7 +245,7 @@ function NextStep({ state, mark, children }: { state: "done" | "now" | "todo"; m
           "inline-flex size-6 flex-none items-center justify-center rounded-full text-xs font-semibold",
           state === "done" && "bg-ok-tx text-white",
           state === "now" && "bg-pri text-white",
-          state === "todo" && "border border-bd2 bg-white text-mut",
+          state === "todo" && "border border-bd2 bg-card text-mut",
         )}
       >
         {mark}
@@ -262,7 +262,7 @@ function CreateAccount({ name, phone }: { name: string; phone: string }) {
   const href = `/register?${new URLSearchParams({ name, phone: `0${localPhone(phone) ?? ""}` })}`;
   return (
     <Card padding={24} className="flex flex-col gap-3 border-light! bg-light! max-sm:p-4">
-      <h2 className="t-h4 text-navy">{t("accountTitle")}</h2>
+      <h2 className="t-h4 text-head">{t("accountTitle")}</h2>
       <p className="text-sm text-tx2">{t("accountText")}</p>
       <Link href={href} className={buttonClasses({ block: true })}>
         {t("createAccount")}

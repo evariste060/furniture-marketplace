@@ -19,7 +19,7 @@ export async function ListingHeader({ title, trail = [] }: { title: string; trai
       {/* One row from 640px: crumbs on the left, the name centred; stacked on phones. */}
       <div className="wrap flex flex-col gap-0.5 pt-0 pb-3 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-4">
         <Breadcrumb label={tu("breadcrumb")} items={items} className="min-w-0" />
-        <h1 className="t-h2 text-navy sm:text-center">{title}</h1>
+        <h1 className="t-h2 text-head sm:text-center">{title}</h1>
       </div>
     </section>
   );

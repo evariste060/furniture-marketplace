@@ -88,9 +88,9 @@ export function QuoteForm() {
   const limited = failure instanceof ApiError && failure.status === 429;
   return (
     <>
-      <form ref={formRef} onSubmit={onSubmit} noValidate aria-labelledby="quote-title" className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <form ref={formRef} onSubmit={onSubmit} noValidate aria-labelledby="quote-title" className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="flex items-start gap-4 border-b border-bd px-8 pt-7 pb-6 max-sm:px-5 max-sm:pt-5">
-          <span aria-hidden="true" className="flex size-12 flex-none items-center justify-center rounded-xl bg-light text-pri max-sm:hidden">
+          <span aria-hidden="true" className="flex size-12 flex-none items-center justify-center rounded-xl bg-light text-pri-fg max-sm:hidden">
             <Building2 size={24} />
           </span>
           <div className="flex min-w-0 flex-col gap-1">
@@ -130,22 +130,22 @@ export function QuoteForm() {
                     const row = errors.rows?.[index];
                     return (
                       <li key={index} className="flex flex-col gap-1">
-                        <div className={cx("flex items-center gap-3 rounded-lg border bg-white py-2 pr-2 pl-4", row ? "border-err" : "border-bd")}>
+                        <div className={cx("flex items-center gap-3 rounded-lg border bg-card py-2 pr-2 pl-4", row ? "border-err" : "border-bd")}>
                           <span className="min-w-0 flex-1 truncate font-medium text-tx">{line.product}</span>
                           <span className="flex-none rounded-md bg-light px-2.5 py-1 text-sm font-semibold text-pri-h">{t("quantityValue", { quantity: line.quantity })}</span>
-                          <IconButton aria-label={t("removeProduct", { product: line.product })} bordered={false} onClick={() => removeLine(index)} className="text-err! hover:bg-err-bg">
+                          <IconButton aria-label={t("removeProduct", { product: line.product })} bordered={false} onClick={() => removeLine(index)} className="text-err-fg! hover:bg-err-bg">
                             <Trash2 size={18} aria-hidden="true" />
                           </IconButton>
                         </div>
-                        {row?.product && <span className="text-cap text-err">{message(row.product)}</span>}
-                        {row?.quantity && <span className="text-cap text-err">{message(row.quantity)}</span>}
+                        {row?.product && <span className="text-cap text-err-fg">{message(row.product)}</span>}
+                        {row?.quantity && <span className="text-cap text-err-fg">{message(row.quantity)}</span>}
                       </li>
                     );
                   })}
                 </ul>
               )}
               {errors.lines && (
-                <span role="alert" className="text-cap text-err">
+                <span role="alert" className="text-cap text-err-fg">
                   {message(errors.lines)}
                 </span>
               )}

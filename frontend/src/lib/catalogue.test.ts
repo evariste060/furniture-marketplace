@@ -69,7 +69,6 @@ describe("listing state", () => {
     expect(state).toEqual({
       q: null,
       category: null,
-      brands: [],
       minPrice: null,
       maxPrice: null,
       stock: [],
@@ -84,14 +83,13 @@ describe("listing state", () => {
   });
 
   it("round-trips through the URL", () => {
-    const search = "?brand=samsung&brand=apple&min_price=200000&max_price=399999&stock=in&rating=4&sort=price_desc&view=list&page=2";
+    const search = "?min_price=200000&max_price=399999&stock=in&rating=4&sort=price_desc&view=list&page=2";
     const state = parseListingState(Object.fromEntries([...new URLSearchParams(search).keys()].map((k) => {
       const v = new URLSearchParams(search).getAll(k);
       return [k, v.length > 1 ? v : v[0]];
     })));
     expect(listingSearch(state)).toBe(search);
     expect(productQuery(state)).toEqual({
-      brand: ["samsung", "apple"],
       min_price: 200_000,
       max_price: 399_999,
       in_stock: true,
@@ -101,7 +99,7 @@ describe("listing state", () => {
       page: 2,
       size: 12,
     });
-    expect(activeFilterCount(state)).toBe(5);
+    expect(activeFilterCount(state)).toBe(3);
   });
 
   it("ignores invalid or contradictory values instead of sending them to the API", () => {
@@ -115,21 +113,22 @@ describe("listing state", () => {
       view: "table",
       page: "-3",
     });
-    expect(state.brands).toEqual(["ok-brand"]);
     expect([state.minPrice, state.maxPrice]).toEqual([null, null]);
     expect(state.stock).toEqual([]); // both ticked = no filter
     expect(state.minRating).toBeNull();
     expect([state.sort, state.view, state.page]).toEqual(["popular", "grid", 1]);
-    expect(filterQuery(state)).toEqual({ brand: ["ok-brand"] });
+    expect(filterQuery(state)).toEqual({}); // brands are not a storefront filter (SC-09)
   });
 
   it("asks for out-of-stock products only when just that box is ticked", () => {
     expect(filterQuery(parseListingState({ stock: "out" }))).toEqual({ in_stock: false });
   });
 
-  it("keeps at most 20 brands, the API's limit", () => {
-    const many = Array.from({ length: 25 }, (_, i) => `b${i}`);
-    expect(parseListingState({ brand: many }).brands).toHaveLength(20);
+  it("ignores ?brand=: brands are not a storefront filter (SC-09)", () => {
+    const state = parseListingState({ brand: ["hp", "dell"] });
+    expect(filterQuery(state)).toEqual({});
+    expect(listingSearch(state)).toBe("");
+    expect(activeFilterCount(state)).toBe(0);
   });
   it("keeps one category and sends it to the API", () => {
     const state = parseListingState({ category: ["phones", "laptops"] });

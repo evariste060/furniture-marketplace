@@ -93,7 +93,7 @@ async function SpotlightSection({ spotlight, tinted }: { spotlight: Spotlight; t
       <div className="flex flex-col gap-3 sm:wrap sm:gap-4">
         <div className="flex items-end justify-between gap-4">
           <div className="flex min-w-0 flex-col gap-1">
-            <h2 id={titleId} className="t-h3 text-navy sm:t-h2">
+            <h2 id={titleId} className="t-h3 text-head sm:t-h2">
               {t("spotlightTitle", { category: category.name })}
             </h2>
             <p className="line-clamp-1 text-sm text-tx2 max-sm:hidden">{category.description || t("spotlightText", { category: category.name })}</p>
@@ -104,7 +104,7 @@ async function SpotlightSection({ spotlight, tinted }: { spotlight: Spotlight; t
           </Link>
         </div>
         <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,32fr)_minmax(0,68fr)]">
-          <article aria-label={showcase.name} className="overflow-hidden rounded-2xl border border-bd bg-white shadow-sh">
+          <article aria-label={showcase.name} className="overflow-hidden rounded-2xl border border-bd bg-card shadow-sh">
             <SpotlightShowcase product={showcase} />
           </article>
           {products.length > 0 && (

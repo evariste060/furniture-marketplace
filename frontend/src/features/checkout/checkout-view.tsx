@@ -185,13 +185,13 @@ function PlacingOrder() {
   const t = useTranslations("store.checkout");
   return (
     <div role="status" aria-live="polite" className="fixed inset-0 z-50 flex items-center justify-center bg-page/95 px-4">
-      <div className="flex w-full max-w-[420px] flex-col items-center gap-5 rounded-xl border border-bd bg-white p-8 text-center shadow-sh2 max-sm:p-6">
+      <div className="flex w-full max-w-[420px] flex-col items-center gap-5 rounded-xl border border-bd bg-card p-8 text-center shadow-sh2 max-sm:p-6">
         <span className="relative size-16" aria-hidden="true">
           <span className="absolute inset-0 rounded-full border-4 border-light" />
           <span className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-pri border-r-pri motion-reduce:animate-none" />
         </span>
         <div className="flex flex-col gap-1.5">
-          <p className="t-h3 text-navy">{t("placing")}</p>
+          <p className="t-h3 text-head">{t("placing")}</p>
           <p className="text-sm text-tx2">{t("placingText")}</p>
         </div>
       </div>
@@ -271,7 +271,7 @@ function BackLink({ label, onClick, href }: { label: string; onClick?: () => voi
       {label}
     </>
   );
-  const cls = "flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-sm font-medium text-pri";
+  const cls = "flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-sm font-medium text-pri-fg";
   return href ? (
     <Link href={href} className={cls}>
       {content}
@@ -324,7 +324,7 @@ function ContactStep({ contact, signedIn, onDone }: { contact: ContactForm; sign
           </Link>
         </Card>
       )}
-      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5 rounded-xl border border-bd bg-white p-8 max-sm:p-4">
+      <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5 rounded-xl border border-bd bg-card p-8 max-sm:p-4">
         <div className="flex flex-col gap-1">
           <h1 className="t-h2">{t("contactTitle")}</h1>
           <p className="text-tx2">{t("contactText")}</p>
@@ -410,7 +410,7 @@ function DeliveryStep({
 
   const quote = cart.delivery;
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[22px] rounded-xl border border-bd bg-white p-8 max-sm:p-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[22px] rounded-xl border border-bd bg-card p-8 max-sm:p-4">
       <div className="flex flex-col gap-1">
         <h1 className="t-h2">{t("deliveryTitle")}</h1>
         <p className="text-tx2">{t("deliveryText")}</p>
@@ -504,10 +504,10 @@ function DeliveryStep({
         </div>
       )}
       <div className={cx("flex items-start gap-3 rounded-xl px-4 py-3.5", zoneError ? "bg-err-bg" : "bg-light")} role={zoneError ? "alert" : undefined}>
-        <Info size={18} className={cx("mt-0.5 flex-none", zoneError ? "text-err" : "text-pri")} aria-hidden="true" />
+        <Info size={18} className={cx("mt-0.5 flex-none", zoneError ? "text-err-fg" : "text-pri-fg")} aria-hidden="true" />
         <div className="flex flex-col gap-0.5">
           {zone && (
-            <b className="text-sm font-semibold text-navy">
+            <b className="text-sm font-semibold text-head">
               {t("zoneLine", {
                 zone: zone.name,
                 fee:
@@ -558,7 +558,7 @@ function PaymentStep({
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[18px] rounded-xl border border-bd bg-white p-8 max-sm:p-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[18px] rounded-xl border border-bd bg-card p-8 max-sm:p-4">
       <div className="flex flex-col gap-1">
         <h1 className="t-h2 max-sm:hidden">{t("paymentTitle")}</h1>
         <h1 className="t-h3 sm:hidden">{t("paymentTitleMobile")}</h1>
@@ -594,7 +594,7 @@ function PaymentStep({
         ))}
       </fieldset>
       {error && (
-        <p id="method-error" role="alert" className="text-sm text-err">
+        <p id="method-error" role="alert" className="text-sm text-err-fg">
           {t("errors.method")}
         </p>
       )}
@@ -629,7 +629,7 @@ function ReviewMain({
   const t = useTranslations("store.checkout");
   const phone = formatPhone(`0${localPhone(contact.phone) ?? ""}`);
   const edit = (step: CheckoutStep, label: string) => (
-    <button type="button" onClick={() => go(step)} aria-label={`${t("edit")}: ${label}`} className="cursor-pointer border-0 bg-transparent p-0 text-cap font-medium text-pri">
+    <button type="button" onClick={() => go(step)} aria-label={`${t("edit")}: ${label}`} className="cursor-pointer border-0 bg-transparent p-0 text-cap font-medium text-pri-fg">
       {t("edit")}
     </button>
   );
@@ -703,7 +703,7 @@ function ReviewMain({
 function Summary({ cart, step, contact, place, go }: { cart: Cart; step: CheckoutStep; contact: ContactForm; place: AddressForm; go: (s: CheckoutStep) => void }) {
   const t = useTranslations("store.checkout");
   return (
-    <aside className="flex w-full flex-[1_1_320px] flex-col gap-4 rounded-xl border border-bd bg-white p-6 max-sm:p-4 sm:max-w-[400px]">
+    <aside className="flex w-full flex-[1_1_320px] flex-col gap-4 rounded-xl border border-bd bg-card p-6 max-sm:p-4 sm:max-w-[400px]">
       <h2 className="t-h3">{t("summary")}</h2>
       {step !== "payment" &&
         cart.lines.map((line) => (
@@ -766,7 +766,7 @@ function Totals({ cart, pending, total = "total" }: { cart: Cart; pending: boole
       <hr className="hr" />
       <div className="flex items-center justify-between">
         <span className="t-h4">{t(total)}</span>
-        <span className={cx(total === "totalToPay" ? "t-price-l" : "t-price", "text-navy")}>
+        <span className={cx(total === "totalToPay" ? "t-price-l" : "t-price", "text-head")}>
           {formatMoney(!pending && cart.grand_total != null ? cart.grand_total : cart.subtotal_after_discount)}
         </span>
       </div>
@@ -780,7 +780,7 @@ function ChosenBox({ title, text, onChange }: { title: string; text: string; onC
     <div className="flex flex-col gap-0.5 rounded-lg bg-page p-3">
       <span className="text-cap font-semibold">{title}</span>
       <span className="text-cap text-tx2">{text}</span>
-      <button type="button" onClick={onChange} aria-label={`${t("change")}: ${title}`} className="cursor-pointer self-start border-0 bg-transparent p-0 text-cap font-medium text-pri">
+      <button type="button" onClick={onChange} aria-label={`${t("change")}: ${title}`} className="cursor-pointer self-start border-0 bg-transparent p-0 text-cap font-medium text-pri-fg">
         {t("change")}
       </button>
     </div>
@@ -892,7 +892,7 @@ function PlaceOrder({
           }
         />
         {termsError && (
-          <span id="terms-error" role="alert" className="text-cap text-err">
+          <span id="terms-error" role="alert" className="text-cap text-err-fg">
             {t("errors.terms")}
           </span>
         )}

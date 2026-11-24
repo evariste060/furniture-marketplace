@@ -72,8 +72,8 @@ export default function StyleGuidePage() {
     <main id="main" className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 py-14 sm:px-16">
       <div className="flex flex-wrap items-center justify-between gap-6">
         <div className="flex flex-col gap-1.5">
-          <span className="t-over text-pri">Design system</span>
-          <h1 className="t-display text-navy">{MARKETPLACE_NAME} UI</h1>
+          <span className="t-over text-pri-fg">Design system</span>
+          <h1 className="t-display text-head">{MARKETPLACE_NAME} UI</h1>
           <p className="max-w-[640px] text-lg text-tx2">
             One set of tokens and components for the storefront and the admin panel. Font: Inter. Every screen on this
             canvas is built from these parts.
@@ -84,7 +84,7 @@ export default function StyleGuidePage() {
             <Logo height={56} alt={`${MARKETPLACE_NAME} logo on light`} />
           </Card>
           <div className="rounded-xl bg-navy p-4">
-            <div className="rounded-lg bg-white px-2.5 py-1.5">
+            <div className="rounded-lg bg-card px-2.5 py-1.5">
               <Logo height={40} alt="Logo on dark, in a white plate" />
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function StyleGuidePage() {
             <Row left={<span>Body 14 — default text across the store and admin.</span>} right="400" />
             <div className="flex items-center justify-between gap-3">
               <span className="text-cap text-mut">Caption 12 — helper text, meta, table headers</span>
-              <span className="t-over text-pri">Overline</span>
+              <span className="t-over text-pri-fg">Overline</span>
             </div>
           </Card>
         </section>

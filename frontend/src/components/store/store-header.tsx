@@ -1,7 +1,7 @@
-import { Search, Truck } from "lucide-react";
+import { Store, Truck } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { getCategories, getDeliveryInfo, getFacets, getProducts, getServices, getStoreContact } from "@/lib/api/catalogue";
+import { getCategories, getDeliveryInfo, getProducts, getStoreContact } from "@/lib/api/catalogue";
 import { getPathname, Link } from "@/i18n/navigation";
 import { MENU_PRODUCTS, menuProduct, menuProductQuery, topCategories, type CatalogCategory, type MenuCategory } from "@/lib/catalogue";
 import { telHref } from "@/lib/contact";
@@ -15,7 +15,7 @@ import {
   LanguageMenu,
   MenuButton,
   NavLink,
-  SearchInput,
+  ThemeToggle,
   TrackOrderLink,
   WishlistLink,
 } from "./header-actions";
@@ -23,7 +23,7 @@ import { CategoryLinks } from "./category-links";
 import { CategoryMegaMenu } from "./category-mega-menu";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
-import { ServicesNav } from "./services-nav";
+import { SearchBox } from "./search-box";
 
 /** Header.dc.html (desktop) and the MobileHome.dc.html header (≤700px): announcement bar, logo,
  * search, language, account, wishlist and cart, then the category nav. Categories come from GET
@@ -55,11 +55,12 @@ export async function StoreHeader() {
           </div>
         </div>
       </div>
-      {/* The whole header scrolls away with the page; then its actions row slides back in and
-          stays pinned to the top, without the category row (HeaderHeight sets data-compact). */}
+      {/* The whole header scrolls away with the page; then it slides back in and stays pinned to
+          the top as one block, the actions row and the store menu together (SC-09; HeaderHeight
+          sets data-compact). */}
       <header
         data-sticky-header
-        className="group/header relative z-40 border-b border-bd bg-white data-compact:sticky data-compact:top-0 data-compact:animate-header-in data-compact:shadow-sh motion-reduce:animate-none!"
+        className="group/header relative z-40 border-b border-bd bg-card data-compact:sticky data-compact:top-0 data-compact:animate-header-in data-compact:shadow-sh motion-reduce:animate-none!"
       >
         <HeaderHeight />
         {/* Desktop */}
@@ -69,24 +70,9 @@ export async function StoreHeader() {
           <Link href="/" aria-label={t("homeLink")} className="block flex-none">
             <Logo height={52} alt={t("logoAlt")} eager className="max-lg:h-11!" />
           </Link>
-          <form role="search" action={searchAction} className="flex h-11 min-w-[200px] flex-1 overflow-hidden rounded-lg border border-bd focus-within:border-pri">
-            <label className="flex flex-1 items-center gap-2.5 px-3.5 text-mut">
-              <Search size={18} aria-hidden="true" />
-              <span className="sr-only">{t("header.searchLabel")}</span>
-              <SearchInput
-                type="search"
-                name="q"
-                required
-                maxLength={160}
-                placeholder={t("header.searchPlaceholder")}
-                className="min-w-0 flex-1 border-0 bg-transparent text-sm text-tx outline-none placeholder:text-mut"
-              />
-            </label>
-            <button type="submit" aria-label={t("header.search")} className="flex w-13 cursor-pointer items-center justify-center border-0 bg-pri text-white hover:bg-pri-h">
-              <Search size={18} aria-hidden="true" />
-            </button>
-          </form>
+          <SearchBox action={searchAction} variant="desktop" />
           <LanguageMenu />
+          <ThemeToggle />
           <TrackOrderLink />
           <AccountLink />
           <WishlistLink />
@@ -106,20 +92,7 @@ export async function StoreHeader() {
               <CartIconLink />
             </div>
           </div>
-          <form role="search" action={searchAction}>
-            <label className="flex h-[42px] items-center gap-2 rounded-lg bg-subtle px-3 text-mut">
-              <Search size={18} aria-hidden="true" />
-              <SearchInput
-                type="search"
-                name="q"
-                required
-                maxLength={160}
-                aria-label={t("header.searchLabel")}
-                placeholder={t("header.searchPlaceholderShort")}
-                className="min-w-0 flex-1 border-0 bg-transparent text-base text-tx outline-none placeholder:text-mut"
-              />
-            </label>
-          </form>
+          <SearchBox action={searchAction} variant="mobile" />
         </div>
         <Suspense fallback={<NavFallback />}>
           <CategoryNav />
@@ -165,9 +138,8 @@ async function HelpLine() {
 }
 
 /** The category nav: "All Categories" (a mega menu of the categories and each one's best
- * sellers), the top-level categories (each a dropdown of its own subcategories), Services (a
- * dropdown of the technical services, ADR-013) and Deals last, in red (owner, 2026-11-18); both
- * pinned, never under "More". Text
+ * sellers), the top-level categories (each a dropdown of its own subcategories) and Deals, in red
+ * (owner, 2026-11-18), pinned, never under "More"; "Become a seller" on the right (SC-07). Text
  * only, no icons; Track Order is in the actions row above (owner, 2026-11-17). The menus' data is
  * read here on the server with the cached catalogue reads (GET /catalog/categories and
  * /catalog/products per category), all at once, so opening a menu never waits for the network.
@@ -176,19 +148,12 @@ async function CategoryNav() {
   const t = await getTranslations("store.header");
   const tree = await getCategories().catch(() => []);
   const categories = topCategories(tree);
-  const locale = (await getLocale()) === "rw" ? "rw" : "en";
-  const [menu, services] = await Promise.all([
-    Promise.all(categories.map(menuCategory)),
-    getServices(locale).then(
-      (list) => list.map(({ slug, name, short_description, icon, items }) => ({ slug, name, short_description, icon, items: items.map((i) => i.title) })),
-      () => [],
-    ),
-  ]);
+  const menu = await Promise.all(categories.map(menuCategory));
   return (
     <>
-      <nav aria-label={t("categories")} className="hidden bg-nav sm:block group-data-compact/header:hidden!">
+      <nav aria-label={t("categories")} className="hidden bg-nav sm:block">
         <div className="wrap flex items-center">
-          <CategoryMegaMenu categories={menu} services={services} />
+          <CategoryMegaMenu categories={menu} />
           {/* As many categories as fit, the rest under "More". */}
           <CategoryLinks
             items={categories.map((c) => ({
@@ -198,12 +163,19 @@ async function CategoryNav() {
               subcategories: (c.children ?? []).map((s) => ({ id: s.id, name: s.name, slug: s.slug })),
             }))}
           />
-          <ServicesNav services={services} />
           {/* Deals last, in red, so it stands apart from the categories (owner, 2026-11-18). */}
           <NavLink href="/deals" tone="deal" className="ml-1">
             {t("deals")}
           </NavLink>
           <span data-nav-spacer className="flex-1" />
+          {/* The existing seller application (/account/seller; sign-in first for guests). */}
+          <Link
+            href="/account/seller"
+            className="ml-2 flex h-8 flex-none items-center gap-1.5 rounded-md border border-white/70 px-3 text-sm font-semibold whitespace-nowrap text-white transition-colors duration-150 hover:bg-card hover:text-nav focus-visible:outline-white motion-reduce:transition-none"
+          >
+            <Store size={15} aria-hidden="true" />
+            {t("becomeSeller")}
+          </Link>
         </div>
       </nav>
       <MobileMenu categories={categories} />
@@ -211,32 +183,18 @@ async function CategoryNav() {
   );
 }
 
-/** A top-level category with what the mega menu lists beside it, and its best sellers
- * (subcategories included; null when they could not be loaded). ADR-012, 2026-11-16: the brands
- * staff chose for its menu, in their order, even those without products yet; without a list, its
- * subcategories; without either, the brands of its products. */
+/** A top-level category with what the mega menu lists beside it (its subcategories; brands are
+ * not offered on the storefront, SC-09) and its best sellers (subcategories included; null when
+ * they could not be loaded). */
 async function menuCategory(category: CatalogCategory): Promise<MenuCategory> {
-  const [products, counted] = await Promise.all([
-    getProducts(menuProductQuery(category.slug)).then(
-      (page) => ({ items: page.items.slice(0, MENU_PRODUCTS).map(menuProduct), total: page.total }),
-      () => null,
-    ),
-    getFacets({ category: category.slug }).then(
-      (facets) => facets.brands.filter((b) => b.count > 0),
-      () => [],
-    ),
-  ]);
-  const chosen = category.menu_brands ?? [];
-  const counts = new Map(counted.map((b) => [b.slug, b.count]));
+  const products = await getProducts(menuProductQuery(category.slug)).then(
+    (page) => ({ items: page.items.slice(0, MENU_PRODUCTS).map(menuProduct), total: page.total }),
+    () => null,
+  );
   const subcategories = (category.children ?? []).map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
-  const brands = chosen.length
-    ? chosen.map((b) => ({ name: b.name, slug: b.slug, count: counts.get(b.slug) ?? 0 }))
-    : subcategories.length
-      ? []
-      : counted.map((b) => ({ name: b.name, slug: b.slug, count: b.count }));
-  return { id: category.id, name: category.name, slug: category.slug, brands, subcategories, products };
+  return { id: category.id, name: category.name, slug: category.slug, subcategories, products };
 }
 
 function NavFallback() {
-  return <div className="hidden h-12 bg-nav sm:block group-data-compact/header:hidden!" />;
+  return <div className="hidden h-12 bg-nav sm:block" />;
 }

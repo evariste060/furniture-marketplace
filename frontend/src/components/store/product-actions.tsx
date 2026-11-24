@@ -59,11 +59,11 @@ export function WishlistButton({
       aria-pressed={saved}
       onClick={onClick}
       className={cx(
-        "flex flex-none cursor-pointer items-center justify-center bg-white",
+        "flex flex-none cursor-pointer items-center justify-center bg-card",
         placement === "card" && "absolute top-2.5 right-2.5 size-8 rounded-full border border-bd",
         placement === "inline" && "size-11 rounded-lg border border-bd",
         placement === "bare" && "size-10 rounded-lg border-0",
-        saved ? "text-err" : placement === "card" ? "text-mut" : "text-tx2",
+        saved ? "text-err-fg" : placement === "card" ? "text-mut" : "text-tx2",
       )}
     >
       <Heart size={placement === "card" ? 16 : placement === "inline" ? 18 : 22} aria-hidden="true" fill={saved ? "currentColor" : "none"} />

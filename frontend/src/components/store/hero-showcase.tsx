@@ -1,19 +1,16 @@
 "use client";
 
-import { ArrowRight, Wrench } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { createElement, useEffect, useRef, useState, type ReactNode } from "react";
 import { buttonClasses } from "@/components/ui/button";
 import { ProductImage } from "@/components/ui/product-image";
-import type { ServiceIconKey } from "@/features/services/service-icon";
-import { ServiceImage } from "@/features/services/service-image";
 import { Link } from "@/i18n/navigation";
 import { categoryIcon } from "@/lib/category-icon";
 import { ORBIT_MAX, RELATED_MAX, type MenuProduct } from "@/lib/catalogue";
 import { cx } from "@/lib/cx";
 import { formatMoney } from "@/lib/format";
-import type { ApiImage } from "@/lib/images";
 import heroBackground from "../../../public/brand/hero-background.jpg";
 import { HoverProductCard } from "./hover-product-card";
 import type { CartTarget } from "./product-actions";
@@ -30,22 +27,6 @@ export type ShowcaseCategory = {
   /** With the variant each one's Add to Cart adds (the one its price is from). */
   related: (MenuProduct & { cart: CartTarget })[];
 };
-
-/** A technical service shown in the Services place: its card's photo (or icon placeholder) and name. */
-export type ShowcaseService = { slug: string; name: string; icon: ServiceIconKey; image: ApiImage | null };
-
-/** The technical services as one place on the orbit, like a main category (owner, 2026-11-17):
- * one image stands for them on the orbit, and four services come in beside the spotlight. */
-export type ShowcaseServices = {
-  kind: "services";
-  id: "services";
-  /** "Services", for the place's button. */
-  name: string;
-  services: ShowcaseService[];
-};
-
-type ShowcaseItem = ShowcaseCategory | ShowcaseServices;
-const isServices = (item: ShowcaseItem): item is ShowcaseServices => "kind" in item && item.kind === "services";
 
 /** The orbit turns every TURN_MS (owner, 2026-11-18: every 3 seconds): the category is shown for
  * SHOW_MS, then its copy and products leave (EXIT_MS) and the orbit turns to the next. */
@@ -69,13 +50,10 @@ const SMALL = 0.36;
  * spotlight and grows, and the copy and the four products change to that category. Rotation
  * pauses while the pointer or keyboard focus is on the hero; the dots under it jump to a category
  * (always moving clockwise). With reduced motion nothing moves: the places change without
- * animation. After the categories comes Services, one place like a main category: one image for
- * all services on the orbit, and in the spotlight "Explore services" with four services on the
- * right (owner, 2026-11-17). */
-export function HeroShowcase({ categories, services = null, title }: { categories: ShowcaseCategory[]; services?: ShowcaseServices | null; title: string }) {
+ * animation. */
+export function HeroShowcase({ categories, title }: { categories: ShowcaseCategory[]; title: string }) {
   const t = useTranslations("hero");
-  const ts = useTranslations("store");
-  const items: ShowcaseItem[] = [...categories.slice(0, ORBIT_MAX), ...(services?.services.length ? [services] : [])];
+  const items = categories.slice(0, ORBIT_MAX);
   const count = items.length;
   /** How many places the orbit has turned since the page opened; it only grows, so every move is
    * clockwise along the circle (also from the last category back to the first). */
@@ -162,9 +140,8 @@ export function HeroShowcase({ categories, services = null, title }: { categorie
   );
   // Phones and laptops: two by two; tablets: one row of four.
   const grid = "m-0 grid list-none auto-rows-fr grid-cols-2 gap-3 p-0 sm:grid-cols-4 lg:grid-cols-2";
-  const service = isServices(current) ? current : null;
-  const category = isServices(current) ? null : current;
-  const price = category?.featured.price ?? null;
+  const category = current;
+  const price = category.featured.price;
 
   return (
     <section ref={ref} aria-roledescription={count > 1 ? "carousel" : undefined} aria-label={t("showcase")} className="relative isolate overflow-hidden bg-light">
@@ -177,56 +154,30 @@ export function HeroShowcase({ categories, services = null, title }: { categorie
           <div className="flex min-w-0 flex-[1.25_1_0] flex-col gap-3 sm:max-w-[420px] sm:gap-5">
             <h1 className="t-over m-0 text-xs text-balance text-pri-h motion-safe:animate-hero-fade max-sm:tracking-[0.06em] sm:text-sm">{title}</h1>
             <div key={current.id} className={cx("flex flex-col gap-1.5 sm:gap-3", out)}>
-              <p className="t-display m-0 line-clamp-2 origin-left text-balance text-navy motion-safe:animate-hero-fade motion-safe:[animation-delay:70ms] max-sm:text-[22px] max-sm:leading-7">
-                {service ? t("servicesHeadline") : category?.featured.name}
+              <p className="t-display m-0 line-clamp-2 origin-left text-balance text-head motion-safe:animate-hero-fade motion-safe:[animation-delay:70ms] max-sm:text-[22px] max-sm:leading-7">
+                {category.featured.name}
               </p>
-              {service ? (
-                <Link
-                  href="/services"
-                  className="flex origin-left items-center gap-1.5 self-start text-cap font-medium text-tx2 hover:text-pri-h motion-safe:animate-hero-fade motion-safe:[animation-delay:140ms] sm:text-sm"
-                >
-                  <span aria-hidden="true" className="flex text-pri">
-                    <Wrench size={14} />
-                  </span>
-                  {t("ourService")}
-                </Link>
-              ) : (
-                <Link
-                  href={`/category/${category?.slug}`}
-                  className="flex origin-left items-center gap-1.5 self-start text-cap font-medium text-tx2 hover:text-pri-h motion-safe:animate-hero-fade motion-safe:[animation-delay:140ms] sm:text-sm"
-                >
-                  <span aria-hidden="true" className="flex text-pri">
-                    {category && <CategoryIcon category={category} />}
-                  </span>
-                  {t("bestIn", { category: current.name })}
-                </Link>
-              )}
-              {service && (
-                <p className="m-0 line-clamp-2 origin-left text-sm text-tx2 motion-safe:animate-hero-fade motion-safe:[animation-delay:210ms] max-sm:hidden sm:text-base">
-                  {ts("home.servicesText")}
-                </p>
-              )}
+              <Link
+                href={`/category/${category.slug}`}
+                className="flex origin-left items-center gap-1.5 self-start text-cap font-medium text-tx2 hover:text-pri-h motion-safe:animate-hero-fade motion-safe:[animation-delay:140ms] sm:text-sm"
+              >
+                <span aria-hidden="true" className="flex text-pri-fg">
+                  <CategoryIcon category={category} />
+                </span>
+                {t("bestIn", { category: current.name })}
+              </Link>
               {price !== null && (
                 <p className="t-price-l m-0 origin-left text-pri-h motion-safe:animate-hero-fade motion-safe:[animation-delay:210ms] max-sm:text-lg sm:pt-1">{formatMoney(price)}</p>
               )}
             </div>
             <div key={`${current.id}-actions`} className={cx("flex origin-left flex-wrap gap-3 motion-safe:animate-hero-fade motion-safe:[animation-delay:280ms]", out)}>
-              {service ? (
-                <Link href="/services" className={cx(buttonClasses({ size: "md" }), "max-sm:h-9 max-sm:px-3.5 max-sm:text-sm")}>
-                  {t("exploreServices")}
-                  <ArrowRight size={16} aria-hidden="true" />
-                </Link>
-              ) : (
-                <>
-                  <Link href={`/product/${category?.featured.slug}`} className={cx(buttonClasses({ size: "md" }), "max-sm:h-9 max-sm:px-3.5 max-sm:text-sm")}>
-                    {t("shopNow")}
-                    <ArrowRight size={16} aria-hidden="true" />
-                  </Link>
-                  <Link href={`/category/${category?.slug}`} className={cx(buttonClasses({ variant: "outline", size: "md" }), "max-sm:hidden")}>
-                    {t("explore", { category: current.name })}
-                  </Link>
-                </>
-              )}
+              <Link href={`/product/${category.featured.slug}`} className={cx(buttonClasses({ size: "md" }), "max-sm:h-9 max-sm:px-3.5 max-sm:text-sm")}>
+                {t("shopNow")}
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+              <Link href={`/category/${category.slug}`} className={cx(buttonClasses({ variant: "outline", size: "md" }), "max-sm:hidden")}>
+                {t("explore", { category: current.name })}
+              </Link>
             </div>
           </div>
           <Orbit items={items} turn={turn} className="w-[150px] flex-none sm:w-auto sm:max-w-[420px] sm:flex-[1_1_0]" />
@@ -234,14 +185,13 @@ export function HeroShowcase({ categories, services = null, title }: { categorie
 
         {/* The spotlight category's next four best sellers, straight over the photo. */}
         <div key={current.id} className="flex flex-col gap-3 lg:w-[310px] lg:flex-none xl:w-[330px]">
-          <div className={cx("flex items-baseline justify-between gap-3 rounded-lg bg-white/80 px-3 py-2 backdrop-blur-sm motion-safe:animate-hero-fade motion-safe:[animation-delay:140ms]", out)}>
-            <p className="m-0 text-sm font-semibold text-navy sm:text-base">{service ? ts("home.servicesTitle") : t("moreIn", { category: current.name })}</p>
-            <Link href={service ? "/services" : `/category/${category?.slug}`} className="text-cap font-semibold whitespace-nowrap text-pri-h hover:text-pri">
-              {t("viewAll", { count: service ? service.services.length : (category?.total ?? 0) })}
+          <div className={cx("flex items-baseline justify-between gap-3 rounded-lg bg-card/80 px-3 py-2 backdrop-blur-sm motion-safe:animate-hero-fade motion-safe:[animation-delay:140ms]", out)}>
+            <p className="m-0 text-sm font-semibold text-head sm:text-base">{t("moreIn", { category: current.name })}</p>
+            <Link href={`/category/${category.slug}`} className="text-cap font-semibold whitespace-nowrap text-pri-h hover:text-pri-fg">
+              {t("viewAll", { count: category.total })}
             </Link>
           </div>
-          {service && <ul className={grid}>{service.services.slice(0, RELATED_MAX).map((s) => tile(s.slug, <ServiceTile service={s} />))}</ul>}
-          {category && category.related.length > 0 && (
+          {category.related.length > 0 && (
             <ul className={grid}>{category.related.slice(0, RELATED_MAX).map((product) => tile(product.id, <HoverProductCard product={product} />))}</ul>
           )}
         </div>
@@ -282,31 +232,6 @@ function CategoryIcon({ category }: { category: { slug: string; name: string } }
   return createElement(categoryIcon(category), { size: 14, "aria-hidden": true });
 }
 
-/** A service beside the Services spotlight: its photo (or icon placeholder) and name, linking to its page. */
-function ServiceTile({ service }: { service: ShowcaseService }) {
-  return (
-    <Link
-      href={`/services/${service.slug}`}
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-bd bg-white text-tx shadow-sh transition-shadow duration-200 hover:shadow-sh2 hover:text-tx"
-    >
-      <ServiceImage image={service.image} icon={service.icon} sizes="(max-width: 700px) 30vw, 130px" iconSize={26} className="aspect-[4/3] w-full" />
-      <span className="p-2">
-        <span className="line-clamp-2 text-cap font-medium group-hover:text-pri">{service.name}</span>
-      </span>
-    </Link>
-  );
-}
-
-/** The one image standing for the services on the orbit: the brand's light tint with the
- * services' wrench (as on the Services entry of the All Categories menu). */
-function ServicesImage({ big }: { big: boolean }) {
-  return (
-    <span className={cx("flex size-full items-center justify-center rounded-2xl border border-bd bg-linear-to-br from-light to-white text-pri", big ? "shadow-sh2" : "shadow-sh")}>
-      <Wrench strokeWidth={1.5} className="size-[42%]" />
-    </span>
-  );
-}
-
 /** The hero's background (owner, 2026-11-18): public/brand/hero-background.jpg across the full
  * width. Since ADR-014 phase 6 it is a drawn living room, a placeholder until a FurniHub photo is
  * approved (the file name and size stay, so replacing it needs no code change). It is served
@@ -317,7 +242,7 @@ function HeroBackdrop() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0">
       <Image src={heroBackground} alt="" fill preload placeholder="blur" sizes="100vw" className="object-cover object-center" />
-      <div className="absolute inset-0 bg-linear-to-b from-white/85 via-white/55 to-white/10 sm:bg-linear-to-r sm:from-white/90 sm:from-10% sm:via-white/50 sm:via-35% sm:to-transparent sm:to-60%" />
+      <div className="absolute inset-0 bg-linear-to-b from-card/85 via-card/55 to-card/10 sm:bg-linear-to-r sm:from-card/90 sm:from-10% sm:via-card/50 sm:via-35% sm:to-transparent sm:to-60%" />
     </div>
   );
 }
@@ -327,7 +252,7 @@ function HeroBackdrop() {
  * transition interpolates the angles), clockwise: from the spotlight at the left (180°) up over the
  * top, down the right and back in from the bottom. The one at the left is large and in front; the
  * others are small and a little faded. */
-function Orbit({ items, turn, className }: { items: ShowcaseItem[]; turn: number; className: string }) {
+function Orbit({ items, turn, className }: { items: ShowcaseCategory[]; turn: number; className: string }) {
   const count = items.length;
   const step = 360 / count;
   const active = turn % count;
@@ -353,18 +278,14 @@ function Orbit({ items, turn, className }: { items: ShowcaseItem[]; turn: number
           >
             <div className="size-full transition-[scale,opacity] duration-[1100ms] ease-soft motion-reduce:transition-none" style={{ scale: big ? 1 : SMALL, opacity: big ? 1 : 0.9 }}>
               <div className="size-full motion-safe:animate-hero-float" style={{ animationDelay: `${i * 700}ms` }}>
-                {isServices(c) ? (
-                  <ServicesImage big={big} />
-                ) : (
-                  <ProductImage
-                    image={c.featured.image}
-                    alt=""
-                    sizes="(max-width: 700px) 150px, 220px"
-                    preload={i === 0}
-                    iconSize={40}
-                    className={cx("size-full rounded-2xl border border-bd bg-white", big ? "p-[6%] shadow-sh2" : "shadow-sh")}
-                  />
-                )}
+                <ProductImage
+                  image={c.featured.image}
+                  alt=""
+                  sizes="(max-width: 700px) 150px, 220px"
+                  preload={i === 0}
+                  iconSize={40}
+                  className={cx("size-full rounded-2xl border border-bd bg-card", big ? "p-[6%] shadow-sh2" : "shadow-sh")}
+                />
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ export function Card({
 }: HTMLAttributes<HTMLDivElement> & { padding?: keyof typeof PADDING; shadow?: boolean }) {
   return (
     <div
-      className={cx("rounded-xl border border-bd bg-white", PADDING[padding], shadow && "shadow-sh", className)}
+      className={cx("rounded-xl border border-bd bg-card", PADDING[padding], shadow && "shadow-sh", className)}
       {...props}
     />
   );

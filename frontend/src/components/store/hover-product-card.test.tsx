@@ -53,7 +53,7 @@ describe("HoverProductCard", () => {
     renderCard(PHONE, "md");
     expect(screen.getByText("128GB · Black")).toBeInTheDocument();
     expect(screen.getByText("Rated 4.5 out of 5 from 2 reviews")).toBeInTheDocument();
-    expect(screen.getByText("RWF 265,500", { exact: false })).toHaveClass("text-err");
+    expect(screen.getByText("RWF 265,500", { exact: false })).toHaveClass("text-err-fg");
     expect(screen.getAllByText("−10%", { exact: false }).length).toBeGreaterThan(0);
   });
 

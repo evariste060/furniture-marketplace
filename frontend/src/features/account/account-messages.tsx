@@ -51,7 +51,7 @@ export function MessagesView() {
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="t-h1 text-navy">{t("mineTitle")}</h1>
+          <h1 className="t-h1 text-head">{t("mineTitle")}</h1>
           <p className="text-tx2">{t("mineText")}</p>
         </div>
         <Link href="/contact" className={buttonClasses({ size: "sm" })}>
@@ -77,7 +77,7 @@ export function MessagesView() {
               <li key={thread.id}>
                 <Link
                   href={`/account/messages/${thread.reference}`}
-                  className="group flex items-center gap-4 rounded-xl border border-bd bg-white p-5 text-tx no-underline hover:border-pri hover:text-tx max-sm:p-4"
+                  className="group flex items-center gap-4 rounded-xl border border-bd bg-card p-5 text-tx no-underline hover:border-pri hover:text-tx max-sm:p-4"
                 >
                   <span className="flex min-w-0 flex-1 flex-col gap-1">
                     <span className="flex flex-wrap items-center gap-2">
@@ -93,7 +93,7 @@ export function MessagesView() {
                       {thread.reference} · {formatDate(thread.last_message_at, "dateTime")}
                     </span>
                   </span>
-                  <ChevronRight size={18} aria-hidden="true" className="flex-none text-tx2 group-hover:text-pri" />
+                  <ChevronRight size={18} aria-hidden="true" className="flex-none text-tx2 group-hover:text-pri-fg" />
                 </Link>
               </li>
             ))}

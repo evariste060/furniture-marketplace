@@ -74,7 +74,7 @@ export function SettingsView() {
     <>
       <PageHeader title={t("title")} description={t("description")} />
       {tabs.length > 1 && (
-        <div role="group" aria-label={t("tabsLabel")} className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl border border-bd bg-white p-1 shadow-sh">
+        <div role="group" aria-label={t("tabsLabel")} className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl border border-bd bg-card p-1 shadow-sh">
           {tabs.map((id) => {
             const on = id === tab;
             const Icon = TAB_ICON[id];
@@ -105,7 +105,7 @@ export function SettingsView() {
 function SettingsCard({ Icon, tone, title, description, aside, children }: { Icon: LucideIcon; tone: string; title: string; description?: ReactNode; aside?: ReactNode; children: ReactNode }) {
   const id = useId();
   return (
-    <section aria-labelledby={id} className="rounded-xl border border-bd bg-white shadow-sh">
+    <section aria-labelledby={id} className="rounded-xl border border-bd bg-card shadow-sh">
       <div className="flex items-start gap-3.5 border-b border-bd px-6 py-4 max-sm:px-4">
         <span aria-hidden="true" className={cx("flex size-10 flex-none items-center justify-center rounded-lg", tone)}>
           <Icon size={20} />
@@ -290,7 +290,7 @@ function StoreForm({ items, manage, t }: { items: Settings; manage: boolean; t: 
           {SOCIAL_NETWORKS.map((network) => (
             <Field key={network} label={SOCIAL_NAMES[network]} error={socialErrors[network]}>
               {(c) => (
-                <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-white focus-within:border-pri focus-within:shadow-focus">
+                <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-card focus-within:border-pri focus-within:shadow-focus">
                   <span className="flex h-full w-11 flex-none items-center justify-center border-r border-bd bg-page text-tx2" aria-hidden="true">
                     <SocialIcon network={network} size={17} />
                   </span>
@@ -374,7 +374,7 @@ function StoreForm({ items, manage, t }: { items: Settings; manage: boolean; t: 
       <SettingsCard Icon={Truck} tone="bg-ok-bg text-ok-tx" title={t("settings.delivery")} description={t("delivery.thresholdHelp")}>
         <Field label={t("delivery.threshold")} error={errors.threshold} className="w-[300px] max-w-full">
           {(c) => (
-            <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-white focus-within:border-pri focus-within:shadow-focus">
+            <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-card focus-within:border-pri focus-within:shadow-focus">
               <span className="flex h-full items-center border-r border-bd bg-page px-3 text-sm font-medium text-tx2">RWF</span>
               <input
                 {...c}
@@ -391,14 +391,14 @@ function StoreForm({ items, manage, t }: { items: Settings; manage: boolean; t: 
 
       {/* Save stays in reach while scrolling through the groups. */}
       {manage ? (
-        <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-bd bg-white px-5 py-3 shadow-sh2">
+        <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-bd bg-card px-5 py-3 shadow-sh2">
           <span className="text-sm text-tx2">{t("settings.saveHint")}</span>
           <Button type="submit" disabled={save.isPending}>
             {t("common.saveChanges")}
           </Button>
         </div>
       ) : (
-        <p className="m-0 rounded-xl border border-bd bg-white px-5 py-3 text-sm text-tx2">{t("settings.readOnly")}</p>
+        <p className="m-0 rounded-xl border border-bd bg-card px-5 py-3 text-sm text-tx2">{t("settings.readOnly")}</p>
       )}
     </form>
   );
@@ -434,7 +434,7 @@ function BannersTab() {
 
   return (
     <>
-      <section className="min-w-0 overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="min-w-0 overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-bd px-6 py-4 max-sm:px-4">
           <div className="flex min-w-0 items-start gap-3.5">
             <span aria-hidden="true" className="flex size-10 flex-none items-center justify-center rounded-lg bg-light text-pri-h">

@@ -60,7 +60,7 @@ export function DeliveryView() {
         }
       />
       {can("settings:read") && <ThresholdCard />}
-      <section className="overflow-hidden rounded-xl border border-bd bg-white">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card">
         {zones.isError ? (
           <LoadError onRetry={() => zones.refetch()} className="m-5" />
         ) : (
@@ -156,7 +156,7 @@ function ThresholdCard() {
     <Card padding={20} className="flex flex-wrap items-end gap-5">
       <Field label={t("delivery.threshold")} error={error ?? undefined} help={current === null && settings.data ? t("delivery.thresholdUnset") : t("delivery.thresholdHelp")} className="w-[300px] max-w-full">
         {(c) => (
-          <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-white focus-within:border-pri">
+          <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-card focus-within:border-pri">
             <span className="flex h-full items-center border-r border-bd bg-page px-3 text-sm font-medium text-tx2">RWF</span>
             <input
               {...c}

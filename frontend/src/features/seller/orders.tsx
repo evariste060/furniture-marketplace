@@ -29,7 +29,7 @@ export function SellerOrdersView() {
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
-      <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <FilterTabs
           label={t("statusLabel")}
           items={[{ id: "", label: t("allStatuses") }, ...SELLER_ORDER_STATUSES.map((s) => ({ id: s, label: ts(s) }))]}

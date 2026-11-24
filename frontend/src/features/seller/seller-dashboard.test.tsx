@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import admin from "../../../messages/admin.json";
 import en from "../../../messages/en.json";
 import { ToastProvider } from "@/components/ui/toast";
+import { ACCOUNT_LINKS, SellerDashboardLink } from "@/features/account/account-shell";
 import { SellerApplicationView } from "@/features/account/seller-application";
 import {
   CatalogScopeProvider,
@@ -353,12 +354,18 @@ describe("a seller order", () => {
 
 const seller = en.store.account.seller;
 
-describe("Sell with us (Account)", () => {
+describe("Seller application wizard (Account, SC-08)", () => {
+  const next = () => screen.getByRole("button", { name: seller.next });
+  /** Fills every step and stops on Review. */
   const fill = async (user: ReturnType<typeof userEvent.setup>) => {
-    await user.type(screen.getByLabelText(seller.name), "Oak Works");
-    await user.type(screen.getByLabelText(seller.email), "sales@oak.rw");
+    await user.type(await screen.findByLabelText(seller.name), "Oak Works");
+    await user.click(next());
+    await user.type(await screen.findByLabelText(seller.email), "sales@oak.rw");
     await user.type(screen.getByLabelText(seller.phone), "0788 123 456");
-    await user.type(screen.getByLabelText(seller.district), "Gasabo");
+    await user.click(next());
+    await user.type(await screen.findByLabelText(seller.district), "Gasabo");
+    await user.click(next());
+    await screen.findByText(new RegExp(seller.stepOf.replace("{step}", "4").replace("{total}", "4")));
   };
 
   it("applies once, then shows the application under review", async () => {
@@ -384,11 +391,23 @@ describe("Sell with us (Account)", () => {
     );
     const user = userEvent.setup();
     wrap(<SellerApplicationView />);
-    await user.click(
-      await screen.findByRole("button", { name: seller.submit }),
-    );
-    expect(api.POST).not.toHaveBeenCalled(); // checked in the browser first
+    // Step 1 of 4: Next is refused until the step is valid, and nothing is sent.
+    expect(
+      await screen.findByText(new RegExp(seller.stepOf.replace("{step}", "1").replace("{total}", "4"))),
+    ).toBeInTheDocument();
+    await user.click(next());
+    expect(await screen.findByText(seller.errors.name)).toBeInTheDocument();
+    expect(screen.getByLabelText(seller.name)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: seller.submit })).toBeNull();
+    // Answers survive going back and forth.
+    await user.type(screen.getByLabelText(seller.name), "Oak Works");
+    await user.click(next());
+    await user.click(screen.getByRole("button", { name: seller.back }));
+    expect(screen.getByLabelText(seller.name)).toHaveValue("Oak Works");
+    await user.clear(screen.getByLabelText(seller.name));
     await fill(user);
+    expect(screen.getByText("Gasabo")).toBeInTheDocument(); // the review
+    expect(api.POST).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: seller.submit }));
     await waitFor(() => expect(api.POST).toHaveBeenCalled());
     const [path, { body }] = api.POST.mock.calls[0];
@@ -416,7 +435,6 @@ describe("Sell with us (Account)", () => {
     );
     const user = userEvent.setup();
     wrap(<SellerApplicationView />);
-    await screen.findByRole("button", { name: seller.submit });
     await fill(user);
     await user.click(screen.getByRole("button", { name: seller.submit }));
     expect(await screen.findByText(seller.verifyFirst)).toBeInTheDocument();
@@ -472,12 +490,56 @@ describe("Sell with us (Account)", () => {
         seller.reason.replace("{reason}", rejected.status_reason),
       ),
     ).toBeInTheDocument();
-    await user.type(screen.getByLabelText(/Street address/), "KG 11 Ave");
-    await user.click(screen.getByRole("button", { name: seller.resubmit }));
+    // The saved answers are filled in: straight to Location, then Review.
+    await user.click(next());
+    await user.click(next());
+    await user.type(await screen.findByLabelText(/Street address/), "KG 11 Ave");
+    await user.click(next());
+    await user.click(await screen.findByRole("button", { name: seller.resubmit }));
     await waitFor(() => expect(api.PUT).toHaveBeenCalled());
     expect(api.PUT.mock.calls[0][1].body).toMatchObject({
       street_address: "KG 11 Ave",
       name: "Oak Works",
     });
+  });
+});
+
+describe("Account menu: Seller Dashboard (SC-08)", () => {
+  const store = (status: string) => ({
+    id: "s1",
+    name: "Oak Works",
+    status,
+    status_reason: null,
+    submitted_at: "2026-11-22T08:00:00Z",
+    contact_email: "sales@oak.rw",
+    contact_phone: "+250788123456",
+    district: "Gasabo",
+  });
+
+  it("has no Sell with us entry", () => {
+    expect(ACCOUNT_LINKS.map((l) => l.href)).not.toContain("/account/seller");
+  });
+
+  it("shows Seller Dashboard only for an approved store", async () => {
+    api.GET.mockImplementation(() => ok(store("approved")));
+    wrap(<SellerDashboardLink enabled className="" />);
+    expect(await screen.findByRole("link", { name: en.store.account.nav.sellerDashboard })).toHaveAttribute("href", "/seller");
+  });
+
+  it.each(["pending", "rejected", "suspended"])("shows nothing while the store is %s", async (status) => {
+    api.GET.mockImplementation(() => ok(store(status)));
+    wrap(<SellerDashboardLink enabled className="" />);
+    await waitFor(() => expect(api.GET).toHaveBeenCalled());
+    expect(screen.queryByRole("link", { name: en.store.account.nav.sellerDashboard })).toBeNull();
+  });
+
+  it("shows nothing without an application, and asks nothing before sign-in", async () => {
+    api.GET.mockImplementation(() => refused(404, "store_not_found"));
+    const { unmount } = wrap(<SellerDashboardLink enabled={false} className="" />);
+    expect(api.GET).not.toHaveBeenCalled();
+    unmount();
+    wrap(<SellerDashboardLink enabled className="" />);
+    await waitFor(() => expect(api.GET).toHaveBeenCalled());
+    expect(screen.queryByRole("link", { name: en.store.account.nav.sellerDashboard })).toBeNull();
   });
 });

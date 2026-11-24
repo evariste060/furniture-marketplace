@@ -59,7 +59,7 @@ export function Dialog({ open, onClose, title, closeLabel, children, footer, cla
       ref={ref}
       aria-labelledby={titleId}
       className={cx(
-        "m-auto w-[calc(100%-32px)] max-w-[480px] rounded-xl border border-bd bg-white p-0 text-tx shadow-sh2 backdrop:bg-overlay",
+        "m-auto w-[calc(100%-32px)] max-w-[480px] rounded-xl border border-bd bg-card p-0 text-tx shadow-sh2 backdrop:bg-overlay",
         className,
       )}
     >
@@ -117,7 +117,7 @@ export function Drawer({
         if (event.target === event.currentTarget) onClose();
       }}
       className={cx(
-        "fixed m-0 border-0 bg-white p-0 text-tx shadow-sh2 backdrop:bg-overlay",
+        "fixed m-0 border-0 bg-card p-0 text-tx shadow-sh2 backdrop:bg-overlay",
         SIDES[side],
         className,
       )}

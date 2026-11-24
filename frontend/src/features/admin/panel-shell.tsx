@@ -58,7 +58,7 @@ export function PanelShell({
 
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-card focus:px-3 focus:py-2">
         {t("skipToContent")}
       </a>
       <div className="flex min-h-dvh bg-page">
@@ -72,14 +72,14 @@ export function PanelShell({
           </div>
         )}
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex min-h-[68px] flex-wrap items-center gap-5 border-b border-bd bg-white px-7 py-3 max-md:gap-3 max-md:px-4">
+          <header className="sticky top-0 z-30 flex min-h-[68px] flex-wrap items-center gap-5 border-b border-bd bg-card px-7 py-3 max-md:gap-3 max-md:px-4">
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
               aria-label={t("openMenu")}
               aria-expanded={menuOpen}
               aria-controls="admin-menu"
-              className="flex size-10 cursor-pointer items-center justify-center rounded-lg border border-bd bg-white text-tx transition-colors duration-150 hover:bg-page lg:hidden"
+              className="flex size-10 cursor-pointer items-center justify-center rounded-lg border border-bd bg-card text-tx transition-colors duration-150 hover:bg-page lg:hidden"
             >
               <Menu size={20} aria-hidden="true" />
             </button>
@@ -130,7 +130,7 @@ function Sidebar({
     <div className="flex min-h-full w-full flex-col">
       <div className="flex items-start justify-between gap-2 px-5 pt-[18px] pb-4">
         <div className="flex flex-col gap-1.5">
-          <NextLink href={home} aria-label={homeLabel} className="block w-fit rounded-lg bg-white px-2.5 py-1.5">
+          <NextLink href={home} aria-label={homeLabel} className="block w-fit rounded-lg bg-card px-2.5 py-1.5">
             <Logo height={34} alt="" />
           </NextLink>
           <span className="text-cap text-odm">{panelLabel}</span>
@@ -237,7 +237,7 @@ export function useDismiss(open: boolean, close: () => void, box: RefObject<HTML
   }, [open, close, box, button]);
 }
 
-export const POPUP = "absolute top-[calc(100%+8px)] right-0 z-40 m-0 rounded-xl border border-bd bg-white shadow-sh2";
+export const POPUP = "absolute top-[calc(100%+8px)] right-0 z-40 m-0 rounded-xl border border-bd bg-card shadow-sh2";
 export const TOP_BUTTON =
   "flex h-10 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent bg-transparent px-2.5 text-sm font-medium text-tx transition-colors duration-150 hover:bg-page aria-expanded:border-bd aria-expanded:bg-page motion-reduce:transition-none";
 

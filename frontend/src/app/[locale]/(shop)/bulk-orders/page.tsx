@@ -36,7 +36,7 @@ export default async function BulkOrdersPage() {
                   <li key={title} className="relative flex items-start gap-3.5 pb-5 last:pb-0">
                     {/* The line joining each step to the next. */}
                     {i < steps.length - 1 && <span aria-hidden="true" className="absolute top-11 bottom-1 left-5 w-0.5 -translate-x-1/2 rounded-full bg-bd" />}
-                    <span aria-hidden="true" className="relative flex size-10 flex-none items-center justify-center rounded-full bg-light text-pri">
+                    <span aria-hidden="true" className="relative flex size-10 flex-none items-center justify-center rounded-full bg-light text-pri-fg">
                       <Icon size={20} />
                     </span>
                     <span className="flex min-w-0 flex-col gap-0.5">

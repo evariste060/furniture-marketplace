@@ -118,7 +118,7 @@ export function CategoryLinks({ items }: { items: CategoryLinkItem[] }) {
                       onClick={close}
                       className={cx(
                         "flex items-center rounded-md px-3 py-2 text-sm font-semibold transition-colors duration-150 motion-reduce:transition-none",
-                        at(c.slug) ? "bg-light text-pri-h" : "text-tx hover:bg-page hover:text-pri",
+                        at(c.slug) ? "bg-light text-pri-h" : "text-tx hover:bg-page hover:text-pri-fg",
                       )}
                     >
                       {c.name}
@@ -147,7 +147,7 @@ function SubcategoryList({ items, at, onPick, nested = false }: { items: Categor
             onClick={onPick}
             className={cx(
               "flex items-center rounded-md px-3 py-2 text-sm transition-colors duration-150 motion-reduce:transition-none",
-              at(s.slug) ? "bg-light font-medium text-pri-h" : "text-tx hover:bg-page hover:text-pri",
+              at(s.slug) ? "bg-light font-medium text-pri-h" : "text-tx hover:bg-page hover:text-pri-fg",
             )}
           >
             {s.name}

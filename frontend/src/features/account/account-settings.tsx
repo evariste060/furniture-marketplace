@@ -77,7 +77,7 @@ export function AddressesView() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="t-h1 text-navy">{t("addressesTitle")}</h1>
+        <h1 className="t-h1 text-head">{t("addressesTitle")}</h1>
         <Button size="sm" onClick={() => setEditing("new")}>
           <Plus size={16} aria-hidden="true" />
           {t("addAddress")}
@@ -103,7 +103,7 @@ export function AddressesView() {
               <article
                 key={a.id}
                 aria-label={a.label || tc("addressFallback")}
-                className={cx("flex flex-col gap-1.5 rounded-xl bg-white", a.is_default ? "border-2 border-pri p-[19px]" : "border border-bd p-5")}
+                className={cx("flex flex-col gap-1.5 rounded-xl bg-card", a.is_default ? "border-2 border-pri p-[19px]" : "border border-bd p-5")}
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <b className="font-semibold">{a.label || tc("addressFallback")}</b>
@@ -120,11 +120,11 @@ export function AddressesView() {
                   </Badge>
                 )}
                 <div className="flex flex-wrap gap-4 pt-1.5">
-                  <button type="button" className={cx(linkButton, "text-pri")} onClick={() => setEditing(a)}>
+                  <button type="button" className={cx(linkButton, "text-pri-fg")} onClick={() => setEditing(a)}>
                     {t("edit")}
                     <span className="sr-only"> {a.label || tc("addressFallback")}</span>
                   </button>
-                  <button type="button" className={cx(linkButton, "text-err")} onClick={() => setDeleting(a)}>
+                  <button type="button" className={cx(linkButton, "text-err-fg")} onClick={() => setDeleting(a)}>
                     {t("delete")}
                     <span className="sr-only"> {a.label || tc("addressFallback")}</span>
                   </button>
@@ -322,7 +322,7 @@ export function ProfileView() {
   const methods = useSignInMethods();
   return (
     <div className="flex max-w-[820px] flex-col gap-4">
-      <h1 className="t-h1 text-navy">{t("profileTitle")}</h1>
+      <h1 className="t-h1 text-head">{t("profileTitle")}</h1>
       {profile.isPending ? (
         <Skeleton className="h-64 w-full rounded-xl" />
       ) : profile.isError || !profile.data ? (
@@ -382,7 +382,7 @@ function DetailsForm({ fullName, phone: initialPhone, email }: { fullName: strin
   }
 
   return (
-    <form ref={form} onSubmit={onSubmit} noValidate aria-labelledby="details-title" className="flex flex-col gap-4 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+    <form ref={form} onSubmit={onSubmit} noValidate aria-labelledby="details-title" className="flex flex-col gap-4 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
       <h2 id="details-title" className="t-h3">
         {t("personalDetails")}
       </h2>
@@ -463,7 +463,7 @@ function PasswordForm() {
   }
 
   return (
-    <form ref={form} onSubmit={onSubmit} noValidate aria-labelledby="password-title" className="flex flex-col gap-4 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+    <form ref={form} onSubmit={onSubmit} noValidate aria-labelledby="password-title" className="flex flex-col gap-4 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
       <h2 id="password-title" className="t-h3">
         {t("changePassword")}
       </h2>
@@ -516,7 +516,7 @@ function ConnectedAccounts({ methods }: { methods: ReturnType<typeof useSignInMe
 
   const data = methods.data;
   return (
-    <section aria-labelledby="connected-title" className="flex flex-col gap-4 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+    <section aria-labelledby="connected-title" className="flex flex-col gap-4 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
       <h2 id="connected-title" className="t-h3">
         {t("connectedTitle")}
       </h2>
@@ -577,7 +577,7 @@ function ConnectedAccounts({ methods }: { methods: ReturnType<typeof useSignInMe
 function SetPassword() {
   const t = useTranslations("store.account");
   return (
-    <section aria-labelledby="set-password-title" className="flex flex-col items-start gap-3 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+    <section aria-labelledby="set-password-title" className="flex flex-col items-start gap-3 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
       <h2 id="set-password-title" className="t-h3">
         {t("setPasswordTitle")}
       </h2>
@@ -602,7 +602,7 @@ function LogoutEverywhere() {
     await client.invalidateQueries();
   }
   return (
-    <section aria-labelledby="logout-all-title" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-err-bd bg-white p-6 max-sm:p-4">
+    <section aria-labelledby="logout-all-title" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-err-bd bg-card p-6 max-sm:p-4">
       <span className="flex flex-col gap-0.5">
         <b id="logout-all-title" className="font-semibold">
           {t("logoutAllTitle")}

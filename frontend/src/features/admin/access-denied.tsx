@@ -17,7 +17,7 @@ export async function AccessDenied({ area }: { area?: NavKey }) {
   }
   return (
     <div className="flex justify-center pt-24 max-md:pt-8">
-      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-white p-8 text-center">
+      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-card p-8 text-center">
         <span aria-hidden="true" className="flex size-20 items-center justify-center rounded-full bg-warn-bg text-warn-tx">
           <Lock size={32} />
         </span>

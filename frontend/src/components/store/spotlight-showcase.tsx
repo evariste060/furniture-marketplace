@@ -76,9 +76,9 @@ export function SpotlightShowcase({ product }: { product: ShowcaseProduct }) {
   return (
     <div ref={root} className="flex flex-col">
       <div className="relative">
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="group/photo relative block h-72 overflow-hidden bg-white sm:h-80 lg:h-[360px]">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="group/photo relative block h-72 overflow-hidden bg-card sm:h-80 lg:h-[360px]">
           {count === 0 ? (
-            <ProductImage image={null} alt="" sizes="1px" iconSize={64} className="absolute! inset-0 size-full bg-white" />
+            <ProductImage image={null} alt="" sizes="1px" iconSize={64} className="absolute! inset-0 size-full bg-card" />
           ) : (
             product.images.map((image, i) => (
               <ProductImage
@@ -89,7 +89,7 @@ export function SpotlightShowcase({ product }: { product: ShowcaseProduct }) {
                 preload={i === 0}
                 iconSize={64}
                 className={cx(
-                  "absolute! inset-3 size-auto! bg-white transition-[opacity,scale] duration-700 ease-soft motion-reduce:transition-none sm:inset-4",
+                  "absolute! inset-3 size-auto! bg-card transition-[opacity,scale] duration-700 ease-soft motion-reduce:transition-none sm:inset-4",
                   i === shown ? "scale-100 opacity-100" : "scale-[1.04] opacity-0",
                   "group-hover/photo:scale-[1.03] motion-reduce:scale-100!",
                 )}
@@ -121,7 +121,7 @@ export function SpotlightShowcase({ product }: { product: ShowcaseProduct }) {
         )}
       </div>
       <div className="flex flex-col gap-2 border-t border-bd p-4 sm:p-5">
-        <Link href={href} className="line-clamp-2 text-h3 font-bold text-navy hover:text-pri-h sm:text-h2">
+        <Link href={href} className="line-clamp-2 text-h3 font-bold text-head hover:text-pri-h sm:text-h2">
           {product.name}
         </Link>
         {(!!product.detail || !!product.rating?.count) && (
@@ -136,7 +136,7 @@ export function SpotlightShowcase({ product }: { product: ShowcaseProduct }) {
         )}
         {product.price !== null && (
           <p className="m-0 flex flex-wrap items-baseline gap-x-2">
-            <span className={cx("text-h2 font-extrabold sm:text-price-l", discounted ? "text-err" : "text-pri-h")}>
+            <span className={cx("text-h2 font-extrabold sm:text-price-l", discounted ? "text-err-fg" : "text-pri-h")}>
               {discounted && <span className="sr-only">{tp("discount", { percent: product.discount ?? 0 })} </span>}
               {formatMoney(product.price)}
             </span>

@@ -25,7 +25,7 @@ export default async function DealsPage({ searchParams }: PageProps<"/[locale]/d
       <section className="bg-light">
         <div className="wrap flex flex-col gap-2.5 py-5 sm:py-8">
           <Breadcrumb label={tu("breadcrumb")} items={[{ label: th("home"), href: home }, { label: t("title") }]} />
-          <h1 className="t-h1 text-navy">{t("title")}</h1>
+          <h1 className="t-h1 text-head">{t("title")}</h1>
           <p className="max-w-[560px] text-tx2">{t("text")}</p>
           <Suspense fallback={<span className="h-5" />}>
             <ShowingCount searchParams={searchParams} base={BASE} />

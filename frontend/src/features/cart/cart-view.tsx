@@ -58,7 +58,7 @@ function Heading({ count }: { count: number | null }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="flex flex-col gap-1.5">
-        <h1 className="t-h1 text-navy">{t("title")}</h1>
+        <h1 className="t-h1 text-head">{t("title")}</h1>
         {count !== null && <p className="text-tx2">{t("count", { count })}</p>}
       </div>
       <Link href="/" className="flex items-center gap-1.5 text-sm font-medium">
@@ -123,7 +123,7 @@ function FilledCart({ cart }: { cart: Cart }) {
       <Heading count={units} />
       {(cart.has_price_changes || blocked.length > 0) && <ChangesBanner cart={cart} />}
       <div className="flex flex-wrap items-start gap-6">
-        <section aria-label={t("itemsLabel")} className="flex min-w-0 flex-[999_1_560px] flex-col gap-3 sm:gap-0 sm:rounded-xl sm:border sm:border-bd sm:bg-white sm:p-6">
+        <section aria-label={t("itemsLabel")} className="flex min-w-0 flex-[999_1_560px] flex-col gap-3 sm:gap-0 sm:rounded-xl sm:border sm:border-bd sm:bg-card sm:p-6">
           <div className="hidden gap-5 border-b border-bd pb-3 text-cap font-semibold text-mut sm:flex">
             <span className="flex-1">{t("product")}</span>
             <span className="w-[120px]">{t("price")}</span>
@@ -145,7 +145,7 @@ function FilledCart({ cart }: { cart: Cart }) {
             {cart.discount?.applied && (
               <div className="kv">
                 <span>{t("discount", { code: cart.discount.code })}</span>
-                <b className="font-medium text-err">−{formatMoney(cart.discount_total)}</b>
+                <b className="font-medium text-err-fg">−{formatMoney(cart.discount_total)}</b>
               </div>
             )}
             <div className="kv">
@@ -161,7 +161,7 @@ function FilledCart({ cart }: { cart: Cart }) {
             <hr className="hr" />
             <div className="flex items-center justify-between">
               <span className="t-h4">{t("total")}</span>
-              <span className="t-price text-navy">{formatMoney(cart.subtotal_after_discount)}</span>
+              <span className="t-price text-head">{formatMoney(cart.subtotal_after_discount)}</span>
             </div>
             <p className="text-cap text-mut">{t("vatNote")}</p>
           </Card>
@@ -177,7 +177,7 @@ function FilledCart({ cart }: { cart: Cart }) {
         </aside>
       </div>
       {/* MobileCart.dc.html: the total and the checkout button stay at the bottom of the screen. */}
-      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-1.5 border-t border-bd bg-white px-4 pt-3 pb-4 sm:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-20 flex flex-col gap-1.5 border-t border-bd bg-card px-4 pt-3 pb-4 sm:hidden">
         <div className="flex items-center justify-between text-sm">
           <span className="text-tx2">{t("total")}</span>
           <b className="font-bold">{formatMoney(cart.subtotal_after_discount)}</b>
@@ -291,7 +291,7 @@ function LineRow({ line }: { line: CartLine }) {
   return (
     <div
       className={cx(
-        "flex items-start gap-3 rounded-xl border border-bd bg-white p-3",
+        "flex items-start gap-3 rounded-xl border border-bd bg-card p-3",
         "sm:flex-wrap sm:items-center sm:gap-5 sm:rounded-none sm:border-0 sm:border-b sm:p-0 sm:py-5",
         gone && "opacity-60",
       )}
@@ -325,7 +325,7 @@ function LineRow({ line }: { line: CartLine }) {
               disabled={busy}
               onClick={onRemove}
               aria-label={`${t("remove")}: ${line.product_name}`}
-              className="hidden cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-cap font-medium text-err sm:flex"
+              className="hidden cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-cap font-medium text-err-fg sm:flex"
             >
               <Trash2 size={14} aria-hidden="true" />
               {t("remove")}
@@ -339,7 +339,7 @@ function LineRow({ line }: { line: CartLine }) {
             disabled={busy}
             onClick={onRemove}
             aria-label={`${t("remove")}: ${line.product_name}`}
-            className="flex size-10 cursor-pointer items-center justify-center border-0 bg-transparent text-err sm:hidden"
+            className="flex size-10 cursor-pointer items-center justify-center border-0 bg-transparent text-err-fg sm:hidden"
           >
             <Trash2 size={18} aria-hidden="true" />
           </button>
@@ -381,7 +381,7 @@ function Stepper({
         aria-label={t("decrease")}
         disabled={disabled || line.quantity <= 1}
         onClick={() => onChange(line.quantity - 1)}
-        className={cx("flex h-full cursor-pointer items-center justify-center border-0 bg-white text-tx2 disabled:cursor-not-allowed disabled:opacity-45", size)}
+        className={cx("flex h-full cursor-pointer items-center justify-center border-0 bg-card text-tx2 disabled:cursor-not-allowed disabled:opacity-45", size)}
       >
         <Minus size={14} aria-hidden="true" />
       </button>
@@ -393,7 +393,7 @@ function Stepper({
         aria-label={t("increase")}
         disabled={disabled || line.quantity >= MAX_LINE_QUANTITY}
         onClick={() => onChange(line.quantity + 1)}
-        className={cx("flex h-full cursor-pointer items-center justify-center border-0 bg-white text-tx2 disabled:cursor-not-allowed disabled:opacity-45", size)}
+        className={cx("flex h-full cursor-pointer items-center justify-center border-0 bg-card text-tx2 disabled:cursor-not-allowed disabled:opacity-45", size)}
       >
         <Plus size={14} aria-hidden="true" />
       </button>
@@ -482,7 +482,7 @@ function DiscountCode({ cart }: { cart: Cart }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-bd bg-white p-4 sm:rounded-none sm:border-0 sm:p-0 sm:pt-5">
+    <div className="flex flex-col gap-3 rounded-xl border border-bd bg-card p-4 sm:rounded-none sm:border-0 sm:p-0 sm:pt-5">
       {current && (
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <Badge tone={current.applied ? "soft-ok" : "soft-err"}>
@@ -496,7 +496,7 @@ function DiscountCode({ cart }: { cart: Cart }) {
             type="button"
             disabled={removeCode.isPending}
             onClick={() => removeCode.mutate(undefined, { onError: () => toast.show(t("updateFailed"), "error") })}
-            className="cursor-pointer border-0 bg-transparent p-0 text-sm font-medium text-pri"
+            className="cursor-pointer border-0 bg-transparent p-0 text-sm font-medium text-pri-fg"
           >
             {t("removeCode")}
           </button>

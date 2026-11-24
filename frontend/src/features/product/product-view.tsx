@@ -85,7 +85,7 @@ export function ProductGallery() {
         sizes={IMAGE_SIZES.gallery}
         iconSize={64}
         preload
-        className="h-[340px] w-full rounded-none bg-white sm:h-[480px] sm:rounded-2xl sm:border sm:border-bd"
+        className="h-[340px] w-full rounded-none bg-card sm:h-[480px] sm:rounded-2xl sm:border sm:border-bd"
       />
       {images.length > 1 && (
         <>
@@ -98,7 +98,7 @@ export function ProductGallery() {
                 aria-pressed={i === index}
                 onClick={() => setChosen(i)}
                 className={cx(
-                  "cursor-pointer overflow-hidden rounded-img bg-white p-0",
+                  "cursor-pointer overflow-hidden rounded-img bg-card p-0",
                   i === index ? "border-2 border-pri" : "border border-bd",
                 )}
               >
@@ -186,7 +186,7 @@ function Options() {
                     onClick={() => target && setVariant(target)}
                     className={cx(
                       "flex cursor-pointer flex-col items-start gap-0.5 rounded-[10px] text-left",
-                      on ? "border-2 border-pri bg-light px-4 py-2.5" : "border border-bd bg-white px-[17px] py-[11px]",
+                      on ? "border-2 border-pri bg-light px-4 py-2.5" : "border border-bd bg-card px-[17px] py-[11px]",
                       out && !on && "bg-subtle",
                     )}
                   >
@@ -249,7 +249,7 @@ function Quantity() {
   const t = useTranslations("store.productPage");
   const { quantity, setQuantity, variant } = useProduct();
   const disabled = !variant?.in_stock;
-  const step = "flex h-full w-10 cursor-pointer items-center justify-center border-0 bg-white text-tx2 disabled:cursor-not-allowed disabled:text-bd2";
+  const step = "flex h-full w-10 cursor-pointer items-center justify-center border-0 bg-card text-tx2 disabled:cursor-not-allowed disabled:text-bd2";
   return (
     <div role="group" aria-label={t("quantity")} className="flex h-11 overflow-hidden rounded-lg border border-bd">
       <button type="button" aria-label={t("decrease")} className={step} disabled={disabled || quantity <= 1} onClick={() => setQuantity(quantity - 1)}>
@@ -282,7 +282,7 @@ export function PurchasePanel({ description }: { description: string | null }) {
     <>
       <div className="flex flex-wrap items-center gap-3">
         {variant && (
-          <span className={cx("t-price-l max-sm:text-2xl", discount ? "text-err" : "text-navy")}>{formatMoney(variant.price)}</span>
+          <span className={cx("t-price-l max-sm:text-2xl", discount ? "text-err-fg" : "text-head")}>{formatMoney(variant.price)}</span>
         )}
         {variant && discount && (
           <>
@@ -329,7 +329,7 @@ export function MobileBuyBar() {
   const tp = useTranslations("store.product");
   const buy = useBuy();
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 flex h-16 items-center gap-2.5 border-t border-bd bg-white px-4 shadow-[0_-4px_16px_rgba(13,31,64,.06)] sm:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-20 flex h-16 items-center gap-2.5 border-t border-bd bg-card px-4 shadow-[0_-4px_16px_rgba(13,31,64,.06)] sm:hidden">
       <Button variant="outline" className="flex-1" disabled={!buy.can || buy.pending} onClick={() => buy.run("toast")}>
         <ShoppingCart size={18} aria-hidden="true" />
         {buy.can ? tp("addToCart") : t("outOfStock")}

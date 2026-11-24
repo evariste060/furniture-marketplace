@@ -1,7 +1,6 @@
 import {
   Building2,
   ChartLine,
-  ClipboardCheck,
   Headset,
   History,
   House,
@@ -13,7 +12,6 @@ import {
   Store,
   Tag,
   Users,
-  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,12 +57,10 @@ export type NavKey =
   | "promotions"
   | "reviews"
   | "messages"
-  | "serviceRequests"
   | "quotes"
   | "analytics"
   | "settings"
   | "delivery"
-  | "services"
   | "staff"
   | "audit";
 
@@ -80,8 +76,8 @@ export type NavItem = {
 
 /** The marketplace administrator's sidebar (SC-06, ADR-014 phase 7): marketplace governance,
  * platform support, analytics and platform settings. Store operations (orders, payments, stock,
- * catalogue editing, imports) are the sellers' and have no page here. Service and quote requests
- * stay under Support while those services are FurniHub's own. */
+ * catalogue editing, imports) are the sellers' and have no page here. Quote requests stay under
+ * Support; Services and service requests were removed (SC-07). */
 export const NAV: {
   group: "overview" | "marketplace" | "support" | "insights" | "platform";
   items: NavItem[];
@@ -144,12 +140,6 @@ export const NAV: {
         anyOf: ["support:read"],
       },
       {
-        key: "serviceRequests",
-        href: "/admin/service-requests",
-        Icon: ClipboardCheck,
-        anyOf: ["services:read"],
-      },
-      {
         key: "quotes",
         href: "/admin/quotes",
         Icon: Building2,
@@ -182,12 +172,6 @@ export const NAV: {
         href: "/admin/delivery",
         Icon: MapPin,
         anyOf: ["delivery:read"],
-      },
-      {
-        key: "services",
-        href: "/admin/services",
-        Icon: Wrench,
-        anyOf: ["services:read"],
       },
       {
         key: "staff",

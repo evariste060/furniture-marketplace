@@ -98,7 +98,7 @@ export function QuotesView() {
         }))}
       />
 
-      <section aria-label={t("listLabel")} className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section aria-label={t("listLabel")} className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <ListHeading Icon={LOOK[status].Icon} chip={LOOK[status].chip} title={t(`tiles.${status || "all"}`)} total={list.data?.total} />
         {list.isError ? (
           <LoadError onRetry={() => list.refetch()} className="m-4" />
@@ -254,7 +254,7 @@ function QuoteDetail({ quote, now }: { quote: Quote; now: number }) {
                   disabled={current || change.isPending}
                   onClick={() => change.mutate(s)}
                   className={cx(
-                    "group flex w-full flex-col items-center gap-1.5 rounded-lg border bg-white px-2 py-3 text-center transition-[border-color,box-shadow] duration-150 motion-reduce:transition-none",
+                    "group flex w-full flex-col items-center gap-1.5 rounded-lg border bg-card px-2 py-3 text-center transition-[border-color,box-shadow] duration-150 motion-reduce:transition-none",
                     current ? "cursor-default border-pri ring-1 ring-pri" : "cursor-pointer border-bd hover:border-bd2 hover:shadow-sh disabled:cursor-wait disabled:opacity-60",
                   )}
                 >
@@ -262,12 +262,12 @@ function QuoteDetail({ quote, now }: { quote: Quote; now: number }) {
                     aria-hidden="true"
                     className={cx(
                       "flex size-8 items-center justify-center rounded-full text-cap font-semibold",
-                      done ? "bg-ok-tx text-white" : current ? "bg-pri text-white ring-4 ring-light" : "border border-bd2 bg-white text-tx2",
+                      done ? "bg-ok-tx text-white" : current ? "bg-pri text-white ring-4 ring-light" : "border border-bd2 bg-card text-tx2",
                     )}
                   >
                     {done ? <Check size={15} /> : i + 1}
                   </span>
-                  <span className={cx("max-w-full truncate text-sm", current ? "font-semibold text-navy" : "font-medium text-tx2 group-hover:text-tx")}>{t(`status.${s}`)}</span>
+                  <span className={cx("max-w-full truncate text-sm", current ? "font-semibold text-head" : "font-medium text-tx2 group-hover:text-tx")}>{t(`status.${s}`)}</span>
                   {!current && <span className="sr-only">{t(`mark.${s}`)}</span>}
                 </button>
               </li>
@@ -330,8 +330,8 @@ function QuoteDetail({ quote, now }: { quote: Quote; now: number }) {
         </dl>
         {/* In their words. */}
         {quote.message && (
-          <figure className="m-0 flex gap-3 rounded-xl border border-bd bg-white p-4">
-            <MessageSquareText size={18} aria-hidden="true" className="mt-0.5 flex-none text-pri" />
+          <figure className="m-0 flex gap-3 rounded-xl border border-bd bg-card p-4">
+            <MessageSquareText size={18} aria-hidden="true" className="mt-0.5 flex-none text-pri-fg" />
             <blockquote className="m-0 flex flex-col gap-1">
               <span className="text-cap font-semibold text-tx2">{t("message")}</span>
               <p className="m-0 break-words whitespace-pre-line text-tx">{quote.message}</p>

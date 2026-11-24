@@ -52,7 +52,7 @@ function usePendingFacets(base: BaseQuery, applied: Filters, pending: Filters, i
     placeholderData: keepPreviousData,
     queryFn: async () => {
       const { data, error, response } = await browserApi.GET("/api/v1/catalog/facets", {
-        params: { query: { ...base, ...filterQuery(pending), brand: [...(base.brand ?? []), ...pending.brands] } },
+        params: { query: { ...base, ...filterQuery(pending) } },
       });
       if (!data) throw ApiError.from(response.status, error);
       return data;
@@ -68,7 +68,6 @@ function useFilterState(state: ListingState, basePath: string, keepCategory = fa
   const applied: Filters = useMemo(
     () => ({
       category: state.category,
-      brands: state.brands,
       minPrice: state.minPrice,
       maxPrice: state.maxPrice,
       stock: state.stock,
@@ -91,8 +90,6 @@ function useFilterState(state: ListingState, basePath: string, keepCategory = fa
     },
     reset: () => setPending(applied),
     setCategory: (slug: string | null) => setPending((f) => ({ ...f, category: slug })),
-    toggleBrand: (slug: string) =>
-      setPending((f) => ({ ...f, brands: f.brands.includes(slug) ? f.brands.filter((b) => b !== slug) : [...f.brands, slug] })),
     setBand: (band: PriceBand | null) =>
       setPending((f) => ({ ...f, minPrice: band?.min_price ?? null, maxPrice: band?.max_price ?? null })),
     toggleStock: (choice: StockChoice) =>
@@ -133,11 +130,11 @@ function SubcategoryGroup({ sub, state }: { sub: SubcategoryFilter; state: Listi
             <Link
               href={c.href}
               aria-current={c.on ? "page" : undefined}
-              className={cx("flex items-center gap-2 rounded-md py-1 text-sm no-underline", c.on ? "font-semibold text-pri-h" : "text-tx hover:text-pri")}
+              className={cx("flex items-center gap-2 rounded-md py-1 text-sm no-underline", c.on ? "font-semibold text-pri-h" : "text-tx hover:text-pri-fg")}
             >
               <span
                 aria-hidden="true"
-                className={cx("flex size-4 flex-none items-center justify-center rounded-full border", c.on ? "border-pri" : "border-bd2 bg-white")}
+                className={cx("flex size-4 flex-none items-center justify-center rounded-full border", c.on ? "border-pri" : "border-bd2 bg-card")}
               >
                 {c.on && <span className="size-2 rounded-full bg-pri" />}
               </span>
@@ -189,7 +186,7 @@ export function FilterPanel({ state, facets: initial, basePath, base, first = "b
   return (
     <aside
       aria-label={t("filters")}
-      className="sticky top-[calc(var(--store-header-h)+1rem)] hidden max-h-[calc(100dvh-var(--store-header-h)-2rem)] max-w-[300px] flex-[1_1_260px] overflow-y-auto overscroll-contain rounded-xl border border-bd bg-white p-5 lg:block"
+      className="sticky top-[calc(var(--store-header-h)+1rem)] hidden max-h-[calc(100dvh-var(--store-header-h)-2rem)] max-w-[300px] flex-[1_1_260px] overflow-y-auto overscroll-contain rounded-xl border border-bd bg-card p-5 lg:block"
     >
       <div className="flex items-center justify-between pb-4">
         <h2 className="t-h3">{t("filters")}</h2>
@@ -209,13 +206,6 @@ export function FilterPanel({ state, facets: initial, basePath, base, first = "b
               checked={f.pending.category === c.slug}
               onChange={() => f.setCategory(c.slug)}
             />
-          ))}
-        </Group>
-      )}
-      {first === "brand" && facets.brands.length > 0 && (
-        <Group legend={t("brand")}>
-          {facets.brands.map((b) => (
-            <Checkbox key={b.slug} label={n(b.name, b.count)} checked={f.pending.brands.includes(b.slug)} onChange={() => f.toggleBrand(b.slug)} />
           ))}
         </Group>
       )}
@@ -278,7 +268,7 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
       onClick={onClick}
       className={cx(
         "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-4 py-[7px] text-sm font-medium",
-        on ? "border-pri bg-light text-pri-h" : "border-bd bg-white text-tx",
+        on ? "border-pri bg-light text-pri-h" : "border-bd bg-card text-tx",
       )}
     >
       {children}
@@ -353,7 +343,7 @@ export function FilterSheet({
                   onClick={() => setOpen(false)}
                   className={cx(
                     "inline-flex items-center rounded-full border px-4 py-[7px] text-sm font-medium no-underline",
-                    c.on ? "border-pri bg-light text-pri-h" : "border-bd bg-white text-tx",
+                    c.on ? "border-pri bg-light text-pri-h" : "border-bd bg-card text-tx",
                   )}
                 >
                   {c.name}
@@ -371,15 +361,6 @@ export function FilterSheet({
                   </Chip>
                 );
               })}
-            </SheetGroup>
-          )}
-          {first === "brand" && facets.brands.length > 0 && (
-            <SheetGroup title={t("brand")}>
-              {facets.brands.map((b) => (
-                <Chip key={b.slug} on={f.pending.brands.includes(b.slug)} onClick={() => f.toggleBrand(b.slug)}>
-                  {b.name}
-                </Chip>
-              ))}
             </SheetGroup>
           )}
           {attributeGroups(facets, f.pending).map((group) => (

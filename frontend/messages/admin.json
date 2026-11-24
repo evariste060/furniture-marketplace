@@ -18,12 +18,10 @@
       "promotions": "Promotions",
       "reviews": "Reviews & Moderation",
       "messages": "Platform support",
-      "serviceRequests": "Service requests",
       "quotes": "Quote requests",
       "analytics": "Analytics & Reports",
       "settings": "Platform settings",
       "delivery": "Delivery zones",
-      "services": "Services",
       "staff": "Administrators",
       "audit": "Audit Log"
     },
@@ -52,8 +50,7 @@
       "sellers": "{count, plural, one {# seller application to review} other {# seller applications to review}}",
       "messages": "{count, plural, one {# message to reply to} other {# messages to reply to}}",
       "quotes": "{count, plural, one {# new quote request} other {# new quote requests}}",
-      "reviews": "{count, plural, one {# review to approve} other {# reviews to approve}}",
-      "serviceRequests": "{count, plural, one {# new service request} other {# new service requests}}"
+      "reviews": "{count, plural, one {# review to approve} other {# reviews to approve}}"
     }
   },
   "denied": {
@@ -190,10 +187,6 @@
       "messages": {
         "title": "Support conversations",
         "body": "{count, plural, =0 {No conversations are open.} one {# conversation is open.} other {# conversations are open.}}"
-      },
-      "serviceRequests": {
-        "title": "Service requests",
-        "body": "{count, plural, =0 {No new service requests.} one {# new service request.} other {# new service requests.}}"
       },
       "quotes": {
         "title": "Quote requests",
@@ -1295,166 +1288,9 @@
     "settings": "Platform settings",
     "staff": "Administrators",
     "brands": "Brands",
-    "services": "Services",
-    "serviceRequests": "Service requests",
     "sellers": "Sellers",
     "seller": "Seller",
     "analytics": "Analytics & reports"
-  },
-  "services": {
-    "title": "Services",
-    "description": "The furniture services on the store’s Services pages, in their order. Services are not sold online: each one has a request form.",
-    "add": "Add service",
-    "listLabel": "Services",
-    "empty": "No services yet. Add the first one.",
-    "moveUp": "Move {name} up",
-    "moveDown": "Move {name} down",
-    "itemCount": "{count, plural, one {# item} other {# items}}",
-    "requestCount": "{count, plural, =0 {No requests} one {# request} other {# requests}}",
-    "noRw": "No Kinyarwanda",
-    "shown": "{name} is now shown in the store",
-    "hidden": "{name} is now hidden from the store",
-    "showService": "Show {name} in the store",
-    "editOf": "Edit {name}",
-    "deleted": "{name} deleted",
-    "tabsLabel": "Service sections",
-    "tabs": {
-      "details": "Details",
-      "items": "What we offer ({count})",
-      "image": "Image"
-    },
-    "nameEn": "Name (English)",
-    "nameRw": "Name (Kinyarwanda)",
-    "slug": "Web address (slug)",
-    "slugHelp": "Leave empty to make it from the English name.",
-    "shortEn": "Card text (English)",
-    "shortRw": "Card text (Kinyarwanda)",
-    "introEn": "Page intro (English)",
-    "introRw": "Page intro (Kinyarwanda)",
-    "icon": "Icon",
-    "icons": {
-      "cctv": "CCTV camera",
-      "gate": "Gate",
-      "fingerprint": "Fingerprint (access control)",
-      "network": "Network",
-      "wrench": "Wrench (repair)",
-      "graduation-cap": "Graduation cap (training)",
-      "shield": "Shield (security)",
-      "cpu": "Chip (IT)",
-      "hammer": "Hammer",
-      "truck": "Delivery truck",
-      "ruler": "Measuring ruler",
-      "sofa": "Sofa",
-      "paintbrush": "Paintbrush"
-    },
-    "activeService": "Show this service in the store",
-    "deleteHint": "{count, plural, one {This service has # request,} other {This service has # requests,}} so it can’t be deleted. Hide it instead.",
-    "image": "Image",
-    "itemsAfterSave": "Save the service first, then add its items and image.",
-    "itemsLabel": "What we offer",
-    "noItems": "No items yet. Add what this service includes, one line each.",
-    "itemEn": "Item (English)",
-    "itemRw": "Item (Kinyarwanda)",
-    "addItem": "Add item",
-    "itemsFull": "A service has at most {max} items.",
-    "moveItemUp": "Move “{name}” up",
-    "moveItemDown": "Move “{name}” down",
-    "editItem": "Edit “{name}”",
-    "deleteItem": "Delete “{name}”",
-    "errors": {
-      "text": "Write at least 2 characters.",
-      "slug": "Use lowercase letters, digits and single hyphens.",
-      "slugTaken": "Another service already uses this web address.",
-      "hasRequests": "This service has requests, so it can’t be deleted. Hide it instead."
-    }
-  },
-  "serviceRequests": {
-    "title": "Service requests",
-    "description": "Requests from the store’s service pages. Call or WhatsApp the client, then move the request along.",
-    "listLabel": "Service requests",
-    "tabsLabel": "Service request status",
-    "status": {
-      "new": "New",
-      "contacted": "Contacted",
-      "scheduled": "Scheduled",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    },
-    "service": "Service",
-    "allServices": "All services",
-    "from": "Sent from",
-    "to": "Sent to",
-    "clearFilters": "Clear filters",
-    "empty": "No service requests yet. Requests from the Services pages appear here.",
-    "emptyFiltered": "No service requests match these filters.",
-    "columns": {
-      "client": "Client",
-      "service": "Service",
-      "type": "Client type",
-      "sent": "Sent",
-      "assigned": "Assigned to",
-      "status": "Status",
-      "actions": "Actions"
-    },
-    "clientTypes": {
-      "home": "Home",
-      "business": "Business",
-      "institution": "Institution"
-    },
-    "unassigned": "Unassigned",
-    "detailTitle": "Request from {name}",
-    "call": "Call",
-    "whatsapp": "WhatsApp",
-    "newTab": "(opens in a new tab)",
-    "whatsappMessage": "Hello {name}, this is {marketplace} about your request {reference} for {service}.",
-    "location": "Location",
-    "preferredDate": "Preferred date",
-    "language": "Language",
-    "prefersRw": "Prefers Kinyarwanda",
-    "notGiven": "Not given",
-    "notes": "Internal notes",
-    "notesHelp": "Only staff see these notes.",
-    "saveNotes": "Save notes",
-    "emptyTitle": "No requests yet",
-    "emptyFilteredTitle": "Nothing matches",
-    "overview": {
-      "all": "All requests",
-      "hints": {
-        "all": "Everything received",
-        "new": "Needs a first call",
-        "contacted": "Client reached",
-        "scheduled": "Visit or work booked",
-        "completed": "Work done",
-        "cancelled": "Closed without work"
-      }
-    },
-    "assignedFilter": "Assigned to",
-    "anyone": "Anyone",
-    "anyDay": "Any day",
-    "whatsappName": "WhatsApp {name}",
-    "open": "Open the request from {name}",
-    "copyReference": "Copy reference {reference}",
-    "copied": "Reference copied",
-    "receivedAgo": "Received {ago} · {date}",
-    "email": "Email",
-    "progressTitle": "Progress",
-    "next": {
-      "new": "Mark as contacted",
-      "contacted": "Mark as scheduled",
-      "scheduled": "Mark as completed"
-    },
-    "cancelRequest": "Cancel request",
-    "cancelledNote": "This request was cancelled.",
-    "reopen": "Reopen",
-    "detailsTitle": "Request details",
-    "messageTitle": "Client’s message",
-    "manageTitle": "Follow-up",
-    "activityTitle": "Activity",
-    "activity": {
-      "received": "Request received",
-      "statusChanged": "Moved to {status}",
-      "updated": "Last updated"
-    }
   },
   "inbox": {
     "call": "Call",

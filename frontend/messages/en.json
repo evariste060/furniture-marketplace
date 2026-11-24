@@ -27,19 +27,17 @@
     "supportSub": "Local team",
     "banners": "Banners",
     "showBanner": "Show banner {n} of {total}",
-    "showcase": "Products and services showcase",
+    "showcase": "Products showcase",
     "moreIn": "More in {category}",
     "bestIn": "Best seller in {category}",
     "explore": "Explore {category}",
     "viewAll": "View all ({count})",
-    "showCategory": "Show {category}",
-    "ourService": "Our furniture services",
-    "servicesHeadline": "Furniture Services",
-    "exploreServices": "Explore services"
+    "showCategory": "Show {category}"
   },
   "store": {
     "logoAlt": "{marketplace}",
     "homeLink": "{marketplace} — home",
+    "backToTop": "Back to top",
     "announcement": {
       "freeDelivery": "Free delivery in Kigali on orders above {amount}",
       "freeDeliveryShort": "Free delivery in Kigali over {amount}",
@@ -51,6 +49,11 @@
       "searchLabel": "Search products",
       "searchPlaceholder": "Search for sofas, beds, tables, desks…",
       "searchPlaceholderShort": "Search sofas, beds, tables…",
+      "suggestions": "Search suggestions",
+      "recentSearches": "Recent searches",
+      "popularSearches": "Popular products",
+      "clearRecent": "Clear",
+      "removeRecent": "Remove {term} from recent searches",
       "search": "Search",
       "language": "Language: {name}",
       "myAccount": "My Account",
@@ -61,16 +64,15 @@
       "cartCount": "Cart, {count, plural, one {# item} other {# items}}",
       "categories": "Categories",
       "allCategories": "All Categories",
-      "brands": "Brands",
       "deals": "Deals",
+      "becomeSeller": "Become a seller",
+      "darkMode": "Dark mode",
+      "lightMode": "Light mode",
       "trackOrder": "Track Order",
       "itemCount": ", {count, plural, one {# item} other {# items}}",
       "more": "More",
       "moreCategories": "More categories",
-      "subcategoriesOf": "{name} subcategories",
-      "services": "Services",
-      "servicesMenu": "Services menu",
-      "allServices": "All services"
+      "subcategoriesOf": "{name} subcategories"
     },
     "languages": {
       "en": "English",
@@ -88,7 +90,7 @@
       "trackOrder": "Track order",
       "business": "Business & bulk orders",
       "language": "Language",
-      "services": "Furniture services"
+      "theme": "Appearance"
     },
     "megaMenu": {
       "browseAll": "Browse all products",
@@ -96,14 +98,9 @@
       "viewAllCount": "View all ({count})",
       "viewCategory": "View category",
       "empty": "No products in this category yet.",
-      "emptyBrand": "No {brand} products in {category} yet.",
       "productsError": "We couldn't load these products. Open the category to see them.",
       "noCategories": "No categories yet.",
-      "allBrands": "All brands",
-      "subcategoriesOf": "Subcategories of {name}",
-      "brandsIn": "Brands in {name}",
-      "noBrands": "No brands yet.",
-      "viewService": "View service"
+      "subcategoriesOf": "Subcategories of {name}"
     },
     "tabs": {
       "label": "Main",
@@ -135,8 +132,6 @@
       "cod": "Cash on delivery",
       "copyright": "© {year} {name}. All rights reserved.",
       "languages": "English · Kinyarwanda",
-      "services": "Services",
-      "allServices": "All services",
       "followUs": "Follow us",
       "socialLink": "{network} (opens in a new tab)"
     },
@@ -185,12 +180,7 @@
       "callUs": "Call us",
       "emailUs": "Email us",
       "visitUs": "Visit us",
-      "spotlightPhoto": "Show photo {n} of {count}",
-      "servicesTitle": "Our Services",
-      "servicesText": "Assembly, installation, delivery and repair by trained fitters.",
-      "brandsTitle": "Trusted Brands",
-      "brandsCount": "{count, plural, one {# brand available} other {# brands available}}",
-      "brandsCountOver": "{count}+ brands available"
+      "spotlightPhoto": "Show photo {n} of {count}"
     },
     "brands": {
       "title": "Brands",
@@ -213,7 +203,6 @@
       "filters": "Filters",
       "filtersCount": "Filters ({count})",
       "clearAll": "Clear all",
-      "brand": "Brand",
       "price": "Price range (RWF)",
       "priceShort": "Price (RWF)",
       "under": "Under {max}",
@@ -661,7 +650,6 @@
       "perkAddresses": "Saved delivery addresses",
       "perkOrders": "Order history & invoices",
       "perkTrack": "Track every delivery",
-      "staffNote": "Staff members sign in here too with their email and password — you’ll be taken to the admin panel.",
       "loginTitle": "Sign in",
       "newHere": "New to {marketplace}? <link>Create an account</link>",
       "passwordUpdated": "Password updated. Sign in with your new password.",
@@ -797,8 +785,8 @@
         "messages": "My messages",
         "addresses": "Addresses",
         "profile": "Profile & security",
-        "logout": "Log out",
-        "seller": "Sell with us"
+        "sellerDashboard": "Seller Dashboard",
+        "logout": "Log out"
       },
       "overviewMeta": "My account",
       "hello": "Hello, {name}",
@@ -930,7 +918,6 @@
         },
         "reason": "Reason: {reason}",
         "openDashboard": "Open the seller dashboard",
-        "formTitle": "Your store",
         "name": "Store name",
         "nameHelp": "Shown to customers. It must be unique on the marketplace.",
         "about": "Description",
@@ -940,7 +927,7 @@
         "sector": "Sector",
         "street": "Street address",
         "optional": "(optional)",
-        "submit": "Send application",
+        "submit": "Submit application",
         "resubmit": "Send again",
         "save": "Save changes",
         "sent": "Application sent. We’ll email you when it’s reviewed.",
@@ -955,7 +942,32 @@
           "closed": "This application can no longer be changed.",
           "exists": "You already have a store.",
           "failed": "We couldn’t send your application. Try again."
-        }
+        },
+        "stepOf": "Step {step} of {total}",
+        "progress": "Application steps",
+        "steps": {
+          "store": {
+            "title": "Your store",
+            "text": "The name customers will see, and a few words about what you sell."
+          },
+          "contact": {
+            "title": "Contact",
+            "text": "How customers and the marketplace team reach your store."
+          },
+          "location": {
+            "title": "Location",
+            "text": "Where your shop is. Only the district is required."
+          },
+          "review": {
+            "title": "Review",
+            "text": "Check your details, then send your application for review."
+          }
+        },
+        "next": "Next",
+        "back": "Back",
+        "edit": "Edit",
+        "editStep": "Edit {step}",
+        "notGiven": "Not given"
       }
     },
     "orderInfo": {
@@ -1322,133 +1334,6 @@
         "emailInvalid": "Enter a valid email address.",
         "contactRequired": "Give a phone number or an email address so we can reply.",
         "invalid": "Check this field."
-      }
-    },
-    "services": {
-      "metaTitle": "Our Furniture Services",
-      "metaDescription": "Furniture assembly, installation, delivery and setup, upholstery and repair for homes, offices, hotels and schools in Rwanda.",
-      "title": "Our Furniture Services",
-      "intro": "Beyond the furniture itself, {marketplace} connects you with trained fitters for assembly, wall mounting, delivery and room setup, upholstery and wood repair — for homes, offices, hotels and schools across Rwanda.",
-      "listLabel": "Services",
-      "empty": "Our services will be listed here soon. Talk to our team in the meantime.",
-      "error": "We couldn’t load our services. Please try again.",
-      "ctaTitle": "Not sure what you need? Talk to our team",
-      "ctaText": "Tell us about your home, office or institution and we’ll recommend the right solution.",
-      "call": "Call us",
-      "whatsapp": "WhatsApp us",
-      "whatsappText": "Hello, I would like to ask about your furniture services.",
-      "whatsappServiceText": "Hello, I would like to ask about {service}.",
-      "breadcrumbServices": "Services",
-      "requestThis": "Request this service",
-      "offerTitle": "What we offer",
-      "whoTitle": "Who it’s for",
-      "who": {
-        "homes": "Homes",
-        "offices": "Offices",
-        "shops": "Shops",
-        "institutions": "Institutions"
-      },
-      "whoText": "Every installation is planned for your site and budget.",
-      "otherTitle": "Other services",
-      "formTitle": "Request this service",
-      "formText": "Tell us what you need for {service} and our team will call you to agree the details.",
-      "fullName": "Full name",
-      "fullNamePlaceholder": "e.g. Aline Uwase",
-      "phone": "Phone number",
-      "phonePlaceholder": "788 123 456",
-      "email": "Email",
-      "emailPlaceholder": "you@example.com",
-      "location": "Location or district",
-      "locationPlaceholder": "e.g. Kicukiro, Kigali",
-      "clientType": "I am requesting for",
-      "clientTypes": {
-        "home": "My home",
-        "business": "A business",
-        "institution": "An institution"
-      },
-      "preferredDate": "Preferred date",
-      "message": "Message",
-      "messagePlaceholder": "Tell us about your site, the number of rooms or doors, or the problem to fix.",
-      "optional": "Optional",
-      "send": "Send request",
-      "replyTime": "We’ll call you within one working day.",
-      "sent": "Thank you — we’ve received your request and will call you within one working day.",
-      "urgent": " Urgent? <link>WhatsApp us</link>.",
-      "whatsappMessage": "Hello, about my service request {reference} ({service}).",
-      "reference": "Your reference: {reference}",
-      "failed": "We couldn’t send your request. Please try again.",
-      "limited": "Too many requests from this number. Please try again later or WhatsApp us.",
-      "errors": {
-        "required": "This field is required.",
-        "tooShort": "Use at least 2 characters.",
-        "tooLong": "This is too long.",
-        "phoneInvalid": "Enter a Rwandan mobile number, e.g. 788 123 456.",
-        "emailInvalid": "Enter a valid email address.",
-        "clientTypeRequired": "Choose who the service is for.",
-        "dateInvalid": "Choose a date from today up to one year ahead.",
-        "invalid": "Check this field."
-      },
-      "notFoundTitle": "Service not found",
-      "wizard": {
-        "title": "Request {service}",
-        "stepsLabel": "Request steps",
-        "stepOf": "Step {n} of {total}",
-        "completed": "(completed)",
-        "steps": {
-          "service": "Service",
-          "date": "Date",
-          "details": "Your details",
-          "review": "Review",
-          "done": "Confirmation"
-        },
-        "serviceTitle": "Confirm the service",
-        "serviceText": "Check that {service} is what you need before you go on.",
-        "changeService": "Choose another service",
-        "dateTitle": "Choose a date",
-        "dateText": "When would you like our team to come?",
-        "timeNote": "Our team will call you to agree the exact time. You can also leave the date empty and agree it then.",
-        "detailsTitle": "Your details",
-        "detailsText": "We use these to contact you about your request.",
-        "reviewTitle": "Review your request",
-        "reviewText": "Check everything before you send it. You can edit any part.",
-        "edit": "Edit",
-        "notGiven": "Not given",
-        "noDate": "No preferred date",
-        "back": "Back",
-        "continue": "Continue",
-        "doneTitle": "Request sent",
-        "referenceLabel": "Reference",
-        "statusLabel": "Status",
-        "statusReceived": "Received",
-        "whatsappUrgent": "Urgent? WhatsApp us",
-        "moreServices": "See all services"
-      },
-      "listTitle": "Explore our services",
-      "listText": "Choose a service to see what it includes and request it in a few steps.",
-      "hero": {
-        "overline": "Furniture services",
-        "explore": "Explore services",
-        "talk": "Talk to our team",
-        "count": "{count, plural, one {# service by trained fitters} other {# services by trained fitters}}"
-      },
-      "promo": {
-        "overline": "Not sure where to start?",
-        "title": "Tell us what you need",
-        "text": "Describe your home, office or site and our team will recommend the right service.",
-        "contact": "Contact us",
-        "whatsapp": "WhatsApp",
-        "call": "Call",
-        "email": "Email",
-        "emailSubject": "Furniture services enquiry"
-      },
-      "card": {
-        "details": "Details",
-        "book": "Book Now",
-        "included": "What’s included",
-        "showIncluded": "See what’s included",
-        "showFront": "Back to overview",
-        "more": "{count, plural, one {+ # more on the details page} other {+ # more on the details page}}",
-        "noItems": "See the details page or ask our team what this service includes."
       }
     },
     "soldBy": {

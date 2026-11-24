@@ -247,7 +247,7 @@ function StepDot({ state, children }: { state: "done" | "now" | "todo"; children
         "inline-flex size-6 flex-none items-center justify-center rounded-full text-xs font-semibold",
         state === "done" && "bg-ok-tx text-white",
         state === "now" && "bg-pri text-white",
-        state === "todo" && "border border-bd2 bg-white text-mut",
+        state === "todo" && "border border-bd2 bg-card text-mut",
       )}
     >
       {children}
@@ -277,7 +277,7 @@ function Waiting({
   const provider = t(`provider.${status.method === "airtel_money" ? "airtel_money" : "mtn_momo"}`);
   const strong = (chunks: ReactNode) => <b className="font-semibold text-tx">{chunks}</b>;
   return (
-    <section role="status" aria-live="polite" className="flex w-full max-w-[560px] flex-col items-center gap-5 rounded-xl border border-bd bg-white p-8 text-center shadow-sh max-sm:p-5">
+    <section role="status" aria-live="polite" className="flex w-full max-w-[560px] flex-col items-center gap-5 rounded-xl border border-bd bg-card p-8 text-center shadow-sh max-sm:p-5">
       <div className="relative size-28">
         <span className="absolute inset-0 rounded-full border-6 border-light" />
         <span className="absolute inset-0 animate-spin rounded-full border-6 border-transparent border-t-pri border-r-pri [animation-duration:1.6s] motion-reduce:animate-none" />
@@ -346,8 +346,8 @@ function Failed({
         : t(`reason.${status.status === "expired" ? "expired" : status.status === "cancelled" ? "cancelled" : "failed"}`);
   const strong = (chunks: ReactNode) => <b className="font-semibold text-tx">{chunks}</b>;
   return (
-    <section role="alert" className="flex w-full max-w-[560px] flex-col items-center gap-5 rounded-xl border border-bd bg-white p-8 text-center shadow-sh max-sm:p-5">
-      <span className="flex size-22 items-center justify-center rounded-full bg-err-bg text-err">
+    <section role="alert" className="flex w-full max-w-[560px] flex-col items-center gap-5 rounded-xl border border-bd bg-card p-8 text-center shadow-sh max-sm:p-5">
+      <span className="flex size-22 items-center justify-center rounded-full bg-err-bg text-err-fg">
         <CircleAlert size={40} aria-hidden="true" />
       </span>
       <div className="flex flex-col items-center gap-1.5">
@@ -368,7 +368,7 @@ function Failed({
         </div>
         <div className="kv">
           <span>{t("reasonLabel")}</span>
-          <span className="font-medium text-err">{reason}</span>
+          <span className="font-medium text-err-fg">{reason}</span>
         </div>
       </div>
       <div className="flex w-full flex-col gap-2.5">
@@ -390,7 +390,7 @@ function Expired({ status }: { status: Status }) {
   const t = useTranslations("store.payment");
   const strong = (chunks: ReactNode) => <b className="font-semibold text-tx">{chunks}</b>;
   return (
-    <section role="alert" className="flex w-full max-w-[560px] flex-col items-center gap-5 rounded-xl border border-bd bg-white p-8 text-center shadow-sh max-sm:p-5">
+    <section role="alert" className="flex w-full max-w-[560px] flex-col items-center gap-5 rounded-xl border border-bd bg-card p-8 text-center shadow-sh max-sm:p-5">
       <span className="flex size-22 items-center justify-center rounded-full bg-warn-bg text-warn-tx">
         <Clock size={40} aria-hidden="true" />
       </span>
@@ -433,7 +433,7 @@ function ChooseMethod({ orderNumber, access, status, onDone }: { orderNumber: st
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-[560px] flex-col gap-5 rounded-xl border border-bd bg-white p-8 shadow-sh max-sm:p-5">
+    <form onSubmit={onSubmit} className="flex w-full max-w-[560px] flex-col gap-5 rounded-xl border border-bd bg-card p-8 shadow-sh max-sm:p-5">
       <div className="flex flex-col gap-1">
         <h1 className="t-h2">{tc("paymentTitle")}</h1>
         <p className="text-tx2">{t("chooseText", { number: orderNumber })}</p>
@@ -513,7 +513,7 @@ export function PhoneForm({
 }) {
   const t = useTranslations("store.payment");
   return (
-    <form onSubmit={onSubmit} noValidate className="flex w-full max-w-[480px] flex-col gap-4 rounded-xl border border-bd bg-white p-8 max-sm:p-5">
+    <form onSubmit={onSubmit} noValidate className="flex w-full max-w-[480px] flex-col gap-4 rounded-xl border border-bd bg-card p-8 max-sm:p-5">
       <div className="flex flex-col gap-1">
         <h1 className="t-h2">{label}</h1>
         <p className="text-tx2">{text}</p>

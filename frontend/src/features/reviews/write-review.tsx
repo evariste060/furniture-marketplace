@@ -70,7 +70,7 @@ function LoadFailed({ onRetry }: { onRetry: () => void }) {
 const STATES: Record<Outcome, { icon: ReactNode; tone: string; link: "home" | "login" | "product" }> = {
   thanks: { icon: <CircleCheck size={24} aria-hidden="true" />, tone: "bg-ok-bg text-ok-tx", link: "home" },
   expired: { icon: <Clock size={24} aria-hidden="true" />, tone: "bg-warn-bg text-warn-tx", link: "login" },
-  used: { icon: <Star size={24} aria-hidden="true" />, tone: "bg-light text-pri", link: "product" },
+  used: { icon: <Star size={24} aria-hidden="true" />, tone: "bg-light text-pri-fg", link: "product" },
   invalid: { icon: <Link2Off size={24} aria-hidden="true" />, tone: "bg-subtle text-tx2", link: "login" },
 };
 
@@ -141,10 +141,10 @@ function ReviewForm({ token, info, onOutcome }: { token: string; info: Info; onO
   return (
     <>
       <div className="flex flex-col gap-1.5">
-        <h1 className="t-h1 text-navy">{t("title")}</h1>
+        <h1 className="t-h1 text-head">{t("title")}</h1>
         <p className="text-tx2">{t("text")}</p>
       </div>
-      <form ref={form} onSubmit={onSubmit} noValidate aria-labelledby="review-product" className="flex flex-col gap-[18px] rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+      <form ref={form} onSubmit={onSubmit} noValidate aria-labelledby="review-product" className="flex flex-col gap-[18px] rounded-xl border border-bd bg-card p-6 max-sm:p-4">
         <div className="flex items-center gap-3.5">
           <ProductImage image={info.product.image ?? null} alt="" sizes={IMAGE_SIZES.thumb} className="size-[72px] flex-none" iconSize={28} />
           <span className="flex flex-col gap-0.5">
@@ -161,7 +161,7 @@ function ReviewForm({ token, info, onOutcome }: { token: string; info: Info; onO
         )}
         <fieldset className="m-0 flex flex-col gap-2 border-0 p-0" aria-describedby={errors.rating ? "rating-error" : undefined}>
           <legend className="mb-2 p-0 text-sm font-medium">
-            {t("rating")} <span className="text-err">*</span>
+            {t("rating")} <span className="text-err-fg">*</span>
           </legend>
           <div className="flex items-center gap-1.5">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -184,7 +184,7 @@ function ReviewForm({ token, info, onOutcome }: { token: string; info: Info; onO
             </span>
           </div>
           {errors.rating && (
-            <span id="rating-error" className="text-cap text-err">
+            <span id="rating-error" className="text-cap text-err-fg">
               {errors.rating}
             </span>
           )}
@@ -201,7 +201,7 @@ function ReviewForm({ token, info, onOutcome }: { token: string; info: Info; onO
         <Field
           label={
             <>
-              {t("bodyLabel")} <span className="text-err">*</span>
+              {t("bodyLabel")} <span className="text-err-fg">*</span>
             </>
           }
           help={t("bodyHelp", { min: REVIEW_BODY_MIN })}

@@ -28,7 +28,7 @@ function LiveTabBar() {
 function TabBarView({ pathname }: { pathname: string | null }) {
   const t = useTranslations("store.tabs");
   if (pathname?.startsWith("/product/") || pathname === "/cart") return null;
-  const tone = (active: boolean) => (active ? "text-pri" : "text-mut hover:text-tx");
+  const tone = (active: boolean) => (active ? "text-pri-fg" : "text-mut hover:text-tx");
   const item = (href: string, icon: ReactNode, label: string) => {
     const active = pathname !== null && (href === "/" ? pathname === "/" : pathname.startsWith(href));
     return (
@@ -39,7 +39,7 @@ function TabBarView({ pathname }: { pathname: string | null }) {
     );
   };
   return (
-    <nav aria-label={t("label")} className="fixed inset-x-0 bottom-0 z-20 flex h-16 items-center border-t border-bd bg-white px-2 sm:hidden">
+    <nav aria-label={t("label")} className="fixed inset-x-0 bottom-0 z-20 flex h-16 items-center border-t border-bd bg-card px-2 sm:hidden">
       {item("/", <House size={22} aria-hidden="true" />, t("home"))}
       {item("/products", <LayoutGrid size={22} aria-hidden="true" />, t("categories"))}
       {item("/search", <Search size={22} aria-hidden="true" />, t("search"))}

@@ -562,7 +562,7 @@ function EditorForm({ product }: { product: Product | null }) {
               valueLabel={t("editor.specValue")}
             />
             {errors.specifications && (
-              <span className="text-cap text-err">{errors.specifications}</span>
+              <span className="text-cap text-err-fg">{errors.specifications}</span>
             )}
           </Card>
         </fieldset>
@@ -609,7 +609,7 @@ function EditorForm({ product }: { product: Product | null }) {
                 ))}
               </div>
               {errors.status && (
-                <span className="text-cap text-err">{errors.status}</span>
+                <span className="text-cap text-err-fg">{errors.status}</span>
               )}
               {scope.merchandising && (
                 <Checkbox
@@ -1076,7 +1076,7 @@ function Images({ product, manage }: { product: Product; manage: boolean }) {
           >
             <span
               className={cx(
-                "relative flex size-[112px] items-center justify-center rounded-[10px] bg-white",
+                "relative flex size-[112px] items-center justify-center rounded-[10px] bg-card",
                 i === 0 ? "border-2 border-pri" : "border border-bd",
               )}
             >
@@ -1365,7 +1365,7 @@ function Variants({
                     />
                   </Td>
                   <Td
-                    className={cx("font-medium", available === 0 && "text-err")}
+                    className={cx("font-medium", available === 0 && "text-err-fg")}
                   >
                     {available ?? "—"}
                   </Td>

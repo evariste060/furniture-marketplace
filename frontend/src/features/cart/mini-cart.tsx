@@ -56,7 +56,7 @@ function MiniCartDrawer({ variantId, onClose }: { variantId: string | null; onCl
               {line.variant_name} · {t("qty", { count: line.quantity })}
             </span>
             <SoldBy store={line.store} />
-            {line.unit_price !== null && <span className="font-semibold text-navy">{formatMoney(line.unit_price)}</span>}
+            {line.unit_price !== null && <span className="font-semibold text-head">{formatMoney(line.unit_price)}</span>}
           </span>
         </div>
       )}

@@ -59,14 +59,14 @@ function renderPanel(ui: ReactNode) {
 
 describe("Subcategory filter", () => {
   it("lists the main category and its subcategories, keeping the other filters", () => {
-    const state = parseListingState({ brand: "hp", sort: "price_asc", page: "3" });
+    const state = parseListingState({ min_price: "100000", sort: "price_asc", page: "3" });
     renderPanel(<FilterPanel state={state} facets={FACETS} basePath="/category/laptops" base={{ category: "laptops" }} subcategories={SUBS("laptops")} />);
     const group = screen.getByRole("navigation", { name: "Subcategory" });
     const links = within(group).getAllByRole("link");
     expect(links.map((a) => [a.textContent, a.getAttribute("href")])).toEqual([
-      ["All Laptops", "/category/laptops?brand=hp&sort=price_asc"],
-      ["Gaming Laptops", "/category/gaming-laptops?brand=hp&sort=price_asc"],
-      ["Monitors", "/category/monitors?brand=hp&sort=price_asc"],
+      ["All Laptops", "/category/laptops?min_price=100000&sort=price_asc"],
+      ["Gaming Laptops", "/category/gaming-laptops?min_price=100000&sort=price_asc"],
+      ["Monitors", "/category/monitors?min_price=100000&sort=price_asc"],
     ]);
     expect(links[0]).toHaveAttribute("aria-current", "page");
   });

@@ -221,7 +221,7 @@ export function LoginView() {
   const registerHref = `/register?${new URLSearchParams({ returnTo }).toString()}`;
   const guest = returnTo.startsWith("/checkout") || returnTo.startsWith("/cart");
   return (
-    <div className="mx-auto flex max-w-[960px] flex-wrap items-stretch overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+    <div className="mx-auto flex max-w-[960px] flex-wrap items-stretch overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
       <div className="flex flex-[1_1_360px] flex-col gap-[18px] bg-navy p-10 text-white max-sm:order-2 max-sm:p-6">
         <h2 className="t-h2 text-white">{t("asideTitle")}</h2>
         <p className="text-odm">{t("asideText")}</p>
@@ -233,8 +233,6 @@ export function LoginView() {
             </li>
           ))}
         </ul>
-        <span className="flex-1" />
-        <p className="text-cap text-odm">{t("staffNote")}</p>
       </div>
       <form ref={form} onSubmit={onSubmit} noValidate className="flex flex-[1_1_400px] flex-col gap-[18px] p-10 max-sm:p-6">
         <div className="flex flex-col gap-1">
@@ -355,7 +353,7 @@ export function RegisterView() {
 
   const loginHref = `/login?${new URLSearchParams({ returnTo }).toString()}`;
   return (
-    <form ref={form} onSubmit={onSubmit} noValidate className="mx-auto flex max-w-[520px] flex-col gap-[18px] rounded-xl border border-bd bg-white p-8 shadow-sh max-sm:p-5">
+    <form ref={form} onSubmit={onSubmit} noValidate className="mx-auto flex max-w-[520px] flex-col gap-[18px] rounded-xl border border-bd bg-card p-8 shadow-sh max-sm:p-5">
       <div className="flex flex-col gap-1">
         <h1 className="t-h2">{t("registerTitle")}</h1>
         <p className="text-sm text-tx2">
@@ -420,7 +418,7 @@ export function RegisterView() {
           label={<span className="text-sm text-tx2">{t.rich("agree", policyLinks())}</span>}
         />
         {errors.terms && (
-          <span id="terms-error" className="text-cap text-err">
+          <span id="terms-error" className="text-cap text-err-fg">
             {errors.terms}
           </span>
         )}
@@ -491,8 +489,8 @@ export function ForgotView() {
   }
 
   return (
-    <form ref={form} onSubmit={onSubmit} noValidate className="mx-auto flex max-w-[480px] flex-col gap-[18px] rounded-xl border border-bd bg-white p-8 shadow-sh max-sm:p-5">
-      <span className="flex size-14 items-center justify-center rounded-[14px] bg-light text-pri">
+    <form ref={form} onSubmit={onSubmit} noValidate className="mx-auto flex max-w-[480px] flex-col gap-[18px] rounded-xl border border-bd bg-card p-8 shadow-sh max-sm:p-5">
+      <span className="flex size-14 items-center justify-center rounded-[14px] bg-light text-pri-fg">
         <KeyRound size={28} aria-hidden="true" />
       </span>
       <div className="flex flex-col gap-1.5">
@@ -569,7 +567,7 @@ function CodeInput({ value, onChange, invalid, describedBy }: { value: string; o
           onChange={(e) => onInput(i, e.target.value)}
           onKeyDown={(e) => onKeyDown(i, e)}
           onPaste={(e) => onPaste(i, e)}
-          className="h-14 w-[52px] rounded-lg border border-bd bg-white p-0 text-center text-[22px] font-semibold outline-none focus:border-pri focus:shadow-focus aria-invalid:border-err max-sm:w-11"
+          className="h-14 w-[52px] rounded-lg border border-bd bg-card p-0 text-center text-[22px] font-semibold outline-none focus:border-pri focus:shadow-focus aria-invalid:border-err max-sm:w-11"
         />
       ))}
     </div>
@@ -655,7 +653,7 @@ export function ResetView() {
 
   if (stored === undefined) return null;
   return (
-    <form ref={form} onSubmit={onSubmit} noValidate className="mx-auto flex max-w-[480px] flex-col gap-[18px] rounded-xl border border-bd bg-white p-8 shadow-sh max-sm:p-5">
+    <form ref={form} onSubmit={onSubmit} noValidate className="mx-auto flex max-w-[480px] flex-col gap-[18px] rounded-xl border border-bd bg-card p-8 shadow-sh max-sm:p-5">
       <div className="flex flex-col gap-1.5">
         <h1 className="t-h2">{t("resetTitle")}</h1>
         <p className="text-tx2">
@@ -672,7 +670,7 @@ export function ResetView() {
       <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
         <legend className="mb-2 p-0 text-sm font-medium">{t("codeLabel")}</legend>
         <CodeInput value={code} onChange={setCode} invalid={Boolean(errors.code)} describedBy="code-note" />
-        <span id="code-note" className={cx("text-cap", errors.code ? "text-err" : "text-tx2")}>
+        <span id="code-note" className={cx("text-cap", errors.code ? "text-err-fg" : "text-tx2")}>
           {errors.code ?? (
             <>
               {t("noCode")}{" "}

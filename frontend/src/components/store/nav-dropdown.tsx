@@ -76,7 +76,7 @@ export function NavDropdown({
           aria-controls={panelId}
           className={cx(
             "flex h-10 w-48 cursor-pointer items-center gap-3 rounded-md border-0 px-4 xl:w-64 text-base font-semibold whitespace-nowrap shadow-sh transition-colors duration-150 hover:bg-light hover:text-pri-h focus-visible:outline-white motion-reduce:transition-none",
-            lit ? "bg-light text-pri-h" : "bg-white text-pri",
+            lit ? "bg-light text-pri-h" : "bg-card text-pri-fg",
           )}
         >
           {icon && (
@@ -115,7 +115,7 @@ export function NavDropdown({
         // laid out, so it can fade out.
         style={menu.position ? { top: menu.position.top, left: menu.position.left, width: menu.position.width } : undefined}
         className={cx(
-          "fixed z-50 overflow-hidden rounded-b-xl border border-t-0 border-bd bg-white shadow-sh2",
+          "fixed z-50 overflow-hidden rounded-b-xl border border-t-0 border-bd bg-card shadow-sh2",
           "transition-[opacity,translate,visibility] duration-150 ease-out motion-reduce:transition-none",
           menu.open && menu.position ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0",
         )}

@@ -58,7 +58,7 @@ const SIZES = {
     lift: "group-hover:-translate-y-[60px] [@media(hover:hover)]:group-focus-within:-translate-y-[60px]",
     name: "line-clamp-2 text-cap leading-4 font-semibold",
     price: "text-sm font-bold whitespace-nowrap",
-    panel: "flex-col gap-1 bg-white px-2.5 pb-2.5",
+    panel: "flex-col gap-1 bg-card px-2.5 pb-2.5",
   },
 } as const;
 
@@ -73,7 +73,7 @@ export function HoverProductCard({ product, size = "sm" }: { product: HoverProdu
   const md = size === "md";
   const discounted = md && !!product.discount;
   return (
-    <div className={cx("group relative flex h-full flex-col overflow-hidden rounded-xl border border-bd bg-white transition-[translate,box-shadow,border-color] ease-soft motion-reduce:translate-y-0!", s.card)}>
+    <div className={cx("group relative flex h-full flex-col overflow-hidden rounded-xl border border-bd bg-card transition-[translate,box-shadow,border-color] ease-soft motion-reduce:translate-y-0!", s.card)}>
       <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col text-tx hover:text-tx">
         <span className={cx("flex p-2 pb-0", s.frame)}>
           <ProductImage
@@ -81,12 +81,12 @@ export function HoverProductCard({ product, size = "sm" }: { product: HoverProdu
             alt=""
             sizes={s.sizes}
             iconSize={s.icon}
-            className={cx(s.photo, "bg-white transition-[scale] ease-soft motion-reduce:scale-100!", s.zoom)}
+            className={cx(s.photo, "bg-card transition-[scale] ease-soft motion-reduce:scale-100!", s.zoom)}
           />
         </span>
         <span
           className={cx(
-            "relative z-10 flex flex-col bg-white",
+            "relative z-10 flex flex-col bg-card",
             s.text,
             "transition-transform ease-soft motion-reduce:transition-none",
             s.slide,
@@ -95,7 +95,7 @@ export function HoverProductCard({ product, size = "sm" }: { product: HoverProdu
         >
           <span className={s.name}>{product.name}</span>
           {product.price !== null && (
-            <span className={cx(s.price, md && (discounted ? "text-err" : "text-tx"))}>
+            <span className={cx(s.price, md && (discounted ? "text-err-fg" : "text-tx"))}>
               {discounted && <span className="sr-only">{t("discount", { percent: product.discount ?? 0 })} </span>}
               {formatMoney(product.price)}
             </span>

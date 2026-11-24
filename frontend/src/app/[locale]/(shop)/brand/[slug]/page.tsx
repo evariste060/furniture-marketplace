@@ -57,14 +57,14 @@ async function Hero({ params, searchParams }: Props) {
               { label: found.name },
             ]}
           />
-          <h1 className="t-h1 text-navy">{found.name}</h1>
+          <h1 className="t-h1 text-head">{found.name}</h1>
           <Suspense fallback={<span className="h-5" />}>
             <ShowingCount searchParams={searchParams} base={{ brand: [found.slug] }} first="category" />
           </Suspense>
         </div>
         {found.logo && (
           <div className="hidden sm:block">
-            <ProductImage image={found.logo} alt="" sizes={IMAGE_SIZES.thumb} className="size-[120px] rounded-xl bg-white" preload />
+            <ProductImage image={found.logo} alt="" sizes={IMAGE_SIZES.thumb} className="size-[120px] rounded-xl bg-card" preload />
           </div>
         )}
       </div>

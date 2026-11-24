@@ -77,7 +77,7 @@ export function StaffView() {
         }
       />
 
-      <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="flex flex-wrap items-center gap-3 border-b border-bd p-4">
           <div role="group" aria-label={t("staff.statusLabel")} className="flex rounded-lg bg-page p-1">
             {STATUSES.map((s) => (
@@ -88,7 +88,7 @@ export function StaffView() {
                 onClick={() => set({ status: s })}
                 className={cx(
                   "h-8 cursor-pointer rounded-md border-0 px-3.5 text-sm font-medium transition-colors duration-150 motion-reduce:transition-none",
-                  status === s ? "bg-white text-tx shadow-sh" : "bg-transparent text-tx2 hover:text-tx",
+                  status === s ? "bg-card text-tx shadow-sh" : "bg-transparent text-tx2 hover:text-tx",
                 )}
               >
                 {t(`staff.statuses.${s || "all"}`)}

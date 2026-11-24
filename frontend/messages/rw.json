@@ -27,19 +27,17 @@
     "supportSub": "Itsinda ryo mu gihugu",
     "banners": "Amatangazo",
     "showBanner": "Erekana itangazo rya {n} muri {total}",
-    "showcase": "Imurikwa ry'ibicuruzwa na serivisi",
+    "showcase": "Imurikwa ry'ibicuruzwa",
     "moreIn": "Ibindi muri {category}",
     "bestIn": "Igicuruzwa kigurwa cyane muri {category}",
     "explore": "Reba {category}",
     "viewAll": "Reba byose ({count})",
-    "showCategory": "Erekana {category}",
-    "ourService": "Serivisi zacu z'ibikoresho byo mu nzu",
-    "servicesHeadline": "Serivisi z'ibikoresho byo mu nzu",
-    "exploreServices": "Reba serivisi"
+    "showCategory": "Erekana {category}"
   },
   "store": {
     "logoAlt": "{marketplace}",
     "homeLink": "{marketplace} — ahabanza",
+    "backToTop": "Subira hejuru",
     "announcement": {
       "freeDelivery": "Kugezwaho ku buntu i Kigali ku byaguzwe birenze {amount}",
       "freeDeliveryShort": "Kugezwaho ku buntu i Kigali hejuru ya {amount}",
@@ -51,6 +49,11 @@
       "searchLabel": "Shakisha ibicuruzwa",
       "searchPlaceholder": "Shakisha intebe, ibitanda, ameza, ameza y'akazi…",
       "searchPlaceholderShort": "Shakisha intebe, ibitanda, ameza…",
+      "suggestions": "Ibyo ushobora gushakisha",
+      "recentSearches": "Ibyo washakishije vuba",
+      "popularSearches": "Ibicuruzwa bikunzwe",
+      "clearRecent": "Siba",
+      "removeRecent": "Kuramo {term} mu byo washakishije vuba",
       "search": "Shakisha",
       "language": "Ururimi: {name}",
       "myAccount": "Konti yanjye",
@@ -61,16 +64,15 @@
       "cartCount": "Igitebo, {count, plural, one {igicuruzwa #} other {ibicuruzwa #}}",
       "categories": "Ibyiciro",
       "allCategories": "Ibyiciro byose",
-      "brands": "Ibirango",
       "deals": "Poromosiyo",
+      "becomeSeller": "Ba umucuruzi",
+      "darkMode": "Uburyo bw'umwijima",
+      "lightMode": "Uburyo bw'urumuri",
       "trackOrder": "Kurikirana ibyo watumije",
       "itemCount": ", {count, plural, one {igicuruzwa #} other {ibicuruzwa #}}",
       "more": "Ibindi",
       "moreCategories": "Ibindi byiciro",
-      "subcategoriesOf": "Ibyiciro bito bya {name}",
-      "services": "Serivisi",
-      "servicesMenu": "Menu ya serivisi",
-      "allServices": "Serivisi zose"
+      "subcategoriesOf": "Ibyiciro bito bya {name}"
     },
     "languages": {
       "en": "English",
@@ -88,7 +90,7 @@
       "trackOrder": "Kurikirana ibyo watumije",
       "business": "Ibigo n'abagura byinshi",
       "language": "Ururimi",
-      "services": "Serivisi z'ibikoresho byo mu nzu"
+      "theme": "Isura"
     },
     "megaMenu": {
       "browseAll": "Reba ibicuruzwa byose",
@@ -96,14 +98,9 @@
       "viewAllCount": "Reba byose ({count})",
       "viewCategory": "Reba icyiciro",
       "empty": "Nta bicuruzwa biri muri iki cyiciro ubu.",
-      "emptyBrand": "Nta bicuruzwa bya {brand} biri muri {category} kugeza ubu.",
       "productsError": "Ntitwashoboye kuzana ibi bicuruzwa. Fungura icyiciro ubibone.",
       "noCategories": "Nta byiciro birahari.",
-      "allBrands": "Ibirango byose",
-      "subcategoriesOf": "Ibyiciro bito bya {name}",
-      "brandsIn": "Ibirango biri muri {name}",
-      "noBrands": "Nta birango birahari.",
-      "viewService": "Reba serivisi"
+      "subcategoriesOf": "Ibyiciro bito bya {name}"
     },
     "tabs": {
       "label": "Ibyingenzi",
@@ -135,8 +132,6 @@
       "cod": "Kwishyura ubigejejweho",
       "copyright": "© {year} {name}. Uburenganzira bwose burabitswe.",
       "languages": "English · Kinyarwanda",
-      "services": "Serivisi",
-      "allServices": "Serivisi zose",
       "followUs": "Dukurikire",
       "socialLink": "{network} (bifungukira mu idirishya rishya)"
     },
@@ -185,12 +180,7 @@
       "callUs": "Duhamagare",
       "emailUs": "Twandikire kuri imeli",
       "visitUs": "Dusure",
-      "spotlightPhoto": "Erekana ifoto ya {n} kuri {count}",
-      "servicesTitle": "Serivisi zacu",
-      "servicesText": "Guteranya, gushyiraho, kugeza no gusana bikorwa n'abatekinisiye babihuguriwe.",
-      "brandsTitle": "Ibirango byizewe",
-      "brandsCount": "{count, plural, one {Ikirango # kirahari} other {Ibirango # birahari}}",
-      "brandsCountOver": "Ibirango {count}+ birahari"
+      "spotlightPhoto": "Erekana ifoto ya {n} kuri {count}"
     },
     "brands": {
       "title": "Ibirango",
@@ -213,7 +203,6 @@
       "filters": "Muyunguruzi",
       "filtersCount": "Muyunguruzi ({count})",
       "clearAll": "Siba byose",
-      "brand": "Ikirango",
       "price": "Igiciro (RWF)",
       "priceShort": "Igiciro (RWF)",
       "under": "Munsi ya {max}",
@@ -661,7 +650,6 @@
       "perkAddresses": "Aderesi zo kugezwaho wabitse",
       "perkOrders": "Amateka y'ibyo watumije n'inyemezabuguzi",
       "perkTrack": "Kurikirana buri kugezwaho",
-      "staffNote": "Abakozi na bo binjirira hano bakoresheje imeri n'ijambo ry'ibanga — uzajyanwa ku rubuga rw'ubuyobozi.",
       "loginTitle": "Injira",
       "newHere": "Uri mushya kuri {marketplace}? <link>Fungura konti</link>",
       "passwordUpdated": "Ijambo ry'ibanga ryahinduwe. Injira ukoresheje irishya.",
@@ -797,8 +785,8 @@
         "messages": "Ubutumwa bwanjye",
         "addresses": "Aderesi",
         "profile": "Umwirondoro n'umutekano",
-        "logout": "Sohoka",
-        "seller": "Curuza natwe"
+        "sellerDashboard": "Ubuyobozi bw'umucuruzi",
+        "logout": "Sohoka"
       },
       "overviewMeta": "Konti yanjye",
       "hello": "Muraho, {name}",
@@ -930,7 +918,6 @@
         },
         "reason": "Impamvu: {reason}",
         "openDashboard": "Fungura ubuyobozi bw'umucuruzi",
-        "formTitle": "Iduka ryawe",
         "name": "Izina ry'iduka",
         "nameHelp": "Rigaragarira abakiriya. Rigomba kuba ridasanzwe ku rubuga.",
         "about": "Igisobanuro",
@@ -955,7 +942,32 @@
           "closed": "Ubu busabe ntibugishobora guhindurwa.",
           "exists": "Usanzwe ufite iduka.",
           "failed": "Ntitwashoboye kohereza ubusabe bwawe. Ongera ugerageze."
-        }
+        },
+        "stepOf": "Intambwe ya {step} kuri {total}",
+        "progress": "Intambwe z'ubusabe",
+        "steps": {
+          "store": {
+            "title": "Iduka ryawe",
+            "text": "Izina abakiriya bazabona, n'amagambo make ku byo ucuruza."
+          },
+          "contact": {
+            "title": "Kuvugana",
+            "text": "Uko abakiriya n'itsinda ry'urubuga bavugana n'iduka ryawe."
+          },
+          "location": {
+            "title": "Aho riherereye",
+            "text": "Aho iduka ryawe riri. Akarere konyine ni ngombwa."
+          },
+          "review": {
+            "title": "Gusuzuma",
+            "text": "Reba amakuru yawe, hanyuma wohereze ubusabe bwawe busuzumwe."
+          }
+        },
+        "next": "Komeza",
+        "back": "Subira inyuma",
+        "edit": "Hindura",
+        "editStep": "Hindura {step}",
+        "notGiven": "Ntibyatanzwe"
       }
     },
     "orderInfo": {
@@ -1322,133 +1334,6 @@
         "emailInvalid": "Andika imeli nyayo.",
         "contactRequired": "Tanga nimero ya telefoni cyangwa imeli kugira ngo tugusubize.",
         "invalid": "Genzura iki gice."
-      }
-    },
-    "services": {
-      "metaTitle": "Serivisi zacu z'ibikoresho byo mu nzu",
-      "metaDescription": "Guteranya ibikoresho byo mu nzu, kubishyiraho, kubigeza no kubitunganya, gusana intebe n'ibindi ku ngo, ibiro, amahoteli n'amashuri mu Rwanda.",
-      "title": "Serivisi zacu z'ibikoresho byo mu nzu",
-      "intro": "Uretse ibikoresho ubwabyo, {marketplace} ikuhuza n'abatekinisiye babihuguriwe bo guteranya, kumanika ku rukuta, kugeza no gutunganya icyumba, gusana intebe n'ibikoresho by'ibiti — ku ngo, ibiro, amahoteli n'amashuri mu Rwanda hose.",
-      "listLabel": "Serivisi",
-      "empty": "Serivisi zacu zizagaragara hano vuba. Muri icyo gihe, vugana n'itsinda ryacu.",
-      "error": "Ntibishobotse kwerekana serivisi zacu. Ongera ugerageze.",
-      "ctaTitle": "Ntuzi neza icyo ukeneye? Vugana n'itsinda ryacu",
-      "ctaText": "Tubwire iby'urugo rwawe, ibiro cyangwa ikigo, tukugire inama y'igisubizo gikwiye.",
-      "call": "Duhamagare",
-      "whatsapp": "Twandikire kuri WhatsApp",
-      "whatsappText": "Muraho, nifuzaga kubaza ibijyanye na serivisi zanyu z'ibikoresho byo mu nzu.",
-      "whatsappServiceText": "Muraho, nifuzaga kubaza ibijyanye na {service}.",
-      "breadcrumbServices": "Serivisi",
-      "requestThis": "Saba iyi serivisi",
-      "offerTitle": "Ibyo dutanga",
-      "whoTitle": "Abo igenewe",
-      "who": {
-        "homes": "Ingo",
-        "offices": "Ibiro",
-        "shops": "Amaduka",
-        "institutions": "Ibigo"
-      },
-      "whoText": "Buri gikorwa gitegurwa hakurikijwe aho uri n'ingengo y'imari yawe.",
-      "otherTitle": "Izindi serivisi",
-      "formTitle": "Saba iyi serivisi",
-      "formText": "Tubwire icyo ukeneye kuri {service}, itsinda ryacu rizaguhamagara mwumvikane ibisigaye.",
-      "fullName": "Amazina yose",
-      "fullNamePlaceholder": "urugero: Aline Uwase",
-      "phone": "Nimero ya telefoni",
-      "phonePlaceholder": "788 123 456",
-      "email": "Imeli",
-      "emailPlaceholder": "wowe@example.com",
-      "location": "Aho uherereye cyangwa akarere",
-      "locationPlaceholder": "urugero: Kicukiro, Kigali",
-      "clientType": "Ndasabira",
-      "clientTypes": {
-        "home": "Urugo rwanjye",
-        "business": "Ubucuruzi",
-        "institution": "Ikigo"
-      },
-      "preferredDate": "Itariki wifuza",
-      "message": "Ubutumwa",
-      "messagePlaceholder": "Tubwire iby'aho uri, umubare w'ibyumba cyangwa imiryango, cyangwa ikibazo gikenewe gukemurwa.",
-      "optional": "Si ngombwa",
-      "send": "Ohereza ubusabe",
-      "replyTime": "Tuzaguhamagara mu munsi umwe w'akazi.",
-      "sent": "Murakoze — twakiriye ubusabe bwanyu kandi tuzabahamagara mu munsi umwe w'akazi.",
-      "urgent": " Birihutirwa? <link>Twandikire kuri WhatsApp</link>.",
-      "whatsappMessage": "Muraho, ku bijyanye n'ubusabe bwanjye bwa serivisi {reference} ({service}).",
-      "reference": "Nimero y'ubusabe: {reference}",
-      "failed": "Ntibishobotse kohereza ubusabe bwawe. Ongera ugerageze.",
-      "limited": "Ubusabe bwinshi buturutse kuri iyi nimero. Ongera ugerageze nyuma cyangwa utwandikire kuri WhatsApp.",
-      "errors": {
-        "required": "Iki gice kirakenewe.",
-        "tooShort": "Koresha nibura inyuguti 2.",
-        "tooLong": "Ni birebire cyane.",
-        "phoneInvalid": "Andika nimero ya telefoni yo mu Rwanda, urugero 788 123 456.",
-        "emailInvalid": "Andika imeli nyayo.",
-        "clientTypeRequired": "Hitamo uwo serivisi igenewe.",
-        "dateInvalid": "Hitamo itariki kuva uyu munsi kugeza mu mwaka umwe.",
-        "invalid": "Genzura iki gice."
-      },
-      "notFoundTitle": "Serivisi ntiyabonetse",
-      "wizard": {
-        "title": "Saba {service}",
-        "stepsLabel": "Intambwe zo gusaba",
-        "stepOf": "Intambwe {n} kuri {total}",
-        "completed": "(byarangiye)",
-        "steps": {
-          "service": "Serivisi",
-          "date": "Itariki",
-          "details": "Amakuru yawe",
-          "review": "Gusuzuma",
-          "done": "Byemejwe"
-        },
-        "serviceTitle": "Emeza serivisi",
-        "serviceText": "Reba ko {service} ari yo ukeneye mbere yo gukomeza.",
-        "changeService": "Hitamo indi serivisi",
-        "dateTitle": "Hitamo itariki",
-        "dateText": "Ni ryari wifuza ko itsinda ryacu riza?",
-        "timeNote": "Itsinda ryacu rizaguhamagara kugira ngo mwumvikane ku isaha nyayo. Ushobora no gusiga itariki ubusa mukayumvikanaho icyo gihe.",
-        "detailsTitle": "Amakuru yawe",
-        "detailsText": "Tuyakoresha kugira ngo tukuvugishe ku busabe bwawe.",
-        "reviewTitle": "Suzuma ubusabe bwawe",
-        "reviewText": "Reba byose mbere yo kohereza. Ushobora guhindura igice icyo ari cyo cyose.",
-        "edit": "Hindura",
-        "notGiven": "Ntibyatanzwe",
-        "noDate": "Nta tariki wahisemo",
-        "back": "Subira inyuma",
-        "continue": "Komeza",
-        "doneTitle": "Ubusabe bwoherejwe",
-        "referenceLabel": "Nimero y'ubusabe",
-        "statusLabel": "Uko bihagaze",
-        "statusReceived": "Bwakiriwe",
-        "whatsappUrgent": "Byihutirwa? Twandikire kuri WhatsApp",
-        "moreServices": "Reba serivisi zose"
-      },
-      "listTitle": "Reba serivisi zacu",
-      "listText": "Hitamo serivisi urebe ibyo ikubiyemo, uyisabe mu ntambwe nke.",
-      "hero": {
-        "overline": "Serivisi z'ibikoresho byo mu nzu",
-        "explore": "Reba serivisi",
-        "talk": "Vugana n'itsinda ryacu",
-        "count": "{count, plural, one {Serivisi # itangwa n'abatekinisiye babihuguriwe} other {Serivisi # zitangwa n'abatekinisiye babihuguriwe}}"
-      },
-      "promo": {
-        "overline": "Ntuzi aho uhera?",
-        "title": "Tubwire icyo ukeneye",
-        "text": "Tubwire iby'inzu yawe, ibiro cyangwa aho ukorera, itsinda ryacu rikugire inama kuri serivisi ikwiriye.",
-        "contact": "Twandikire",
-        "whatsapp": "WhatsApp",
-        "call": "Hamagara",
-        "email": "Imeyili",
-        "emailSubject": "Ikibazo ku serivisi z'ibikoresho byo mu nzu"
-      },
-      "card": {
-        "details": "Ibisobanuro",
-        "book": "Saba ubu",
-        "included": "Ibikubiyemo",
-        "showIncluded": "Reba ibikubiyemo",
-        "showFront": "Subira ku ncamake",
-        "more": "{count, plural, one {+ # kindi ku rupapuro rw'ibisobanuro} other {+ # ibindi ku rupapuro rw'ibisobanuro}}",
-        "noItems": "Reba urupapuro rw'ibisobanuro cyangwa ubaze itsinda ryacu ibyo iyi serivisi ikubiyemo."
       }
     },
     "soldBy": {

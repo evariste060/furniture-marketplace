@@ -24,7 +24,7 @@ const DURATION_MS = 5000;
 const TONES: Record<Tone, { className: string; Icon: typeof Info }> = {
   success: { className: "bg-ok-bg text-ok-tx", Icon: CheckCircle2 },
   error: { className: "bg-err-bg text-err-tx", Icon: AlertCircle },
-  info: { className: "bg-light text-pri", Icon: Info },
+  info: { className: "bg-light text-pri-fg", Icon: Info },
 };
 
 let nextId = 1;

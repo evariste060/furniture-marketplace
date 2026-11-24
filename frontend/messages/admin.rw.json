@@ -18,12 +18,10 @@
       "promotions": "Poromosiyo",
       "reviews": "Ibitekerezo no kugenzura",
       "messages": "Ubufasha bw'urubuga",
-      "serviceRequests": "Ubusabe bwa serivisi",
       "quotes": "Ubusabe bw'ibiciro",
       "analytics": "Isesengura na raporo",
       "settings": "Igenamiterere ry'urubuga",
       "delivery": "Uturere two kugeza",
-      "services": "Serivisi",
       "staff": "Abayobozi",
       "audit": "Igitabo cy'ibikorwa"
     },
@@ -52,8 +50,7 @@
       "sellers": "{count, plural, one {Ubusabe # bw'umucuruzi bwo gusuzuma} other {Ubusabe # bw'abacuruzi bwo gusuzuma}}",
       "messages": "{count, plural, one {Ubutumwa # bwo gusubiza} other {Ubutumwa # bwo gusubiza}}",
       "quotes": "{count, plural, one {Ubusabe # bushya bw'igiciro} other {Ubusabe # bushya bw'ibiciro}}",
-      "reviews": "{count, plural, one {Igitekerezo # cyo kwemeza} other {Ibitekerezo # byo kwemeza}}",
-      "serviceRequests": "{count, plural, one {Ubusabe bushya # bwa serivisi} other {Ubusabe bushya # bwa serivisi}}"
+      "reviews": "{count, plural, one {Igitekerezo # cyo kwemeza} other {Ibitekerezo # byo kwemeza}}"
     }
   },
   "denied": {
@@ -190,10 +187,6 @@
       "messages": {
         "title": "Ibiganiro by'ubufasha",
         "body": "{count, plural, =0 {Nta kiganiro gifunguye.} one {Ikiganiro # kirafunguye.} other {Ibiganiro # birafunguye.}}"
-      },
-      "serviceRequests": {
-        "title": "Ubusabe bwa serivisi",
-        "body": "{count, plural, =0 {Nta busabe bushya bwa serivisi.} one {Ubusabe bushya # bwa serivisi.} other {Ubusabe bushya # bwa serivisi.}}"
       },
       "quotes": {
         "title": "Ubusabe bw'ibiciro",
@@ -1295,166 +1288,9 @@
     "settings": "Igenamiterere ry'urubuga",
     "staff": "Abayobozi",
     "brands": "Ibirango",
-    "services": "Serivisi",
-    "serviceRequests": "Ubusabe bwa serivisi",
     "sellers": "Abacuruzi",
     "seller": "Umucuruzi",
     "analytics": "Isesengura na raporo"
-  },
-  "services": {
-    "title": "Serivisi",
-    "description": "Serivisi z'ibikoresho byo mu nzu ziri ku mpapuro za Serivisi z'iduka, uko zikurikirana. Serivisi ntizigurishwa kuri interineti: buri imwe ifite ifishi y'ubusabe.",
-    "add": "Ongeraho serivisi",
-    "listLabel": "Serivisi",
-    "empty": "Nta serivisi irahari. Ongeraho iya mbere.",
-    "moveUp": "Zamura {name}",
-    "moveDown": "Manura {name}",
-    "itemCount": "{count, plural, one {Ikintu #} other {Ibintu #}}",
-    "requestCount": "{count, plural, =0 {Nta busabe} one {Ubusabe #} other {Ubusabe #}}",
-    "noRw": "Nta Kinyarwanda",
-    "shown": "{name} ubu igaragara mu iduka",
-    "hidden": "{name} ubu ihishwe mu iduka",
-    "showService": "Erekana {name} mu iduka",
-    "editOf": "Hindura {name}",
-    "deleted": "{name} yasibwe",
-    "tabsLabel": "Ibice bya serivisi",
-    "tabs": {
-      "details": "Ibisobanuro",
-      "items": "Ibyo dutanga ({count})",
-      "image": "Ifoto"
-    },
-    "nameEn": "Izina (Icyongereza)",
-    "nameRw": "Izina (Ikinyarwanda)",
-    "slug": "Aderesi y'urubuga (slug)",
-    "slugHelp": "Siga ubusa kugira ngo ikorwe uhereye ku izina ry'Icyongereza.",
-    "shortEn": "Inyandiko y'ikarita (Icyongereza)",
-    "shortRw": "Inyandiko y'ikarita (Ikinyarwanda)",
-    "introEn": "Intangiriro y'urupapuro (Icyongereza)",
-    "introRw": "Intangiriro y'urupapuro (Ikinyarwanda)",
-    "icon": "Agashushanyo",
-    "icons": {
-      "cctv": "Kamera y'umutekano",
-      "gate": "Irembo",
-      "fingerprint": "Igikumwe (kugenzura kwinjira)",
-      "network": "Umuyoboro",
-      "wrench": "Urufunguzo (gukora ibyangiritse)",
-      "graduation-cap": "Ingofero y'abarangije (amahugurwa)",
-      "shield": "Ingabo (umutekano)",
-      "cpu": "Chip (IT)",
-      "hammer": "Inyundo",
-      "truck": "Imodoka itwara ibintu",
-      "ruler": "Igipimo",
-      "sofa": "Intebe",
-      "paintbrush": "Uburoso bwo gusiga irangi"
-    },
-    "activeService": "Erekana iyi serivisi mu iduka",
-    "deleteHint": "{count, plural, one {Iyi serivisi ifite ubusabe #,} other {Iyi serivisi ifite ubusabe #,}} ntishobora gusibwa. Yihishe aho kuyisiba.",
-    "image": "Ifoto",
-    "itemsAfterSave": "Banza ubike serivisi, hanyuma wongereho ibyo itanga n'ifoto.",
-    "itemsLabel": "Ibyo dutanga",
-    "noItems": "Nta kintu kirahari. Ongeraho ibyo iyi serivisi ikubiyemo, kimwe ku murongo.",
-    "itemEn": "Ikintu (Icyongereza)",
-    "itemRw": "Ikintu (Ikinyarwanda)",
-    "addItem": "Ongeraho ikintu",
-    "itemsFull": "Serivisi ifite ibintu {max} ntarengwa.",
-    "moveItemUp": "Zamura “{name}”",
-    "moveItemDown": "Manura “{name}”",
-    "editItem": "Hindura “{name}”",
-    "deleteItem": "Siba “{name}”",
-    "errors": {
-      "text": "Andika nibura inyuguti 2.",
-      "slug": "Koresha inyuguti nto, imibare n'akanyerezo kamwe.",
-      "slugTaken": "Indi serivisi isanzwe ikoresha iyi aderesi.",
-      "hasRequests": "Iyi serivisi ifite ubusabe, ntishobora gusibwa. Yihishe aho kuyisiba."
-    }
-  },
-  "serviceRequests": {
-    "title": "Ubusabe bwa serivisi",
-    "description": "Ubusabe buturutse ku mpapuro za serivisi z'iduka. Hamagara cyangwa wandikire umukiliya kuri WhatsApp, hanyuma ukomeze ubusabe.",
-    "listLabel": "Ubusabe bwa serivisi",
-    "tabsLabel": "Uko ubusabe bwa serivisi buhagaze",
-    "status": {
-      "new": "Bushya",
-      "contacted": "Twavuganye",
-      "scheduled": "Byateganyijwe",
-      "completed": "Byarangiye",
-      "cancelled": "Byahagaritswe"
-    },
-    "service": "Serivisi",
-    "allServices": "Serivisi zose",
-    "from": "Byoherejwe kuva",
-    "to": "Byoherejwe kugeza",
-    "clearFilters": "Kuraho iyungurura",
-    "empty": "Nta busabe bwa serivisi burahari. Ubusabe buturutse ku mpapuro za Serivisi buzagaragara hano.",
-    "emptyFiltered": "Nta busabe bwa serivisi buhuye n'iyi yungurura.",
-    "columns": {
-      "client": "Umukiliya",
-      "service": "Serivisi",
-      "type": "Ubwoko bw'umukiliya",
-      "sent": "Byoherejwe",
-      "assigned": "Bihawe",
-      "status": "Uko bihagaze",
-      "actions": "Ibikorwa"
-    },
-    "clientTypes": {
-      "home": "Urugo",
-      "business": "Ubucuruzi",
-      "institution": "Ikigo"
-    },
-    "unassigned": "Ntawe bihawe",
-    "detailTitle": "Ubusabe bwa {name}",
-    "call": "Hamagara",
-    "whatsapp": "WhatsApp",
-    "newTab": "(bifungukira mu idirishya rishya)",
-    "whatsappMessage": "Muraho {name}, ni {marketplace} ku bijyanye n'ubusabe bwanyu {reference} bwa {service}.",
-    "location": "Aho aherereye",
-    "preferredDate": "Itariki yifuza",
-    "language": "Ururimi",
-    "prefersRw": "Ahitamo Ikinyarwanda",
-    "notGiven": "Ntibyatanzwe",
-    "notes": "Inyandiko z'imbere",
-    "notesHelp": "Abakozi bonyine ni bo babona izi nyandiko.",
-    "saveNotes": "Bika inyandiko",
-    "emptyTitle": "Nta busabe buraza",
-    "emptyFilteredTitle": "Nta gihuye n'ibyo washatse",
-    "overview": {
-      "all": "Ubusabe bwose",
-      "hints": {
-        "all": "Ibyakiriwe byose",
-        "new": "Bikeneye guhamagarwa",
-        "contacted": "Umukiriya yavuganywe",
-        "scheduled": "Gusura cyangwa akazi byateganyijwe",
-        "completed": "Akazi karakozwe",
-        "cancelled": "Byafunzwe nta kazi kakozwe"
-      }
-    },
-    "assignedFilter": "Ushinzwe",
-    "anyone": "Uwo ari we wese",
-    "anyDay": "Umunsi uwo ari wo wose",
-    "whatsappName": "Andikira {name} kuri WhatsApp",
-    "open": "Fungura ubusabe bwa {name}",
-    "copyReference": "Koporora nimero {reference}",
-    "copied": "Nimero yakoporowe",
-    "receivedAgo": "Bwakiriwe {ago} · {date}",
-    "email": "Imeyili",
-    "progressTitle": "Aho bigeze",
-    "next": {
-      "new": "Shyira ku cyavuganywe",
-      "contacted": "Shyira ku cyateganyijwe",
-      "scheduled": "Shyira ku cyarangiye"
-    },
-    "cancelRequest": "Hagarika ubusabe",
-    "cancelledNote": "Ubu busabe bwahagaritswe.",
-    "reopen": "Ongera ufungure",
-    "detailsTitle": "Ibisobanuro by'ubusabe",
-    "messageTitle": "Ubutumwa bw'umukiriya",
-    "manageTitle": "Gukurikirana",
-    "activityTitle": "Ibyakozwe",
-    "activity": {
-      "received": "Ubusabe bwakiriwe",
-      "statusChanged": "Byashyizwe kuri {status}",
-      "updated": "Byahinduwe bwa nyuma"
-    }
   },
   "inbox": {
     "call": "Hamagara",

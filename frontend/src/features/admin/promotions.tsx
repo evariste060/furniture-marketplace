@@ -119,7 +119,7 @@ export function PromotionsView() {
               onClick={() => setPhase(p)}
               className={cx(
                 "flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-left shadow-sh transition-[border-color,box-shadow,background-color] duration-150 motion-reduce:transition-none",
-                on ? "border-pri bg-light ring-1 ring-pri" : "border-bd bg-white hover:border-bd2 hover:shadow-sh2",
+                on ? "border-pri bg-light ring-1 ring-pri" : "border-bd bg-card hover:border-bd2 hover:shadow-sh2",
               )}
             >
               <span aria-hidden="true" className={cx("flex size-10 flex-none items-center justify-center rounded-lg", tone)}>
@@ -134,7 +134,7 @@ export function PromotionsView() {
         })}
       </div>
 
-      <section className="min-w-0 overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="min-w-0 overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         {query.isError ? (
           <LoadError onRetry={() => query.refetch()} className="m-5" />
         ) : query.data && rows.length === 0 ? (
@@ -408,7 +408,7 @@ function PromotionForm({
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label={t("promotions.discount")} error={errors.value ?? errors.percent_off ?? errors.amount_off}>
               {(c) => (
-                <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-white focus-within:border-pri focus-within:shadow-focus">
+                <div className="flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-card focus-within:border-pri focus-within:shadow-focus">
                   {kind === "fixed" && <span className="flex h-full items-center border-r border-bd bg-page px-3 text-sm font-medium text-tx2">RWF</span>}
                   <input {...c} inputMode="numeric" value={value} onChange={(e) => setValue(e.target.value)} className="h-full min-w-0 flex-1 border-0 px-3.5 text-base outline-none" />
                   {kind === "percent" && <span className="flex h-full items-center border-l border-bd bg-page px-3 text-sm font-medium text-tx2">%</span>}

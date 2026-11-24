@@ -94,7 +94,7 @@ async function SearchResults({ searchParams }: Pick<Props, "searchParams">) {
 
   return (
     <>
-      <section className="border-b border-bd bg-white">
+      <section className="border-b border-bd bg-card">
         <div className="wrap flex flex-col gap-2 pt-5 pb-5 sm:pt-7 sm:pb-6">
           <Breadcrumb
             label={tu("breadcrumb")}
@@ -132,12 +132,12 @@ async function SearchResults({ searchParams }: Pick<Props, "searchParams">) {
       </section>
       <div className="wrap flex flex-col gap-5 pt-5 pb-14 sm:pt-6">
         {/* Sticks under the header while the results scroll; -my/py keep its resting position. */}
-        <div className="sticky top-(--store-header-h) z-30 -my-3 flex flex-wrap items-center gap-3 bg-white py-3">
+        <div className="sticky top-(--store-header-h) z-30 -my-3 flex flex-wrap items-center gap-3 bg-card py-3">
           <FilterSheet state={state} facets={facets} basePath="/search" base={base} side="right" className="flex-none" keepCategory={Boolean(trail)} />
           <Link
             href={href({ stock: inStockOnly ? [] : ["in"], page: 1 })}
             aria-current={inStockOnly ? "true" : undefined}
-            className={cx(CHIP, inStockOnly ? "border-pri bg-light text-pri-h" : "border-bd bg-white text-tx")}
+            className={cx(CHIP, inStockOnly ? "border-pri bg-light text-pri-h" : "border-bd bg-card text-tx")}
           >
             {inStockOnly && <Check size={14} aria-hidden="true" className="mr-1.5" />}
             {t("inStockOnly")}
@@ -151,7 +151,7 @@ async function SearchResults({ searchParams }: Pick<Props, "searchParams">) {
           <SortSelect state={state} basePath="/search" />
         </div>
         {products.items.length === 0 ? (
-          <div className="flex flex-col items-start gap-2 rounded-xl border border-bd bg-white p-8">
+          <div className="flex flex-col items-start gap-2 rounded-xl border border-bd bg-card p-8">
             <h2 className="t-h3">{tl("empty")}</h2>
             <p className="text-tx2">{tl("emptyHint")}</p>
             {canClear && (
@@ -183,7 +183,7 @@ async function SearchResults({ searchParams }: Pick<Props, "searchParams">) {
 
 function CategoryChip({ href, on, label }: { href: string; on: boolean; label: string }) {
   return (
-    <Link href={href} aria-current={on ? "true" : undefined} className={cx(CHIP, on ? "border-pri bg-light text-pri-h" : "border-bd bg-white text-tx hover:text-tx")}>
+    <Link href={href} aria-current={on ? "true" : undefined} className={cx(CHIP, on ? "border-pri bg-light text-pri-h" : "border-bd bg-card text-tx hover:text-tx")}>
       {label}
     </Link>
   );
@@ -194,7 +194,7 @@ async function Prompt() {
   const t = await getTranslations("store.search");
   return (
     <div className="wrap flex flex-col items-center gap-4 py-16 text-center">
-      <span className="flex size-24 items-center justify-center rounded-full bg-light text-pri" aria-hidden="true">
+      <span className="flex size-24 items-center justify-center rounded-full bg-light text-pri-fg" aria-hidden="true">
         <SearchIcon size={40} />
       </span>
       <h1 className="t-h2">{t("title")}</h1>
@@ -212,7 +212,7 @@ async function NoResults({ q }: { q: string }) {
     <>
       <section className="bg-page">
         <div className="wrap flex flex-col items-center gap-4 pt-12 pb-12 text-center sm:pt-[72px] sm:pb-16">
-          <span className="flex size-24 items-center justify-center rounded-full bg-light text-pri" aria-hidden="true">
+          <span className="flex size-24 items-center justify-center rounded-full bg-light text-pri-fg" aria-hidden="true">
             <SearchIcon size={40} />
           </span>
           <h1 className="t-h2 break-words">{t("emptyTitle", { q })}</h1>
@@ -240,7 +240,7 @@ async function NoResults({ q }: { q: string }) {
             <ul className="m-0 flex list-none flex-wrap justify-center gap-2.5 p-0 pt-2">
               {categories.map((c) => (
                 <li key={c.id}>
-                  <Link href={`/category/${c.slug}`} className={cx(CHIP, "border-bd bg-white text-tx hover:border-pri hover:text-tx")}>
+                  <Link href={`/category/${c.slug}`} className={cx(CHIP, "border-bd bg-card text-tx hover:border-pri hover:text-tx")}>
                     {c.name}
                   </Link>
                 </li>
@@ -261,7 +261,7 @@ async function Popular() {
   const page = await getProducts({ sort_by: "bestselling", sort_direction: "desc", size: 5 }).catch(() => null);
   if (!page?.items.length) return null;
   return (
-    <section aria-labelledby="popular-title" className="bg-white py-10 sm:py-14">
+    <section aria-labelledby="popular-title" className="bg-card py-10 sm:py-14">
       <div className="wrap flex flex-col gap-6">
         <h2 id="popular-title" className="t-h2">
           {t("popular")}
@@ -281,7 +281,7 @@ async function Popular() {
 function SearchFallback() {
   return (
     <>
-      <section className="border-b border-bd bg-white">
+      <section className="border-b border-bd bg-card">
         <div className="wrap flex flex-col gap-2 py-7">
           <Skeleton className="h-5 w-32" />
           <Skeleton className="h-10 w-72" />

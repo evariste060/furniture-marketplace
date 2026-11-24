@@ -208,7 +208,7 @@ export function ProductsView() {
                 "flex cursor-pointer items-center gap-3.5 rounded-xl border p-4 text-left shadow-sh transition-[border-color,box-shadow,background-color] duration-150 motion-reduce:transition-none",
                 on
                   ? "border-pri bg-light ring-1 ring-pri"
-                  : "border-bd bg-white hover:border-bd2 hover:shadow-sh2",
+                  : "border-bd bg-card hover:border-bd2 hover:shadow-sh2",
               )}
             >
               <span
@@ -243,7 +243,7 @@ export function ProductsView() {
         })}
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="flex flex-wrap items-end gap-3 border-b border-bd p-4">
           <Filter
             label={t("products.searchLabel")}
@@ -501,7 +501,7 @@ export function ProductsView() {
                                 manage ? "products.edit" : "products.open",
                                 { name: p.name },
                               )}
-                              className="flex size-8 items-center justify-center rounded-lg border border-bd bg-white text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none"
+                              className="flex size-8 items-center justify-center rounded-lg border border-bd bg-card text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none"
                             >
                               <Pencil size={15} aria-hidden="true" />
                             </NextLink>
@@ -514,7 +514,7 @@ export function ProductsView() {
                                   name: p.name,
                                 })}
                                 title={t("products.view", { name: p.name })}
-                                className="flex size-8 items-center justify-center rounded-lg border border-bd bg-white text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none"
+                                className="flex size-8 items-center justify-center rounded-lg border border-bd bg-card text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none"
                               >
                                 <ExternalLink size={15} aria-hidden="true" />
                               </a>
@@ -677,7 +677,7 @@ function BulkBar({ ids, onDone }: { ids: string[]; onDone: () => void }) {
           <CheckSquare size={16} />
         </span>
         <span className="flex flex-col">
-          <b className="text-sm font-semibold text-navy">
+          <b className="text-sm font-semibold text-head">
             {t("selected", { count: ids.length })}
           </b>
           <span className="text-cap text-tx2">{t("bulkHint")}</span>

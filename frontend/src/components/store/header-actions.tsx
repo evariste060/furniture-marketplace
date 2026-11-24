@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Heart, Menu, ShoppingCart, Truck, User } from "lucide-react";
+import { ChevronDown, Heart, Menu, Moon, ShoppingCart, Sun, Truck, User } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Suspense, useEffect, useId, useRef, useState, type InputHTMLAttributes, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +11,7 @@ import { useWishlistIds } from "@/features/wishlist/use-wishlist";
 import { Link, usePathname } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { cx } from "@/lib/cx";
+import { useTheme } from "@/lib/theme";
 import { Flag } from "./flags";
 import { useMenuState } from "./menu-state";
 
@@ -82,7 +83,7 @@ function LanguageMenuView({ href }: { href: string }) {
       <ul
         id={listId}
         hidden={!open}
-        className="absolute top-8 right-0 z-30 m-0 w-40 list-none flex-col rounded-lg border border-bd bg-white p-1 shadow-sh2 [&:not([hidden])]:flex"
+        className="absolute top-8 right-0 z-30 m-0 w-40 list-none flex-col rounded-lg border border-bd bg-card p-1 shadow-sh2 [&:not([hidden])]:flex"
       >
         {routing.locales.map((l) => (
           <li key={l}>
@@ -107,6 +108,40 @@ function LanguageMenuView({ href }: { href: string }) {
   );
 }
 
+/** Light / dark mode (SC-07): an icon button in the header's actions row, and a labelled row in
+ * the phone menu (`withLabel`). The choice applies to the whole site and is kept in this browser. */
+export function ThemeToggle({ withLabel = false }: { withLabel?: boolean }) {
+  const t = useTranslations("store.header");
+  const { theme, toggle } = useTheme();
+  const dark = theme === "dark";
+  const label = t(dark ? "lightMode" : "darkMode");
+  const Icon = dark ? Sun : Moon;
+  if (withLabel) {
+    return (
+      <button
+        type="button"
+        onClick={toggle}
+        aria-pressed={dark}
+        className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-bd bg-card px-3 py-1.5 text-cap font-semibold text-tx2 hover:text-tx"
+      >
+        <Icon size={15} aria-hidden="true" />
+        {label}
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={label}
+      title={label}
+      className="flex size-9 flex-none cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-tx hover:bg-subtle hover:text-pri-fg"
+    >
+      <Icon size={19} aria-hidden="true" />
+    </button>
+  );
+}
+
 /** The menu's EN | RW switch (MobileMenu.dc.html). */
 export function LanguageToggle() {
   return <WithCurrentHref render={(href) => <LanguageToggleView href={href} />} />;
@@ -126,7 +161,7 @@ function LanguageToggleView({ href }: { href: string }) {
           aria-current={l === locale ? "true" : undefined}
           className={cx(
             "px-3 py-1.5 text-cap font-semibold",
-            l === locale ? "bg-pri text-white hover:text-white" : "bg-white text-tx2 hover:text-tx",
+            l === locale ? "bg-pri text-white hover:text-white" : "bg-card text-tx2 hover:text-tx",
           )}
         >
           {l.toUpperCase()}
@@ -169,7 +204,7 @@ export function AccountAnchor({
   );
 }
 
-const HLINK = "flex items-center gap-2 text-sm font-medium whitespace-nowrap text-tx hover:text-pri";
+const HLINK = "flex items-center gap-2 text-sm font-medium whitespace-nowrap text-tx hover:text-pri-fg";
 
 export function AccountLink() {
   const t = useTranslations("store.header");
@@ -280,10 +315,10 @@ export function MenuButton() {
 }
 
 /** The store header's scroll behaviour and height. At the top of the page the whole header (the
- * actions row and the blue category row) sits in the page and scrolls away with it. Once it has
- * scrolled out of view, the actions row (logo, search, account, wishlist, cart) slides back in
- * and stays pinned to the top (data-compact on <header>: sticky, without the category row). Back
- * at the top of the page the full header returns in its place.
+ * actions row and the blue store menu) sits in the page and scrolls away with it. Once it has
+ * scrolled out of view, it slides back in and stays pinned to the top as one block (data-compact
+ * on <header>: sticky), so the actions row and the store menu never separate (SC-09). Back at the
+ * top of the page it returns to its place.
  *
  * Also publishes the header's height as --store-header-h on <html>, so the listing filters stick
  * right under it (the height also changes when the desktop row wraps on tablets). globals.css
@@ -302,18 +337,14 @@ export function HeaderHeight() {
     const update = () => {
       frame = 0;
       const y = window.scrollY;
-      // Pinned once the full header is out of view; full again only back where it starts (the
-      // gap between the two keeps the category row's removal from flipping it back).
+      // Pinned once the full header is out of view; in place again only back where it starts
+      // (the gap between the two keeps it from flickering at the edge).
       const next = compact ? y > start() : y > start() + header.offsetHeight;
       if (next === compact) return;
       compact = next;
-      // Pinning removes the category row above the content: the browser's scroll anchoring keeps
-      // the content still. Back at the top the row returns and the content should move down
-      // under it instead, so anchoring is off for that one change.
-      if (!compact) root.style.overflowAnchor = "none";
+      // The header keeps its place in the page either way (sticky), so nothing below it moves.
       header.toggleAttribute("data-compact", compact);
-      publish(); // reads the height: lays the page out now, without anchoring
-      if (!compact) requestAnimationFrame(() => root.style.removeProperty("overflow-anchor"));
+      publish();
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);

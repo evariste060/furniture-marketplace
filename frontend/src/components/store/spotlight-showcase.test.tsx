@@ -70,7 +70,7 @@ describe("SpotlightShowcase", () => {
     expect(screen.getByRole("link", { name: "iPhone 15" })).toHaveAttribute("href", "/product/apple-iphone-15");
     expect(screen.getByText("128GB · Black")).toBeInTheDocument();
     expect(screen.getByText("Rated 4.5 out of 5 from 4 reviews")).toBeInTheDocument();
-    expect(screen.getByText("RWF 1,200,000", { exact: false })).toHaveClass("text-err");
+    expect(screen.getByText("RWF 1,200,000", { exact: false })).toHaveClass("text-err-fg");
     expect(screen.getByText("RWF 1,350,000", { exact: false })).toHaveClass("line-through");
     expect(screen.getByRole("button", { name: "Buy Now: iPhone 15" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add to Cart: iPhone 15" })).toBeInTheDocument();

@@ -9,7 +9,7 @@ export async function AdminNotFound({ home = "/admin" }: { home?: string }) {
   const t = await getTranslations("admin.missing");
   return (
     <div className="flex justify-center pt-24 max-md:pt-8">
-      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-white p-8 text-center">
+      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-card p-8 text-center">
         <span aria-hidden="true" className="flex size-20 items-center justify-center rounded-full bg-light text-pri-h">
           <SearchX size={32} />
         </span>

@@ -25,7 +25,7 @@ export function Conversation({ thread, onReply }: { thread: Thread; onReply: (bo
     <>
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-2.5">
-          <h1 className="t-h1 text-navy">{thread.subject}</h1>
+          <h1 className="t-h1 text-head">{thread.subject}</h1>
           <Badge tone={SUPPORT_TONE[thread.status]}>{t(`status.${thread.status}`)}</Badge>
         </div>
         <p className="m-0 text-sm text-tx2">
@@ -39,7 +39,7 @@ export function Conversation({ thread, onReply }: { thread: Thread; onReply: (bo
           {t("answeredNote")}
         </p>
       )}
-      <div className="flex flex-col gap-4 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+      <div className="flex flex-col gap-4 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
         <ol aria-label={t("conversation")} className="m-0 flex list-none flex-col gap-4 p-0">
           {thread.messages.map((m) => (
             <Bubble key={m.id} mine={m.author === "customer"} latest={m.id === lastStaff} who={m.author === "customer" ? t("you") : t("supportName")} at={m.created_at} body={m.body} />
@@ -58,14 +58,14 @@ function Bubble({ mine, latest, who, at, body }: { mine: boolean; latest: boolea
   return (
     <li className={cx("flex max-w-[85%] flex-col gap-1 max-sm:max-w-full", mine ? "items-end self-end" : "items-start self-start")}>
       <span className="flex items-center gap-1.5 text-cap text-tx2">
-        {!mine && <Headset size={13} aria-hidden="true" className="text-pri" />}
+        {!mine && <Headset size={13} aria-hidden="true" className="text-pri-fg" />}
         <b className="font-semibold text-tx">{who}</b>· {formatDate(at, "dateTime")}
         {latest && <Badge tone="soft-ok">{t("latestReply")}</Badge>}
       </span>
       <p
         className={cx(
           "m-0 rounded-xl px-4 py-3 text-base break-words whitespace-pre-line text-tx",
-          mine ? "rounded-tr-sm bg-light" : cx("rounded-tl-sm border bg-white", latest ? "border-ok shadow-sh" : "border-bd"),
+          mine ? "rounded-tr-sm bg-light" : cx("rounded-tl-sm border bg-card", latest ? "border-ok shadow-sh" : "border-bd"),
         )}
       >
         {body}

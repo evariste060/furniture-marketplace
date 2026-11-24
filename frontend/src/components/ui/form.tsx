@@ -4,7 +4,7 @@ import { cx } from "@/lib/cx";
 /** .field / .lbl / .inp / .help in tokens-and-components.css. */
 
 const CONTROL =
-  "w-full rounded-lg border border-bd bg-white px-3.5 text-base text-tx outline-none placeholder:text-mut " +
+  "w-full rounded-lg border border-bd bg-card px-3.5 text-base text-tx outline-none placeholder:text-mut " +
   "focus:border-pri focus:shadow-focus disabled:bg-subtle disabled:text-mut " +
   "aria-invalid:border-err";
 
@@ -38,7 +38,7 @@ export function Field({ label, help, error, className, children }: FieldProps) {
         "aria-invalid": error ? true : undefined,
       })}
       {note && (
-        <span id={noteId} className={cx("text-cap", error ? "text-err" : "text-mut")}>
+        <span id={noteId} className={cx("text-cap", error ? "text-err-fg" : "text-mut")}>
           {note}
         </span>
       )}
@@ -72,7 +72,7 @@ export function PhoneInput({ className, ...props }: InputHTMLAttributes<HTMLInpu
   return (
     <div
       className={cx(
-        "flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-white focus-within:border-pri focus-within:shadow-focus has-aria-invalid:border-err",
+        "flex h-11 items-center overflow-hidden rounded-lg border border-bd bg-card focus-within:border-pri focus-within:shadow-focus has-aria-invalid:border-err",
         className,
       )}
     >
@@ -112,7 +112,7 @@ export function RadioOption({ label, className, ...props }: ChoiceProps) {
   return (
     <label
       className={cx(
-        "flex cursor-pointer items-center gap-3.5 rounded-xl border border-bd bg-white p-4",
+        "flex cursor-pointer items-center gap-3.5 rounded-xl border border-bd bg-card p-4",
         "has-checked:border-2 has-checked:border-pri has-checked:bg-light has-checked:p-[15px]",
         "has-focus-visible:outline-2 has-focus-visible:outline-pri",
         className,
@@ -121,7 +121,7 @@ export function RadioOption({ label, className, ...props }: ChoiceProps) {
       <input type="radio" className="peer sr-only" {...props} />
       <span
         aria-hidden="true"
-        className="size-5 flex-none rounded-full border-[1.5px] border-bd2 bg-white peer-checked:border-6 peer-checked:border-pri"
+        className="size-5 flex-none rounded-full border-[1.5px] border-bd2 bg-card peer-checked:border-6 peer-checked:border-pri"
       />
       {label}
     </label>

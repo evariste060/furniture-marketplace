@@ -180,7 +180,7 @@ export function ReviewsView() {
 
       <section
         aria-label={t("listLabel")}
-        className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh"
+        className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh"
       >
         <ListHeading
           Icon={LOOK[status].Icon}
@@ -395,7 +395,7 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
   return (
     <div className="flex flex-col gap-5 p-5">
       {/* The rating and title, who wrote it, and where it stands. */}
-      <div className="flex flex-col gap-3 rounded-xl border border-bd bg-linear-to-br from-light to-white p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-bd bg-linear-to-br from-light to-card p-4">
         <div className="flex items-start gap-3">
           <span
             aria-hidden="true"
@@ -415,7 +415,7 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
               className={cx(
                 "text-lg break-words",
                 review.title
-                  ? "font-bold text-navy"
+                  ? "font-bold text-head"
                   : "font-medium text-tx2 italic",
               )}
             >
@@ -443,7 +443,7 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
       {/* In the customer's words. */}
       <DrawerSection title={t("reviewHeading")}>
         {review.body ? (
-          <figure className="m-0 flex gap-3 rounded-xl border border-bd bg-white p-4">
+          <figure className="m-0 flex gap-3 rounded-xl border border-bd bg-card p-4">
             <MessageSquareText
               size={18}
               aria-hidden="true"
@@ -490,8 +490,8 @@ function ReviewDetail({ review, now }: { review: Review; now: number }) {
                       on
                         ? "border-err bg-err-bg text-err-tx"
                         : error
-                          ? "border-err bg-white text-tx2"
-                          : "border-bd bg-white text-tx2 hover:border-bd2 hover:text-tx",
+                          ? "border-err bg-card text-tx2"
+                          : "border-bd bg-card text-tx2 hover:border-bd2 hover:text-tx",
                     )}
                   >
                     {on && <Check size={14} aria-hidden="true" />}

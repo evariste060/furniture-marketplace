@@ -23,7 +23,7 @@ export const CARD_HOVER = [
 ].join(" ");
 /** The product photo eases up to 108% while the card is hovered. */
 export const CARD_IMAGE_ZOOM = "transition-transform duration-500 ease-soft group-hover:scale-[1.08] motion-reduce:scale-100!";
-export const CARD_TITLE_HOVER = "transition-colors duration-300 group-hover:text-pri";
+export const CARD_TITLE_HOVER = "transition-colors duration-300 group-hover:text-pri-fg";
 
 /** The stock badge of the cards: tone and message key per stock level. */
 export const STOCK = {
@@ -77,10 +77,10 @@ export function ProductCard({
   const { variant, image, discount, stock, cart } = cardData(product);
   const href = `/product/${product.slug}`;
   return (
-    <article className={cx("relative flex h-full flex-col overflow-hidden rounded-xl border border-bd bg-white text-tx", CARD_HOVER)}>
+    <article className={cx("relative flex h-full flex-col overflow-hidden rounded-xl border border-bd bg-card text-tx", CARD_HOVER)}>
       {/* A square photo as wide as the card allows, up to 176px (phones ~155px, 5-column desktop 176px). */}
-      <Link href={href} tabIndex={-1} aria-hidden="true" className={cx("flex items-center justify-center bg-white px-2 pt-2", !dense && "sm:px-3 sm:pt-3")}>
-        <ProductImage image={image} alt="" sizes={IMAGE_SIZES.card} preload={preload} className={cx("aspect-square w-full max-w-44 bg-white", CARD_IMAGE_ZOOM)} />
+      <Link href={href} tabIndex={-1} aria-hidden="true" className={cx("flex items-center justify-center bg-card px-2 pt-2", !dense && "sm:px-3 sm:pt-3")}>
+        <ProductImage image={image} alt="" sizes={IMAGE_SIZES.card} preload={preload} className={cx("aspect-square w-full max-w-44 bg-card", CARD_IMAGE_ZOOM)} />
       </Link>
       {(discount || isNew || showStock) && (
         <span className="pointer-events-none absolute top-2.5 right-11 left-2.5 flex flex-wrap items-start gap-1">
@@ -90,7 +90,7 @@ export function ProductCard({
       )}
       <WishlistButton productId={product.id} productName={product.name} />
       <div className={cx("flex flex-1 flex-col", dense ? "gap-1 px-3 pt-2 pb-3" : "gap-1.5 px-3.5 pt-3 pb-3.5")}>
-        <Link href={href} className={cx("line-clamp-2 text-base leading-5 font-semibold text-tx hover:text-pri", !dense && "min-h-10", CARD_TITLE_HOVER)}>
+        <Link href={href} className={cx("line-clamp-2 text-base leading-5 font-semibold text-tx hover:text-pri-fg", !dense && "min-h-10", CARD_TITLE_HOVER)}>
           {product.name}
         </Link>
         {variant?.name && <span className="text-cap text-mut">{variant.name}</span>}
@@ -100,7 +100,7 @@ export function ProductCard({
         {(!dense || product.rating.count > 0) && <RatingStars rating={product.rating} />}
         {variant && (
           <span className={cx("flex flex-wrap items-baseline gap-2", !dense && "mt-auto")}>
-            <span className={cx("t-price", discount ? "text-err" : "text-tx")}>{formatMoney(variant.price)}</span>
+            <span className={cx("t-price", discount ? "text-err-fg" : "text-tx")}>{formatMoney(variant.price)}</span>
             {discount && variant.compare_at_price ? (
               <span className="text-cap text-mut line-through">
                 <span className="sr-only">{t("was")} </span>

@@ -3,7 +3,7 @@
 import { LogOut, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
-import { ACCOUNT_LINKS, isAccountLinkActive, useLogOut } from "@/features/account/account-shell";
+import { ACCOUNT_LINKS, isAccountLinkActive, SellerDashboardLink, useLogOut } from "@/features/account/account-shell";
 import { useSession } from "@/features/session/use-session";
 import { Link } from "@/i18n/navigation";
 import { cx } from "@/lib/cx";
@@ -77,7 +77,7 @@ function AccountPopup({ className, tone, pathname }: { className: string; tone: 
         ref={panel}
         id={id}
         hidden={!open}
-        className="fixed right-2 bottom-[calc(4rem+0.5rem)] z-50 max-h-[calc(100dvh-5rem)] w-60 max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-xl border border-bd bg-white p-2 shadow-sh2"
+        className="fixed right-2 bottom-[calc(4rem+0.5rem)] z-50 max-h-[calc(100dvh-5rem)] w-60 max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-xl border border-bd bg-card p-2 shadow-sh2"
       >
         <nav aria-label={ta("navLabel")} className="flex flex-col gap-0.5">
           {ACCOUNT_LINKS.map(({ href, key, Icon }) => {
@@ -95,6 +95,7 @@ function AccountPopup({ className, tone, pathname }: { className: string; tone: 
               </Link>
             );
           })}
+          <SellerDashboardLink enabled className={cx(ROW, "text-tx hover:bg-page hover:text-pri-h")} onClick={() => setOpen(false)} />
           <hr className="hr my-1" />
           <button
             type="button"
@@ -102,7 +103,7 @@ function AccountPopup({ className, tone, pathname }: { className: string; tone: 
               setOpen(false);
               void logOut();
             }}
-            className={cx(ROW, "cursor-pointer border-0 bg-transparent text-left text-err hover:bg-err-bg")}
+            className={cx(ROW, "cursor-pointer border-0 bg-transparent text-left text-err-fg hover:bg-err-bg")}
           >
             <LogOut size={18} aria-hidden="true" />
             {ta("nav.logout")}

@@ -1,8 +1,8 @@
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { MARKETPLACE_NAME } from "@/lib/marketplace";
 import { Suspense } from "react";
 import { SOCIAL_NAMES, SOCIAL_NETWORKS, SocialIcon, type SocialNetwork } from "@/components/ui/social-icons";
-import { getCategories, getServices, getStoreContact } from "@/lib/api/catalogue";
+import { getCategories, getStoreContact } from "@/lib/api/catalogue";
 import { Link } from "@/i18n/navigation";
 import { topCategories } from "@/lib/catalogue";
 import { INFO_PAGES } from "@/lib/info-pages";
@@ -23,7 +23,7 @@ const SOCIAL_HOVER: Record<SocialNetwork, string> = {
 const STORE_NAME = MARKETPLACE_NAME;
 
 /** Footer.dc.html, rearranged (owner, 2026-11-18): one row with the logo, tagline and social
- * icons, then Shop (the API's categories), Services (ADR-013), Customer Service and Company; "We
+ * icons, then Shop (the API's categories), Customer Service and Company (Services removed, SC-07); "We
  * accept" on a second row; the contact lines are left out (the Contact page has them). The social
  * icons are the links set in Settings (GET /settings → social), each left out while unset. */
 export async function StoreFooter() {
@@ -31,9 +31,9 @@ export async function StoreFooter() {
   const th = await getTranslations("store");
   return (
     <footer className="bg-navy text-white">
-      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 pt-14 pb-10 sm:grid-cols-4 lg:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))] lg:gap-x-8">
-        <div className="col-span-2 flex max-w-[320px] flex-col gap-4 sm:col-span-4 lg:col-span-1">
-          <div className="w-fit rounded-[10px] bg-white px-3 py-2">
+      <div className="wrap grid grid-cols-2 gap-x-6 gap-y-10 pt-14 pb-10 sm:grid-cols-3 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-x-8">
+        <div className="col-span-2 flex max-w-[320px] flex-col gap-4 sm:col-span-3 lg:col-span-1">
+          <div className="w-fit rounded-[10px] bg-card px-3 py-2">
             <Logo height={40} alt={th("logoAlt")} />
           </div>
           <p className="text-sm text-odm">{t("tagline")}</p>
@@ -48,15 +48,6 @@ export async function StoreFooter() {
           </Suspense>
           <Link href="/deals" className={LINK}>
             {th("header.deals")}
-          </Link>
-        </nav>
-        <nav aria-label={t("services")} className="flex flex-col gap-2.5">
-          <h2 className={HEADING}>{t("services")}</h2>
-          <Suspense fallback={null}>
-            <ServiceLinks />
-          </Suspense>
-          <Link href="/services" className={LINK}>
-            {t("allServices")}
           </Link>
         </nav>
         <nav aria-label={t("customerService")} className="flex flex-col gap-2.5">
@@ -125,16 +116,6 @@ async function ShopLinks() {
   return categories.map((c) => (
     <Link key={c.id} href={`/category/${c.slug}`} className={LINK}>
       {c.name}
-    </Link>
-  ));
-}
-
-async function ServiceLinks() {
-  const locale = (await getLocale()) === "rw" ? "rw" : "en";
-  const services = await getServices(locale).catch(() => []);
-  return services.map((s) => (
-    <Link key={s.slug} href={`/services/${s.slug}`} className={LINK}>
-      {s.name}
     </Link>
   ));
 }

@@ -145,10 +145,10 @@ async function ProductContent({ params }: Pick<Props, "params">) {
             <InfoCard warranty={product.warranty_text} />
           </Suspense>
           <WhatsAppLink label={t("askWhatsappShort")} message={t("whatsappMessage", { name: product.name })} block className="sm:hidden" />
-          <Link href="/contact" className="flex items-center gap-2.5 rounded-xl bg-light px-4 py-3 text-navy hover:text-navy max-sm:hidden">
-            <Building2 size={18} aria-hidden="true" className="text-pri" />
+          <Link href="/contact" className="flex items-center gap-2.5 rounded-xl bg-light px-4 py-3 text-head hover:text-head max-sm:hidden">
+            <Building2 size={18} aria-hidden="true" className="text-pri-fg" />
             <span className="flex-1 text-sm font-medium">{t("businessQuote")}</span>
-            <ArrowRight size={16} aria-hidden="true" className="text-pri" />
+            <ArrowRight size={16} aria-hidden="true" className="text-pri-fg" />
           </Link>
         </div>
       </section>
@@ -278,10 +278,10 @@ async function InfoCard({ warranty }: { warranty: string | null }) {
     },
   );
   return (
-    <ul className="m-0 list-none overflow-hidden rounded-xl border border-bd bg-white p-0">
+    <ul className="m-0 list-none overflow-hidden rounded-xl border border-bd bg-card p-0">
       {rows.map((row) => (
         <li key={row.title} className="flex items-start gap-3 border-b border-bd px-4 py-3.5 last:border-b-0 max-sm:gap-2.5 max-sm:px-3.5 max-sm:py-3">
-          <span className="text-pri" aria-hidden="true">
+          <span className="text-pri-fg" aria-hidden="true">
             {row.icon}
           </span>
           <span className="flex flex-1 flex-col gap-0.5">

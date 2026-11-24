@@ -27,7 +27,7 @@ export function RichText({ markdown }: { markdown: string }) {
     ),
     blockquote: ({ children }) => (
       <div className="flex items-start gap-3 rounded-xl bg-light p-4 text-sm text-tx2 [&_p]:text-sm [&_p]:text-tx2">
-        <Info size={20} aria-hidden="true" className="mt-0.5 flex-none text-pri" />
+        <Info size={20} aria-hidden="true" className="mt-0.5 flex-none text-pri-fg" />
         <div className="flex flex-col gap-2">{children}</div>
       </div>
     ),

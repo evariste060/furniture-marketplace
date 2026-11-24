@@ -94,7 +94,7 @@ function Badge({ children, tone = "pri" }: { children: ReactNode; tone?: "pri" |
     <span
       className={cx(
         "flex size-20 flex-none items-center justify-center rounded-full max-sm:size-16",
-        tone === "ok" ? "bg-ok-bg text-ok-tx" : tone === "err" ? "bg-err-bg text-err-tx" : "bg-light text-pri",
+        tone === "ok" ? "bg-ok-bg text-ok-tx" : tone === "err" ? "bg-err-bg text-err-tx" : "bg-light text-pri-fg",
       )}
     >
       {children}
@@ -117,7 +117,7 @@ function BrandBand() {
 /** The card of the references: band, then the centred body. */
 function BrandCard({ children, labelledBy, className }: { children: ReactNode; labelledBy: string; className?: string }) {
   return (
-    <section aria-labelledby={labelledBy} className={cx("mx-auto w-full max-w-[600px] overflow-hidden rounded-2xl bg-white shadow-sh2", className)}>
+    <section aria-labelledby={labelledBy} className={cx("mx-auto w-full max-w-[600px] overflow-hidden rounded-2xl bg-card shadow-sh2", className)}>
       <BrandBand />
       <div className="flex flex-col items-center gap-4 px-12 pt-10 pb-11 text-center max-sm:px-5 max-sm:pt-8 max-sm:pb-7">{children}</div>
     </section>
@@ -222,7 +222,7 @@ export function NewLinkForm({ email, cooldown = 0, nested = false }: { email?: s
         </Field>
       )}
       {email !== undefined && error && (
-        <span role="alert" className="text-cap text-err">
+        <span role="alert" className="text-cap text-err-fg">
           {error}
         </span>
       )}
@@ -282,7 +282,7 @@ function ResendLink({ email }: { email: string }) {
         onClick={resend}
         disabled={pending || wait > 0}
         aria-busy={pending || undefined}
-        className="cursor-pointer border-0 bg-transparent p-0 text-base font-semibold text-navy hover:underline disabled:cursor-default disabled:text-tx2 disabled:no-underline"
+        className="cursor-pointer border-0 bg-transparent p-0 text-base font-semibold text-head hover:underline disabled:cursor-default disabled:text-tx2 disabled:no-underline"
       >
         {pending ? t("sending") : wait > 0 ? t("resendIn", { time: clock(wait) }) : t("resendLink")}
       </button>
@@ -328,7 +328,7 @@ export function CheckYourEmail({ email }: { email: string }) {
           type="button"
           onClick={close}
           aria-label={ta("verify.close")}
-          className="absolute -top-4 -right-4 flex size-11 cursor-pointer items-center justify-center rounded-full border-0 bg-white text-tx2 shadow-sh2 hover:text-tx max-sm:top-2 max-sm:right-2 max-sm:size-9 max-sm:bg-white/15 max-sm:text-white max-sm:shadow-none"
+          className="absolute -top-4 -right-4 flex size-11 cursor-pointer items-center justify-center rounded-full border-0 bg-card text-tx2 shadow-sh2 hover:text-tx max-sm:top-2 max-sm:right-2 max-sm:size-9 max-sm:bg-white/15 max-sm:text-white max-sm:shadow-none"
         >
           <X size={20} aria-hidden="true" />
         </button>

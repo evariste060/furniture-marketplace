@@ -22,7 +22,7 @@ export default async function TrackPage() {
       <div className="wrap flex max-w-[1040px] flex-col gap-6 pt-10 pb-16 max-sm:pt-5">
         <div className="flex flex-col gap-1.5">
           <Breadcrumb label={tu("breadcrumb")} items={[{ label: th("home"), href: getPathname({ href: "/", locale }) }, { label: t("crumb") }]} />
-          <h1 className="t-h1 text-navy">{t("title")}</h1>
+          <h1 className="t-h1 text-head">{t("title")}</h1>
           <p className="text-tx2">{t("text")}</p>
         </div>
         <Suspense fallback={null}>

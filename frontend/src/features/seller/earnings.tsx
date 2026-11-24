@@ -55,7 +55,7 @@ export function SellerEarningsView() {
       <p className="m-0 text-sm text-tx2">
         {td("commissionRate", { rate: percent(store.commissionRateBps) })}
       </p>
-      <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="border-b border-bd px-5 py-[18px]">
           <h2 className="t-h3">{t("byOrder")}</h2>
         </div>

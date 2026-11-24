@@ -242,7 +242,7 @@ function CatalogueHeader({ categories, brands, action }: { categories?: Category
 
 function Stat({ Icon, tone, label, value }: { Icon: LucideIcon; tone: string; label: string; value: number | undefined }) {
   return (
-    <div className="flex items-center gap-3.5 rounded-xl border border-bd bg-white p-4 shadow-sh">
+    <div className="flex items-center gap-3.5 rounded-xl border border-bd bg-card p-4 shadow-sh">
       <span aria-hidden="true" className={cx("flex size-10 flex-none items-center justify-center rounded-xl", tone)}>
         <Icon size={19} />
       </span>
@@ -291,7 +291,7 @@ export function CategoriesView() {
           <Skeleton className="h-96 w-full rounded-xl" />
         </div>
       ) : mains.length === 0 ? (
-        <div className="rounded-xl border border-bd bg-white shadow-sh">
+        <div className="rounded-xl border border-bd bg-card shadow-sh">
           <Empty Icon={FolderTree}>{t("noCategories")}</Empty>
         </div>
       ) : (
@@ -350,7 +350,7 @@ function MainList({ items, mains, selectedId, onSelect }: { items: Category[]; m
       found: searching ? tree.filter(({ item }) => item.parent_id === main.id && keep.has(item.id)).map(({ item }) => item) : [],
     }));
   return (
-    <section aria-labelledby={headingId} className="min-w-0 overflow-hidden rounded-xl border border-bd bg-white shadow-sh lg:sticky lg:top-24">
+    <section aria-labelledby={headingId} className="min-w-0 overflow-hidden rounded-xl border border-bd bg-card shadow-sh lg:sticky lg:top-24">
       <div className="flex flex-col gap-3 border-b border-bd px-4 pt-4 pb-3">
         <h2 id={headingId} className="t-h3 flex items-center gap-2">
           {t("mainCategories")}
@@ -396,7 +396,7 @@ function MainList({ items, mains, selectedId, onSelect }: { items: Category[]; m
                   </span>
                   <span
                     title={t("productCountTotal", { count: total })}
-                    className={cx("flex-none rounded-full px-2 py-0.5 text-cap font-semibold tabular-nums", on ? "bg-white text-pri-h" : "bg-subtle text-tx2")}
+                    className={cx("flex-none rounded-full px-2 py-0.5 text-cap font-semibold tabular-nums", on ? "bg-card text-pri-h" : "bg-subtle text-tx2")}
                   >
                     {total}
                     <span className="sr-only">{t("productsWord", { count: total })}</span>
@@ -532,7 +532,7 @@ function CategoryDetail({
   const listed = (category.menu_brand_ids ?? []).length;
   const ownBrands = brands ? brandsOfCategory(brands, category.id).length : undefined;
   return (
-    <section aria-labelledby={headingId} className="min-w-0 overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+    <section aria-labelledby={headingId} className="min-w-0 overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
       <div className="flex flex-col gap-4 border-b border-bd p-5">
         <div className="flex flex-wrap items-start gap-4">
           <CategoryImage category={category} size={56} main />
@@ -963,7 +963,7 @@ function StoreMenuSummary({ category, subs, brands, onEdit }: { category: Catego
       {mode === "subcategories" && (
         <ul className="m-0 flex list-none flex-wrap gap-2 p-0" aria-label={t("tabs.subcategories")}>
           {subs.map((sub) => (
-            <li key={sub.id} className={cx("rounded-full border border-bd px-3 py-1 text-sm", sub.is_active ? "bg-white" : "bg-subtle text-tx2")}>
+            <li key={sub.id} className={cx("rounded-full border border-bd px-3 py-1 text-sm", sub.is_active ? "bg-card" : "bg-subtle text-tx2")}>
               {sub.is_active ? sub.name : t("hiddenName", { name: sub.name })}
             </li>
           ))}
@@ -1048,7 +1048,7 @@ export function BrandsView() {
           </Button>
         }
       />
-      <section aria-label={t("brands")} className="min-w-0 overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section aria-label={t("brands")} className="min-w-0 overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <FilterBar>
           <label className="relative min-w-0 flex-[1_1_240px]">
             <span className="sr-only">{t("searchBrands")}</span>
@@ -1182,12 +1182,12 @@ export function BrandsView() {
 }
 
 const ICON_BUTTON =
-  "flex size-8 flex-none cursor-pointer items-center justify-center rounded-lg border border-bd bg-white text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none";
+  "flex size-8 flex-none cursor-pointer items-center justify-center rounded-lg border border-bd bg-card text-tx2 transition-colors duration-150 hover:border-pri hover:bg-light hover:text-pri-h motion-reduce:transition-none";
 
 /** The most brands a category's menu may list (CATEGORY_MENU_BRANDS_MAX in the backend). */
 const MENU_BRANDS_MAX = 30;
 
-const MOVE_DISABLED = "disabled:cursor-default disabled:opacity-40 disabled:hover:border-bd disabled:hover:bg-white disabled:hover:text-tx2";
+const MOVE_DISABLED = "disabled:cursor-default disabled:opacity-40 disabled:hover:border-bd disabled:hover:bg-card disabled:hover:text-tx2";
 
 function Empty({ Icon, children }: { Icon: LucideIcon; children: ReactNode }) {
   return (
@@ -1528,7 +1528,7 @@ function MenuBrandsPicker({ value, onChange, error, category }: { value: string[
                 const brand = byId.get(id);
                 const name = brand ? (brand.is_active ? brand.name : te("hiddenOption", { name: brand.name })) : "…";
                 return (
-                  <li key={id} className="flex items-center gap-2 rounded-lg border border-bd bg-white px-3 py-1.5">
+                  <li key={id} className="flex items-center gap-2 rounded-lg border border-bd bg-card px-3 py-1.5">
                     <span className="w-5 flex-none text-cap text-tx2">{index + 1}</span>
                     <span className="min-w-0 flex-1 truncate text-sm">{name}</span>
                     <button type="button" aria-label={t("moveBrandUp", { name })} title={t("moveBrandUp", { name })} disabled={index === 0} onClick={() => onChange(moveItem(value, index, -1))} className={cx(ICON_BUTTON, MOVE_DISABLED)}>
@@ -1724,7 +1724,7 @@ function BrandDialog({ brand, initialCategoryIds, onClose }: { brand: Brand | nu
               ))}
             </div>
           )}
-          <span id={categoriesNoteId} className={cx("text-cap", errors.category_ids ? "text-err" : "text-mut")}>
+          <span id={categoriesNoteId} className={cx("text-cap", errors.category_ids ? "text-err-fg" : "text-mut")}>
             {errors.category_ids ?? t("catalogue.brandCategoriesHelp")}
           </span>
         </fieldset>

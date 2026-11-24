@@ -32,7 +32,7 @@ export function WishlistView() {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <h1 className="t-h1 text-navy">{t("wishlistTitle")}</h1>
+        <h1 className="t-h1 text-head">{t("wishlistTitle")}</h1>
         {wishlist.data && wishlist.data.total > 0 && <p className="text-tx2">{t("wishlistCount", { count: wishlist.data.total })}</p>}
       </div>
       {wishlist.isPending ? (
@@ -91,8 +91,8 @@ function Unavailable({ item }: { item: Item }) {
   const toast = useToast();
   const toggle = useToggleWishlist();
   return (
-    <article className="flex h-full items-center gap-4 rounded-xl border border-bd bg-white p-3.5">
-      <ProductImage image={item.image} alt="" sizes={IMAGE_SIZES.thumb} className="size-20 flex-none bg-white opacity-60" />
+    <article className="flex h-full items-center gap-4 rounded-xl border border-bd bg-card p-3.5">
+      <ProductImage image={item.image} alt="" sizes={IMAGE_SIZES.thumb} className="size-20 flex-none bg-card opacity-60" />
       <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
         <b className="t-h4 text-tx2">{item.name}</b>
         <Badge tone="soft-neutral">{t("noLongerAvailable")}</Badge>

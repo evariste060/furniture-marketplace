@@ -12,7 +12,7 @@ export function Logo({ height, alt, className }: { height: number; alt: string; 
       role={alt ? "img" : undefined}
       aria-label={alt || undefined}
       aria-hidden={alt ? undefined : true}
-      className={cx("inline-flex items-center gap-2 font-extrabold whitespace-nowrap text-navy", className)}
+      className={cx("inline-flex items-center gap-2 font-extrabold whitespace-nowrap text-head", className)}
       style={{ height, fontSize: Math.round(height * 0.52), lineHeight: 1 }}
     >
       <span className="flex flex-none items-center justify-center rounded-[22%] bg-pri text-white" style={{ width: height * 0.82, height: height * 0.82 }}>

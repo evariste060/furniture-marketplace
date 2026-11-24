@@ -23,7 +23,7 @@ export default async function BrandsPage() {
     <main id="main" className="bg-page">
       <section className="bg-light">
         <div className="wrap flex flex-col gap-2.5 py-8">
-          <h1 className="t-h1 text-navy">{t("title")}</h1>
+          <h1 className="t-h1 text-head">{t("title")}</h1>
           <p className="text-tx2">{t("text")}</p>
         </div>
       </section>
@@ -63,10 +63,10 @@ async function BrandGrid() {
         <li key={b.id}>
           <Link
             href={`/brand/${b.slug}`}
-            className="flex h-full flex-col gap-2.5 rounded-xl border border-bd bg-white p-4 text-tx hover:border-pri hover:text-tx"
+            className="flex h-full flex-col gap-2.5 rounded-xl border border-bd bg-card p-4 text-tx hover:border-pri hover:text-tx"
           >
             <span className="flex h-24 items-center justify-center">
-              <ProductImage image={b.logo ?? null} alt="" sizes={IMAGE_SIZES.thumb} className="size-22 bg-white" />
+              <ProductImage image={b.logo ?? null} alt="" sizes={IMAGE_SIZES.thumb} className="size-22 bg-card" />
             </span>
             <span className="font-semibold">{b.name}</span>
             <span className="text-cap text-mut">{t("products", { count: b.product_count })}</span>

@@ -29,7 +29,6 @@ const CATEGORIES: MenuCategory[] = [
     id: "c1",
     name: "Phones",
     slug: "phones",
-    brands: [],
     subcategories: [],
     products: {
       total: 9,
@@ -43,12 +42,11 @@ const CATEGORIES: MenuCategory[] = [
     id: "c2",
     name: "Laptops",
     slug: "laptops",
-    brands: [{ name: "HP", slug: "hp", count: 1 }],
-    subcategories: [],
+    subcategories: [{ id: "s1", name: "Notebooks", slug: "notebooks" }],
     products: { total: 1, items: [{ id: "p3", name: "HP ProBook 450", slug: "hp-probook-450", image: null, price: 980000 }] },
   },
-  { id: "c3", name: "TVs & Audio", slug: "tvs-audio", brands: [], subcategories: [], products: { total: 0, items: [] } },
-  { id: "c4", name: "Accessories", slug: "accessories", brands: [], subcategories: [], products: null },
+  { id: "c3", name: "TVs & Audio", slug: "tvs-audio", subcategories: [], products: { total: 0, items: [] } },
+  { id: "c4", name: "Accessories", slug: "accessories", subcategories: [], products: null },
 ];
 
 const LINKS: CategoryLinkItem[] = [
@@ -135,7 +133,7 @@ describe("All Categories mega menu", () => {
     expect(within(menu).queryByRole("link", { name: /HP ProBook/ })).toBeNull();
     act(() => vi.advanceTimersByTime(150));
     expect(within(menu).getByRole("link", { name: /HP ProBook 450/ })).toHaveAttribute("href", "/product/hp-probook-450");
-    expect(within(menu).getByRole("link", { name: "HP1" })).toHaveAttribute("href", "/category/laptops?brand=hp");
+    expect(within(menu).getByRole("link", { name: "Notebooks" })).toHaveAttribute("href", "/category/notebooks");
     expect(within(menu).queryByRole("link", { name: /Galaxy A55/ })).toBeNull();
 
     // Crossing a category quickly on the way to the products panel keeps Laptops shown.

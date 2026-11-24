@@ -19,18 +19,18 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: "border-transparent bg-pri text-white hover:bg-pri-h hover:text-white",
-  outline: "bg-white text-pri border-pri/45 hover:text-pri-h",
+  outline: "bg-card text-pri-fg border-pri/45 hover:text-pri-h",
   // WCAG AA: --pri on --light is 4.44:1, so the text uses --pri-h (6.15:1).
   secondary: "border-transparent bg-light text-pri-h hover:text-pri-h",
-  ghost: "border-transparent bg-transparent text-pri hover:text-pri-h",
-  neutral: "bg-white text-tx border-bd hover:text-tx",
+  ghost: "border-transparent bg-transparent text-pri-fg hover:text-pri-h",
+  neutral: "bg-card text-tx border-bd hover:text-tx",
   danger: "border-transparent bg-err text-white hover:text-white",
-  "danger-outline": "bg-white text-err border-err-bd hover:text-err",
+  "danger-outline": "bg-card text-err-fg border-err-bd hover:text-err-fg",
   dark: "border-transparent bg-navy text-white hover:text-white",
-  white: "border-transparent bg-white text-pri hover:text-pri-h",
+  white: "border-transparent bg-card text-pri-fg hover:text-pri-h",
   "outline-white": "bg-transparent text-white border-white/60 hover:text-white",
   whatsapp: "border-transparent bg-wa text-wa-ink hover:text-wa-ink",
-  "whatsapp-outline": "bg-white text-ok-tx border-wa hover:text-ok-tx",
+  "whatsapp-outline": "bg-card text-ok-tx border-wa hover:text-ok-tx",
 };
 
 const SIZES: Record<ButtonSize, string> = {
@@ -84,7 +84,7 @@ export function IconButton({
     <button
       type={type}
       className={cx(
-        "inline-flex size-10 flex-none cursor-pointer items-center justify-center rounded-lg bg-white text-tx2",
+        "inline-flex size-10 flex-none cursor-pointer items-center justify-center rounded-lg bg-card text-tx2",
         bordered ? "border border-bd" : "border-0",
         className,
       )}

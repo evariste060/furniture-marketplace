@@ -18,7 +18,7 @@ export function Breadcrumb({ items, label, className }: { items: Crumb[]; label:
                   {item.label}
                 </b>
               ) : (
-                <Link href={item.href} className="text-tx2 hover:text-pri">
+                <Link href={item.href} className="text-tx2 hover:text-pri-fg">
                   {item.label}
                 </Link>
               )}

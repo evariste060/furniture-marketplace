@@ -43,9 +43,9 @@ export default async function ContactPage() {
                 {help.map(({ Icon, label, href }) => (
                   <li key={href}>
                     <Link href={href} className="group flex items-center gap-3 rounded-lg px-2 py-2.5 text-tx no-underline hover:bg-page hover:text-tx">
-                      <Icon size={18} aria-hidden="true" className="flex-none text-pri" />
+                      <Icon size={18} aria-hidden="true" className="flex-none text-pri-fg" />
                       <span className="min-w-0 flex-1 font-medium">{label}</span>
-                      <ArrowRight size={16} aria-hidden="true" className="flex-none text-mut transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-pri motion-reduce:transition-none" />
+                      <ArrowRight size={16} aria-hidden="true" className="flex-none text-mut transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-pri-fg motion-reduce:transition-none" />
                     </Link>
                   </li>
                 ))}

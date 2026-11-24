@@ -120,7 +120,7 @@ export function SellerDashboardView({ name }: { name: string }) {
         {t("commissionRate", { rate: percent(store.commissionRateBps) })}{" "}
         <NextLink href="/seller/earnings">{t("viewEarnings")}</NextLink>
       </p>
-      <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="flex items-center justify-between gap-3 border-b border-bd px-5 py-[18px]">
           <h2 className="t-h3">{t("recent")}</h2>
           <NextLink href="/seller/orders" className="text-sm font-medium">
@@ -161,7 +161,7 @@ function Waiting({
   return (
     <NextLink
       href={href}
-      className="flex items-center gap-3.5 rounded-xl border border-bd bg-white p-4 text-tx no-underline shadow-sh transition-[border-color,box-shadow] duration-150 hover:border-bd2 hover:text-tx hover:shadow-sh2 motion-reduce:transition-none"
+      className="flex items-center gap-3.5 rounded-xl border border-bd bg-card p-4 text-tx no-underline shadow-sh transition-[border-color,box-shadow] duration-150 hover:border-bd2 hover:text-tx hover:shadow-sh2 motion-reduce:transition-none"
     >
       <span
         aria-hidden="true"

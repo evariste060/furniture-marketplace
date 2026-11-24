@@ -94,7 +94,7 @@ export function InventoryView() {
               onClick={() => set({ view: id })}
               className={cx(
                 "flex cursor-pointer items-center gap-4 rounded-xl border p-4 text-left shadow-sh transition-[border-color,box-shadow,background-color] duration-150 motion-reduce:transition-none",
-                on ? "border-pri bg-light ring-1 ring-pri" : "border-bd bg-white hover:border-bd2 hover:shadow-sh2",
+                on ? "border-pri bg-light ring-1 ring-pri" : "border-bd bg-card hover:border-bd2 hover:shadow-sh2",
               )}
             >
               <span aria-hidden="true" className={cx("flex size-12 flex-none items-center justify-center rounded-xl", tone)}>
@@ -114,7 +114,7 @@ export function InventoryView() {
         })}
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         <div className="flex flex-wrap items-end gap-3 border-b border-bd p-4">
           <div className="flex min-w-0 flex-[1_1_260px] flex-col gap-1 sm:max-w-[380px]">
             <span aria-hidden="true" className="text-cap font-semibold text-tx2">
@@ -318,12 +318,12 @@ function AdjustDialog({ row, onClose }: { row: StockRow; onClose: () => void }) 
         </Field>
 
         {/* Current → new stock, once a quantity is typed. */}
-        <div aria-live="polite" className={cx("flex items-center justify-between gap-3 rounded-xl border px-4 py-3", showAfter ? "border-pri/30 bg-light" : "border-dashed border-bd bg-white")}>
+        <div aria-live="polite" className={cx("flex items-center justify-between gap-3 rounded-xl border px-4 py-3", showAfter ? "border-pri/30 bg-light" : "border-dashed border-bd bg-card")}>
           <span className="flex flex-col">
             <span className="text-cap text-tx2">{t("inventory.currentShort")}</span>
             <b className="t-h3 tabular-nums">{row.on_hand}</b>
           </span>
-          <ArrowRight size={18} aria-hidden="true" className={showAfter ? "text-pri" : "text-bd2"} />
+          <ArrowRight size={18} aria-hidden="true" className={showAfter ? "text-pri-fg" : "text-bd2"} />
           <span className="flex flex-col items-end">
             <span className="text-cap text-tx2">{t("inventory.newShort")}</span>
             {showAfter ? (

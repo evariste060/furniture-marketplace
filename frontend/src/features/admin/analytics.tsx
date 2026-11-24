@@ -118,7 +118,7 @@ export function AnalyticsView() {
             aria-label={t("range")}
             value={range}
             onChange={(e) => setRange(Number(e.target.value) as Range)}
-            className="h-10 w-44 bg-white text-sm shadow-sh"
+            className="h-10 w-44 bg-card text-sm shadow-sh"
           >
             {RANGES.map((r) => (
               <option key={r} value={r}>

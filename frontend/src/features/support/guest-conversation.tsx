@@ -36,7 +36,7 @@ export function GuestConversationView({ reference, linkKey }: { reference: strin
   if (query.isError) {
     const missing = query.error instanceof ApiError && (query.error.status === 404 || query.error.status === 422);
     return (
-      <div role="alert" className="flex flex-col items-start gap-3 rounded-xl border border-bd bg-white p-6">
+      <div role="alert" className="flex flex-col items-start gap-3 rounded-xl border border-bd bg-card p-6">
         <h1 className="t-h2">{missing ? t("linkInvalid") : t("loadFailed")}</h1>
         <p className="m-0 text-tx2">{missing ? t("linkInvalidText") : t("loadFailedText")}</p>
         <Link href="/contact" className={buttonClasses({ size: "sm", variant: "outline" })}>

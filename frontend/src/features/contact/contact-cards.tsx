@@ -80,7 +80,7 @@ function Card({
 }) {
   const body = (
     <>
-      <span aria-hidden="true" className={cx("flex size-11 flex-none items-center justify-center rounded-[10px]", tone === "wa" ? "bg-ok-bg text-ok-tx" : "bg-light text-pri")}>
+      <span aria-hidden="true" className={cx("flex size-11 flex-none items-center justify-center rounded-[10px]", tone === "wa" ? "bg-ok-bg text-ok-tx" : "bg-light text-pri-fg")}>
         <Icon size={22} />
       </span>
       <span className="flex min-w-0 flex-col">
@@ -90,7 +90,7 @@ function Card({
       {external && newTab && <span className="sr-only">{newTab}</span>}
     </>
   );
-  const box = compact ? "flex items-center gap-3.5 rounded-lg p-2 text-tx" : "flex items-center gap-3.5 rounded-xl border border-bd bg-white p-5 text-tx";
+  const box = compact ? "flex items-center gap-3.5 rounded-lg p-2 text-tx" : "flex items-center gap-3.5 rounded-xl border border-bd bg-card p-5 text-tx";
   if (!href) return <div className={box}>{body}</div>;
   return (
     <a href={href} className={cx(box, compact ? "hover:bg-page hover:text-tx" : "hover:border-pri hover:text-tx")} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>

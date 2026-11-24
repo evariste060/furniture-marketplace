@@ -64,7 +64,7 @@ export function TrackOrder() {
   const error = lookup.error instanceof ApiError ? lookup.error : lookup.error ? new ApiError(0, "network", "") : null;
   return (
     <>
-      <form ref={form} onSubmit={onSubmit} noValidate aria-label={t("formLabel")} className="flex flex-wrap items-end gap-4 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+      <form ref={form} onSubmit={onSubmit} noValidate aria-label={t("formLabel")} className="flex flex-wrap items-end gap-4 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
         <Field label={t("number")} error={errors.number} className="flex-[1_1_220px]">
           {(c) => <Input {...c} value={number} onChange={(e) => setNumber(e.target.value.toUpperCase())} maxLength={40} placeholder="ORD-261028-AB12CD" autoCapitalize="characters" />}
         </Field>
@@ -106,7 +106,7 @@ function TrackResult({ order }: { order: Order }) {
   const where = addressLine(order.delivery_address, ["sector", "district"]);
   return (
     <div className="flex flex-wrap items-start gap-6">
-      <section aria-label={t("statusLabel")} className="flex min-w-0 flex-[999_1_460px] flex-col gap-5 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+      <section aria-label={t("statusLabel")} className="flex min-w-0 flex-[999_1_460px] flex-col gap-5 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-cap text-tx2">{t("order")}</span>
@@ -122,7 +122,7 @@ function TrackResult({ order }: { order: Order }) {
           <ProgressList order={order} />
         )}
       </section>
-      <aside className="flex w-full flex-[1_1_280px] flex-col gap-3 rounded-xl border border-bd bg-white p-6 max-sm:p-4">
+      <aside className="flex w-full flex-[1_1_280px] flex-col gap-3 rounded-xl border border-bd bg-card p-6 max-sm:p-4">
         <h2 className="t-h4">{t("summary")}</h2>
         {order.lines.map((line) => (
           <div key={line.id} className="flex items-center gap-3">

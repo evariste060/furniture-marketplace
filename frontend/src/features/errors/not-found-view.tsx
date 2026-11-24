@@ -13,11 +13,11 @@ export async function NotFoundView() {
       <div className="wrap flex flex-col items-center gap-4 pt-12 pb-16 text-center sm:pt-[72px] sm:pb-20">
         <div className="relative h-[150px] w-[220px]" aria-hidden="true">
           <span className="absolute inset-x-0 top-0 text-[120px] leading-[140px] font-extrabold tracking-[-0.04em] text-light">404</span>
-          <Armchair size={110} strokeWidth={1.5} className="absolute top-4 left-[55px] -rotate-12 text-pri" />
+          <Armchair size={110} strokeWidth={1.5} className="absolute top-4 left-[55px] -rotate-12 text-pri-fg" />
         </div>
         <h1 className="t-h1">{t("title")}</h1>
         <p className="text-lg max-w-[520px] text-tx2">{t("text")}</p>
-        <form role="search" action={getPathname({ href: "/search", locale })} className="flex h-12 w-full max-w-[480px] overflow-hidden rounded-lg border border-bd bg-white focus-within:border-pri">
+        <form role="search" action={getPathname({ href: "/search", locale })} className="flex h-12 w-full max-w-[480px] overflow-hidden rounded-lg border border-bd bg-card focus-within:border-pri">
           <label className="flex flex-1 items-center gap-2.5 px-3.5 text-mut">
             <Search size={18} aria-hidden="true" />
             <span className="sr-only">{t("searchLabel")}</span>

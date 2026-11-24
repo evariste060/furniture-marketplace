@@ -120,7 +120,7 @@ export function HeroCarousel({
          * hovered (not with reduced motion). */}
         <div
           className={cx(
-            "overflow-hidden rounded-2xl border border-bd bg-white shadow-sh",
+            "overflow-hidden rounded-2xl border border-bd bg-card shadow-sh",
             "transition-[translate,box-shadow] duration-300 ease-soft hover:-translate-y-1 hover:shadow-sh2 motion-reduce:translate-y-0!",
           )}
         >
@@ -196,7 +196,7 @@ function Copy({ slide, viewDeals, points }: { slide: HeroSlide; viewDeals: strin
   return (
     <>
       {overline && <span className="t-over origin-left text-pri-h motion-safe:animate-hero-pop motion-safe:[animation-delay:80ms]">{overline}</span>}
-      <h1 className="t-display origin-left text-navy motion-safe:animate-hero-pop motion-safe:[animation-delay:180ms]">{title}</h1>
+      <h1 className="t-display origin-left text-head motion-safe:animate-hero-pop motion-safe:[animation-delay:180ms]">{title}</h1>
       {subtitle && (
         <p className="max-w-[520px] origin-left text-lg text-tx2 motion-safe:animate-hero-pop motion-safe:[animation-delay:300ms]">{subtitle}</p>
       )}
@@ -222,7 +222,7 @@ function MobileCopy({ slide }: { slide: HeroSlide }) {
   return (
     <>
       {overline && <span className="t-over origin-left text-xs text-pri-h motion-safe:animate-hero-pop motion-safe:[animation-delay:80ms]">{overline}</span>}
-      <h1 className="m-0 origin-left text-[22px] leading-7 font-extrabold text-navy motion-safe:animate-hero-pop motion-safe:[animation-delay:180ms]">
+      <h1 className="m-0 origin-left text-[22px] leading-7 font-extrabold text-head motion-safe:animate-hero-pop motion-safe:[animation-delay:180ms]">
         {title}
       </h1>
       {cta && (

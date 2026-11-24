@@ -18,7 +18,7 @@ export function CheckoutHeader({ step, backHref = "/cart", onBack }: { step: Che
   const index = step ? CHECKOUT_STEPS.indexOf(step) : -1;
   const backClass = "flex size-10 items-center justify-center rounded-lg border-0 bg-transparent text-tx2 cursor-pointer";
   return (
-    <header className="border-b border-bd bg-white">
+    <header className="border-b border-bd bg-card">
       {/* Phone */}
       <div className="sm:hidden">
         <div className="flex h-14 items-center justify-between px-3">
@@ -77,7 +77,7 @@ export function CheckoutHeader({ step, backHref = "/cart", onBack }: { step: Che
                         "inline-flex size-8 flex-none items-center justify-center rounded-full text-[13px] font-semibold",
                         done && "bg-ok-tx text-white",
                         now && "bg-pri text-white",
-                        !done && !now && "border border-bd2 bg-white text-mut",
+                        !done && !now && "border border-bd2 bg-card text-mut",
                       )}
                     >
                       {done ? <Check size={16} aria-hidden="true" /> : i + 1}

@@ -136,10 +136,10 @@ export function SupportWizard() {
   const limited = failure instanceof ApiError && failure.status === 429;
   const contactError = errors.contact && !errors.phone && !errors.email ? message(errors.contact) : undefined;
   return (
-    <form onSubmit={onSubmit} noValidate aria-labelledby="support-title" className="flex min-w-0 flex-[999_1_560px] flex-col overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+    <form onSubmit={onSubmit} noValidate aria-labelledby="support-title" className="flex min-w-0 flex-[999_1_560px] flex-col overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
       <div className="flex flex-col gap-5 border-b border-bd px-8 pt-7 pb-6 max-sm:px-5 max-sm:pt-5">
         <div className="flex items-start gap-4">
-          <span aria-hidden="true" className="flex size-12 flex-none items-center justify-center rounded-xl bg-light text-pri max-sm:hidden">
+          <span aria-hidden="true" className="flex size-12 flex-none items-center justify-center rounded-xl bg-light text-pri-fg max-sm:hidden">
             <MessageSquareText size={24} />
           </span>
           <div className="flex min-w-0 flex-col gap-1">
@@ -171,13 +171,13 @@ export function SupportWizard() {
                   <label
                     key={topic}
                     className={cx(
-                      "flex cursor-pointer items-start gap-3.5 rounded-xl border bg-white p-4 transition-[border-color,background-color] duration-150 motion-reduce:transition-none",
+                      "flex cursor-pointer items-start gap-3.5 rounded-xl border bg-card p-4 transition-[border-color,background-color] duration-150 motion-reduce:transition-none",
                       "has-checked:border-pri has-checked:bg-light has-checked:ring-1 has-checked:ring-pri has-focus-visible:outline-2 has-focus-visible:outline-pri",
                       errors.topic ? "border-err" : "border-bd hover:border-bd2",
                     )}
                   >
                     <input type="radio" name="topic" value={topic} checked={form.topic === topic} onChange={() => set("topic", topic)} className="peer sr-only" />
-                    <span aria-hidden="true" className="flex size-10 flex-none items-center justify-center rounded-[10px] bg-light text-pri peer-checked:bg-pri peer-checked:text-white">
+                    <span aria-hidden="true" className="flex size-10 flex-none items-center justify-center rounded-[10px] bg-light text-pri-fg peer-checked:bg-pri peer-checked:text-white">
                       <Icon size={20} />
                     </span>
                     <span className="flex min-w-0 flex-col gap-0.5">
@@ -189,7 +189,7 @@ export function SupportWizard() {
               })}
             </div>
             {errors.topic && (
-              <span id="support-topic-error" role="alert" className="text-cap text-err">
+              <span id="support-topic-error" role="alert" className="text-cap text-err-fg">
                 {message(errors.topic)}
               </span>
             )}
@@ -295,7 +295,7 @@ function Stepper({ current }: { current: number }) {
             <span
               className={cx(
                 "flex size-8 flex-none items-center justify-center rounded-full text-sm font-semibold",
-                done ? "bg-ok-tx text-white" : on ? "bg-pri text-white" : "border border-bd2 bg-white text-tx2",
+                done ? "bg-ok-tx text-white" : on ? "bg-pri text-white" : "border border-bd2 bg-card text-tx2",
               )}
             >
               {done ? <Check size={16} aria-hidden="true" /> : i + 1}
@@ -358,7 +358,7 @@ function Sent({
     }
   }
   return (
-    <section aria-labelledby="support-sent" className="flex min-w-0 flex-[999_1_560px] flex-col items-center gap-5 rounded-xl border border-bd bg-white px-8 py-12 shadow-sh text-center max-sm:px-5 max-sm:py-8">
+    <section aria-labelledby="support-sent" className="flex min-w-0 flex-[999_1_560px] flex-col items-center gap-5 rounded-xl border border-bd bg-card px-8 py-12 shadow-sh text-center max-sm:px-5 max-sm:py-8">
       <span aria-hidden="true" className="flex size-16 items-center justify-center rounded-full bg-ok-bg text-ok-tx">
         <Check size={32} />
       </span>

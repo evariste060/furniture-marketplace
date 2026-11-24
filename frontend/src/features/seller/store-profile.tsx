@@ -182,9 +182,9 @@ function StoreImage({ field, store }: { field: "logo" | "cover"; store: Store })
   return (
     <div className="flex flex-col gap-2">
       <span className="text-sm font-medium">{t(field)}</span>
-      <span className={cx("flex items-center justify-center overflow-hidden rounded-[10px] border border-bd bg-white", field === "logo" ? "size-[112px]" : "aspect-[3/1] w-full")}>
+      <span className={cx("flex items-center justify-center overflow-hidden rounded-[10px] border border-bd bg-card", field === "logo" ? "size-[112px]" : "aspect-[3/1] w-full")}>
         {image ? (
-          <ProductImage image={image} sizes="300px" alt={image.alt} iconSize={28} className="size-full bg-white" />
+          <ProductImage image={image} sizes="300px" alt={image.alt} iconSize={28} className="size-full bg-card" />
         ) : (
           <span className="px-3 text-center text-cap text-tx2">{t("noImage")}</span>
         )}

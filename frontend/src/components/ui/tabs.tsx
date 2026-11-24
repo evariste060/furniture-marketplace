@@ -69,7 +69,7 @@ export function Tabs({
               onKeyDown={onKeyDown}
               className={cx(
                 "-mb-px cursor-pointer border-0 border-b-2 bg-transparent px-0.5 py-3 font-semibold whitespace-nowrap",
-                selected ? "border-pri text-pri" : "border-transparent text-tx2",
+                selected ? "border-pri text-pri-fg" : "border-transparent text-tx2",
               )}
             >
               {item.label}

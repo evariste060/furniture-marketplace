@@ -8,7 +8,7 @@ export async function NotStaff() {
   const t = await getTranslations("admin.denied");
   return (
     <main id="main" className="flex min-h-dvh items-center justify-center bg-page p-4">
-      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-white p-8 text-center">
+      <section className="flex max-w-[480px] flex-col items-center gap-3.5 rounded-xl border border-bd bg-card p-8 text-center">
         <span aria-hidden="true" className="flex size-20 items-center justify-center rounded-full bg-warn-bg text-warn-tx">
           <Lock size={32} />
         </span>

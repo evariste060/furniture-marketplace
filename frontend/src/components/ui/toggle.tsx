@@ -32,7 +32,7 @@ export function Toggle({
       >
         <span
           aria-hidden="true"
-          className={cx("absolute top-[3px] size-4 rounded-full bg-white", checked ? "left-[21px]" : "left-[3px]")}
+          className={cx("absolute top-[3px] size-4 rounded-full bg-card", checked ? "left-[21px]" : "left-[3px]")}
         />
       </button>
       {label}

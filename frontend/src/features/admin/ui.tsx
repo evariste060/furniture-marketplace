@@ -186,8 +186,8 @@ function PageLink({ href, label, className, children }: { href?: string; label: 
 /** A product photo in its .imgbox, or the neutral placeholder when there is none. */
 export function Thumb({ image, size = 40, alt = "" }: { image?: ApiImage | null; size?: number; alt?: string }) {
   return (
-    <span className="inline-flex flex-none items-center justify-center rounded-lg border border-bd bg-white" style={{ width: size, height: size }}>
-      <ProductImage image={image ?? null} sizes={IMAGE_SIZES.thumb} alt={alt} iconSize={Math.round(size / 2.4)} className="size-[calc(100%-8px)] rounded-md bg-white" />
+    <span className="inline-flex flex-none items-center justify-center rounded-lg border border-bd bg-card" style={{ width: size, height: size }}>
+      <ProductImage image={image ?? null} sizes={IMAGE_SIZES.thumb} alt={alt} iconSize={Math.round(size / 2.4)} className="size-[calc(100%-8px)] rounded-md bg-card" />
     </span>
   );
 }
@@ -225,7 +225,7 @@ export function SearchBox({
   return (
     <label
       className={cx(
-        "flex h-[38px] max-w-[360px] min-w-0 flex-[1_1_260px] items-center gap-2 rounded-lg border border-bd bg-white px-3 text-tx2 transition-[border-color,box-shadow] duration-150 hover:not-focus-within:border-bd2 focus-within:border-pri focus-within:shadow-focus motion-reduce:transition-none",
+        "flex h-[38px] max-w-[360px] min-w-0 flex-[1_1_260px] items-center gap-2 rounded-lg border border-bd bg-card px-3 text-tx2 transition-[border-color,box-shadow] duration-150 hover:not-focus-within:border-bd2 focus-within:border-pri focus-within:shadow-focus motion-reduce:transition-none",
         className,
       )}
     >
@@ -322,7 +322,7 @@ export function Step({ n, title, body, state, children }: { n: number; title: st
           "inline-flex size-8 flex-none items-center justify-center rounded-full text-[13px] font-semibold",
           state === "done" && "bg-ok-tx text-white",
           state === "now" && "bg-pri text-white",
-          state === "todo" && "border border-bd2 bg-white text-tx2",
+          state === "todo" && "border border-bd2 bg-card text-tx2",
         )}
       >
         {n}

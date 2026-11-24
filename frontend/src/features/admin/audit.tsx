@@ -193,7 +193,7 @@ export function AuditView() {
     <>
       <PageHeader title={t("audit.title")} description={t("audit.description")} />
 
-      <section className="flex flex-wrap items-end gap-3 rounded-xl border border-bd bg-white p-4 shadow-sh">
+      <section className="flex flex-wrap items-end gap-3 rounded-xl border border-bd bg-card p-4 shadow-sh">
         {can("staff:read") && (
           <Filter label={t("audit.whoLabel")}>
             {(id) => (
@@ -246,7 +246,7 @@ export function AuditView() {
         </div>
       </section>
 
-      <section aria-label={t("audit.title")} aria-busy={list.isFetching} className="overflow-hidden rounded-xl border border-bd bg-white shadow-sh">
+      <section aria-label={t("audit.title")} aria-busy={list.isFetching} className="overflow-hidden rounded-xl border border-bd bg-card shadow-sh">
         {list.isError ? (
           <LoadError onRetry={() => list.refetch()} className="m-5" />
         ) : !list.data ? (

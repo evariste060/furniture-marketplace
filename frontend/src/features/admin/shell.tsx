@@ -10,7 +10,6 @@ import {
   MessageSquare,
   Search,
   Store,
-  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import NextLink from "next/link";
@@ -114,16 +113,6 @@ function useNavCounts(): Partial<Record<NavKey, number>> {
         })
       ).data?.total ?? 0,
   });
-  const serviceRequests = useQuery({
-    queryKey: ["admin", "count", "service-requests-new"],
-    enabled: can("services:read"),
-    queryFn: async () =>
-      (
-        await browserApi.GET("/api/v1/staff/service-requests", {
-          params: { query: { status: "new", size: 1 } },
-        })
-      ).data?.total ?? 0,
-  });
   const messages = useQuery({
     queryKey: ["admin", "count", "support-open"],
     enabled: can("support:read"),
@@ -148,7 +137,6 @@ function useNavCounts(): Partial<Record<NavKey, number>> {
     sellers: sellers.data,
     reviews: reviews.data,
     quotes: quotes.data,
-    serviceRequests: serviceRequests.data,
     messages: messages.data,
   };
 }
@@ -188,7 +176,7 @@ function AdminSearch() {
     <form
       role="search"
       onSubmit={onSubmit}
-      className="flex h-[42px] max-w-[560px] min-w-0 flex-[1_1_280px] items-center gap-2.5 rounded-lg border border-transparent bg-page px-3.5 text-tx2 transition-[background-color,border-color,box-shadow] duration-150 hover:not-focus-within:border-bd focus-within:border-pri focus-within:bg-white focus-within:shadow-focus motion-reduce:transition-none"
+      className="flex h-[42px] max-w-[560px] min-w-0 flex-[1_1_280px] items-center gap-2.5 rounded-lg border border-transparent bg-page px-3.5 text-tx2 transition-[background-color,border-color,box-shadow] duration-150 hover:not-focus-within:border-bd focus-within:border-pri focus-within:bg-card focus-within:shadow-focus motion-reduce:transition-none"
     >
       <Search size={18} aria-hidden="true" />
       <input
@@ -200,7 +188,7 @@ function AdminSearch() {
       />
       <span
         aria-hidden="true"
-        className="rounded-md border border-bd bg-white px-1.5 py-0.5 text-cap font-medium text-tx2 shadow-sh max-sm:hidden"
+        className="rounded-md border border-bd bg-card px-1.5 py-0.5 text-cap font-medium text-tx2 shadow-sh max-sm:hidden"
       >
         {t("searchShortcut")}
       </span>
@@ -212,7 +200,7 @@ function AdminSearch() {
  * badges (so only the areas their role can open). SC-06: marketplace decisions and platform
  * support only; store operations such as new orders are the sellers'. */
 const WAITING: {
-  key: "sellers" | "messages" | "quotes" | "serviceRequests" | "reviews";
+  key: "sellers" | "messages" | "quotes" | "reviews";
   href: string;
   Icon: LucideIcon;
   tone: string;
@@ -221,7 +209,7 @@ const WAITING: {
     key: "sellers",
     href: "/admin/sellers?status=pending",
     Icon: Store,
-    tone: "bg-light text-pri",
+    tone: "bg-light text-pri-fg",
   },
   {
     key: "messages",
@@ -234,12 +222,6 @@ const WAITING: {
     href: "/admin/quotes",
     Icon: ClipboardList,
     tone: "bg-ok-bg text-ok-tx",
-  },
-  {
-    key: "serviceRequests",
-    href: "/admin/service-requests?status=new",
-    Icon: Wrench,
-    tone: "bg-light text-pri-h",
   },
   {
     key: "reviews",
@@ -351,7 +333,7 @@ function Notifications() {
                   <ChevronRight
                     size={16}
                     aria-hidden="true"
-                    className="flex-none text-bd2 group-hover:text-pri"
+                    className="flex-none text-bd2 group-hover:text-pri-fg"
                   />
                 </NextLink>
               </li>

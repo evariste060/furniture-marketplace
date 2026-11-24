@@ -7,7 +7,7 @@ The admin can be switched to Kinyarwanda from its top bar. Every Kinyarwanda adm
 speaker approves it. Reviewers: write corrections or "OK" in the last column (or in a review comment) and the developer
 updates `messages/admin.rw.json`.
 
-1478 strings.
+1340 strings.
 
 | Key | English | Kinyarwanda (draft) | Reviewer |
 | --- | --- | --- | --- |
@@ -26,12 +26,10 @@ updates `messages/admin.rw.json`.
 | `shell.nav.promotions` | Promotions | Poromosiyo | |
 | `shell.nav.reviews` | Reviews & Moderation | Ibitekerezo no kugenzura | |
 | `shell.nav.messages` | Platform support | Ubufasha bw'urubuga | |
-| `shell.nav.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
 | `shell.nav.quotes` | Quote requests | Ubusabe bw'ibiciro | |
 | `shell.nav.analytics` | Analytics & Reports | Isesengura na raporo | |
 | `shell.nav.settings` | Platform settings | Igenamiterere ry'urubuga | |
 | `shell.nav.delivery` | Delivery zones | Uturere two kugeza | |
-| `shell.nav.services` | Services | Serivisi | |
 | `shell.nav.staff` | Administrators | Abayobozi | |
 | `shell.nav.audit` | Audit Log | Igitabo cy'ibikorwa | |
 | `shell.newCount` | {count} new | {count} bishya | |
@@ -55,7 +53,6 @@ updates `messages/admin.rw.json`.
 | `shell.waiting.messages` | {count, plural, one {# message to reply to} other {# messages to reply to}} | {count, plural, one {Ubutumwa # bwo gusubiza} other {Ubutumwa # bwo gusubiza}} | |
 | `shell.waiting.quotes` | {count, plural, one {# new quote request} other {# new quote requests}} | {count, plural, one {Ubusabe # bushya bw'igiciro} other {Ubusabe # bushya bw'ibiciro}} | |
 | `shell.waiting.reviews` | {count, plural, one {# review to approve} other {# reviews to approve}} | {count, plural, one {Igitekerezo # cyo kwemeza} other {Ibitekerezo # byo kwemeza}} | |
-| `shell.waiting.serviceRequests` | {count, plural, one {# new service request} other {# new service requests}} | {count, plural, one {Ubusabe bushya # bwa serivisi} other {Ubusabe bushya # bwa serivisi}} | |
 | `denied.title` | You don’t have access to this page | Ntufite uburenganzira bwo gufungura uru rupapuro | |
 | `denied.body` | {area} is only available to {roles}. Ask an administrator if you need access. | {area} ifungurwa na {roles} gusa. Saba umuyobozi mukuru niba ubukeneye. | |
 | `denied.bodyGeneric` | Your role can’t open this page. Ask an administrator if you need access. | Inshingano zawe ntizemerewe gufungura uru rupapuro. Saba umuyobozi mukuru niba ubukeneye. | |
@@ -159,8 +156,6 @@ updates `messages/admin.rw.json`.
 | `dashboard.tasks.reviews.body` | {count, plural, =0 {No reviews are waiting.} one {# review is waiting.} other {# reviews are waiting.}} | {count, plural, =0 {Nta gitekerezo gitegereje.} one {Igitekerezo # kirategereje.} other {Ibitekerezo # birategereje.}} | |
 | `dashboard.tasks.messages.title` | Support conversations | Ibiganiro by'ubufasha | |
 | `dashboard.tasks.messages.body` | {count, plural, =0 {No conversations are open.} one {# conversation is open.} other {# conversations are open.}} | {count, plural, =0 {Nta kiganiro gifunguye.} one {Ikiganiro # kirafunguye.} other {Ibiganiro # birafunguye.}} | |
-| `dashboard.tasks.serviceRequests.title` | Service requests | Ubusabe bwa serivisi | |
-| `dashboard.tasks.serviceRequests.body` | {count, plural, =0 {No new service requests.} one {# new service request.} other {# new service requests.}} | {count, plural, =0 {Nta busabe bushya bwa serivisi.} one {Ubusabe bushya # bwa serivisi.} other {Ubusabe bushya # bwa serivisi.}} | |
 | `dashboard.tasks.quotes.title` | Quote requests | Ubusabe bw'ibiciro | |
 | `dashboard.tasks.quotes.body` | {count, plural, =0 {No new quote requests.} one {# new quote request.} other {# new quote requests.}} | {count, plural, =0 {Nta busabe bushya bw'ibiciro.} one {Ubusabe bushya # bw'igiciro.} other {Ubusabe bushya # bw'ibiciro.}} | |
 | `orders.periods.7` | Last 7 days | Iminsi 7 ishize | |
@@ -1072,142 +1067,9 @@ updates `messages/admin.rw.json`.
 | `titles.settings` | Platform settings | Igenamiterere ry'urubuga | |
 | `titles.staff` | Administrators | Abayobozi | |
 | `titles.brands` | Brands | Ibirango | |
-| `titles.services` | Services | Serivisi | |
-| `titles.serviceRequests` | Service requests | Ubusabe bwa serivisi | |
 | `titles.sellers` | Sellers | Abacuruzi | |
 | `titles.seller` | Seller | Umucuruzi | |
 | `titles.analytics` | Analytics & reports | Isesengura na raporo | |
-| `services.title` | Services | Serivisi | |
-| `services.description` | The furniture services on the store’s Services pages, in their order. Services are not sold online: each one has a request form. | Serivisi z'ibikoresho byo mu nzu ziri ku mpapuro za Serivisi z'iduka, uko zikurikirana. Serivisi ntizigurishwa kuri interineti: buri imwe ifite ifishi y'ubusabe. | |
-| `services.add` | Add service | Ongeraho serivisi | |
-| `services.listLabel` | Services | Serivisi | |
-| `services.empty` | No services yet. Add the first one. | Nta serivisi irahari. Ongeraho iya mbere. | |
-| `services.moveUp` | Move {name} up | Zamura {name} | |
-| `services.moveDown` | Move {name} down | Manura {name} | |
-| `services.itemCount` | {count, plural, one {# item} other {# items}} | {count, plural, one {Ikintu #} other {Ibintu #}} | |
-| `services.requestCount` | {count, plural, =0 {No requests} one {# request} other {# requests}} | {count, plural, =0 {Nta busabe} one {Ubusabe #} other {Ubusabe #}} | |
-| `services.noRw` | No Kinyarwanda | Nta Kinyarwanda | |
-| `services.shown` | {name} is now shown in the store | {name} ubu igaragara mu iduka | |
-| `services.hidden` | {name} is now hidden from the store | {name} ubu ihishwe mu iduka | |
-| `services.showService` | Show {name} in the store | Erekana {name} mu iduka | |
-| `services.editOf` | Edit {name} | Hindura {name} | |
-| `services.deleted` | {name} deleted | {name} yasibwe | |
-| `services.tabsLabel` | Service sections | Ibice bya serivisi | |
-| `services.tabs.details` | Details | Ibisobanuro | |
-| `services.tabs.items` | What we offer ({count}) | Ibyo dutanga ({count}) | |
-| `services.tabs.image` | Image | Ifoto | |
-| `services.nameEn` | Name (English) | Izina (Icyongereza) | |
-| `services.nameRw` | Name (Kinyarwanda) | Izina (Ikinyarwanda) | |
-| `services.slug` | Web address (slug) | Aderesi y'urubuga (slug) | |
-| `services.slugHelp` | Leave empty to make it from the English name. | Siga ubusa kugira ngo ikorwe uhereye ku izina ry'Icyongereza. | |
-| `services.shortEn` | Card text (English) | Inyandiko y'ikarita (Icyongereza) | |
-| `services.shortRw` | Card text (Kinyarwanda) | Inyandiko y'ikarita (Ikinyarwanda) | |
-| `services.introEn` | Page intro (English) | Intangiriro y'urupapuro (Icyongereza) | |
-| `services.introRw` | Page intro (Kinyarwanda) | Intangiriro y'urupapuro (Ikinyarwanda) | |
-| `services.icon` | Icon | Agashushanyo | |
-| `services.icons.cctv` | CCTV camera | Kamera y'umutekano | |
-| `services.icons.gate` | Gate | Irembo | |
-| `services.icons.fingerprint` | Fingerprint (access control) | Igikumwe (kugenzura kwinjira) | |
-| `services.icons.network` | Network | Umuyoboro | |
-| `services.icons.wrench` | Wrench (repair) | Urufunguzo (gukora ibyangiritse) | |
-| `services.icons.graduation-cap` | Graduation cap (training) | Ingofero y'abarangije (amahugurwa) | |
-| `services.icons.shield` | Shield (security) | Ingabo (umutekano) | |
-| `services.icons.cpu` | Chip (IT) | Chip (IT) | |
-| `services.icons.hammer` | Hammer | Inyundo | |
-| `services.icons.truck` | Delivery truck | Imodoka itwara ibintu | |
-| `services.icons.ruler` | Measuring ruler | Igipimo | |
-| `services.icons.sofa` | Sofa | Intebe | |
-| `services.icons.paintbrush` | Paintbrush | Uburoso bwo gusiga irangi | |
-| `services.activeService` | Show this service in the store | Erekana iyi serivisi mu iduka | |
-| `services.deleteHint` | {count, plural, one {This service has # request,} other {This service has # requests,}} so it can’t be deleted. Hide it instead. | {count, plural, one {Iyi serivisi ifite ubusabe #,} other {Iyi serivisi ifite ubusabe #,}} ntishobora gusibwa. Yihishe aho kuyisiba. | |
-| `services.image` | Image | Ifoto | |
-| `services.itemsAfterSave` | Save the service first, then add its items and image. | Banza ubike serivisi, hanyuma wongereho ibyo itanga n'ifoto. | |
-| `services.itemsLabel` | What we offer | Ibyo dutanga | |
-| `services.noItems` | No items yet. Add what this service includes, one line each. | Nta kintu kirahari. Ongeraho ibyo iyi serivisi ikubiyemo, kimwe ku murongo. | |
-| `services.itemEn` | Item (English) | Ikintu (Icyongereza) | |
-| `services.itemRw` | Item (Kinyarwanda) | Ikintu (Ikinyarwanda) | |
-| `services.addItem` | Add item | Ongeraho ikintu | |
-| `services.itemsFull` | A service has at most {max} items. | Serivisi ifite ibintu {max} ntarengwa. | |
-| `services.moveItemUp` | Move “{name}” up | Zamura “{name}” | |
-| `services.moveItemDown` | Move “{name}” down | Manura “{name}” | |
-| `services.editItem` | Edit “{name}” | Hindura “{name}” | |
-| `services.deleteItem` | Delete “{name}” | Siba “{name}” | |
-| `services.errors.text` | Write at least 2 characters. | Andika nibura inyuguti 2. | |
-| `services.errors.slug` | Use lowercase letters, digits and single hyphens. | Koresha inyuguti nto, imibare n'akanyerezo kamwe. | |
-| `services.errors.slugTaken` | Another service already uses this web address. | Indi serivisi isanzwe ikoresha iyi aderesi. | |
-| `services.errors.hasRequests` | This service has requests, so it can’t be deleted. Hide it instead. | Iyi serivisi ifite ubusabe, ntishobora gusibwa. Yihishe aho kuyisiba. | |
-| `serviceRequests.title` | Service requests | Ubusabe bwa serivisi | |
-| `serviceRequests.description` | Requests from the store’s service pages. Call or WhatsApp the client, then move the request along. | Ubusabe buturutse ku mpapuro za serivisi z'iduka. Hamagara cyangwa wandikire umukiliya kuri WhatsApp, hanyuma ukomeze ubusabe. | |
-| `serviceRequests.listLabel` | Service requests | Ubusabe bwa serivisi | |
-| `serviceRequests.tabsLabel` | Service request status | Uko ubusabe bwa serivisi buhagaze | |
-| `serviceRequests.status.new` | New | Bushya | |
-| `serviceRequests.status.contacted` | Contacted | Twavuganye | |
-| `serviceRequests.status.scheduled` | Scheduled | Byateganyijwe | |
-| `serviceRequests.status.completed` | Completed | Byarangiye | |
-| `serviceRequests.status.cancelled` | Cancelled | Byahagaritswe | |
-| `serviceRequests.service` | Service | Serivisi | |
-| `serviceRequests.allServices` | All services | Serivisi zose | |
-| `serviceRequests.from` | Sent from | Byoherejwe kuva | |
-| `serviceRequests.to` | Sent to | Byoherejwe kugeza | |
-| `serviceRequests.clearFilters` | Clear filters | Kuraho iyungurura | |
-| `serviceRequests.empty` | No service requests yet. Requests from the Services pages appear here. | Nta busabe bwa serivisi burahari. Ubusabe buturutse ku mpapuro za Serivisi buzagaragara hano. | |
-| `serviceRequests.emptyFiltered` | No service requests match these filters. | Nta busabe bwa serivisi buhuye n'iyi yungurura. | |
-| `serviceRequests.columns.client` | Client | Umukiliya | |
-| `serviceRequests.columns.service` | Service | Serivisi | |
-| `serviceRequests.columns.type` | Client type | Ubwoko bw'umukiliya | |
-| `serviceRequests.columns.sent` | Sent | Byoherejwe | |
-| `serviceRequests.columns.assigned` | Assigned to | Bihawe | |
-| `serviceRequests.columns.status` | Status | Uko bihagaze | |
-| `serviceRequests.columns.actions` | Actions | Ibikorwa | |
-| `serviceRequests.clientTypes.home` | Home | Urugo | |
-| `serviceRequests.clientTypes.business` | Business | Ubucuruzi | |
-| `serviceRequests.clientTypes.institution` | Institution | Ikigo | |
-| `serviceRequests.unassigned` | Unassigned | Ntawe bihawe | |
-| `serviceRequests.detailTitle` | Request from {name} | Ubusabe bwa {name} | |
-| `serviceRequests.call` | Call | Hamagara | |
-| `serviceRequests.whatsapp` | WhatsApp | WhatsApp | |
-| `serviceRequests.newTab` | (opens in a new tab) | (bifungukira mu idirishya rishya) | |
-| `serviceRequests.whatsappMessage` | Hello {name}, this is {marketplace} about your request {reference} for {service}. | Muraho {name}, ni {marketplace} ku bijyanye n'ubusabe bwanyu {reference} bwa {service}. | |
-| `serviceRequests.location` | Location | Aho aherereye | |
-| `serviceRequests.preferredDate` | Preferred date | Itariki yifuza | |
-| `serviceRequests.language` | Language | Ururimi | |
-| `serviceRequests.prefersRw` | Prefers Kinyarwanda | Ahitamo Ikinyarwanda | |
-| `serviceRequests.notGiven` | Not given | Ntibyatanzwe | |
-| `serviceRequests.notes` | Internal notes | Inyandiko z'imbere | |
-| `serviceRequests.notesHelp` | Only staff see these notes. | Abakozi bonyine ni bo babona izi nyandiko. | |
-| `serviceRequests.saveNotes` | Save notes | Bika inyandiko | |
-| `serviceRequests.emptyTitle` | No requests yet | Nta busabe buraza | |
-| `serviceRequests.emptyFilteredTitle` | Nothing matches | Nta gihuye n'ibyo washatse | |
-| `serviceRequests.overview.all` | All requests | Ubusabe bwose | |
-| `serviceRequests.overview.hints.all` | Everything received | Ibyakiriwe byose | |
-| `serviceRequests.overview.hints.new` | Needs a first call | Bikeneye guhamagarwa | |
-| `serviceRequests.overview.hints.contacted` | Client reached | Umukiriya yavuganywe | |
-| `serviceRequests.overview.hints.scheduled` | Visit or work booked | Gusura cyangwa akazi byateganyijwe | |
-| `serviceRequests.overview.hints.completed` | Work done | Akazi karakozwe | |
-| `serviceRequests.overview.hints.cancelled` | Closed without work | Byafunzwe nta kazi kakozwe | |
-| `serviceRequests.assignedFilter` | Assigned to | Ushinzwe | |
-| `serviceRequests.anyone` | Anyone | Uwo ari we wese | |
-| `serviceRequests.anyDay` | Any day | Umunsi uwo ari wo wose | |
-| `serviceRequests.whatsappName` | WhatsApp {name} | Andikira {name} kuri WhatsApp | |
-| `serviceRequests.open` | Open the request from {name} | Fungura ubusabe bwa {name} | |
-| `serviceRequests.copyReference` | Copy reference {reference} | Koporora nimero {reference} | |
-| `serviceRequests.copied` | Reference copied | Nimero yakoporowe | |
-| `serviceRequests.receivedAgo` | Received {ago} · {date} | Bwakiriwe {ago} · {date} | |
-| `serviceRequests.email` | Email | Imeyili | |
-| `serviceRequests.progressTitle` | Progress | Aho bigeze | |
-| `serviceRequests.next.new` | Mark as contacted | Shyira ku cyavuganywe | |
-| `serviceRequests.next.contacted` | Mark as scheduled | Shyira ku cyateganyijwe | |
-| `serviceRequests.next.scheduled` | Mark as completed | Shyira ku cyarangiye | |
-| `serviceRequests.cancelRequest` | Cancel request | Hagarika ubusabe | |
-| `serviceRequests.cancelledNote` | This request was cancelled. | Ubu busabe bwahagaritswe. | |
-| `serviceRequests.reopen` | Reopen | Ongera ufungure | |
-| `serviceRequests.detailsTitle` | Request details | Ibisobanuro by'ubusabe | |
-| `serviceRequests.messageTitle` | Client’s message | Ubutumwa bw'umukiriya | |
-| `serviceRequests.manageTitle` | Follow-up | Gukurikirana | |
-| `serviceRequests.activityTitle` | Activity | Ibyakozwe | |
-| `serviceRequests.activity.received` | Request received | Ubusabe bwakiriwe | |
-| `serviceRequests.activity.statusChanged` | Moved to {status} | Byashyizwe kuri {status} | |
-| `serviceRequests.activity.updated` | Last updated | Byahinduwe bwa nyuma | |
 | `inbox.call` | Call | Hamagara | |
 | `inbox.whatsapp` | WhatsApp | WhatsApp | |
 | `inbox.newTab` | (opens in a new tab) | (bifungukira mu idirishya rishya) | |

@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, ChevronRight, Globe, Truck, User, Wrench, Zap } from "lucide-react";
+import { Building2, ChevronRight, Globe, Palette, Store, Truck, User, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { Drawer } from "@/components/ui/dialog";
@@ -8,7 +8,7 @@ import { ProductImage } from "@/components/ui/product-image";
 import { Link } from "@/i18n/navigation";
 import type { CatalogCategory } from "@/lib/catalogue";
 import { IMAGE_SIZES } from "@/lib/images";
-import { AccountAnchor, LanguageToggle, useAccountLink } from "./header-actions";
+import { AccountAnchor, LanguageToggle, ThemeToggle, useAccountLink } from "./header-actions";
 import { Logo } from "./logo";
 import { useMenuState } from "./menu-state";
 
@@ -32,8 +32,8 @@ export function MobileMenu({ categories }: { categories: CatalogCategory[] }) {
       header={<Logo height={38} alt={t("logoAlt")} />}
     >
       <nav aria-label={t("header.categories")} className="flex min-h-full flex-col">
-        <AccountAnchor onClick={close} className="flex items-center gap-3 bg-light p-4 text-navy hover:text-navy">
-          <span className="flex size-9 flex-none items-center justify-center rounded-full bg-white text-pri">
+        <AccountAnchor onClick={close} className="flex items-center gap-3 bg-light p-4 text-head hover:text-head">
+          <span className="flex size-9 flex-none items-center justify-center rounded-full bg-card text-pri-fg">
             <User size={18} aria-hidden="true" />
           </span>
           <span className="flex flex-1 flex-col">
@@ -47,37 +47,29 @@ export function MobileMenu({ categories }: { categories: CatalogCategory[] }) {
           {categories.map((c) => (
             <li key={c.id}>
               <Link href={`/category/${c.slug}`} onClick={close} className={ROW}>
-                <ProductImage image={c.image ?? null} alt="" sizes={IMAGE_SIZES.thumb} iconSize={16} className="size-7 rounded-md bg-white" />
+                <ProductImage image={c.image ?? null} alt="" sizes={IMAGE_SIZES.thumb} iconSize={16} className="size-7 rounded-md bg-card" />
                 <span className="flex-1 font-medium">{c.name}</span>
                 <ChevronRight size={16} aria-hidden="true" className="text-mut" />
               </Link>
             </li>
           ))}
-          <li>
-            <Link href="/brands" onClick={close} className={ROW}>
-              <span className="flex size-7 items-center justify-center" aria-hidden="true">
-                <Building2 size={22} className="text-pri" />
-              </span>
-              <span className="flex-1 font-medium">{t("header.brands")}</span>
-              <ChevronRight size={16} aria-hidden="true" className="text-mut" />
-            </Link>
-          </li>
-          <li>
-            <Link href="/services" onClick={close} className={ROW_BASE}>
-              <span className="flex size-7 items-center justify-center text-pri" aria-hidden="true">
-                <Wrench size={22} />
-              </span>
-              <span className="flex-1 font-medium">{t("menu.services")}</span>
-              <ChevronRight size={16} aria-hidden="true" className="text-mut" />
-            </Link>
-          </li>
           {/* Deals last, in red, as on the category bar (owner, 2026-11-18). */}
           <li>
-            <Link href="/deals" onClick={close} className={`${ROW_BASE} text-err hover:text-err-tx`}>
+            <Link href="/deals" onClick={close} className={`${ROW_BASE} text-err-fg hover:text-err-tx`}>
               <span className="flex size-7 items-center justify-center" aria-hidden="true">
                 <Zap size={22} />
               </span>
               <span className="flex-1 font-medium">{t("header.deals")}</span>
+            </Link>
+          </li>
+          {/* The existing seller application, as on the category bar (SC-07). */}
+          <li>
+            <Link href="/account/seller" onClick={close} className={`${ROW_BASE} font-semibold text-pri-h hover:text-pri-fg`}>
+              <span className="flex size-7 items-center justify-center" aria-hidden="true">
+                <Store size={22} />
+              </span>
+              <span className="flex-1">{t("header.becomeSeller")}</span>
+              <ChevronRight size={16} aria-hidden="true" className="text-mut" />
             </Link>
           </li>
         </ul>
@@ -91,7 +83,12 @@ export function MobileMenu({ categories }: { categories: CatalogCategory[] }) {
           {t("menu.business")}
         </Link>
         <span className="flex-1" />
-        <div className="flex items-center gap-2 border-t border-bd p-4">
+        <div className="flex items-center gap-2 border-t border-bd px-4 pt-4">
+          <Palette size={18} aria-hidden="true" className="text-mut" />
+          <span className="flex-1 text-sm text-tx2">{t("menu.theme")}</span>
+          <ThemeToggle withLabel />
+        </div>
+        <div className="flex items-center gap-2 p-4">
           <Globe size={18} aria-hidden="true" className="text-mut" />
           <span className="flex-1 text-sm text-tx2">{t("menu.language")}</span>
           <LanguageToggle />

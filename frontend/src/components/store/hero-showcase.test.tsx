@@ -3,7 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import messages from "../../../messages/en.json";
-import { HeroShowcase, TURN_MS, type ShowcaseCategory, type ShowcaseServices } from "./hero-showcase";
+import { HeroShowcase, TURN_MS, type ShowcaseCategory } from "./hero-showcase";
 
 /** The home hero's product showcase: the spotlight, its category's related products, and the
  * change from one category to the next. */
@@ -42,10 +42,10 @@ const CATEGORIES: ShowcaseCategory[] = [
   { id: "c3", name: "TVs & Audio", slug: "tvs-audio", total: 1, featured: product("lg-55", "LG 55\" TV", null), related: [] },
 ];
 
-function renderShowcase(categories = CATEGORIES, services: ShowcaseServices | null = null) {
+function renderShowcase(categories = CATEGORIES) {
   return render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <HeroShowcase categories={categories} services={services} title="Furniture for Every Room, From Stores You Trust" />
+      <HeroShowcase categories={categories} title="Furniture for Every Room, From Stores You Trust" />
     </NextIntlClientProvider>,
   );
 }
@@ -55,7 +55,7 @@ const phones = TURN_MS;
 const laptops = TURN_MS;
 const tvs = TURN_MS;
 
-const hero = () => screen.getByRole("region", { name: "Products and services showcase" });
+const hero = () => screen.getByRole("region", { name: "Products showcase" });
 /** The orbit's places: each product's angle on the circle (180° is the spotlight on the left). */
 function angles() {
   return [...hero().querySelectorAll<HTMLElement>("[data-orbit-item]")].map((el) => Number(el.style.transform.match(/^rotate\((-?[\d.]+)deg\)/)![1]));
@@ -165,27 +165,5 @@ describe("HeroShowcase", () => {
     act(() => vi.advanceTimersByTime(20_000));
     expect(within(hero()).getByText("Tecno Spark 20")).toBeInTheDocument();
     expect(within(hero()).queryByRole("button", { name: /^Show / })).toBeNull();
-  });
-
-  it("turns to Services as one place after the categories, bringing in four services", () => {
-    const service = (slug: string, name: string) => ({ slug, name, icon: "wrench" as const, image: null });
-    const services: ShowcaseServices = {
-      kind: "services",
-      id: "services",
-      name: "Services",
-      services: [service("cctv", "CCTV"), service("gates", "Gates"), service("access", "Access"), service("it", "IT"), service("repair", "Repair"), service("training", "Training")],
-    };
-    renderShowcase(CATEGORIES.slice(0, 1), services);
-    // One place on the orbit for all the services, as for a category.
-    expect(angles()).toHaveLength(2);
-    fireEvent.click(within(hero()).getByRole("button", { name: "Show Services" }));
-    expect(within(hero()).getByText("Furniture Services")).toBeInTheDocument();
-    expect(within(hero()).getByRole("link", { name: "Our furniture services" })).toHaveAttribute("href", "/services");
-    expect(within(hero()).getByRole("link", { name: "Explore services" })).toHaveAttribute("href", "/services");
-    expect(within(hero()).getByRole("link", { name: "View all (6)" })).toHaveAttribute("href", "/services");
-    const tiles = within(hero()).getAllByRole("link", { name: /^(CCTV|Gates|Access|IT|Repair|Training)$/ });
-    // Four services beside the spotlight, as four products; "View all (6)" leads to the rest.
-    expect(tiles.map((a) => a.getAttribute("href"))).toEqual(["/services/cctv", "/services/gates", "/services/access", "/services/it"]);
-    expect(within(hero()).queryByRole("link", { name: "Shop Now" })).toBeNull();
   });
 });

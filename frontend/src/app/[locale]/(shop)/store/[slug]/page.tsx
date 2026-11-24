@@ -48,12 +48,12 @@ async function Hero({ params, searchParams }: Props) {
   return (
     <section className="overflow-hidden bg-light">
       {found.cover && (
-        <div className="relative h-32 w-full bg-white sm:h-48">
+        <div className="relative h-32 w-full bg-card sm:h-48">
           <Image src={found.cover.url} alt="" fill sizes="100vw" preload className="object-cover" />
         </div>
       )}
       <div className="wrap flex flex-wrap items-center gap-5 py-5 sm:py-8">
-        <div className="flex size-20 flex-none items-center justify-center overflow-hidden rounded-xl border border-bd bg-white sm:size-[120px]">
+        <div className="flex size-20 flex-none items-center justify-center overflow-hidden rounded-xl border border-bd bg-card sm:size-[120px]">
           {found.logo ? (
             <ProductImage image={found.logo} alt="" sizes={IMAGE_SIZES.thumb} className="size-full" preload />
           ) : (
@@ -65,7 +65,7 @@ async function Hero({ params, searchParams }: Props) {
             label={tu("breadcrumb")}
             items={[{ label: th("home"), href: getPathname({ href: "/", locale }) }, { label: found.name }]}
           />
-          <h1 className="t-h1 text-navy">{found.name}</h1>
+          <h1 className="t-h1 text-head">{found.name}</h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-tx2">
             <span className="inline-flex items-center gap-1.5">
               <MapPin size={16} aria-hidden="true" />

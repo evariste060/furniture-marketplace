@@ -128,7 +128,7 @@ export function SellerShell({
           cookiePath="/seller"
           topbar={{
             start: (
-              <b className="truncate text-base font-semibold text-navy">
+              <b className="truncate text-base font-semibold text-head">
                 {store.name}
               </b>
             ),

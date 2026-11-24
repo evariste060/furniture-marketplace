@@ -33,7 +33,7 @@ function StepDot({ step }: { step: ProgressStep }) {
         // WCAG AA: white on --ok is 3.30:1, so done steps use --ok-tx.
         step.state === "done" && "bg-ok-tx text-white",
         step.state === "now" && "bg-pri text-white",
-        step.state === "todo" && "border border-bd2 bg-white text-tx2",
+        step.state === "todo" && "border border-bd2 bg-card text-tx2",
       )}
     >
       {step.state === "done" ? <Check size={16} /> : <Icon size={16} />}
